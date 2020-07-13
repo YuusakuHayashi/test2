@@ -8,8 +8,6 @@
     Public Shared fieldName As System.String
 
 
-
-
     Private Sub Window3_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         test = New testclass
         test.w = Me

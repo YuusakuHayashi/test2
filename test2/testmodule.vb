@@ -9,6 +9,7 @@
 
     Private win As System.Windows.Window
     Public defaultWinHeight As System.Int32
+
     '--------------------------------------------------------------
 
     'database manupirate --------------------------------------
@@ -184,7 +185,6 @@
         End Try
         '---------------------------------------------------------------------------
     End Function
-
 
     Public Function TableList(ByVal bd As test2.testmodule.BData) As System.String()
         Dim s() As System.String
