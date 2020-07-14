@@ -460,6 +460,7 @@ Module testmodule
         Dim i As System.Int32 : i = 0
         Dim myJson As System.String
         Dim Obj As test2.testmodule.BData
+        Dim ck As System.Boolean
 
         Load = bd
         If SaveCheck() = (0 Or 2) Then
@@ -470,23 +471,35 @@ Module testmodule
             test2.testmodule.saveFile, System.Text.Encoding.GetEncoding("SHIFT_JIS"))
 
         myJson = sr.ReadToEnd()
-        Obj = JsonConvert.DeserializeObject(Of test2.testmodule.BData)(myJson)
+        ck = test2.testmodule.JsonObjectCheck(myJson)
+        If ck Then
+            Obj = JsonConvert.DeserializeObject(Of test2.testmodule.BData)(myJson)
 
-        bd.ServerName = Obj.ServerName
-        bd.DBName = Obj.DBName
-        bd.FieldName = Obj.FieldName
-        bd.SrcValue = Obj.SrcValue
-        bd.DistValue = Obj.DistValue
+            bd.ServerName = Obj.ServerName
+            bd.DBName = Obj.DBName
+            bd.FieldName = Obj.FieldName
+            bd.SrcValue = Obj.SrcValue
+            bd.DistValue = Obj.DistValue
 
-        Load = bd
+            Load = bd
+            Obj = Nothing
+        End If
 
         sr.Close()
-
         sr = Nothing
-        Obj = Nothing
     End Function
 
     Public Function changeFontSize(txtSize As System.Int32, winHeight As System.Int32) As System.Int32
         changeFontSize = (txtSize / test2.testmodule.defaultWinHeight) * winHeight
+    End Function
+
+    Private Function JsonObjectCheck(ByVal myJson As System.String) As System.Boolean
+        Dim obj As Object
+        JsonObjectCheck = True
+        Try
+            obj = JsonConvert.DeserializeObject(Of Object)(myJson)
+        Catch ex As Exception
+            JsonObjectCheck = False
+        End Try
     End Function
 End Module

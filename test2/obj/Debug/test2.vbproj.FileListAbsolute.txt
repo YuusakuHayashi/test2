@@ -41,3 +41,6 @@ C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\test2.xml
 C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\test2.pdb
 \\Coral\個人情報-林祐\project\test2\test2\bin\Debug\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\test2\test2\bin\Debug\Newtonsoft.Json.xml
+C:\Users\yuusaku.hayashi\project\test2\test2\bin\Debug\Newtonsoft.Json.dll
+C:\Users\yuusaku.hayashi\project\test2\test2\bin\Debug\Newtonsoft.Json.xml
+C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\test2.vbproj.CopyComplete

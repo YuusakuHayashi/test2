@@ -1,5 +1,25 @@
 ﻿Public Class Window2
 
+    Private Sub ControlDisable()
+        Me.ServerName.IsEnabled = Constants.vbFalse
+        Me.DBName.IsEnabled = Constants.vbFalse
+        Me.FieldName.IsEnabled = Constants.vbFalse
+        Me.SrcValue.IsEnabled = Constants.vbFalse
+        Me.DistValue.IsEnabled = Constants.vbFalse
+        Me.Next.IsEnabled = Constants.vbFalse
+        Me.Back.IsEnabled = Constants.vbFalse
+    End Sub
+
+    Private Sub ControlEnable()
+        Me.ServerName.IsEnabled = Constants.vbTrue
+        Me.DBName.IsEnabled = Constants.vbTrue
+        Me.FieldName.IsEnabled = Constants.vbTrue
+        Me.SrcValue.IsEnabled = Constants.vbTrue
+        Me.DistValue.IsEnabled = Constants.vbTrue
+        Me.Next.IsEnabled = Constants.vbTrue
+        Me.Back.IsEnabled = Constants.vbTrue
+    End Sub
+
     Private Sub Window2_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         Dim bd As New test2.testmodule.BData
 
@@ -59,22 +79,15 @@
     End Sub
 
     Private Sub next_Click(sender As Object, e As RoutedEventArgs) Handles [Next].Click
-        Me.ServerName.IsEnabled = Constants.vbFalse
-        Me.DBName.IsEnabled = Constants.vbFalse
-        Me.FieldName.IsEnabled = Constants.vbFalse
-        Me.SrcValue.IsEnabled = Constants.vbFalse
-        Me.DistValue.IsEnabled = Constants.vbFalse
-        Me.Next.IsEnabled = Constants.vbFalse
-        Me.Back.IsEnabled = Constants.vbFalse
-
-
         Dim extFlg As System.Boolean : extFlg = False
         Dim ck As System.Boolean
         Dim ck2 As Microsoft.VisualBasic.MsgBoxResult
         Dim bd As New test2.testmodule.BData
 
-        bd.ServerName = ServerName.Text
-        bd.DBName = DBName.Text
+        Call Me.ControlDisable()
+
+        bd.ServerName = Me.ServerName.Text
+        bd.DBName = Me.DBName.Text
 
         If bd.ServerName = Constants.vbNullString Then
             Me.ServerErr.Content = "サーバ名が入力されていません"
@@ -87,19 +100,21 @@
         End If
 
         If extFlg Then
+            Call Me.ControlEnable()
             Exit Sub
         End If
 
         ck = testmodule.AccessTest(bd)
         If Not ck Then
             Me.DBErr.Content = "接続に失敗しました。" & "サーバ名・データベース名に誤りがないかご確認ください"
+            Call Me.ControlEnable()
             Exit Sub
         End If
 
 
-        bd.SrcValue = SrcValue.Text
-        bd.DistValue = DistValue.Text
-        bd.FieldName = FieldName.Text
+        bd.SrcValue = Me.SrcValue.Text
+        bd.DistValue = Me.DistValue.Text
+        bd.FieldName = Me.FieldName.Text
 
         If bd.FieldName = Constants.vbNullString Then
             Me.FieldErr.Content = "複製対象のフィールド名が入力されていません"
@@ -117,6 +132,7 @@
         End If
 
         If extFlg Then
+            Call Me.ControlEnable()
             Exit Sub
         End If
 
@@ -133,13 +149,7 @@
             Call test2.testmodule.swichPages(Me, sender)
         End If
 
-        Me.ServerName.IsEnabled = Constants.vbTrue
-        Me.DBName.IsEnabled = Constants.vbTrue
-        Me.FieldName.IsEnabled = Constants.vbTrue
-        Me.SrcValue.IsEnabled = Constants.vbTrue
-        Me.DistValue.IsEnabled = Constants.vbTrue
-        Me.Next.IsEnabled = Constants.vbTrue
-        Me.Back.IsEnabled = Constants.vbTrue
+        Call Me.ControlEnable()
 
         bd = Nothing
     End Sub
