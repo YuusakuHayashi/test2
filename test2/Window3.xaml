@@ -141,10 +141,10 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Label x:Name="progress" Content="Step 3/3" Grid.Column="2" Grid.ColumnSpan="15" HorizontalAlignment="Right" Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
-        <Label x:Name="contents" Grid.ColumnSpan="40" HorizontalAlignment="Left" Content="処理を実行しています・・・" Grid.Column="17"  Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
+        <Label x:Name="Progress" Content="Step 3/3" Grid.Column="2" Grid.ColumnSpan="18" HorizontalAlignment="Right" Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
+        <Label x:Name="Contents" Grid.ColumnSpan="40" HorizontalAlignment="Left" Content="処理を実行しています・・・" Grid.Column="20"  Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
         <Label x:Name="history" Grid.ColumnSpan="40" Content="履歴" Grid.Column="2" HorizontalAlignment="Stretch" Grid.Row="9" Grid.RowSpan="3" VerticalAlignment="Bottom" Cursor="None" IsEnabled="False" />
         <TextBox x:Name="result" Grid.ColumnSpan="76" Grid.Column="2" HorizontalAlignment="Stretch" Grid.Row="12" Grid.RowSpan="31"  Text="TextBox" VerticalAlignment="Stretch" FontSize="10" />
-        <Button x:Name="back" Grid.ColumnSpan="8" Content="戻る" Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Stretch" Grid.Row="45" FontSize="12" />
+        <Button x:Name="Back" Grid.ColumnSpan="8" Content="戻る" Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Stretch" Grid.Row="45" FontSize="12" />
     </Grid>
 </Window>

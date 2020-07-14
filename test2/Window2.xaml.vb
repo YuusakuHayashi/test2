@@ -1,11 +1,7 @@
 ﻿Public Class Window2
-    Dim test As test2.testclass
 
     Private Sub Window2_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         Dim bd As New test2.testmodule.BData
-
-        test = New testclass
-        test.w = Me
 
         test2.testmodule.defaultWinHeight = Me.Height
 
@@ -14,69 +10,79 @@
         '(書き換えられないのは、配列が参照型のせいで、
         '参照先がスコープを抜けたことで、解放されるからかもしれない)
         bd = test2.testmodule.Load(bd)
-        If bd.serverName IsNot Nothing Then
-            Me.srvtxt.Text = bd.serverName
+
+        If bd.ServerName IsNot Nothing Then
+            Me.ServerName.Text = bd.ServerName
         End If
-        If bd.databaseName IsNot Nothing Then
-            Me.dbtxt.Text = bd.databaseName
+        If bd.DBName IsNot Nothing Then
+            Me.DBName.Text = bd.DBName
         End If
-        If bd.fieldName IsNot Nothing Then
-            Me.fieldtxt.Text = bd.fieldName
+        If bd.FieldName IsNot Nothing Then
+            Me.FieldName.Text = bd.FieldName
         End If
-        If bd.sourceValue IsNot Nothing Then
-            Me.beforetxt.Text = bd.sourceValue
+        If bd.SrcValue IsNot Nothing Then
+            Me.SrcValue.Text = bd.SrcValue
         End If
-        If bd.distinationValue IsNot Nothing Then
-            Me.aftertxt.Text = bd.distinationValue
+        If bd.DistValue IsNot Nothing Then
+            Me.DistValue.Text = bd.DistValue
         End If
 
-        If test2.Window3.serverName IsNot Nothing Then
-            If test2.Window3.serverName <> vbNullString Then
-                Me.srvtxt.Text = test2.Window3.serverName
+        If test2.Window3.ServerName IsNot Nothing Then
+            If test2.Window3.ServerName <> vbNullString Then
+                Me.ServerName.Text = test2.Window3.ServerName
             End If
         End If
-        If test2.Window3.databaseName IsNot Nothing Then
-            If test2.Window3.databaseName <> vbNullString Then
-                Me.dbtxt.Text = test2.Window3.databaseName
+        If test2.Window3.DBName IsNot Nothing Then
+            If test2.Window3.DBName <> vbNullString Then
+                Me.DBName.Text = test2.Window3.DBName
             End If
         End If
-        If test2.Window3.fieldName IsNot Nothing Then
-            If test2.Window3.fieldName <> vbNullString Then
-                Me.fieldtxt.Text = test2.Window3.fieldName
+        If test2.Window3.FieldName IsNot Nothing Then
+            If test2.Window3.FieldName <> vbNullString Then
+                Me.FieldName.Text = test2.Window3.FieldName
             End If
         End If
-        If test2.Window3.sourceValue IsNot Nothing Then
-            If test2.Window3.sourceValue <> vbNullString Then
-                Me.beforetxt.Text = test2.Window3.sourceValue
+        If test2.Window3.SrcValue IsNot Nothing Then
+            If test2.Window3.SrcValue <> vbNullString Then
+                Me.SrcValue.Text = test2.Window3.SrcValue
             End If
         End If
-        If test2.Window3.distinationValue IsNot Nothing Then
-            If test2.Window3.distinationValue <> vbNullString Then
-                Me.aftertxt.Text = test2.Window3.distinationValue
+        If test2.Window3.DistValue IsNot Nothing Then
+            If test2.Window3.DistValue <> vbNullString Then
+                Me.DistValue.Text = test2.Window3.DistValue
             End If
         End If
     End Sub
 
-    Private Sub back_Click(sender As Object, e As RoutedEventArgs) Handles back.Click
-        Call test2.testmodule.swichPages(test.w, sender)
+    Private Sub back_Click(sender As Object, e As RoutedEventArgs) Handles Back.Click
+        Call test2.testmodule.swichPages(Me, sender)
     End Sub
 
-    Private Sub next_Click(sender As Object, e As RoutedEventArgs) Handles [next].Click
+    Private Sub next_Click(sender As Object, e As RoutedEventArgs) Handles [Next].Click
+        Me.ServerName.IsEnabled = Constants.vbFalse
+        Me.DBName.IsEnabled = Constants.vbFalse
+        Me.FieldName.IsEnabled = Constants.vbFalse
+        Me.SrcValue.IsEnabled = Constants.vbFalse
+        Me.DistValue.IsEnabled = Constants.vbFalse
+        Me.Next.IsEnabled = Constants.vbFalse
+        Me.Back.IsEnabled = Constants.vbFalse
+
+
         Dim extFlg As System.Boolean : extFlg = False
-        Dim ck As System.Boolean    'access test
-        Dim ck2 As MsgBoxResult   'confirm
+        Dim ck As System.Boolean
+        Dim ck2 As Microsoft.VisualBasic.MsgBoxResult
         Dim bd As New test2.testmodule.BData
 
-        bd.serverName = srvtxt.Text
-        bd.databaseName = dbtxt.Text
+        bd.ServerName = ServerName.Text
+        bd.DBName = DBName.Text
 
-        If bd.serverName = Constants.vbNullString Then
-            Me.srverr.Content = "サーバ名が入力されていません"
+        If bd.ServerName = Constants.vbNullString Then
+            Me.ServerErr.Content = "サーバ名が入力されていません"
             extFlg = Constants.vbTrue
         End If
 
-        If bd.databaseName = Constants.vbNullString Then
-            Me.dberr.Content = "DB名が入力されていません"
+        If bd.DBName = Constants.vbNullString Then
+            Me.DBErr.Content = "DB名が入力されていません"
             extFlg = Constants.vbTrue
         End If
 
@@ -84,29 +90,29 @@
             Exit Sub
         End If
 
-        ck = testmodule.testAccess(bd)
+        ck = testmodule.AccessTest(bd)
         If Not ck Then
-            Me.dberr.Content = "接続に失敗しました。" & "サーバ名・データベース名に誤りがないかご確認ください"
+            Me.DBErr.Content = "接続に失敗しました。" & "サーバ名・データベース名に誤りがないかご確認ください"
             Exit Sub
         End If
 
 
-        bd.sourceValue = beforetxt.Text
-        bd.distinationValue = aftertxt.Text
-        bd.fieldName = fieldtxt.Text
+        bd.SrcValue = SrcValue.Text
+        bd.DistValue = DistValue.Text
+        bd.FieldName = FieldName.Text
 
-        If bd.fieldName = Constants.vbNullString Then
-            Me.fielderr.Content = "複製対象のフィールド名が入力されていません"
+        If bd.FieldName = Constants.vbNullString Then
+            Me.FieldErr.Content = "複製対象のフィールド名が入力されていません"
             extFlg = Constants.vbTrue
         End If
 
-        If bd.sourceValue = Constants.vbNullString Then
-            Me.valueerr.Content = "複製元の値が入力されていません"
+        If bd.SrcValue = Constants.vbNullString Then
+            Me.ValueErr.Content = "複製元の値が入力されていません"
             extFlg = Constants.vbTrue
         End If
 
-        If bd.distinationValue = Constants.vbNullString Then
-            Me.valueerr.Content = "複製先の値が入力されていません"
+        If bd.DistValue = Constants.vbNullString Then
+            Me.ValueErr.Content = "複製先の値が入力されていません"
             extFlg = Constants.vbTrue
         End If
 
@@ -114,58 +120,69 @@
             Exit Sub
         End If
 
-        ck2 = MsgBox("実行します。よろしいですか？", Microsoft.VisualBasic.MsgBoxStyle.OkCancel)
+        ck2 = MsgBox("実行します。よろしいですか？",
+                     Microsoft.VisualBasic.MsgBoxStyle.OkCancel)
 
         'ここどうにかならないのか・・・
         If ck2 = MsgBoxResult.Ok Then
-            test2.Window3.serverName = bd.serverName
-            test2.Window3.databaseName = bd.databaseName
-            test2.Window3.fieldName = bd.fieldName
-            test2.Window3.sourceValue = bd.sourceValue
-            test2.Window3.distinationValue = bd.distinationValue
-            Call test2.testmodule.swichPages(test.w, sender)
+            test2.Window3.ServerName = bd.ServerName
+            test2.Window3.DBName = bd.DBName
+            test2.Window3.FieldName = bd.FieldName
+            test2.Window3.SrcValue = bd.SrcValue
+            test2.Window3.DistValue = bd.DistValue
+            Call test2.testmodule.swichPages(Me, sender)
         End If
+
+        Me.ServerName.IsEnabled = Constants.vbTrue
+        Me.DBName.IsEnabled = Constants.vbTrue
+        Me.FieldName.IsEnabled = Constants.vbTrue
+        Me.SrcValue.IsEnabled = Constants.vbTrue
+        Me.DistValue.IsEnabled = Constants.vbTrue
+        Me.Next.IsEnabled = Constants.vbTrue
+        Me.Back.IsEnabled = Constants.vbTrue
 
         bd = Nothing
     End Sub
 
-    Private Sub srvtxt_GotFocus(sender As Object, e As RoutedEventArgs) Handles srvtxt.GotFocus
-        Me.srvtxt.SelectAll()
+    Private Sub ServerName_GotFocus(sender As Object, e As RoutedEventArgs) Handles ServerName.GotFocus
+        Me.ServerName.SelectAll()
     End Sub
 
-    Private Sub dbtxt_GotFocus(sender As Object, e As RoutedEventArgs) Handles dbtxt.GotFocus
-        Me.dbtxt.SelectAll()
+    Private Sub DBName_GotFocus(sender As Object, e As RoutedEventArgs) Handles DBName.GotFocus
+        Me.DBName.SelectAll()
     End Sub
 
-    Private Sub fieldtxt_GotFocus(sender As Object, e As RoutedEventArgs) Handles fieldtxt.GotFocus
-        Me.fieldtxt.SelectAll()
+    Private Sub FieldName_GotFocus(sender As Object, e As RoutedEventArgs) Handles FieldName.GotFocus
+        Me.FieldName.SelectAll()
     End Sub
 
-    Private Sub beforetxt_GotFocus(sender As Object, e As RoutedEventArgs) Handles beforetxt.GotFocus
-        Me.beforetxt.SelectAll()
+    Private Sub SrcValue_GotFocus(sender As Object, e As RoutedEventArgs) Handles SrcValue.GotFocus
+        Me.SrcValue.SelectAll()
     End Sub
 
-    Private Sub aftertxt_GotFocus(sender As Object, e As RoutedEventArgs) Handles aftertxt.GotFocus
-        Me.aftertxt.SelectAll()
+    Private Sub DistValue_GotFocus(sender As Object, e As RoutedEventArgs) Handles DistValue.GotFocus
+        Me.DistValue.SelectAll()
     End Sub
 
     Private Sub Window2_ContentRendered(sender As Object, e As EventArgs) Handles Me.ContentRendered
     End Sub
 
     Private Sub Window2_SizeChanged(sender As Object, e As SizeChangedEventArgs) Handles Me.SizeChanged
-        Me.srvlabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.srvtxt.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.srverr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.dblabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.dbtxt.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.dberr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.fieldlabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.fieldtxt.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.fielderr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.value.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.aftertxt.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.beforetxt.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.valueerr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.Progress.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
+        Me.Contents.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
+        Me.ServerLabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.ServerName.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.ServerErr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.DBLabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.DBName.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.DBErr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.FieldLabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.FieldName.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.FieldErr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.ValueLabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.DistValue.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.SrcValue.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        Me.ValueErr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
         Me.label2.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
         Me.label3.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
         Me.label4.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
