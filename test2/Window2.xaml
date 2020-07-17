@@ -142,7 +142,7 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Label x:Name="Progress" Content="Step 2/3" Grid.Column="2" Grid.ColumnSpan="18" HorizontalAlignment="Right" Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
-        <Label x:Name="Contents" Grid.ColumnSpan="36" HorizontalAlignment="Left" Content="処理の指定を行います。" Grid.Column="20"  Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
+        <Label x:Name="Contents" Grid.ColumnSpan="58" HorizontalAlignment="Left" Content="処理の指定を行います。" Grid.Column="20"  Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
         <Label x:Name="ServerLabel" Content="サーバ名" Grid.Column="2" Grid.ColumnSpan="8" HorizontalAlignment="Right" Grid.Row="9" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="12" />
         <TextBox x:Name="ServerName" Grid.ColumnSpan="40" Grid.Column="11" HorizontalAlignment="Stretch" Grid.Row="9" Grid.RowSpan="3"  Text="TextBox" VerticalAlignment="Bottom" FontSize="12" BorderThickness="0,0,0,1" />
         <Label x:Name="ServerErr" Content="" Grid.Column="11" Grid.ColumnSpan="40" HorizontalAlignment="Stretch" Grid.Row="12" Grid.RowSpan="3"  VerticalAlignment="Top" FontSize="12" />
@@ -152,16 +152,18 @@
         <Label x:Name="FieldLabel" Content="フィールド名" Grid.Column="2" Grid.ColumnSpan="8" HorizontalAlignment="Right" Grid.Row="21" Grid.RowSpan="3"  VerticalAlignment="Bottom" FontSize="12" />
         <TextBox x:Name="FieldName" Grid.ColumnSpan="40" Grid.Column="11" HorizontalAlignment="Stretch" Grid.Row="21" Grid.RowSpan="3"  Text="TextBox" VerticalAlignment="Bottom" FontSize="12" BorderThickness="0,0,0,1" />
         <Label x:Name="FieldErr" Content="" Grid.Column="11" Grid.ColumnSpan="40" HorizontalAlignment="Stretch" Grid.Row="24" Grid.RowSpan="3"  VerticalAlignment="Top" FontSize="12" />
-        <Label x:Name="label2" Content="複" Grid.Column="11" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />
-        <Label x:Name="label3" Content="製" Grid.Column="19" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />
-        <Label x:Name="label4" Content="前" Grid.Column="27" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />
-        <Label x:Name="label5" Content="複" Grid.Column="34" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />
-        <Label x:Name="label6" Content="製" Grid.Column="41" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />
-        <Label x:Name="label7" Content="後" Grid.Column="48" Grid.ColumnSpan="3" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />
-        <Label x:Name="ValueLabel" Content="フィールド値" Grid.Column="2" Grid.ColumnSpan="8" HorizontalAlignment="Right" Grid.Row="30" Grid.RowSpan="3"  VerticalAlignment="Top" FontSize="12" />
-        <TextBox x:Name="SrcValue" Grid.ColumnSpan="18" Grid.Column="11" Grid.Row="30" Grid.RowSpan="3" Text="複製前" HorizontalAlignment="Stretch" VerticalAlignment="Top" FontSize="12" BorderThickness="0,0,0,1" />
-        <TextBox x:Name="DistValue" Grid.ColumnSpan="18" Grid.Column="33" HorizontalAlignment="Stretch" Grid.Row="30" Grid.RowSpan="3" VerticalAlignment="Top" Text="複製後" FontSize="12" BorderThickness="0,0,0,1" />
-        <Label x:Name="ValueErr" Content="" Grid.Column="11" Grid.ColumnSpan="40" HorizontalAlignment="Stretch" Grid.Row="33" Grid.RowSpan="3"  VerticalAlignment="Top" FontSize="12" />
+        
+        <!--<Label x:Name="label2" Content="複" Grid.Column="11" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />-->
+        <!--<Label x:Name="label3" Content="製" Grid.Column="19" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />-->
+        <!--<Label x:Name="label4" Content="前" Grid.Column="27" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />-->
+        <!--<Label x:Name="label5" Content="複" Grid.Column="34" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />-->
+        <!--<Label x:Name="label6" Content="製" Grid.Column="41" Grid.ColumnSpan="2" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />-->
+        <!--<Label x:Name="label7" Content="後" Grid.Column="48" Grid.ColumnSpan="3" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" IsEnabled="False" Cursor="None" FontSize="10" />-->
+        <Label x:Name="ValueLabel" Content="フィールド値" Grid.Column="2" Grid.ColumnSpan="8" HorizontalAlignment="Right" Grid.Row="27" Grid.RowSpan="3"  VerticalAlignment="Top" FontSize="12" />
+        <TextBox x:Name="SrcValue" Grid.ColumnSpan="18" Grid.Column="11" Grid.Row="27" Grid.RowSpan="3" Text="複製前" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" FontSize="12" BorderThickness="0,0,0,1" />
+        <Label x:Name="FromTo" Content="から" Grid.Column="29" Grid.ColumnSpan="4" HorizontalAlignment="Center" Grid.Row="27" Grid.RowSpan="3"  VerticalAlignment="Bottom" FontSize="12" Padding="5,5,5,0" />
+        <TextBox x:Name="DistValue" Grid.ColumnSpan="18" Grid.Column="33" HorizontalAlignment="Stretch" Grid.Row="27" Grid.RowSpan="3" VerticalAlignment="Bottom" Text="複製後" FontSize="12" BorderThickness="0,0,0,1" />
+        <Label x:Name="ValueErr" Content="" Grid.Column="11" Grid.ColumnSpan="40" HorizontalAlignment="Stretch" Grid.Row="30" Grid.RowSpan="3"  VerticalAlignment="Top" FontSize="12" />
         <Button x:Name="Back" Grid.ColumnSpan="8" Content="戻る" Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Stretch" Grid.Row="45" FontSize="12" />
         <Button x:Name="Next" Grid.ColumnSpan="8" Content="次へ" Grid.Column="70" Grid.RowSpan="3" HorizontalAlignment="Stretch" Grid.Row="45" FontSize="12" />
     </Grid>

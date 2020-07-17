@@ -1,5 +1,8 @@
 ﻿Public Class Window2
 
+    Private Const INITIAL_DT = "TESTDB"
+    Private Const INITIAL_SQLVER = 2015
+
     Private Sub ControlDisable()
         Me.ServerName.IsEnabled = Constants.vbFalse
         Me.DBName.IsEnabled = Constants.vbFalse
@@ -19,6 +22,8 @@
         Me.Next.IsEnabled = Constants.vbTrue
         Me.Back.IsEnabled = Constants.vbTrue
     End Sub
+
+
 
     Private Sub Window2_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         Dim bd As New test2.testmodule.BData
@@ -136,6 +141,20 @@
             Exit Sub
         End If
 
+        If bd.TestDT Is Nothing Then
+            bd.TestDT = INITIAL_DT
+        End If
+        If bd.TestDT = Constants.vbNullString Then
+            bd.TestDT = INITIAL_DT
+        End If
+
+        If bd.SqlVer = Nothing Then
+            bd.SqlVer = INITIAL_SQLVER
+        End If
+        If bd.SqlVer = 0 Then
+            bd.SqlVer = INITIAL_SQLVER
+        End If
+
         ck2 = MsgBox("実行します。よろしいですか？",
                      Microsoft.VisualBasic.MsgBoxStyle.OkCancel)
 
@@ -146,6 +165,8 @@
             test2.Window3.FieldName = bd.FieldName
             test2.Window3.SrcValue = bd.SrcValue
             test2.Window3.DistValue = bd.DistValue
+            test2.Window3.TestDT = bd.TestDT
+            test2.Window3.SqlVer = bd.SqlVer
             Call test2.testmodule.swichPages(Me, sender)
         End If
 
@@ -193,11 +214,13 @@
         Me.DistValue.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
         Me.SrcValue.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
         Me.ValueErr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        Me.label2.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        Me.label3.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        Me.label4.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        Me.label5.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        Me.label6.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        Me.label7.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
+        Me.FromTo.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
+        'Me.label2.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
+        'Me.label3.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
+        'Me.label4.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
+        'Me.label5.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
+        'Me.label6.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
+        'Me.label7.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
     End Sub
+
 End Class

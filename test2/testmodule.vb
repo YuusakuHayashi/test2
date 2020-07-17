@@ -1,4 +1,5 @@
 ﻿Imports Newtonsoft.Json
+Imports System.Data
 
 Module testmodule
     'フレキシブルデザイン関係
@@ -19,11 +20,12 @@ Module testmodule
     Dim sr As System.IO.StreamReader
     Dim sw As System.IO.StreamWriter
 
-
-    Delegate Sub connectionDelegator(ByVal r1 As Action,
-                                     ByVal r2 As Action(Of Exception),
-                                     ByVal r3 As Action,
-                                     ByVal r4 As Action(Of Exception))
+    'デリゲート関係
+    Delegate Sub mySub()
+    Delegate Sub myBDSub(ByVal bd As test2.testmodule.BData)
+    Dim ms As mySub
+    Dim ms2 As mySub
+    Dim mbds As myBDSub
 
 
 
@@ -35,6 +37,8 @@ Module testmodule
         Public DistValue As System.String
         Public Query As System.String
         Public DTName As System.String
+        Public TestDT As System.String
+        Public SqlVer As System.Int32
     End Structure
 
 
@@ -109,12 +113,32 @@ Module testmodule
     '    End Try
     'End Sub
 
+    Private Sub ConnectionEstablish()
+        scon = New System.Data.SqlClient.SqlConnection(ConStr)
+        scon.Open()
+    End Sub
 
+    Private Sub ConnectionDispose()
+        scon.Close()
+        scon.Dispose()
+    End Sub
+
+    Private Sub CommandEstablish(ByVal bd As test2.testmodule.BData)
+        scmd = New System.Data.SqlClient.SqlCommand
+        scmd = scon.CreateCommand()
+        scmd.CommandText = bd.Query
+        scmd.CommandType = System.Data.CommandType.Text
+        scmd.CommandTimeout = 30
+        scmd.Transaction = strn
+    End Sub
 
 
     Public Function AccessTest(ByVal bd As test2.testmodule.BData) As System.Boolean
         Dim rtn As System.Boolean
         Dim trnFlg As System.Boolean
+
+        ms = AddressOf ConnectionEstablish
+        ms2 = AddressOf ConnectionDispose
 
         'Transactionが実行したかどうかのフラグ
         trnFlg = Constants.vbFalse
@@ -122,46 +146,17 @@ Module testmodule
         'データベースの接続文字列
         ConStr = ConnectionString(bd)
 
-        '' Connection Sucess
-        'Dim rtn1 As System.Action = Sub()
-        '                                rtn = Constants.vbTrue
-        '                            End Sub
-
-        '' Connection Failed
-        'Dim rtn2 = Sub(ByRef ex)
-        '               rtn = Constants.vbFalse
-        '               MsgBox("Commit Exception Type: " & ex.GetType().ToString)
-        '           End Sub
-
-        '' Common Transaction
-        'Dim rtn3 As System.Action = Sub()
-        '                                testAccess = rtn
-        '                            End Sub
-
-        '' Rollback Failed
-        'Dim rtn4 = Sub(ByRef ex2)
-        '               MsgBox("Rollback Exception Type: " & ex2.GetType().ToString)
-        '               ' This catch block will handle any errors that may have occured
-        '               ' on the server that would cause the rollback to fail, such as
-        '               ' a closed connection
-        '           End Sub
-
-        ''Dim delg As New connectionDelegator(AddressOf Connection)
-        'Call Connection(rtn1, rtn2, rtn3, rtn4)
-
-        '---------------------------------------------------------------------------
         Try
-            scon = New System.Data.SqlClient.SqlConnection(ConStr)
-            scon.Open()
+            Call ms()
             strn = scon.BeginTransaction()
+
             trnFlg = Constants.vbTrue
 
-            'Sucess ...
+            '成功
             rtn = Constants.vbTrue
-
         Catch ex As Exception
 
-            'Failed ...
+            '失敗
             rtn = Constants.vbFalse
 
             Try
@@ -174,14 +169,14 @@ Module testmodule
                 ' on the server that would cause the rollback to fail, such as
                 ' a closed connection
             End Try
-
         Finally
-            scon.Close()
+            Call ms2()
             AccessTest = rtn
-            scon = Nothing
         End Try
         '---------------------------------------------------------------------------
     End Function
+
+
 
 
 
@@ -190,15 +185,17 @@ Module testmodule
         Dim Tbl() As System.String
         Dim cnt As System.Int32
 
-        bd.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
+        ms = AddressOf ConnectionEstablish
+        ms2 = AddressOf ConnectionDispose
 
+
+
+        bd.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
         ConStr = ConnectionString(bd)
 
-        '---------------------------------------------------------------------------
         Try
             '接続...
-            scon = New System.Data.SqlClient.SqlConnection(ConStr)
-            scon.Open()
+            Call ms()
             strn = scon.BeginTransaction()
 
             'データ取得
@@ -227,28 +224,38 @@ Module testmodule
                 ' on the server that would cause the rollback to fail, such as
                 ' a closed connection
             End Try
-
         Finally
-            scon.Close()
-            scon = Nothing
+            Call ms2()
         End Try
-        '---------------------------------------------------------------------------
     End Function
+
+
+
+
+
+    'クエリ単純実行
+    Private Sub myQuery(ByVal bd As test2.testmodule.BData)
+        mbds = AddressOf CommandEstablish
+        Try
+            Call mbds(bd)
+            scmd.ExecuteNonQuery()
+        Catch ex As Exception
+            Throw ex
+        Finally
+            scmd.Dispose()
+        End Try
+    End Sub
+
+
 
 
 
 
     'クエリによるデータセット取得
     Private Function myDataSet(ByVal bd As test2.testmodule.BData) As System.Data.DataSet
-        '---------------------------------------------------------------------------
+        mbds = AddressOf CommandEstablish
         Try
-            scmd = New System.Data.SqlClient.SqlCommand
-            scmd = scon.CreateCommand()
-            scmd.CommandText = bd.Query
-            scmd.CommandType = System.Data.CommandType.Text
-            scmd.CommandTimeout = 30
-            scmd.Transaction = strn
-
+            Call mbds(bd)
             sda = New System.Data.SqlClient.SqlDataAdapter(scmd)
             ds = New System.Data.DataSet
             sda.Fill(ds)
@@ -257,19 +264,23 @@ Module testmodule
         Catch ex As Exception
             Throw ex
         Finally
-            scmd = Nothing
+            sda.Dispose()
+            ds.Dispose()
+            scmd.Dispose()
         End Try
         '---------------------------------------------------------------------------
     End Function
 
 
+    'テストテーブルとやり取りするタイプ
+    Public Function Main2(ByVal bd As test2.testmodule.BData) As System.String
 
-
-    Public Function Main(ByVal bd As test2.testmodule.BData) As System.String
-
-        'DateTime型対応
         Dim sourceValue As System.Object
         Dim distinationvalue As System.Object
+
+        ms = AddressOf ConnectionEstablish
+        ms2 = AddressOf ConnectionDispose
+
 
         '戻り値テキスト
         Dim result As System.String : result = Constants.vbNullString
@@ -277,62 +288,44 @@ Module testmodule
         Dim errmsg As System.String : errmsg = Constants.vbNullString
         Dim err2msg As System.String : err2msg = Constants.vbNullString
 
-
-        '前後にカンマを付加
-        '空白を含むフィールド値に対応するため
-        sourceValue = "'" & bd.SrcValue & "'"
-
-        '抽出クエリ文
-        bd.Query = $"SELECT * FROM {bd.DTName} WHERE {bd.FieldName} = {sourceValue}"
-
-        '接続文字列
         ConStr = ConnectionString(bd)
 
-        '---------------------------------------------------------------------------
         Try
-            scon = New System.Data.SqlClient.SqlConnection(ConStr)
-            scon.Open()
+            Call ms()
             strn = scon.BeginTransaction()
 
-            ds = test2.testmodule.myDataSet(bd)
+            sourceValue = "'" & bd.SrcValue & "'"
+            distinationvalue = "'" & bd.DistValue & "'"
 
-            dt = ds.Tables(0)
+            'テストテーブル削除
+            bd.Query = $"IF OBJECT_ID('{bd.TestDT}', 'U') IS NOT NULL BEGIN DROP TABLE {bd.TestDT} END"
+            If bd.SqlVer > 2015 Then
+                bd.Query = $"IF EXISTS DROP TABLE {bd.TestDT}"
+            End If
+            Call myQuery(bd)
 
-            '書き方が格好良くないが、頭の１件を見てデータ型を判定する
-            Select Case dt.Rows(1)(bd.FieldName).GetType().Name
-                Case "DateTime"
-                    sourceValue = Convert.ToDateTime(bd.SrcValue)
-                    distinationvalue = Convert.ToDateTime(bd.DistValue)
-                Case Else
-                    sourceValue = bd.SrcValue
-                    distinationvalue = bd.DistValue
-            End Select
+            'テストテーブル作成
+            bd.Query = $"SELECT * INTO {bd.TestDT} FROM {bd.DTName} WHERE 1 <> 1"
+            Call myQuery(bd)
 
-            For i As Integer = 0 To dt.Rows.Count - 1
-                If dt.Rows(i)(bd.FieldName) = sourceValue Then
-                    dr = dt.NewRow
-                    For Each c In dt.Columns
-                        If c.ToString = bd.FieldName Then
-                            dr(c.ToString) = distinationvalue
-                        Else
-                            dr(c.ToString) = dt.Rows(i)(c.ToString)
-                        End If
-                    Next
-                    dt.Rows.Add(dr)
-                End If
-            Next
+            'テストテーブル複製
+            bd.Query = $"INSERT INTO {bd.TestDT} SELECT * FROM {bd.DTName} WHERE {bd.FieldName} = {sourceValue}"
+            Call myQuery(bd)
 
-            scb = New System.Data.SqlClient.SqlCommandBuilder(sda)
-            sda.Update(ds, dt.TableName)
+            'テストテーブル更新
+            bd.Query = $"UPDATE {bd.TestDT} SET {bd.FieldName} = {distinationvalue} WHERE {bd.FieldName} = {sourceValue}"
+            Call myQuery(bd)
 
+            'テストテーブルから挿入
+            bd.Query = $"INSERT INTO {bd.DTName} SELECT * FROM {bd.TestDT} WHERE {bd.FieldName} = {bd.DistValue}"
+            Call myQuery(bd)
+
+            '成功
             strn.Commit()
-
-            'result OK
             result = "O K"
             msg = bd.SrcValue & " --> " & bd.DistValue
-
         Catch ex As Exception
-            'result ERR
+            '失敗
             result = "ERR"
             errmsg = ex.GetType().ToString() & " " & ex.Message
 
@@ -347,13 +340,118 @@ Module testmodule
             End Try
 
         Finally
-            Main = "(" & result & ")" & "[" & bd.DTName & " / " _
+            Main2 = "(" & result & ")" & "[" & bd.DTName & " / " _
                 & bd.FieldName & "] " & msg & " " & errmsg & " " & err2msg
-            scon.Close()
-            scon = Nothing
+            Call ms2()
         End Try
         '---------------------------------------------------------------------------
     End Function
+
+
+
+    ''メモリー内でやり取りするタイプ
+    'Public Function Main(ByVal bd As test2.testmodule.BData) As System.String
+
+    '    'DateTime型対応
+    '    Dim sourceValue As System.Object
+    '    Dim distinationvalue As System.Object
+
+    '    '戻り値テキスト
+    '    Dim result As System.String : result = Constants.vbNullString
+    '    Dim msg As System.String : msg = Constants.vbNullString
+    '    Dim errmsg As System.String : errmsg = Constants.vbNullString
+    '    Dim err2msg As System.String : err2msg = Constants.vbNullString
+
+    '    '前後にカンマを付加
+    '    '空白を含むフィールド値に対応するため
+    '    sourceValue = "'" & bd.SrcValue & "'"
+
+    '    '抽出クエリ文
+    '    bd.Query = $"SELECT * FROM {bd.DTName} WHERE {bd.FieldName} = {sourceValue}"
+
+    '    '接続文字列
+    '    ConStr = ConnectionString(bd)
+
+    '    '---------------------------------------------------------------------------
+    '    Try
+    '        scon = New System.Data.SqlClient.SqlConnection(ConStr)
+    '        scon.Open()
+    '        strn = scon.BeginTransaction()
+
+    '        ds = test2.testmodule.myDataSet(bd)
+
+    '        dt = ds.Tables(0)
+
+
+    '        '書き方が格好良くないが、頭の１件を見てデータ型を判定する
+    '        Select Case dt.Rows(1)(bd.FieldName).GetType().Name
+    '            Case "DateTime"
+    '                sourceValue = Convert.ToDateTime(bd.SrcValue)
+    '                distinationvalue = Convert.ToDateTime(bd.DistValue)
+    '            Case Else
+    '                sourceValue = bd.SrcValue
+    '                distinationvalue = bd.DistValue
+    '        End Select
+
+    '        '色々考えたが、無理だった・・・
+    '        'dt2 = dt.AsEnumerable().Where(
+    '        '    Function(r)
+    '        '        Return r(bd.FieldName) = bd.SrcValue
+    '        '    End Function
+    '        ').Select(
+    '        '    Function(r)
+    '        '        r(bd.FieldName) = bd.DistValue
+    '        '        Return r
+    '        '    End Function
+    '        ').CopyToDataTable()
+
+
+    '        For i As Integer = 0 To dt.Rows.Count
+    '            If dt.Rows(i)(bd.FieldName) = sourceValue Then
+    '                dr = dt.NewRow
+    '                For Each c In dt.Columns
+    '                    If c.ToString = bd.FieldName Then
+    '                        dr(c.ToString) = distinationvalue
+    '                    Else
+    '                        dr(c.ToString) = dt.Rows(i)(c.ToString)
+    '                    End If
+    '                Next
+    '                dt.Rows.Add(dr)
+    '            End If
+    '        Next
+
+    '        scb = New System.Data.SqlClient.SqlCommandBuilder(sda)
+    '        sda.Update(ds, dt.TableName)
+
+    '        strn.Commit()
+
+    '        'result OK
+    '        result = "O K"
+    '        msg = bd.SrcValue & " --> " & bd.DistValue
+
+    '    Catch ex As Exception
+    '        'result ERR
+    '        result = "ERR"
+    '        errmsg = ex.GetType().ToString() & " " & ex.Message
+
+    '        Try
+    '            strn.Rollback()
+    '        Catch ex2 As Exception
+    '            errmsg = ex2.GetType().ToString() & " " & ex2.Message
+    '            'MsgBox("Rollback Exception Type: " & ex2.GetType().ToString)
+    '            ' This catch block will handle any errors that may have occured
+    '            ' on the server that would cause the rollback to fail, such as
+    '            ' a closed connection
+    '        End Try
+
+    '    Finally
+    '        Main = "(" & result & ")" & "[" & bd.DTName & " / " _
+    '            & bd.FieldName & "] " & msg & " " & errmsg & " " & err2msg
+    '        scon.Close()
+    '        scon = Nothing
+    '    End Try
+    '    '---------------------------------------------------------------------------
+    'End Function
 
 
 
@@ -420,6 +518,12 @@ Module testmodule
         If bd.DistValue = Constants.vbNullString Then
             bd.DistValue = "Distination Value"
         End If
+        If bd.TestDT = Constants.vbNullString Then
+            bd.TestDT = "TESTDB"
+        End If
+        If bd.SqlVer = 0 Then
+            bd.SqlVer = 2015
+        End If
 
         myJson = JsonConvert.SerializeObject(bd)
 
@@ -457,49 +561,50 @@ Module testmodule
     End Function
 
     Public Function Load(ByVal bd As test2.testmodule.BData) As test2.testmodule.BData
-        Dim i As System.Int32 : i = 0
         Dim myJson As System.String
-        Dim Obj As test2.testmodule.BData
-        Dim ck As System.Boolean
+        Dim obj As test2.testmodule.BData
+        Dim ph As System.Int32 : ph = 0
 
-        Load = bd
-        If SaveCheck() = (0 Or 2) Then
-            Exit Function
-        End If
+        Try
+            If SaveCheck() = (0 Or 2) Then
+                Throw New Exception
+            End If
 
-        sr = New System.IO.StreamReader(
+            sr = New System.IO.StreamReader(
             test2.testmodule.saveFile, System.Text.Encoding.GetEncoding("SHIFT_JIS"))
 
-        myJson = sr.ReadToEnd()
-        ck = test2.testmodule.JsonObjectCheck(myJson)
-        If ck Then
-            Obj = JsonConvert.DeserializeObject(Of test2.testmodule.BData)(myJson)
+            'ストリーム化に成功
+            ph += 1
 
-            bd.ServerName = Obj.ServerName
-            bd.DBName = Obj.DBName
-            bd.FieldName = Obj.FieldName
-            bd.SrcValue = Obj.SrcValue
-            bd.DistValue = Obj.DistValue
+            myJson = sr.ReadToEnd()
+            obj = JsonConvert.DeserializeObject(Of test2.testmodule.BData)(myJson)
 
+            'オブジェクト化に成功
+            ph += 1
+
+            bd.ServerName = obj.ServerName
+            bd.DBName = obj.DBName
+            bd.FieldName = obj.FieldName
+            bd.SrcValue = obj.SrcValue
+            bd.DistValue = obj.DistValue
+            bd.TestDT = obj.TestDT
+            bd.SqlVer = obj.SqlVer
+
+        Catch ex As Exception
+            '
+        Finally
             Load = bd
-            Obj = Nothing
-        End If
-
-        sr.Close()
-        sr = Nothing
+            If ph > 0 Then
+                sr.Close()
+                sr = Nothing
+            End If
+            If ph > 1 Then
+                obj = Nothing
+            End If
+        End Try
     End Function
 
     Public Function changeFontSize(txtSize As System.Int32, winHeight As System.Int32) As System.Int32
         changeFontSize = (txtSize / test2.testmodule.defaultWinHeight) * winHeight
-    End Function
-
-    Private Function JsonObjectCheck(ByVal myJson As System.String) As System.Boolean
-        Dim obj As Object
-        JsonObjectCheck = True
-        Try
-            obj = JsonConvert.DeserializeObject(Of Object)(myJson)
-        Catch ex As Exception
-            JsonObjectCheck = False
-        End Try
     End Function
 End Module
