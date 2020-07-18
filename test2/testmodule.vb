@@ -19,14 +19,20 @@ Module testmodule
     'セーブファイル関係
     Dim sr As System.IO.StreamReader
     Dim sw As System.IO.StreamWriter
+    Private Const SHIFT_JIS = "SHIFT_JIS"
+
+    Private Const DEFAULT_SQL_VER = "SQLSERVER2014"
 
     'デリゲート関係
     Delegate Sub mySub()
     Delegate Sub myBDSub(ByVal bd As test2.testmodule.BData)
+    Delegate Sub myExSub(ByRef ex As System.Exception)
+    Delegate Function myExFunc(ByVal ex As System.Exception)
     Dim ms As mySub
     Dim ms2 As mySub
     Dim mbds As myBDSub
-
+    Dim mexs As myExSub
+    Dim mexs2 As myExSub
 
 
     Public Structure BData
@@ -38,8 +44,11 @@ Module testmodule
         Public Query As System.String
         Public DTName As System.String
         Public TestDT As System.String
-        Public SqlVer As System.Int32
+        Public AccessCk As System.Boolean
+        Public SqlVer As System.String
+        Public TableList() As System.String
     End Structure
+
 
 
 
@@ -114,13 +123,37 @@ Module testmodule
     'End Sub
 
     Private Sub ConnectionEstablish()
-        scon = New System.Data.SqlClient.SqlConnection(ConStr)
-        scon.Open()
+        Try
+            scon = New System.Data.SqlClient.SqlConnection(ConStr)
+            scon.Open()
+            strn = scon.BeginTransaction()
+        Catch ex As Exception
+            Throw ex
+        End Try
     End Sub
 
     Private Sub ConnectionDispose()
-        scon.Close()
-        scon.Dispose()
+        If scon IsNot Nothing Then
+            scon.Close()
+            scon.Dispose()
+        End If
+    End Sub
+
+    Private Sub TransactionRollback()
+        If strn IsNot Nothing Then
+            strn.Rollback()
+        End If
+    End Sub
+
+    Private Sub RollbackFailed(ByRef ex As System.Exception)
+        MsgBox("Rollback Exception Type: " & ex.GetType().ToString)
+        ' This catch block will handle any errors that may have occured
+        ' on the server that would cause the rollback to fail, such as
+        ' a closed connection
+    End Sub
+
+    Private Sub ConnectionFailed(ByRef ex As System.Exception)
+        MsgBox("Commit Exception Type: " & ex.GetType().ToString)
     End Sub
 
     Private Sub CommandEstablish(ByVal bd As test2.testmodule.BData)
@@ -133,47 +166,38 @@ Module testmodule
     End Sub
 
 
-    Public Function AccessTest(ByVal bd As test2.testmodule.BData) As System.Boolean
-        Dim rtn As System.Boolean
-        Dim trnFlg As System.Boolean
+    Public Function AccessTest(ByVal bd As test2.testmodule.BData) As test2.testmodule.BData
+        Dim ms3 As mySub
 
         ms = AddressOf ConnectionEstablish
         ms2 = AddressOf ConnectionDispose
-
-        'Transactionが実行したかどうかのフラグ
-        trnFlg = Constants.vbFalse
+        ms3 = AddressOf TransactionRollback
+        mexs = AddressOf ConnectionFailed
+        mexs2 = AddressOf RollbackFailed
 
         'データベースの接続文字列
         ConStr = ConnectionString(bd)
 
         Try
             Call ms()
-            strn = scon.BeginTransaction()
-
-            trnFlg = Constants.vbTrue
+            bd.SqlVer = scon.ServerVersion
 
             '成功
-            rtn = Constants.vbTrue
+            bd.AccessCk = Constants.vbTrue
         Catch ex As Exception
-
             '失敗
-            rtn = Constants.vbFalse
+            bd.AccessCk = Constants.vbFalse
+            Call mexs(ex)
 
             Try
-                If trnFlg Then
-                    strn.Rollback()
-                End If
+                Call ms3()
             Catch ex2 As Exception
-                'MsgBox("Rollback Exception Type: " & ex2.GetType().ToString)
-                ' This catch block will handle any errors that may have occured
-                ' on the server that would cause the rollback to fail, such as
-                ' a closed connection
+                Call mexs2(ex2)
             End Try
         Finally
             Call ms2()
-            AccessTest = rtn
+            AccessTest = bd
         End Try
-        '---------------------------------------------------------------------------
     End Function
 
 
@@ -181,13 +205,18 @@ Module testmodule
 
 
     'データベースに存在するユーザテーブル一覧の取得
-    Public Function myTableList(ByVal bd As test2.testmodule.BData) As System.String()
-        Dim Tbl() As System.String
+    'テストテーブル名の設定
+    Public Function myTableList(ByVal bd As test2.testmodule.BData) As test2.testmodule.BData
         Dim cnt As System.Int32
+        Dim ms3 As mySub
+        Dim hitFlg As System.Boolean : hitFlg = Microsoft.VisualBasic.Constants.vbFalse
+        Dim j As System.Int32
 
         ms = AddressOf ConnectionEstablish
         ms2 = AddressOf ConnectionDispose
-
+        ms3 = AddressOf TransactionRollback
+        mexs = AddressOf ConnectionFailed
+        mexs2 = AddressOf RollbackFailed
 
 
         bd.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
@@ -196,7 +225,6 @@ Module testmodule
         Try
             '接続...
             Call ms()
-            strn = scon.BeginTransaction()
 
             'データ取得
             ds = test2.testmodule.myDataSet(bd)
@@ -204,27 +232,43 @@ Module testmodule
 
             cnt = dt.Rows.Count
 
-            ReDim Tbl(cnt - 1)
-            For i = LBound(Tbl) To UBound(Tbl)
-                Tbl(i) = dt.Rows(i)("name")
+            'テーブル一覧
+            ReDim bd.TableList(cnt - 1)
+            For i = LBound(bd.TableList) To UBound(bd.TableList)
+                bd.TableList(i) = dt.Rows(i)("name")
             Next
 
-            'Success ...
-            myTableList = Tbl
+
+            'テストテーブル
+            While Constants.vbTrue
+                bd.TestDT = "TSTTBL" + j
+                For i = LBound(bd.TableList) To UBound(bd.TableList)
+                    If bd.TableList(i) = bd.TestDT Then
+                        hitFlg = Constants.vbTrue
+                        Exit For
+                    End If
+                Next
+
+                If hitFlg Then
+                    hitFlg = Constants.vbFalse
+                Else
+                    Exit While
+                End If
+            End While
+
 
         Catch ex As Exception
             'Failed ...
-            MsgBox("Commit Exception Type: " & ex.GetType().ToString)
+            bd.AccessCk = False
+            Call mexs(ex)
 
             Try
-                strn.Rollback()
+                Call ms3()
             Catch ex2 As Exception
-                MsgBox("Rollback Exception Type: " & ex2.GetType().ToString)
-                ' This catch block will handle any errors that may have occured
-                ' on the server that would cause the rollback to fail, such as
-                ' a closed connection
+                Call mexs(ex2)
             End Try
         Finally
+            myTableList = bd
             Call ms2()
         End Try
     End Function
@@ -272,36 +316,76 @@ Module testmodule
     End Function
 
 
+
+    'テストテーブルとやり取りするタイプ
+    Public Sub TestTableDelete(ByVal bd As test2.testmodule.BData)
+        ms = AddressOf ConnectionEstablish
+        ms2 = AddressOf ConnectionDispose
+        mexs = AddressOf RollbackFailed
+
+        ConStr = ConnectionString(bd)
+
+        Try
+            Call ms()
+
+            'テストテーブル削除
+            bd.Query = $"IF OBJECT_ID('{bd.TestDT}', 'U') IS NOT NULL BEGIN DROP TABLE {bd.TestDT} END"
+            'If bd.SqlVer > 2015 Then
+            '    bd.Query = $"IF EXISTS DROP TABLE {bd.TestDT}"
+            'End If
+            Call myQuery(bd)
+
+            '成功
+            strn.Commit()
+        Catch ex As Exception
+            '失敗
+            Try
+                strn.Rollback()
+            Catch ex2 As Exception
+                Call mexs(ex2)
+            End Try
+            MsgBox("作業テーブルの削除に失敗しました。" _
+                & vbCrLf & "以下の名前で作業テーブルが残る可能性があります。" _
+                & vbCrLf & bd.TestDT)
+        Finally
+            Call ms2()
+        End Try
+    End Sub
+
+
     'テストテーブルとやり取りするタイプ
     Public Function Main2(ByVal bd As test2.testmodule.BData) As System.String
 
         Dim sourceValue As System.Object
         Dim distinationvalue As System.Object
 
+        Dim mexf As test2.testmodule.myExFunc
+
         ms = AddressOf ConnectionEstablish
         ms2 = AddressOf ConnectionDispose
-
+        mexf = Function(ex)
+                   Return ex.GetType().ToString() & " " & ex.Message
+               End Function
+        mexs = AddressOf RollbackFailed
 
         '戻り値テキスト
         Dim result As System.String : result = Constants.vbNullString
         Dim msg As System.String : msg = Constants.vbNullString
         Dim errmsg As System.String : errmsg = Constants.vbNullString
-        Dim err2msg As System.String : err2msg = Constants.vbNullString
 
         ConStr = ConnectionString(bd)
 
         Try
             Call ms()
-            strn = scon.BeginTransaction()
 
             sourceValue = "'" & bd.SrcValue & "'"
             distinationvalue = "'" & bd.DistValue & "'"
 
             'テストテーブル削除
             bd.Query = $"IF OBJECT_ID('{bd.TestDT}', 'U') IS NOT NULL BEGIN DROP TABLE {bd.TestDT} END"
-            If bd.SqlVer > 2015 Then
-                bd.Query = $"IF EXISTS DROP TABLE {bd.TestDT}"
-            End If
+            'If bd.SqlVer > 2015 Then
+            '    bd.Query = $"IF EXISTS DROP TABLE {bd.TestDT}"
+            'End If
             Call myQuery(bd)
 
             'テストテーブル作成
@@ -327,21 +411,16 @@ Module testmodule
         Catch ex As Exception
             '失敗
             result = "ERR"
-            errmsg = ex.GetType().ToString() & " " & ex.Message
+            errmsg = mexf(ex)
 
             Try
                 strn.Rollback()
             Catch ex2 As Exception
-                errmsg = ex2.GetType().ToString() & " " & ex2.Message
-                'MsgBox("Rollback Exception Type: " & ex2.GetType().ToString)
-                ' This catch block will handle any errors that may have occured
-                ' on the server that would cause the rollback to fail, such as
-                ' a closed connection
+                Call mexs(ex2)
             End Try
-
         Finally
             Main2 = "(" & result & ")" & "[" & bd.DTName & " / " _
-                & bd.FieldName & "] " & msg & " " & errmsg & " " & err2msg
+                & bd.FieldName & "] " & msg & " " & errmsg
             Call ms2()
         End Try
         '---------------------------------------------------------------------------
@@ -494,94 +573,111 @@ Module testmodule
     End Property
 
 
+    Private Function InspectBdata(ByVal bd As test2.testmodule.BData) As test2.testmodule.BData
+        'この関数は例外を出すことはないはず・・・
+        If String.IsNullOrEmpty(bd.ServerName) Then
+            bd.ServerName = "Server Name"
+        End If
+        If String.IsNullOrEmpty(bd.DBName) Then
+            bd.DBName = "DataBase Name"
+        End If
+        If String.IsNullOrEmpty(bd.FieldName) Then
+            bd.FieldName = "Field Name"
+        End If
+        If String.IsNullOrEmpty(bd.SrcValue) Then
+            bd.SrcValue = "Source Value"
+        End If
+        If String.IsNullOrEmpty(bd.DistValue) Then
+            bd.DistValue = "Distination Value"
+        End If
+        If String.IsNullOrEmpty(bd.TestDT) Then
+            bd.TestDT = "TESTDB"
+        End If
+        If String.IsNullOrEmpty(bd.SqlVer) Then
+            bd.SqlVer = DEFAULT_SQL_VER
+        End If
+        InspectBdata = bd
+    End Function
 
 
     Public Sub Save(ByVal bd As test2.testmodule.BData)
         Dim myJson As System.String
+        Dim i As System.Int32 : i = 0
 
-        If test2.testmodule.SaveCheck = 0 Then
-            Exit Sub
-        End If
+        '例外はいずれもセーブせず終了
+        Try
+            i = test2.testmodule.SaveCheck
+            bd = test2.testmodule.InspectBdata(bd)
 
-        If bd.ServerName = Constants.vbNullString Then
-            bd.ServerName = "Server Name"
-        End If
-        If bd.DBName = Constants.vbNullString Then
-            bd.DBName = "DataBase Name"
-        End If
-        If bd.FieldName = Constants.vbNullString Then
-            bd.FieldName = "Field Name"
-        End If
-        If bd.SrcValue = Constants.vbNullString Then
-            bd.SrcValue = "Source Value"
-        End If
-        If bd.DistValue = Constants.vbNullString Then
-            bd.DistValue = "Distination Value"
-        End If
-        If bd.TestDT = Constants.vbNullString Then
-            bd.TestDT = "TESTDB"
-        End If
-        If bd.SqlVer = 0 Then
-            bd.SqlVer = 2015
-        End If
-
-        myJson = JsonConvert.SerializeObject(bd)
-
-        sw = New System.IO.StreamWriter(
-            test2.testmodule.saveFile, False, System.Text.Encoding.GetEncoding("SHIFT_JIS"))
-
-        sw.WriteLine(myJson)
-
-        sw.Close()
-
-        sw = Nothing
+            myJson = JsonConvert.SerializeObject(bd)
+            sw = New System.IO.StreamWriter(
+                test2.testmodule.saveFile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+            sw.WriteLine(myJson)
+        Catch ex As Exception
+            bd = test2.testmodule.InitializeBData(bd)
+        Finally
+            If sw IsNot Nothing Then
+                sw.Close()
+                sw.Dispose()
+            End If
+        End Try
     End Sub
 
     Private Function SaveCheck() As System.Int32
-        If Not System.IO.Directory.Exists(test2.testmodule.saveDir) Then
-            System.IO.Directory.CreateDirectory(test2.testmodule.saveDir)
-            System.IO.File.Create(test2.testmodule.iniFile)
-        End If
+        Try
+            If Not System.IO.Directory.Exists(test2.testmodule.saveDir) Then
+                System.IO.Directory.CreateDirectory(test2.testmodule.saveDir)
+                System.IO.File.Create(test2.testmodule.iniFile)
+            End If
 
-        '既に同名フォルダーが存在する場合、作成しない
-        If Not System.IO.File.Exists(test2.testmodule.iniFile) Then
-            SaveCheck = 0
-            Exit Function
-        End If
+            '既に同名フォルダーが存在する場合、作成しない
+            If Not System.IO.File.Exists(test2.testmodule.iniFile) Then
+                Throw New Exception
+            End If
 
-        'saveFileが存在しない
-        If Not System.IO.File.Exists(test2.testmodule.saveFile) Then
-            System.IO.File.Create(test2.testmodule.saveFile)
-            SaveCheck = 2
-            Exit Function
-        End If
+            'saveFileが存在しない(初回)
+            If Not System.IO.File.Exists(test2.testmodule.saveFile) Then
+                System.IO.File.Create(test2.testmodule.saveFile)
+                SaveCheck = 2
+                Exit Function
+            End If
 
-        '正常
-        SaveCheck = 1
+            '正常
+            SaveCheck = 1
+        Catch ex As Exception
+            Throw ex
+        End Try
     End Function
+
+    Private Function InitializeBData(ByVal bd As test2.testmodule.BData) As test2.testmodule.BData
+        bd.ServerName = "Server Name"
+        bd.DBName = "DataBase Name"
+        bd.FieldName = "Field Name"
+        bd.SrcValue = "Source Value"
+        bd.DistValue = "Distination Value"
+        bd.TestDT = "TESTDB"
+        bd.SqlVer = DEFAULT_SQL_VER
+        InitializeBData = bd
+    End Function
+
 
     Public Function Load(ByVal bd As test2.testmodule.BData) As test2.testmodule.BData
         Dim myJson As System.String
         Dim obj As test2.testmodule.BData
-        Dim ph As System.Int32 : ph = 0
 
+        'いずれの例外も初期化
         Try
-            If SaveCheck() = (0 Or 2) Then
+            If SaveCheck() = 2 Then
                 Throw New Exception
             End If
 
             sr = New System.IO.StreamReader(
-            test2.testmodule.saveFile, System.Text.Encoding.GetEncoding("SHIFT_JIS"))
-
-            'ストリーム化に成功
-            ph += 1
+            test2.testmodule.saveFile, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
             myJson = sr.ReadToEnd()
             obj = JsonConvert.DeserializeObject(Of test2.testmodule.BData)(myJson)
 
-            'オブジェクト化に成功
-            ph += 1
-
+            'エラーが発生し得る
             bd.ServerName = obj.ServerName
             bd.DBName = obj.DBName
             bd.FieldName = obj.FieldName
@@ -589,18 +685,17 @@ Module testmodule
             bd.DistValue = obj.DistValue
             bd.TestDT = obj.TestDT
             bd.SqlVer = obj.SqlVer
-
         Catch ex As Exception
-            '
+
+            bd = InitializeBData(bd)
         Finally
             Load = bd
-            If ph > 0 Then
+            If sr IsNot Nothing Then
                 sr.Close()
                 sr = Nothing
             End If
-            If ph > 1 Then
-                obj = Nothing
-            End If
+
+            obj = Nothing
         End Try
     End Function
 

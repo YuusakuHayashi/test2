@@ -2,7 +2,6 @@
 Imports System.Threading
 
 Public Class Window3
-
     Public Shared ServerName As System.String
     Public Shared DBName As System.String
     Public Shared SrcValue As System.String
@@ -10,8 +9,7 @@ Public Class Window3
     Public Shared FieldName As System.String
     Public Shared TestDT As System.String
     Public Shared SqlVer As System.Int32
-    'Private endFlg As System.Boolean
-
+    Public Shared TableList() As System.String
 
     Private Sub Window3_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         test2.testmodule.defaultWinHeight = Me.Height
@@ -20,12 +18,9 @@ Public Class Window3
 
     Private Sub Window3_ContentRendered(sender As Object, e As EventArgs) Handles Me.ContentRendered
         Dim bd As New test2.testmodule.BData
-        Dim tl As System.String()
         Dim i As System.Int32 : i = 0
         Dim res As System.String
         Dim dt As DateTime
-
-        'endFlg = 0
 
         '-------------------------------------------
         bd.ServerName = Window3.ServerName
@@ -35,6 +30,7 @@ Public Class Window3
         bd.DistValue = Window3.DistValue
         bd.TestDT = Window3.TestDT
         bd.SqlVer = Window3.SqlVer
+        bd.TableList = Window3.TableList
         '-------------------------------------------
 
         Me.Back.IsEnabled = False
@@ -44,21 +40,13 @@ Public Class Window3
 
         ThreadPool.QueueUserWorkItem(
             Sub()
-                tl = test2.testmodule.myTableList(bd)
-
-                For j As System.Int32 = LBound(tl) To UBound(tl)
-                    i += 1
-
+                For j As System.Int32 = LBound(bd.TableList) To UBound(bd.TableList)
                     'TEST
                     'If Not tl(j) = "HYSTEST" Then
                     '    Continue For
                     'End If
 
-                    If tl(j) = bd.TestDT Then
-                        Continue For
-                    End If
-
-                    bd.DTName = tl(j)
+                    bd.DTName = bd.TableList(j)
 
                     Me.Dispatcher.BeginInvoke(
                         Sub()
@@ -70,12 +58,15 @@ Public Class Window3
 
                     Me.Dispatcher.BeginInvoke(
                         Sub()
-                            Me.Progress.Content = i & "/" & UBound(tl) & "テーブルを処理しました"
+                            Me.Progress.Content = j & "/" & UBound(bd.TableList) & "テーブルを処理しました"
                             Me.Result.AppendText(Constants.vbCrLf)
                             Me.Result.AppendText(res)
                             Me.Result.ScrollToEnd()
                         End Sub)
                 Next
+
+                Call test2.testmodule.TestTableDelete(bd)
+
                 Me.Dispatcher.BeginInvoke(
                     Sub()
                         dt = DateTime.Now
@@ -89,58 +80,6 @@ Public Class Window3
                 )
             End Sub, Nothing
         )
-
-        'ThreadPool.QueueUserWorkItem(
-        '    Sub()
-        '        dt = DateTime.Now
-
-        '        tl = test2.testmodule.myTableList(bd)
-
-        '        Me.Dispatcher.BeginInvoke(
-        '            Sub()
-        '                Me.Back.IsEnabled = False
-        '                Me.Result.Text = "START(" & dt.ToLocalTime & ")"
-        '                For j As System.Int32 = LBound(tl) To UBound(tl)
-        '                    i += 1
-
-        '                    'TEST
-        '                    'If Not tl(j) = "HYSTEST" Then
-        '                    '    Continue For
-        '                    'End If
-
-        '                    If endFlg = 1 Then
-        '                        endFlg = 2
-        '                        Exit For
-        '                    End If
-
-        '                    If tl(j) = bd.TestDT Then
-        '                        Continue For
-        '                    End If
-
-        '                    bd.DTName = tl(j)
-
-        '                    Me.History.Content = "テーブル " & bd.DTName & " を処理しています・・・"
-
-        '                    res = test2.testmodule.Main2(bd)
-
-        '                    Me.Progress.Content = i & "/" & UBound(tl) & "テーブルを処理しました"
-        '                    Me.Result.AppendText(Constants.vbCrLf)
-        '                    Me.Result.AppendText(res)
-        '                    Me.Result.ScrollToEnd()
-        '                Next
-        '                dt = DateTime.Now
-        '                Me.Result.AppendText(Constants.vbCrLf)
-        '                Me.Result.AppendText("END(" & dt.ToLocalTime & ")")
-        '                Me.Back.IsEnabled = True
-        '            End Sub)
-
-        '        MsgBox("終了しました")
-
-        '        Call test2.testmodule.Save(bd)
-
-        '        bd = Nothing
-        '        endFlg = 2
-        '    End Sub, Nothing)
     End Sub
 
     Private Sub Back_Click(sender As Object, e As RoutedEventArgs) Handles Back.Click

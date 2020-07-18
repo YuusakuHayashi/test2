@@ -44,3 +44,5 @@ C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\test2.pdb
 C:\Users\yuusaku.hayashi\project\test2\test2\bin\Debug\Newtonsoft.Json.dll
 C:\Users\yuusaku.hayashi\project\test2\test2\bin\Debug\Newtonsoft.Json.xml
 C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\test2.vbproj.CopyComplete
+C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\Window1.g.vb
+C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\Window1.baml
