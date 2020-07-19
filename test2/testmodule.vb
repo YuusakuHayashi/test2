@@ -1,5 +1,7 @@
 ﻿Imports Newtonsoft.Json
 Imports System.Data
+Imports System.ComponentModel
+Imports System.Threading
 
 Module testmodule
     'フレキシブルデザイン関係
@@ -21,7 +23,6 @@ Module testmodule
     Dim sw As System.IO.StreamWriter
     Private Const SHIFT_JIS = "SHIFT_JIS"
 
-    Private Const DEFAULT_SQL_VER = "SQLSERVER2014"
 
     'デリゲート関係
     Delegate Sub mySub()
@@ -34,6 +35,9 @@ Module testmodule
     Dim mexs As myExSub
     Dim mexs2 As myExSub
 
+    Private Const WINM = "MainWindow"
+    Private Const WIN2 = "Window2"
+    Private Const WIN3 = "Window3"
 
     Public Structure BData
         Public ServerName As System.String
@@ -46,7 +50,7 @@ Module testmodule
         Public TestDT As System.String
         Public AccessCk As System.Boolean
         Public SqlVer As System.String
-        Public TableList() As System.String
+        Public TableList() As System.Object
     End Structure
 
 
@@ -58,9 +62,6 @@ Module testmodule
 
 
         Dim NewWin As System.Windows.Window
-        Const WINM = "MainWindow"
-        Const WIN2 = "Window2"
-        Const WIN3 = "Window3"
 
         Select Case OldWin.Title
             Case WINM
@@ -235,7 +236,7 @@ Module testmodule
             'テーブル一覧
             ReDim bd.TableList(cnt - 1)
             For i = LBound(bd.TableList) To UBound(bd.TableList)
-                bd.TableList(i) = dt.Rows(i)("name")
+                bd.TableList(i)("name") = dt.Rows(i)("name")
             Next
 
 
@@ -243,7 +244,7 @@ Module testmodule
             While Constants.vbTrue
                 bd.TestDT = "TSTTBL" + j
                 For i = LBound(bd.TableList) To UBound(bd.TableList)
-                    If bd.TableList(i) = bd.TestDT Then
+                    If bd.TableList(i)("name") = bd.TestDT Then
                         hitFlg = Constants.vbTrue
                         Exit For
                     End If
@@ -593,9 +594,14 @@ Module testmodule
         If String.IsNullOrEmpty(bd.TestDT) Then
             bd.TestDT = "TESTDB"
         End If
-        If String.IsNullOrEmpty(bd.SqlVer) Then
-            bd.SqlVer = DEFAULT_SQL_VER
-        End If
+        'If String.IsNullOrEmpty(bd.SqlVer) Then
+        '    bd.SqlVer = DEFAULT_SQL_VER
+        'End If
+        'If IsNothing(bd.TableList) Then
+        '    bd.TableList("name") = Constants.vbNullString
+        '    bd.TableList("stat") = Constants.vbNullString
+        'End If
+
         InspectBdata = bd
     End Function
 
@@ -656,7 +662,13 @@ Module testmodule
         bd.SrcValue = "Source Value"
         bd.DistValue = "Distination Value"
         bd.TestDT = "TESTDB"
-        bd.SqlVer = DEFAULT_SQL_VER
+        'bd.SqlVer = DEFAULT_SQL_VER
+        'If Not IsNothing(bd.TableList) Then
+        '    bd.TableList = Nothing
+        'End If
+        'bd.TableList("name") = Constants.vbNullString
+        'bd.TableList("stat") = Constants.vbNullString
+
         InitializeBData = bd
     End Function
 
@@ -684,7 +696,8 @@ Module testmodule
             bd.SrcValue = obj.SrcValue
             bd.DistValue = obj.DistValue
             bd.TestDT = obj.TestDT
-            bd.SqlVer = obj.SqlVer
+            'bd.SqlVer = obj.SqlVer
+
         Catch ex As Exception
 
             bd = InitializeBData(bd)
@@ -694,10 +707,29 @@ Module testmodule
                 sr.Close()
                 sr = Nothing
             End If
-
             obj = Nothing
         End Try
     End Function
+
+
+    Public Sub RequirementCheck()
+        Try
+            'ThreadPool And Rambda
+            ThreadPool.QueueUserWorkItem(
+            Sub()
+            End Sub, Nothing)
+
+            '
+            String.IsNullOrEmpty("")
+
+            '
+            System.Environment.GetEnvironmentVariable("USERPROFILE")
+
+            '
+        Catch ex As Exception
+
+        End Try
+    End Sub
 
     Public Function changeFontSize(txtSize As System.Int32, winHeight As System.Int32) As System.Int32
         changeFontSize = (txtSize / test2.testmodule.defaultWinHeight) * winHeight

@@ -8,8 +8,7 @@
     End Sub
 
     Private Sub MainWindow_SizeChanged(sender As Object, e As SizeChangedEventArgs) Handles Me.SizeChanged
-        Me.Progress.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
-        Me.Contents.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
+        Me.Title.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
         Me.trn1.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
     End Sub
 End Class

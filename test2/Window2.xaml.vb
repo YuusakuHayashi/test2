@@ -1,31 +1,13 @@
 ﻿Public Class Window2
-
-    Private Sub ControlDisable()
-        Me.ServerName.IsEnabled = Constants.vbFalse
-        Me.DBName.IsEnabled = Constants.vbFalse
-        Me.FieldName.IsEnabled = Constants.vbFalse
-        Me.SrcValue.IsEnabled = Constants.vbFalse
-        Me.DistValue.IsEnabled = Constants.vbFalse
-        Me.Next.IsEnabled = Constants.vbFalse
-        Me.Back.IsEnabled = Constants.vbFalse
-    End Sub
-
-    Private Sub ControlEnable()
-        Me.ServerName.IsEnabled = Constants.vbTrue
-        Me.DBName.IsEnabled = Constants.vbTrue
-        Me.FieldName.IsEnabled = Constants.vbTrue
-        Me.SrcValue.IsEnabled = Constants.vbTrue
-        Me.DistValue.IsEnabled = Constants.vbTrue
-        Me.Next.IsEnabled = Constants.vbTrue
-        Me.Back.IsEnabled = Constants.vbTrue
-    End Sub
-
-
-
-
-
     Private Sub Window2_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         Dim bd As New test2.testmodule.BData
+
+        Try
+            test2.testmodule.RequirementCheck()
+        Catch ex As System.Exception
+            MsgBox("この処理を実行可能なシステム要件が満たされていません" & vbCrLf & "終了してください")
+            Exit Sub
+        End Try
 
         test2.testmodule.defaultWinHeight = Me.Height
 
@@ -73,7 +55,7 @@
         Dim bd As New test2.testmodule.BData
 
         'コントロール制御
-        Call Me.ControlDisable()
+        Call Me.ControlsDisabled()
 
         bd.AccessCk = Constants.vbTrue
 
@@ -90,7 +72,7 @@
         bd.DBName = Me.DBName.Text
 
         If Not bd.AccessCk Then
-            Call Me.ControlEnable()
+            Call Me.ControlsEnabled()
             Exit Sub
         End If
 
@@ -119,7 +101,7 @@
         End If
 
         If Not bd.AccessCk Then
-            Call Me.ControlEnable()
+            Call Me.ControlsEnabled()
             Exit Sub
         End If
 
@@ -129,7 +111,7 @@
         End If
 
         If Not bd.AccessCk Then
-            Call Me.ControlEnable()
+            Call Me.ControlsEnabled()
             Exit Sub
         End If
 
@@ -151,36 +133,53 @@
         End If
 
         'コントロール制御戻し
-        Call Me.ControlEnable()
+        Call Me.ControlsEnabled()
 
     End Sub
 
     Private Sub ServerName_GotFocus(sender As Object, e As RoutedEventArgs) Handles ServerName.GotFocus
-        Me.ServerName.SelectAll()
+        Try
+            Me.ServerName.SelectAll()
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub DBName_GotFocus(sender As Object, e As RoutedEventArgs) Handles DBName.GotFocus
-        Me.DBName.SelectAll()
+        Try
+            Me.DBName.SelectAll()
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Private Sub FieldName_GotFocus(sender As Object, e As RoutedEventArgs) Handles FieldName.GotFocus
-        Me.FieldName.SelectAll()
+        Try
+            Me.FieldName.SelectAll()
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Private Sub SrcValue_GotFocus(sender As Object, e As RoutedEventArgs) Handles SrcValue.GotFocus
-        Me.SrcValue.SelectAll()
+        Try
+            Me.SrcValue.SelectAll()
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub DistValue_GotFocus(sender As Object, e As RoutedEventArgs) Handles DistValue.GotFocus
-        Me.DistValue.SelectAll()
+        Try
+            Me.DistValue.SelectAll()
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub Window2_ContentRendered(sender As Object, e As EventArgs) Handles Me.ContentRendered
     End Sub
 
     Private Sub Window2_SizeChanged(sender As Object, e As SizeChangedEventArgs) Handles Me.SizeChanged
-        Me.Progress.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
-        Me.Contents.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
+        Me.Title.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
+        Me.Contents.FontSize = test2.testmodule.changeFontSize(20, e.NewSize.Height)
         Me.ServerLabel.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
         Me.ServerName.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
         Me.ServerErr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
@@ -195,12 +194,31 @@
         Me.SrcValue.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
         Me.ValueErr.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
         Me.FromTo.FontSize = test2.testmodule.changeFontSize(12, e.NewSize.Height)
-        'Me.label2.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        'Me.label3.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        'Me.label4.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        'Me.label5.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        'Me.label6.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        'Me.label7.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
     End Sub
 
+    Private Sub ControlsEnabled()
+        Try
+            Me.ServerName.IsEnabled = Constants.vbTrue
+            Me.DBName.IsEnabled = Constants.vbTrue
+            Me.FieldName.IsEnabled = Constants.vbTrue
+            Me.SrcValue.IsEnabled = Constants.vbTrue
+            Me.DistValue.IsEnabled = Constants.vbTrue
+            Me.Next.IsEnabled = Constants.vbTrue
+            Me.Back.IsEnabled = Constants.vbTrue
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Sub ControlsDisabled()
+        Try
+            Me.ServerName.IsEnabled = Constants.vbFalse
+            Me.DBName.IsEnabled = Constants.vbFalse
+            Me.FieldName.IsEnabled = Constants.vbFalse
+            Me.SrcValue.IsEnabled = Constants.vbFalse
+            Me.DistValue.IsEnabled = Constants.vbFalse
+            Me.Next.IsEnabled = Constants.vbFalse
+            Me.Back.IsEnabled = Constants.vbFalse
+        Catch ex As Exception
+        End Try
+    End Sub
 End Class

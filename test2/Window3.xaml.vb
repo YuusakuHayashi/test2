@@ -9,7 +9,9 @@ Public Class Window3
     Public Shared FieldName As System.String
     Public Shared TestDT As System.String
     Public Shared SqlVer As System.Int32
-    Public Shared TableList() As System.String
+    Public Shared TableList() As System.Object
+
+    Private excFlg As System.Boolean
 
     Private Sub Window3_Initialized(sender As Object, e As EventArgs) Handles Me.Initialized
         test2.testmodule.defaultWinHeight = Me.Height
@@ -32,54 +34,62 @@ Public Class Window3
         bd.SqlVer = Window3.SqlVer
         bd.TableList = Window3.TableList
         '-------------------------------------------
+        Try
+            ThreadPool.QueueUserWorkItem(
+                Sub()
+                    Call Me.ControlsDisabled()
+                    Me.excFlg = Constants.vbTrue
 
-        Me.Back.IsEnabled = False
+                    dt = DateTime.Now
+                    Me.Result.Text = "START(" & dt.ToLocalTime & ")"
 
-        dt = DateTime.Now
-        Me.Result.Text = "START(" & dt.ToLocalTime & ")"
+                    For j As System.Int32 = LBound(bd.TableList) To UBound(bd.TableList)
+                        'TEST
+                        'If Not tl(j) = "HYSTEST" Then
+                        '    Continue For
+                        'End If
 
-        ThreadPool.QueueUserWorkItem(
-            Sub()
-                For j As System.Int32 = LBound(bd.TableList) To UBound(bd.TableList)
-                    'TEST
-                    'If Not tl(j) = "HYSTEST" Then
-                    '    Continue For
-                    'End If
+                        bd.DTName = bd.TableList(j)("name")
 
-                    bd.DTName = bd.TableList(j)
+                        Me.Dispatcher.BeginInvoke(
+                            Sub()
+                                Me.History.Content = "テーブル " & bd.DTName & " を処理しています・・・"
+                            End Sub
+                        )
+
+                        res = test2.testmodule.Main2(bd)
+
+                        Me.Dispatcher.BeginInvoke(
+                            Sub()
+                                Me.Progress.Content = j & "/" & UBound(bd.TableList) & "テーブルを処理しました"
+                                Me.Result.AppendText(Constants.vbCrLf)
+                                Me.Result.AppendText(res)
+                                Me.Result.ScrollToEnd()
+                            End Sub)
+                    Next
+
+                    Call test2.testmodule.TestTableDelete(bd)
 
                     Me.Dispatcher.BeginInvoke(
                         Sub()
-                            Me.History.Content = "テーブル " & bd.DTName & " を処理しています・・・"
+                            dt = DateTime.Now
+                            Me.Result.AppendText(Constants.vbCrLf)
+                            Me.Result.AppendText("END(" & dt.ToLocalTime & ")")
                         End Sub
                     )
 
-                    res = test2.testmodule.Main2(bd)
+                    Call test2.testmodule.Save(bd)
+                    bd = Nothing
+                    Call Me.ControlsEnabled()
+                    Me.excFlg = Constants.vbFalse
+                    MsgBox("終了しました")
 
-                    Me.Dispatcher.BeginInvoke(
-                        Sub()
-                            Me.Progress.Content = j & "/" & UBound(bd.TableList) & "テーブルを処理しました"
-                            Me.Result.AppendText(Constants.vbCrLf)
-                            Me.Result.AppendText(res)
-                            Me.Result.ScrollToEnd()
-                        End Sub)
-                Next
+                End Sub, Nothing)
 
-                Call test2.testmodule.TestTableDelete(bd)
+        Catch ex As Exception
+            MsgBox("処理異常が発生しました")
+        End Try
 
-                Me.Dispatcher.BeginInvoke(
-                    Sub()
-                        dt = DateTime.Now
-                        Me.Result.AppendText(Constants.vbCrLf)
-                        Me.Result.AppendText("END(" & dt.ToLocalTime & ")")
-                        MsgBox("終了しました")
-                        Call test2.testmodule.Save(bd)
-                        bd = Nothing
-                        Me.Back.IsEnabled = True
-                    End Sub
-                )
-            End Sub, Nothing
-        )
     End Sub
 
     Private Sub Back_Click(sender As Object, e As RoutedEventArgs) Handles Back.Click
@@ -87,29 +97,26 @@ Public Class Window3
     End Sub
 
     Private Sub Window3_SizeChanged(sender As Object, e As SizeChangedEventArgs) Handles Me.SizeChanged
-        Me.Progress.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
-        Me.Contents.FontSize = test2.testmodule.changeFontSize(36, e.NewSize.Height)
+        Me.Title.FontSize = test2.testmodule.changeFontSize(20, e.NewSize.Height)
+        Me.Contents.FontSize = test2.testmodule.changeFontSize(20, e.NewSize.Height)
         Me.History.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
+        Me.Progress.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
         Me.Result.FontSize = test2.testmodule.changeFontSize(10, e.NewSize.Height)
     End Sub
 
-    'Private Sub Window3_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-    '    e.Cancel = Constants.vbTrue
-    '    ThreadPool.QueueUserWorkItem(
-    '        Sub()
-    '            Me.Dispatcher.BeginInvoke(
-    '                Sub()
-    '                    Me.History.Content = "処理を終了しています。しばらくお待ちください・・・"
-    '                    endFlg = 1
-    '                    Do While True
-    '                        Thread.Sleep(100)
-    '                        If endFlg = 2 Then
-    '                            Exit Do
-    '                        End If
-    '                    Loop
-    '                    e.Cancel = Constants.vbFalse
-    '                End Sub
-    '            )
-    '        End Sub, Nothing)
-    'End Sub
+    Private Sub Window3_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        e.Cancel = Constants.vbFalse
+        If Me.excFlg Then
+            MsgBox("処理中は終了できません" & Constants.vbCrLf & "処理が終わるまでお待ちください")
+            e.Cancel = Constants.vbTrue
+        End If
+    End Sub
+
+    Private Sub ControlsEnabled()
+        Me.Back.IsEnabled = Constants.vbFalse
+    End Sub
+
+    Private Sub ControlsDisabled()
+        Me.Back.IsEnabled = Constants.vbTrue
+    End Sub
 End Class
