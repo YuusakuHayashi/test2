@@ -54,6 +54,16 @@ test2
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:test2.MainWin">
+<summary>
+MainWin
+</summary>
+</member>
+<member name="M:test2.MainWin.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
 <member name="T:test2.Window1">
 <summary>
 Window1
@@ -70,16 +80,6 @@ Window2
 </summary>
 </member>
 <member name="M:test2.Window2.InitializeComponent">
-<summary>
-InitializeComponent
-</summary>
-</member>
-<member name="T:test2.Window3">
-<summary>
-Window3
-</summary>
-</member>
-<member name="M:test2.Window3.InitializeComponent">
 <summary>
 InitializeComponent
 </summary>
@@ -107,6 +107,46 @@ MainWindow
 <member name="M:test2.MainWindow.InitializeComponent">
 <summary>
 InitializeComponent
+</summary>
+</member>
+<member name="T:test2.Window3">
+<summary>
+Window3
+</summary>
+</member>
+<member name="M:test2.Window3.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
+<member name="T:test2.XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+<summary>
+GeneratedInternalTypeHelper
+</summary>
+</member>
+<member name="M:test2.XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+<summary>
+CreateInstance
+</summary>
+</member>
+<member name="M:test2.XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+<summary>
+GetPropertyValue
+</summary>
+</member>
+<member name="M:test2.XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+<summary>
+SetPropertyValue
+</summary>
+</member>
+<member name="M:test2.XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+<summary>
+CreateDelegate
+</summary>
+</member>
+<member name="M:test2.XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+<summary>
+AddEventHandler
 </summary>
 </member>
 </members>

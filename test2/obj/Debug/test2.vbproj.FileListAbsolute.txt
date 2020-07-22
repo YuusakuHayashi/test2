@@ -46,3 +46,8 @@ C:\Users\yuusaku.hayashi\project\test2\test2\bin\Debug\Newtonsoft.Json.xml
 C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\test2.vbproj.CopyComplete
 C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\Window1.g.vb
 C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\Window1.baml
+\\Coral\個人情報-林祐\project\test2\test2\obj\Debug\Window1.g.vb
+\\Coral\個人情報-林祐\project\test2\test2\obj\Debug\Window1.baml
+\\Coral\個人情報-林祐\project\test2\test2\obj\Debug\MainWin.g.vb
+\\Coral\個人情報-林祐\project\test2\test2\obj\Debug\MainWin.baml
+\\Coral\個人情報-林祐\project\test2\test2\obj\Debug\GeneratedInternalTypeHelper.g.vb

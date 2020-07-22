@@ -141,7 +141,7 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Label x:Name="Title" Content="処理の選択を行います。" Grid.Column="2" Grid.ColumnSpan="76" HorizontalAlignment="Left" Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Stretch" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
+        <Label x:Name="Theme" Content="処理の選択を行います。" Grid.Column="2" Grid.ColumnSpan="76" HorizontalAlignment="Left" Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Stretch" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
         <!--<Label x:Name="Contents" Grid.ColumnSpan="68" HorizontalAlignment="Left" Content="Step 1/2  処理の指定を行います。" Grid.Column="6"  Grid.Row="7" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="20" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />-->
         <RadioButton x:Name="trn1" Content="既存データからダミーデータを作成する" Grid.Row="11" Grid.RowSpan="3" Grid.Column="6"  Grid.ColumnSpan="72" VerticalAlignment="Center" HorizontalAlignment="Stretch" IsChecked="True" FontSize="12" />
         <Button x:Name="Next" Grid.ColumnSpan="8" Content="次へ" Grid.Column="70" Grid.RowSpan="3" HorizontalAlignment="Stretch" Grid.Row="45" FontSize="12" />

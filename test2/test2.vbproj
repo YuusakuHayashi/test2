@@ -72,7 +72,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DelegateCommand.vb" />
+    <Compile Include="MainWin.xaml.vb">
+      <DependentUpon>MainWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Model.vb" />
+    <Compile Include="MyCommand.vb" />
     <Compile Include="testmodule.vb" />
+    <Compile Include="VMCommand.vb" />
+    <Compile Include="ViewModel.vb" />
     <Compile Include="Window1.xaml.vb">
       <DependentUpon>Window1.xaml</DependentUpon>
     </Compile>
@@ -82,6 +90,10 @@
     <Compile Include="Window3.xaml.vb">
       <DependentUpon>Window3.xaml</DependentUpon>
     </Compile>
+    <Page Include="MainWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

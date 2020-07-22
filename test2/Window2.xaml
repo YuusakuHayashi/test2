@@ -141,7 +141,7 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Label x:Name="Title" Content="既存データからダミーデータを作成する" Grid.Column="2" Grid.ColumnSpan="76" HorizontalAlignment="Left" Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Stretch" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
+        <Label x:Name="Theme" Content="既存データからダミーデータを作成する" Grid.Column="2" Grid.ColumnSpan="76" HorizontalAlignment="Left" Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Stretch" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
         <Label x:Name="Contents" Grid.ColumnSpan="68" HorizontalAlignment="Left" Content="Step 1/2  処理の指定を行います。" Grid.Column="6"  Grid.Row="7" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="20" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
         <Label x:Name="ServerLabel" Content="サーバ名" Grid.Column="2" Grid.ColumnSpan="8" HorizontalAlignment="Right" Grid.Row="13" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="12" />
         <TextBox x:Name="ServerName" Grid.ColumnSpan="40" Grid.Column="11" HorizontalAlignment="Stretch" Grid.Row="13" Grid.RowSpan="3"  Text="TextBox" VerticalAlignment="Bottom" FontSize="12" BorderThickness="0,0,0,1" />
