@@ -54,6 +54,16 @@ test2
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:test2.MainWin">
+<summary>
+MainWin
+</summary>
+</member>
+<member name="M:test2.MainWin.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
 <member name="T:test2.Window1">
 <summary>
 Window1
@@ -70,16 +80,6 @@ Window2
 </summary>
 </member>
 <member name="M:test2.Window2.InitializeComponent">
-<summary>
-InitializeComponent
-</summary>
-</member>
-<member name="T:test2.Window3">
-<summary>
-Window3
-</summary>
-</member>
-<member name="M:test2.Window3.InitializeComponent">
 <summary>
 InitializeComponent
 </summary>
@@ -105,6 +105,16 @@ MainWindow
 </summary>
 </member>
 <member name="M:test2.MainWindow.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
+<member name="T:test2.Window3">
+<summary>
+Window3
+</summary>
+</member>
+<member name="M:test2.Window3.InitializeComponent">
 <summary>
 InitializeComponent
 </summary>
