@@ -1,79 +1,15 @@
 ﻿Imports System.Collections.ObjectModel
 Imports Newtonsoft.Json
+Imports System.IO
 
 Delegate Sub mySub()
-
-Public Class ServerModel
-    Private _SaveName As String
-    Public Property SaveName As String
-        Get
-            Return _SaveName
-        End Get
-        Set(value As String)
-            _SaveName = value
-        End Set
-    End Property
-
-    Private _FieldName As String
-    Public Property FieldName As String
-        Get
-            Return _FieldName
-        End Get
-        Set(value As String)
-            _FieldName = value
-        End Set
-    End Property
+Delegate Function myBoolFunction() As Boolean
+Delegate Function myStringFunction() As String
 
 
-    Private _SourceValue As String
-    Public Property SourceValue As String
-        Get
-            Return _SourceValue
-        End Get
-        Set(value As String)
-            _SourceValue = value
-        End Set
-    End Property
-
-    Private _DistinationValue As String
-    Public Property DistinationValue As String
-        Get
-            Return _DistinationValue
-        End Get
-        Set(value As String)
-            _DistinationValue = value
-        End Set
-    End Property
-
-    Private _ServerName As String
-    Public Property ServerName As String
-        Get
-            Return _ServerName
-        End Get
-        Set(value As String)
-            _ServerName = value
-        End Set
-    End Property
-
-    Private Property _DataBaseName As String
-    Public Property DataBaseName As String
-        Get
-            Return _DataBaseName
-        End Get
-        Set(value As String)
-            _DataBaseName = value
-        End Set
-    End Property
-
-    Private Property _DataTableName As String
-    Public Property DataTableName As String
-        Get
-            Return _DataTableName
-        End Get
-        Set(value As String)
-            _DataTableName = value
-        End Set
-    End Property
+Public Class TreeViewM
+    'TreeView は考え方が複雑・・・
+    '描画線用のデータ構造ではTreeViewのリスト型
     Private Property _RealName As String
     Public Property RealName As String
         Get
@@ -84,87 +20,143 @@ Public Class ServerModel
         End Set
     End Property
 
-    Private _Child As List(Of ServerModel)
-    Public Property Child As List(Of ServerModel)
+    Private _Child As List(Of TreeViewM)
+    Public Property Child As List(Of TreeViewM)
         Get
             Return _Child
         End Get
-        Set(value As List(Of ServerModel))
+        Set(value As List(Of TreeViewM))
             _Child = value
         End Set
     End Property
+    '-----------------------------------------------------------------------------'
+
+    'Private _SaveName As String
+    'Public Property SaveName As String
+    '    Get
+    '        Return _SaveName
+    '    End Get
+    '    Set(value As String)
+    '        _SaveName = value
+    '    End Set
+    'End Property
+
+    'Private _FieldName As String
+    'Public Property FieldName As String
+    '    Get
+    '        Return _FieldName
+    '    End Get
+    '    Set(value As String)
+    '        _FieldName = value
+    '    End Set
+    'End Property
+
+
+    'Private _SourceValue As String
+    'Public Property SourceValue As String
+    '    Get
+    '        Return _SourceValue
+    '    End Get
+    '    Set(value As String)
+    '        _SourceValue = value
+    '    End Set
+    'End Property
+
+    'Private _DistinationValue As String
+    'Public Property DistinationValue As String
+    '    Get
+    '        Return _DistinationValue
+    '    End Get
+    '    Set(value As String)
+    '        _DistinationValue = value
+    '    End Set
+    'End Property
+
+    'Private _ServerName As String
+    'Public Property ServerName As String
+    '    Get
+    '        Return _ServerName
+    '    End Get
+    '    Set(value As String)
+    '        _ServerName = value
+    '    End Set
+    'End Property
+
+    'Private Property _DataBaseName As String
+    'Public Property DataBaseName As String
+    '    Get
+    '        Return _DataBaseName
+    '    End Get
+    '    Set(value As String)
+    '        _DataBaseName = value
+    '    End Set
+    'End Property
+
+    'Private Property _DataTableName As String
+    'Public Property DataTableName As String
+    '    Get
+    '        Return _DataTableName
+    '    End Get
+    '    Set(value As String)
+    '        _DataTableName = value
+    '    End Set
+    'End Property
 End Class
 
-Public Class Model
+Public Class MyProject
     Private Const SHIFT_JIS = "SHIFT_JIS"
+    Private Const CONFIG_FILE_JSON = "ConfigFile.json"
 
-    Private _Servers As List(Of ServerModel)
-    Public Property Servers As List(Of ServerModel)
+    Private ReadOnly Property _FileManagerFileName As String
         Get
-            Return _Servers
-        End Get
-        Set(value As List(Of ServerModel))
-            _Servers = value
-        End Set
-    End Property
-
-    Public Function ServersLoad() As List(Of ServerModel)
-        ServersLoad = ModelLoad().Servers
-    End Function
-
-    Private ReadOnly Property ConfigFile As String
-        Get
-            Return MyDirectory & "\ConfigFile.json"
+            Return _MyDirectoryName & "\FileManager.json"
         End Get
     End Property
 
-    Private ReadOnly Property IniFile As String
-        Get
-            Return MyDirectory & "\IniFile"
-        End Get
-    End Property
-
-    Private ReadOnly Property MyDirectory As String
+    Private ReadOnly Property _MyDirectoryName As String
         Get
             Return System.Environment.GetEnvironmentVariable("USERPROFILE") & "\test"
         End Get
     End Property
 
-    Private Sub MyDirectoryEstablish()
-        System.IO.Directory.CreateDirectory(Me.MyDirectory)
-    End Sub
+    Private ReadOnly Property _IniFileName As String
+        Get
+            Return _MyDirectoryName & "\IniFile"
+        End Get
+    End Property
 
-    Private Sub IniFileEstablish()
-        System.IO.File.Create(Me.IniFile)
-    End Sub
+    Public ReadOnly Property ConfigFileName As String
+        Get
+            Return _LoadConfigFileName()
+        End Get
+    End Property
 
-    Private Sub ConfigFileEstablish()
-        System.IO.File.Create(Me.ConfigFile)
-    End Sub
-
-    Private Function ModelLoad() As Model
+    Private Function _LoadConfigFileName() As String
         Dim txt As String
         Dim sr As System.IO.StreamReader
-        Dim res As Int32
 
-        ModelLoad = Nothing
+        Dim ms As mySub
+        Dim mbf As myBoolFunction
 
-        'いずれの例外も初期化
+        _LoadConfigFileName = vbNullString
         Try
-            res = _MyDirectoryState
-            Select Case res
-                Case 0
-                    sr = New System.IO.StreamReader(
-                        Me.ConfigFile, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-                    )
-                    txt = sr.ReadToEnd()
-                    ModelLoad = JsonConvert.DeserializeObject(Of Model)(txt)
-                Case 1, 99, 999
-                    Throw New Exception
-                Case Else
-                    Throw New Exception
-            End Select
+            ms = Sub()
+                     sr = New System.IO.StreamReader(
+                        Me._FileManagerFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+                     txt = sr.ReadToEnd()
+                     _LoadConfigFileName = JsonConvert.DeserializeObject(Of FileManagerFileModel)(txt).ConfigFileName
+                 End Sub
+            mbf = Function()
+                      Return _FileCheck(Me._FileManagerFileName)
+                  End Function
 
+            Select Case Me._MyFileState(mbf)
+                Case 0
+                    Call ms()
+                Case 1
+                Case 99
+                Case 999
+            End Select
         Catch ex As Exception
             '
         Finally
@@ -175,63 +167,29 @@ Public Class Model
         End Try
     End Function
 
-    Public Sub ModelSave()
-        Dim txt As String
-        Dim sw As System.IO.StreamWriter
+    Private Function _MyProjectState() As Int32
+        Dim mbf As myBoolFunction
+        mbf = Function()
+                  Return True
+              End Function
+        _MyProjectState = _MyFileState(mbf)
+    End Function
 
-        Dim ms As mySub
-        ms = Sub()
-                 txt = JsonConvert.SerializeObject(Me)
-                 sw = New System.IO.StreamWriter(
-                    Me.ConfigFile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-                 )
-                 sw.WriteLine(txt)
-             End Sub
-        Dim ms2 As mySub : ms2 = AddressOf MyDirectoryEstablish
-        Dim ms3 As mySub : ms3 = AddressOf IniFileEstablish
-
-        Dim res As Int32 : res = _MyDirectoryState
-        Try
-            Select Case res
-                Case 0, 1
-                    Call ms()
-                Case 99
-                    '
-                Case 999
-                    Call ms2()
-                    Call ms3()
-                    Call ms()
-                Case Else
-                    '
-            End Select
-        Catch ex As Exception
-            '
-        Finally
-            If sw IsNot Nothing Then
-                sw.Close()
-                sw.Dispose()
-            End If
-        End Try
-    End Sub
-
-    Private ReadOnly Property _MyDirectoryState As Int32
-        Get
-            If _DirectoryCheck(Me.MyDirectory) Then
-                If _FileCheck(Me.IniFile) Then
-                    If _FileCheck(Me.ConfigFile) Then
-                        Return 0    '正常
-                    Else
-                        Return 1    'Configファイルが存在せず、初回に発生しうる
-                    End If
+    Private Function _MyFileState(ByVal d As myBoolFunction) As Int32
+        If _DirectoryCheck(Me._MyDirectoryName) Then
+            If _FileCheck(Me._IniFileName) Then
+                If (d()) Then
+                    Return 0    '正常
                 Else
-                    Return 99       '既に同名ファイルが存在
+                    Return 1    '対象ファイルが存在しない
                 End If
             Else
-                Return 999          'ディレクトリが存在しない
+                Return 99       '既に同名ファイルが存在
             End If
-        End Get
-    End Property
-
+        Else
+            Return 999          'ディレクトリが存在しない
+        End If
+    End Function
 
     Private ReadOnly Property _DirectoryCheck(d) As Boolean
         Get
@@ -247,17 +205,170 @@ Public Class Model
         End Get
     End Property
 
-    Private ReadOnly Property _FileCheck(ByVal f As String) As Boolean
+    Private Function _FileCheck(ByVal f As String) As Boolean
+        If File.Exists(f) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Private Sub DirectoryEstablish(ByVal d As String)
+        System.IO.Directory.CreateDirectory(d)
+    End Sub
+
+    Private Sub FileEstablish(ByVal f As String)
+        System.IO.File.Create(f)
+    End Sub
+
+    Private Sub FileWrite(ByVal f As String, ByVal txt As String)
+        Dim sw As StreamWriter
+        sw = New System.IO.StreamWriter(
+            f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+        )
+        sw.Write(txt)
+        sw.Close()
+        sw.Dispose()
+    End Sub
+
+
+
+
+    Sub New()
+        Dim ms As mySub
+        Dim ms2 As mySub
+        Dim ms3 As mySub
+        Dim ms4 As mySub
+        Dim ms5 As mySub
+        Dim mbf As myBoolFunction   '_MyFileStateの為の対象ファイルの状態を示すBool Function
+
+        Try
+            ms = Sub()
+                     Call DirectoryEstablish(Me._MyDirectoryName)
+                 End Sub
+            ms2 = Sub()
+                      Call FileWrite(Me._IniFileName, vbNullString)
+                  End Sub
+            ms3 = Sub()
+                      Call FileWrite(Me._FileManagerFileName,
+                                     JsonConvert.SerializeObject(_FileManagerFileInitialize()))
+                  End Sub
+            ms4 = Sub()
+                      Call FileWrite(Me.ConfigFileName,
+                                     JsonConvert.SerializeObject(New Model))
+                  End Sub
+            Select Case (Me._MyProjectState())
+                Case 0
+                    Exit Select
+                Case 99
+                    Throw New Exception
+                Case 999
+                    Call ms()
+                    Call ms2()
+                    Call ms3()
+                    Call ms4()
+            End Select
+        Catch ex As Exception
+            '
+        Finally
+        End Try
+    End Sub
+
+    Private Function _FileManagerFileInitialize() As FileManagerFileModel
+        Dim fmfm As New FileManagerFileModel
+        fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
+        _FileManagerFileInitialize = fmfm
+    End Function
+End Class
+
+Public Class FileManagerFileModel
+    Public ConfigFileName As String
+End Class
+
+Public Class Model
+    Private Const SHIFT_JIS = "SHIFT_JIS"
+
+    '-- My Project ---------------------------------------------------------------'
+    Private mp As MyProject
+    '-----------------------------------------------------------------------------'
+
+    '-- Tree View ----------------------------------------------------------------'
+    Private _TreeViews As List(Of TreeViewM)
+    Public Property TreeViews As List(Of TreeViewM)
         Get
-            Try
-                If System.IO.File.Exists(f) Then
-                    Return True
-                Else
-                    Return False
-                End If
-            Catch ex As Exception
-                Throw ex
-            End Try
+            Return _TreeViews
         End Get
+        Set(value As List(Of TreeViewM))
+            _TreeViews = value
+        End Set
     End Property
+
+    Public Function TreeViewLoad() As List(Of TreeViewM)
+        TreeViewLoad = Me.ModelLoad().TreeViews
+    End Function
+    '-----------------------------------------------------------------------------'
+
+
+    Public Function ModelLoad() As Model
+        Dim txt As String
+        Dim sr As System.IO.StreamReader
+        Dim mp As MyProject
+
+        Dim ms As mySub
+
+        ModelLoad = Nothing
+
+        'いずれの例外も初期化
+        Try
+            mp = New MyProject
+            ms = Sub()
+                     sr = New System.IO.StreamReader(
+                        mp.ConfigFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+                     txt = sr.ReadToEnd()
+                     ModelLoad = JsonConvert.DeserializeObject(Of Model)(txt)
+                 End Sub
+
+            Call ms()
+        Catch ex As Exception
+            '
+        Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
+            If mp IsNot Nothing Then
+                mp = Nothing
+            End If
+        End Try
+    End Function
+
+
+    Public Sub ModelSave()
+        Dim txt As String
+        Dim sw As System.IO.StreamWriter
+        Dim ms As mySub
+        Dim mp As MyProject
+
+        Try
+            mp = New MyProject
+            ms = Sub()
+                     txt = JsonConvert.SerializeObject(Me)
+                     sw = New System.IO.StreamWriter(
+                        mp.ConfigFileName, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+                     )
+                     sw.Write(txt)
+                 End Sub
+            Call ms()
+        Catch ex As Exception
+            '
+        Finally
+            If sw IsNot Nothing Then
+                sw.Close()
+                sw.Dispose()
+            End If
+            If mp IsNot Nothing Then
+                mp = Nothing
+            End If
+        End Try
+    End Sub
 End Class

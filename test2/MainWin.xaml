@@ -161,46 +161,97 @@
                 Content="保存"  HorizontalAlignment="Stretch"
                 Grid.Row="0" Grid.RowSpan="3"
                 VerticalAlignment="Top" BorderBrush="White" BorderThickness="1" OpacityMask="Black" Background="White" Height="27" Margin="0,0,0.1,0" />
-        <Label x:Name="ServerNameLabel" Content="サーバー名"  Grid.Column="23" Grid.ColumnSpan="10" HorizontalAlignment="Right" Grid.Row="6" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="10" />
-        <Label x:Name="DataBaseLabel" Content="データベース名" Grid.Column="23" Grid.ColumnSpan="10" HorizontalAlignment="Right" Grid.Row="10" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="10" />
-        <Label x:Name="DataTableLabel" Content="データテーブル名" Grid.Column="23" Grid.ColumnSpan="10" HorizontalAlignment="Right" Grid.Row="14" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="10" />
-        <Label x:Name="FieldNameLabel" Content="フィールド名" Grid.Column="23" Grid.ColumnSpan="10" HorizontalAlignment="Right" Grid.Row="18" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="10" />
-        <Label x:Name="SourceValueLabel" Content="フィールド値(変更前)" Grid.Column="23" Grid.ColumnSpan="10" HorizontalAlignment="Right" Grid.Row="22" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="10" />
-        <Label x:Name="DistinationValueLabel" Content="フィールド値(変更後)" Grid.Column="23" Grid.ColumnSpan="10" HorizontalAlignment="Right" Grid.Row="26" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="10" />
+        <Label x:Name="ConfigFileLabel" 
+               Content="設定ファイル名"  
+               Grid.Column="23" Grid.ColumnSpan="10" 
+               HorizontalAlignment="Right" 
+               Grid.Row="6" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10" />
+        <Label x:Name="ServerNameLabel" 
+               Content="サーバー名"  
+               Grid.Column="23" Grid.ColumnSpan="10" 
+               HorizontalAlignment="Right" 
+               Grid.Row="10" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10" />
+        <Label x:Name="DataBaseLabel" 
+               Content="データベース名" 
+               Grid.Column="23" Grid.ColumnSpan="10" 
+               HorizontalAlignment="Right" 
+               Grid.Row="14" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10" />
+        <Label x:Name="DataTableLabel" 
+               Content="データテーブル名" 
+               Grid.Column="23" Grid.ColumnSpan="10" 
+               HorizontalAlignment="Right" 
+               Grid.Row="18" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10" />
+        <Label x:Name="FieldNameLabel" 
+               Content="フィールド名" 
+               Grid.Column="23" Grid.ColumnSpan="10" 
+               HorizontalAlignment="Right" 
+               Grid.Row="22" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10" />
+        <Label x:Name="SourceValueLabel" 
+               Content="フィールド値(変更前)" 
+               Grid.Column="23" Grid.ColumnSpan="10" 
+               HorizontalAlignment="Right" 
+               Grid.Row="26" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10" />
+        <Label x:Name="DistinationValueLabel" 
+               Content="フィールド値(変更後)" 
+               Grid.Column="23" Grid.ColumnSpan="10" 
+               HorizontalAlignment="Right" 
+               Grid.Row="30" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10" />
+        <Label x:Name="ConfigFileValue" 
+               Content="{Binding ConfigFileName}"
+               Grid.ColumnSpan="21" Grid.Column="33" 
+               HorizontalAlignment="Stretch" 
+               Grid.Row="6" Grid.RowSpan="3" 
+               VerticalAlignment="Bottom" 
+               FontSize="10"
+               BorderThickness="0,0,0,0" />
         <TextBox x:Name="ServerNameValue" 
                  Text="{Binding ServerName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
-                 Grid.Row="6" Grid.RowSpan="3" 
+                 Grid.Row="10" Grid.RowSpan="3" 
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="DataBaseValue" 
                  Text="{Binding DataBaseName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
-                 Grid.Row="10" Grid.RowSpan="3" 
+                 Grid.Row="14" Grid.RowSpan="3" 
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="DataTabelValue" 
                  Text="{Binding DataTableName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
-                 Grid.Row="14" Grid.RowSpan="3" 
+                 Grid.Row="18" Grid.RowSpan="3" 
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="FieldNameValue" 
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
-                 Grid.Row="18" Grid.RowSpan="3" 
+                 Grid.Row="22" Grid.RowSpan="3" 
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="SourceValue" 
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
-                 Grid.Row="22" Grid.RowSpan="3" 
+                 Grid.Row="26" Grid.RowSpan="3" 
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="DistinationValue" 
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
-                 Grid.Row="26" Grid.RowSpan="3" 
+                 Grid.Row="30" Grid.RowSpan="3" 
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
-        <TreeView x:Name="TreeView" ItemsSource="{Binding Path=ServerVM}" Grid.ColumnSpan="20" Grid.Column="0" HorizontalAlignment="Stretch" Grid.Row="0" Grid.RowSpan="50" VerticalAlignment="Stretch">
+        <TreeView x:Name="TreeView" ItemsSource="{Binding Path=Datas}" Grid.ColumnSpan="20" Grid.Column="0" HorizontalAlignment="Stretch" Grid.Row="0" Grid.RowSpan="50" VerticalAlignment="Stretch">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Child}">
                     <TextBlock Text="{Binding Path=RealName}" />

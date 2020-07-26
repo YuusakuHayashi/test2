@@ -1,0 +1,3 @@
+﻿Module MyModule
+
+End Module

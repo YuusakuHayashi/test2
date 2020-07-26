@@ -5,6 +5,7 @@
         InitializeComponent()
 
         ' InitializeComponent() 呼び出しの後で初期化を追加します。
-        Me.DataContext = New ViewModel()
+        Me.ConfigFileValue.DataContext = New ConfigFileVM
+        Me.TreeView.DataContext = New TreeViewVM
     End Sub
 End Class
