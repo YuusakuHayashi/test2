@@ -25,12 +25,18 @@ End Class
 Public Class AccessButtonVM
     Inherits ViewModel
 
-    Private _ConfigFileName As String
 
-    Private ReadOnly Property _EnableFlag As Boolean
+    Private _fmfm As FileManagerFileM
+    Private ReadOnly Property ConfigFileName As String
         Get
-            _ConfigFileName = (New ConfigFileVM).ConfigFileName
-            If _ConfigFileName <> vbNullString Then
+            RaisePropertyChanged("EnableFlag")
+            Return Me._fmfm.ConfigFileName
+        End Get
+    End Property
+
+    Public ReadOnly Property EnableFlag As Boolean
+        Get
+            If Me._fmfm.ConfigFileName <> vbNullString Then
                 Return True
             Else
                 Return False
@@ -39,6 +45,7 @@ Public Class AccessButtonVM
     End Property
 
     Sub New()
+        Me._fmfm = New FileManagerFileM
     End Sub
 
     'Private _ServerName As String

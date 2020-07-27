@@ -1,10 +1,24 @@
 ﻿Imports System.Collections.ObjectModel
+Imports System.ComponentModel
 Imports Newtonsoft.Json
 Imports System.IO
 
 Delegate Sub mySub()
 Delegate Function myBoolFunction() As Boolean
 Delegate Function myStringFunction() As String
+
+Public MustInherit Class ModelBase
+    Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler _
+        Implements INotifyPropertyChanged.PropertyChanged
+
+    Protected Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
+        RaiseEvent PropertyChanged(
+            Me, New PropertyChangedEventArgs(PropertyName)
+        )
+    End Sub
+End Class
 
 
 Public Class TreeViewM
@@ -144,7 +158,7 @@ Public Class MyProject
                      sr = New System.IO.StreamReader(
                         Me._FileManagerFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
                      txt = sr.ReadToEnd()
-                     _LoadConfigFileName = JsonConvert.DeserializeObject(Of FileManagerFileModel)(txt).ConfigFileName
+                     _LoadConfigFileName = JsonConvert.DeserializeObject(Of FileManagerFileM)(txt).ConfigFileName
                  End Sub
             mbf = Function()
                       Return _FileCheck(Me._FileManagerFileName)
@@ -273,15 +287,24 @@ Public Class MyProject
         End Try
     End Sub
 
-    Private Function _FileManagerFileInitialize() As FileManagerFileModel
-        Dim fmfm As New FileManagerFileModel
+    Private Function _FileManagerFileInitialize() As FileManagerFileM
+        Dim fmfm As New FileManagerFileM
         fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
         _FileManagerFileInitialize = fmfm
     End Function
 End Class
 
-Public Class FileManagerFileModel
-    Public ConfigFileName As String
+Public Class FileManagerFileM : Inherits ModelBase
+    Private _ConfigFileName As String
+    Public Property ConfigFileName As String
+        Get
+            Return _ConfigFileName
+        End Get
+        Set(value As String)
+            _ConfigFileName = value
+            RaisePropertyChanged("ConfigFileName")
+        End Set
+    End Property
 End Class
 
 Public Class Model
