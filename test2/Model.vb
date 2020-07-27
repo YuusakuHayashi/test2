@@ -168,6 +168,7 @@ Public Class MyProject
     End Function
 
     Private Function _MyProjectState() As Int32
+        'ディレクトリおよび、iniFileのチェック
         Dim mbf As myBoolFunction
         mbf = Function()
                   Return True
@@ -184,7 +185,7 @@ Public Class MyProject
                     Return 1    '対象ファイルが存在しない
                 End If
             Else
-                Return 99       '既に同名ファイルが存在
+                Return 99       '既に同名ディレクトリが存在
             End If
         Else
             Return 999          'ディレクトリが存在しない
@@ -230,8 +231,6 @@ Public Class MyProject
         sw.Close()
         sw.Dispose()
     End Sub
-
-
 
 
     Sub New()

@@ -11,6 +11,7 @@ Public Class ConfigFileVM
         End Get
         Set(value As String)
             _ConfigFileName = value
+            RaisePropertyChanged("ConfigFileName")
         End Set
     End Property
 

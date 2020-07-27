@@ -141,9 +141,12 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Button Grid.ColumnSpan="6" Grid.Column="20" 
+        <Button x:Name="AccessButton"
+                Grid.ColumnSpan="6" Grid.Column="20" 
                 Content="接続"  HorizontalAlignment="Stretch"
                 Grid.Row="0" Grid.RowSpan="3"
+                Command=""
+                IsEnabled="{Binding EnableFlag}"
                 VerticalAlignment="Top" BorderBrush="White" BorderThickness="1" OpacityMask="Black" Background="White" Height="27" Margin="0,0,0.1,0" />
         <Button Grid.ColumnSpan="6" Grid.Column="26" 
                 Content="複製"  HorizontalAlignment="Stretch"
@@ -210,8 +213,8 @@
                Grid.Row="30" Grid.RowSpan="3" 
                VerticalAlignment="Bottom" 
                FontSize="10" />
-        <Label x:Name="ConfigFileValue" 
-               Content="{Binding ConfigFileName}"
+        <TextBox x:Name="ConfigFileValue" 
+               Text="{Binding ConfigFileName}"
                Grid.ColumnSpan="21" Grid.Column="33" 
                HorizontalAlignment="Stretch" 
                Grid.Row="6" Grid.RowSpan="3" 

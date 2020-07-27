@@ -50,7 +50,6 @@ C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\Window1.baml
 \\Coral\個人情報-林祐\project\test2\test2\obj\Debug\Window1.baml
 \\Coral\個人情報-林祐\project\test2\test2\obj\Debug\MainWin.g.vb
 \\Coral\個人情報-林祐\project\test2\test2\obj\Debug\MainWin.baml
-\\Coral\個人情報-林祐\project\test2\test2\obj\Debug\GeneratedInternalTypeHelper.g.vb
 C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\MainWin.g.vb
 C:\Users\yuusaku.hayashi\project\test2\test2\obj\Debug\MainWin.baml
 C:\Users\yuusa\project\test2\test2\bin\Debug\test2.exe.config
