@@ -4,10 +4,16 @@ Imports System.Windows.Forms
 Public Class ConfigFileVM
     Inherits ViewModel
 
+    Private Const _PLEASE_INPUT = "Please Input Config File Name"
+
     Private _ConfigFileName As String
     Public Property ConfigFileName As String
         Get
-            Return _ConfigFileName
+            If _ConfigFileName <> vbNullString Then
+                Return _ConfigFileName
+            Else
+                Return _PLEASE_INPUT
+            End If
         End Get
         Set(value As String)
             _ConfigFileName = value
@@ -21,6 +27,6 @@ Public Class ConfigFileVM
     End Sub
 
     Sub New()
-        Me.ConfigFileName = "C:\Users\yuusaku.hayashi\test\ConfigFile.json"
+        Me.ConfigFileName = _ConfigFileName
     End Sub
 End Class

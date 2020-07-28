@@ -15,38 +15,65 @@ Public Class ButtonVM
         End Set
     End Property
 
-
-    Sub New()
-        Dim abvm As New AccessButtonVM
-    End Sub
 End Class
 
 
 Public Class AccessButtonVM
     Inherits ViewModel
+    Implements IDisposable
 
+    Private _Listener As IDisposable
 
-    Private _fmfm As FileManagerFileM
-    Private ReadOnly Property ConfigFileName As String
-        Get
-            RaisePropertyChanged("EnableFlag")
-            Return Me._fmfm.ConfigFileName
-        End Get
-    End Property
 
     Public ReadOnly Property EnableFlag As Boolean
         Get
-            If Me._fmfm.ConfigFileName <> vbNullString Then
-                Return True
-            Else
-                Return False
-            End If
+            Return True
         End Get
     End Property
 
-    Sub New()
-        Me._fmfm = New FileManagerFileM
+    Sub New(ByRef cfvm As ConfigFileVM)
+        _Listener = New PropertyChangedEventListener(cfvm,
+            Sub(sender, e)
+                If e.PropertyName = "ConfigFileName" Then
+                End If
+            End Sub
+        )
     End Sub
+
+#Region "IDisposable Support"
+    Private disposedValue As Boolean ' 重複する呼び出しを検出するには
+
+    ' IDisposable
+    Protected Overridable Sub Dispose(disposing As Boolean)
+        If Not disposedValue Then
+            If disposing Then
+                ' TODO: マネージ状態を破棄します (マネージ オブジェクト)。
+                If _Listener IsNot Nothing Then
+                    _Listener.Dispose()
+                End If
+            End If
+
+            ' TODO: アンマネージ リソース (アンマネージ オブジェクト) を解放し、下の Finalize() をオーバーライドします。
+            ' TODO: 大きなフィールドを null に設定します。
+        End If
+        disposedValue = True
+    End Sub
+
+    ' TODO: 上の Dispose(disposing As Boolean) にアンマネージ リソースを解放するコードが含まれる場合にのみ Finalize() をオーバーライドします。
+    'Protected Overrides Sub Finalize()
+    '    ' このコードを変更しないでください。クリーンアップ コードを上の Dispose(disposing As Boolean) に記述します。
+    '    Dispose(False)
+    '    MyBase.Finalize()
+    'End Sub
+
+    ' このコードは、破棄可能なパターンを正しく実装できるように Visual Basic によって追加されました。
+    Public Sub Dispose() Implements IDisposable.Dispose
+        ' このコードを変更しないでください。クリーンアップ コードを上の Dispose(disposing As Boolean) に記述します。
+        Dispose(True)
+        ' TODO: 上の Finalize() がオーバーライドされている場合は、次の行のコメントを解除してください。
+        ' GC.SuppressFinalize(Me)
+    End Sub
+#End Region
 
     'Private _ServerName As String
     'Public Property ServerName As String
