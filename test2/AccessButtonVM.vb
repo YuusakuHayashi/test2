@@ -20,9 +20,24 @@ Public Class AccessButtonVM
                 Case Else
                     AccessEnableFlag = True
             End Select
-            RaisePropertyChanged("AccessEnableFlag")
         End If
     End Sub
+
+
+    Private _AccessCommand As ICommand
+    Public ReadOnly Property AccessCommand As ICommand
+        Get
+            If _AccessCommand Is Nothing Then
+                _AccessCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _AccessCommandExecute,
+                    .CanExecuteHandler = AddressOf _AceessCommandCanExecute
+                }
+                Return _AccessCommand
+            Else
+                Return _AccessCommand
+            End If
+        End Get
+    End Property
 
     Private _AccessEnableFlag As Boolean
     Public Property AccessEnableFlag As Boolean
@@ -31,14 +46,19 @@ Public Class AccessButtonVM
         End Get
         Set(value As Boolean)
             _AccessEnableFlag = value
+            CType(AccessCommand, DelegateCommand).RaiseCanExecuteChanged()
         End Set
     End Property
 
-    Sub New(ByRef cfvm As ConfigFileVM)
-        AddHandler cfvm.PropertyChanged, AddressOf _AccessEnableCheck
+    Private Sub _AccessCommandExecute(ByVal parameter As Object)
+        MsgBox("hello")
     End Sub
 
-    Private Sub AccessCommandExecute(ByVal parameter As Object)
+    Private Function _AceessCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return AccessEnableFlag
+    End Function
 
+    Sub New(ByRef cfvm As ConfigFileVM)
+        AddHandler cfvm.PropertyChanged, AddressOf _AccessEnableCheck
     End Sub
 End Class
