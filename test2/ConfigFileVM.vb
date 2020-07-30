@@ -4,15 +4,15 @@ Imports System.Windows.Forms
 Public Class ConfigFileVM
     Inherits ViewModel
 
-    Private Const _PLEASE_INPUT = "Please Input Config File Name"
+    Public Const PLEASE_INPUT = "Please Input Config File Name"
 
     Private _ConfigFileName As String
     Public Property ConfigFileName As String
         Get
-            If _ConfigFileName <> vbNullString Then
-                Return _ConfigFileName
+            If String.IsNullOrEmpty(_ConfigFileName) Then
+                Return PLEASE_INPUT
             Else
-                Return _PLEASE_INPUT
+                Return _ConfigFileName
             End If
         End Get
         Set(value As String)
@@ -21,12 +21,13 @@ Public Class ConfigFileVM
         End Set
     End Property
 
+
     Private Sub ClickCommandExecute(ByVal parameter As Object)
         Dim ofd As New OpenFileDialog
         ofd.FileName = "default.html"
     End Sub
 
     Sub New()
-        Me.ConfigFileName = _ConfigFileName
+
     End Sub
 End Class

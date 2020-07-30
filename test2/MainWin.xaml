@@ -146,7 +146,7 @@
                 Content="接続"  HorizontalAlignment="Stretch"
                 Grid.Row="0" Grid.RowSpan="3"
                 Command=""
-                IsEnabled="{Binding EnableFlag}"
+                IsEnabled="{Binding AccessEnableFlag}"
                 VerticalAlignment="Top" BorderBrush="White" BorderThickness="1" OpacityMask="Black" Background="White" Height="27" Margin="0,0,0.1,0" />
         <Button Grid.ColumnSpan="6" Grid.Column="26" 
                 Content="複製"  HorizontalAlignment="Stretch"

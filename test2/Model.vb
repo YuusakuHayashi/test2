@@ -6,6 +6,8 @@ Imports System.IO
 Delegate Sub mySub()
 Delegate Function myBoolFunction() As Boolean
 Delegate Function myStringFunction() As String
+Delegate Function myModelLoad(Of T)(ByVal f As String) As T
+Delegate Sub mySubWithT(Of T)(ByVal t As T)
 
 Public MustInherit Class ModelBase
     Implements INotifyPropertyChanged
@@ -117,6 +119,88 @@ Public Class TreeViewM
     'End Property
 End Class
 
+
+Public Class MainModel
+    Public ServerName As String
+    Public DataBaseName As String
+    Public DataTableName As String
+    Public FieldName As String
+    Public SourceValue As String
+    Public DistinationValue As String
+    '-- Field Name ------------------------------------------------------'
+    'Private _FieldName As String
+    'Public Property FieldName As String
+    '    Get
+    '        Return _FieldName
+    '    End Get
+    '    Set(value As String)
+    '        _FieldName = value
+    '    End Set
+    'End Property
+    '--------------------------------------------------------------------'
+
+    '-- Source Value ----------------------------------------------------'
+    'Private _SourceValue As String
+    'Public Property SourceValue As String
+    '    Get
+    '        Return _SourceValue
+    '    End Get
+    '    Set(value As String)
+    '        _SourceValue = value
+    '    End Set
+    'End Property
+    ''--------------------------------------------------------------------'
+
+    ''-- Distination Value -----------------------------------------------'
+    'Private _DistinationValue As String
+    'Public Property DistinationValue As String
+    '    Get
+    '        Return _DistinationValue
+    '    End Get
+    '    Set(value As String)
+    '        _DistinationValue = value
+    '    End Set
+    'End Property
+    ''--------------------------------------------------------------------'
+
+    ''-- Server Name -----------------------------------------------------'
+    'Private _ServerName As String
+    'Public Property ServerName As String
+    '    Get
+    '        Return _ServerName
+    '    End Get
+    '    Set(value As String)
+    '        _ServerName = value
+    '    End Set
+    'End Property
+    ''--------------------------------------------------------------------'
+
+    ''-- DataBase Name ---------------------------------------------------'
+    'Private Property _DataBaseName As String
+    'Public Property DataBaseName As String
+    '    Get
+    '        Return _DataBaseName
+    '    End Get
+    '    Set(value As String)
+    '        _DataBaseName = value
+    '    End Set
+    'End Property
+    ''--------------------------------------------------------------------'
+
+
+    ''-- DataTable Name --------------------------------------------------'
+    'Private Property _DataTableName As String
+    'Public Property DataTableName As String
+    '    Get
+    '        Return _DataTableName
+    '    End Get
+    '    Set(value As String)
+    '        _DataTableName = value
+    '    End Set
+    'End Property
+    ''--------------------------------------------------------------------'
+End Class
+
 Public Class MyProject
     Private Const SHIFT_JIS = "SHIFT_JIS"
     Private Const CONFIG_FILE_JSON = "ConfigFile.json"
@@ -145,40 +229,44 @@ Public Class MyProject
         End Get
     End Property
 
-    Private Function _LoadConfigFileName() As String
-        Dim txt As String
-        Dim sr As System.IO.StreamReader
+    Public Function LoadConfigFileName() As String
+        Dim myload As myModelLoad(Of FileManagerFileM)
 
-        Dim ms As mySub
-        Dim mbf As myBoolFunction
+        myload = AddressOf ModelLoad(Of FileManagerFileM)
+        LoadConfigFileName = (myload("FileManagerFile")).ConfigFileName
+        'Dim txt As String
+        'Dim sr As System.IO.StreamReader
 
-        _LoadConfigFileName = vbNullString
-        Try
-            ms = Sub()
-                     sr = New System.IO.StreamReader(
-                        Me._FileManagerFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
-                     txt = sr.ReadToEnd()
-                     _LoadConfigFileName = JsonConvert.DeserializeObject(Of FileManagerFileM)(txt).ConfigFileName
-                 End Sub
-            mbf = Function()
-                      Return _FileCheck(Me._FileManagerFileName)
-                  End Function
+        'Dim ms As mySub
+        'Dim mbf As myBoolFunction
 
-            Select Case Me._MyFileState(mbf)
-                Case 0
-                    Call ms()
-                Case 1
-                Case 99
-                Case 999
-            End Select
-        Catch ex As Exception
-            '
-        Finally
-            If sr IsNot Nothing Then
-                sr.Close()
-                sr = Nothing
-            End If
-        End Try
+        '_LoadConfigFileName = vbNullString
+        'Try
+        '    ms = Sub()
+        '             sr = New System.IO.StreamReader(
+        '                Me._FileManagerFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        '             txt = sr.ReadToEnd()
+        '             _LoadConfigFileName = JsonConvert.DeserializeObject(Of FileManagerFileM)(txt).ConfigFileName
+        '         End Sub
+        '    mbf = Function()
+        '              Return _FileCheck(Me._FileManagerFileName)
+        '          End Function
+
+        '    Select Case Me._MyFileState(mbf)
+        '        Case 0
+        '            Call ms()
+        '        Case 1
+        '        Case 99
+        '        Case 999
+        '    End Select
+        'Catch ex As Exception
+        '    '
+        'Finally
+        '    If sr IsNot Nothing Then
+        '        sr.Close()
+        '        sr = Nothing
+        '    End If
+        'End Try
     End Function
 
     Private Function _MyProjectState() As Int32
@@ -246,14 +334,81 @@ Public Class MyProject
         sw.Dispose()
     End Sub
 
+    Private Function _FileManagerFileInitialize() As FileManagerFileM
+        Dim fmfm As New FileManagerFileM
+        fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
+        _FileManagerFileInitialize = fmfm
+    End Function
+
+    Public Function ModelLoad(Of T)(ByVal f As String) As T
+        Dim txt As String
+        Dim sr As System.IO.StreamReader
+        Dim mp As MyProject
+
+        Dim ms As mySub
+
+        ModelLoad = Nothing
+
+        'いずれの例外も初期化
+        Try
+            mp = New MyProject
+            ms = Sub()
+                     sr = New System.IO.StreamReader(
+                        f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+                     txt = sr.ReadToEnd()
+                     ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
+                 End Sub
+
+            Call ms()
+        Catch ex As Exception
+            '
+        Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
+            If mp IsNot Nothing Then
+                mp = Nothing
+            End If
+        End Try
+    End Function
+
+
+    Public Sub ModelSave(Of T)(ByVal m As T)
+        Dim txt As String
+        Dim sw As System.IO.StreamWriter
+        Dim ms As mySub
+        Dim mp As MyProject
+
+        Try
+            mp = New MyProject
+            ms = Sub()
+                     txt = JsonConvert.SerializeObject(m)
+                     sw = New System.IO.StreamWriter(
+                        mp.ConfigFileName, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+                     )
+                     sw.Write(txt)
+                 End Sub
+            Call ms()
+        Catch ex As Exception
+            '
+        Finally
+            If sw IsNot Nothing Then
+                sw.Close()
+                sw.Dispose()
+            End If
+            If mp IsNot Nothing Then
+                mp = Nothing
+            End If
+        End Try
+    End Sub
+
 
     Sub New()
         Dim ms As mySub
         Dim ms2 As mySub
         Dim ms3 As mySub
         Dim ms4 As mySub
-        Dim ms5 As mySub
-        Dim mbf As myBoolFunction   '_MyFileStateの為の対象ファイルの状態を示すBool Function
 
         Try
             ms = Sub()
@@ -286,12 +441,6 @@ Public Class MyProject
         Finally
         End Try
     End Sub
-
-    Private Function _FileManagerFileInitialize() As FileManagerFileM
-        Dim fmfm As New FileManagerFileM
-        fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
-        _FileManagerFileInitialize = fmfm
-    End Function
 End Class
 
 Public Class FileManagerFileM : Inherits ModelBase
@@ -309,6 +458,9 @@ End Class
 
 Public Class Model
     Private Const SHIFT_JIS = "SHIFT_JIS"
+
+
+
 
     '-- My Project ---------------------------------------------------------------'
     Private mp As MyProject
@@ -330,67 +482,4 @@ Public Class Model
     End Function
     '-----------------------------------------------------------------------------'
 
-
-    Public Function ModelLoad() As Model
-        Dim txt As String
-        Dim sr As System.IO.StreamReader
-        Dim mp As MyProject
-
-        Dim ms As mySub
-
-        ModelLoad = Nothing
-
-        'いずれの例外も初期化
-        Try
-            mp = New MyProject
-            ms = Sub()
-                     sr = New System.IO.StreamReader(
-                        mp.ConfigFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
-                     txt = sr.ReadToEnd()
-                     ModelLoad = JsonConvert.DeserializeObject(Of Model)(txt)
-                 End Sub
-
-            Call ms()
-        Catch ex As Exception
-            '
-        Finally
-            If sr IsNot Nothing Then
-                sr.Close()
-                sr.Dispose()
-            End If
-            If mp IsNot Nothing Then
-                mp = Nothing
-            End If
-        End Try
-    End Function
-
-
-    Public Sub ModelSave()
-        Dim txt As String
-        Dim sw As System.IO.StreamWriter
-        Dim ms As mySub
-        Dim mp As MyProject
-
-        Try
-            mp = New MyProject
-            ms = Sub()
-                     txt = JsonConvert.SerializeObject(Me)
-                     sw = New System.IO.StreamWriter(
-                        mp.ConfigFileName, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-                     )
-                     sw.Write(txt)
-                 End Sub
-            Call ms()
-        Catch ex As Exception
-            '
-        Finally
-            If sw IsNot Nothing Then
-                sw.Close()
-                sw.Dispose()
-            End If
-            If mp IsNot Nothing Then
-                mp = Nothing
-            End If
-        End Try
-    End Sub
 End Class

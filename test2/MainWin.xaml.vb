@@ -6,7 +6,7 @@
 
         ' InitializeComponent() 呼び出しの後で初期化を追加します。
         Dim cfvm As New ConfigFileVM
-        Me.ConfigFileValue.DataContext = New ConfigFileVM
+        Me.ConfigFileValue.DataContext = cfvm
         Me.TreeView.DataContext = New TreeViewVM
         Me.AccessButton.DataContext = New AccessButtonVM(cfvm)
     End Sub
