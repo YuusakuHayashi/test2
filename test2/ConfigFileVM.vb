@@ -21,7 +21,6 @@ Public Class ConfigFileVM
         End Set
     End Property
 
-
     Private Sub ClickCommandExecute(ByVal parameter As Object)
         Dim ofd As New OpenFileDialog
         ofd.FileName = "default.html"

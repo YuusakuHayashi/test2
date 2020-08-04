@@ -1,6 +1,11 @@
 ﻿Public Class TreeViewModel
     'TreeView は考え方が複雑・・・
     '描画線用のデータ構造ではTreeViewのリスト型
+
+    Public ServerName As String
+    Public DataBaseName As String
+    Public DataTableName As String
+
     Private Property _RealName As String
     Public Property RealName As String
         Get

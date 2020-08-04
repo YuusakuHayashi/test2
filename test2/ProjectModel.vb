@@ -38,9 +38,13 @@ Public Class ProjectModel
         LoadFileManagerFile = myload(Me._FileManagerFileName)
     End Function
 
+    Private Function _FileManagerFileInitialize() As FileManagerFileModel
+        Dim fmfm As New FileManagerFileModel
+        fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
+        _FileManagerFileInitialize = fmfm
+    End Function
+
     '---------------------------------------------------------------------------------------'
-
-
 
 
     '-- Tree Views -------------------------------------------------------------------------'
@@ -52,6 +56,18 @@ Public Class ProjectModel
     End Function
 
     '---------------------------------------------------------------------------------------'
+
+
+
+    '-- SqlStatus --------------------------------------------------------------------------'
+    Public Function LoadSqlModel() As SqlModel
+        Dim myload As myModelLoad(Of ConfigFileModel)
+
+        myload = AddressOf ModelLoad(Of ConfigFileModel)
+        LoadSqlModel = myload(Me.LoadFileManagerFile.ConfigFileName).SqlStatus
+    End Function
+    '---------------------------------------------------------------------------------------'
+
 
     Private Function _MyProjectState() As Int32
         'ディレクトリおよび、iniFileのチェック
@@ -118,13 +134,6 @@ Public Class ProjectModel
         sw.Dispose()
     End Sub
 
-    '-- File Manager File -------------------------------------------------------------'
-    Private Function _FileManagerFileInitialize() As FileManagerFileModel
-        Dim fmfm As New FileManagerFileModel
-        fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
-        _FileManagerFileInitialize = fmfm
-    End Function
-    '----------------------------------------------------------------------------------'
 
     Public Function ModelLoad(Of T)(ByVal f As String) As T
         Dim txt As String

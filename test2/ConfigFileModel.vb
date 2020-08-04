@@ -1,4 +1,9 @@
 ﻿Public Class ConfigFileModel
+    '-- Sql Status ---------------------------------------------------------------'
+    Public SqlStatus As SqlModel
+    '-----------------------------------------------------------------------------'
+
+
     '-- Tree View ----------------------------------------------------------------'
     Private _TreeViews As List(Of TreeViewModel)
     Public Property TreeViews As List(Of TreeViewModel)
@@ -10,8 +15,4 @@
         End Set
     End Property
     '-----------------------------------------------------------------------------'
-
-    Sub New()
-
-    End Sub
 End Class

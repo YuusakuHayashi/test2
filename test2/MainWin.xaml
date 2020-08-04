@@ -159,10 +159,13 @@
                 Content="開く"  HorizontalAlignment="Stretch"
                 Grid.Row="0" Grid.RowSpan="3"
                 VerticalAlignment="Top" BorderBrush="White" BorderThickness="1" OpacityMask="Black" Background="White" Height="27" Margin="0,0,0.1,0" />
-        <Button Grid.ColumnSpan="6" Grid.Column="44" 
-                Content="保存"  HorizontalAlignment="Stretch"
-                Grid.Row="0" Grid.RowSpan="3"
-                VerticalAlignment="Top" BorderBrush="White" BorderThickness="1" OpacityMask="Black" Background="White" Height="27" Margin="0,0,0.1,0" />
+        <Button 
+            x:Name="SaveButton"
+            Command="{Binding SaveCommand}"
+            Grid.ColumnSpan="6" Grid.Column="44" 
+            Content="保存"  HorizontalAlignment="Stretch"
+            Grid.Row="0" Grid.RowSpan="3"
+            VerticalAlignment="Top" BorderBrush="White" BorderThickness="1" OpacityMask="Black" Background="White" Height="27" Margin="0,0,0.1,0" />
         <Label x:Name="ConfigFileLabel" 
                Content="設定ファイル名"  
                Grid.Column="23" Grid.ColumnSpan="10" 
@@ -225,33 +228,42 @@
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="10" Grid.RowSpan="3" 
+                 FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="DataBaseValue" 
                  Text="{Binding DataBaseName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="14" Grid.RowSpan="3" 
+                 FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="DataTabelValue" 
                  Text="{Binding DataTableName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="18" Grid.RowSpan="3" 
+                 FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="FieldNameValue" 
+                 Text="{Binding FieldName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="22" Grid.RowSpan="3" 
+                 FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="SourceValue" 
+                 Text="{Binding SourceValue}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
-                 Grid.Row="26" Grid.RowSpan="3" 
+                 Grid.Row="26" Grid.RowSpan="3"
+                 FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TextBox x:Name="DistinationValue" 
+                 Text="{Binding DistinationValue}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="30" Grid.RowSpan="3" 
+                 FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
         <TreeView x:Name="TreeView" ItemsSource="{Binding Path=Datas}" Grid.ColumnSpan="20" Grid.Column="0" HorizontalAlignment="Stretch" Grid.Row="0" Grid.RowSpan="50" VerticalAlignment="Stretch">
             <TreeView.ItemTemplate>
