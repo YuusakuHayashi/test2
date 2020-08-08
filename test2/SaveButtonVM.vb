@@ -24,6 +24,16 @@ Public Class SaveButtonVM
         End Set
     End Property
 
+    Private Property __TreeViewVM As TreeViewViewModel
+    Private Property _TreeViewVM As TreeViewViewModel
+        Get
+            Return Me.__TreeViewVM
+        End Get
+        Set(value As TreeViewViewModel)
+            Me.__TreeViewVM = value
+        End Set
+    End Property
+
 
     Private __ABVM As AccessButtonVM
     Private Property _ABVM As AccessButtonVM
@@ -63,22 +73,29 @@ Public Class SaveButtonVM
 
         abvm = CType(sender, AccessButtonVM)
         Me._ABVM = abvm
+
+        'イベントハンドラに追加していくよりも
+        'ここにViewModel変更時のトリガーを追加していったほうがいい・・・？
+        Call _SaveEnableCheck()
     End Sub
 
 
 
-    Private Sub _SaveEnableCheck(ByVal sender As Object,
-                                  ByVal e As PropertyChangedEventArgs)
-        Dim abvm As AccessButtonVM
+    'TreeViewModel変更の反映
+    Private Sub _TreeViewMUpdate(ByVal sender As Object,
+                                 ByVal e As PropertyChangedEventArgs)
+        Dim tvvm As TreeViewViewModel
 
-        Select Case e.PropertyName
-            Case "AccessEnableFlag"
-            Case Else
-                Exit Sub
-        End Select
+        tvvm = CType(sender, TreeViewViewModel)
+        Me._TreeViewVM = tvvm
 
-        abvm = CType(sender, AccessButtonVM)
-        Me.SaveEnableFlag = abvm.AccessEnableFlag
+        'イベントハンドラに追加していくよりも
+        'ここにViewModel変更時のトリガーを追加していったほうがいい・・・？
+    End Sub
+
+
+    Private Sub _SaveEnableCheck()
+        Me.SaveEnableFlag = Me._ABVM.AccessEnableFlag
     End Sub
 
 
@@ -98,6 +115,7 @@ Public Class SaveButtonVM
         End Get
     End Property
 
+
     Private _SaveEnableFlag As Boolean
     Public Property SaveEnableFlag As Boolean
         Get
@@ -110,7 +128,20 @@ Public Class SaveButtonVM
     End Property
 
     Private Sub _SaveCommandExecute(ByVal parameter As Object)
-        Call Me._Model.Save()
+        'Call Me._Model.Save()
+        Dim pm As New ProjectModel
+        Dim cfm As New ConfigFileModel
+        Dim f As String
+
+        f = pm.LoadFileManagerFile.ConfigFileName
+        cfm = pm.ModelLoad(Of ConfigFileModel)(f)
+        cfm.SqlStatus = Me._Model
+        'cfm.TreeViews = Me._TreeViewVM.ModelList
+
+        pm.ModelSave(Of ConfigFileModel)(f, cfm)
+
+        pm = Nothing
+        cfm = Nothing
     End Sub
 
     Private Function _SaveCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -118,15 +149,21 @@ Public Class SaveButtonVM
     End Function
 
 
-    Sub New(ByRef sm As SqlModel, ByRef ssvm As SqlStatusVM, ByRef abvm As AccessButtonVM)
+    Sub New(ByRef sm As SqlModel,
+            ByRef ssvm As SqlStatusVM,
+            ByRef abvm As AccessButtonVM,
+            ByRef tvvm As TreeViewViewModel)
 
         Me._Model = sm
         Me._VM = ssvm
         Me._ABVM = abvm
+        Me._TreeViewVM = tvvm
+
+        Call Me._SaveEnableCheck()
 
         AddHandler sm.PropertyChanged, AddressOf Me._ModelUpdate
         AddHandler ssvm.PropertyChanged, AddressOf Me._VMUpdate
         AddHandler abvm.PropertyChanged, AddressOf Me._ABVMUpdate
-        AddHandler abvm.PropertyChanged, AddressOf Me._SaveEnableCheck
+        AddHandler tvvm.PropertyChanged, AddressOf Me._TreeViewMUpdate
     End Sub
 End Class

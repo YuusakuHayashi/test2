@@ -5,6 +5,32 @@
 Imports System.Data.SqlClient
 
 Module MyModule
+
+    'Public Function TreeViewVMRecursive(ByRef ltvm As List(Of TreeViewModel)) As TreeViewViewModel
+    '    Dim tvvm As New TreeViewViewModel
+    '    Dim tvvm2 As TreeViewViewModel
+    '    Dim l As List(Of TreeViewModel)
+
+    '    If ltvm IsNot Nothing Then
+    '        For Each tvm In ltvm
+    '            tvvm.RealName = tvm.RealName
+    '            tvvm.Checked = tvm.Checked
+    '            '-- 直接再帰関数に.Childを入れるとウィルスチェックに掛かる ---
+    '            l = tvm.Child
+
+    '            If l IsNot Nothing Then
+    '                tvvm2 = TreeViewVMRecursive(l)
+    '                If tvvm2 IsNot Nothing Then
+    '                    tvvm.Child.Add(tvvm2)
+    '                End If
+    '                'tvvm.Child.Add(TreeViewVMRecursive(l))
+    '            End If
+    '            '-------------------------------------------------------------
+    '        Next
+    '    End If
+    '    Return tvvm
+    'End Function
+
     '    'フレキシブルデザイン関係
     '    Public defaultWinHeight As System.Int32
 

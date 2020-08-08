@@ -89,10 +89,11 @@
     <Compile Include="SqlModel.vb" />
     <Compile Include="SqlStatusVM.vb" />
     <Compile Include="testmodule.vb" />
+    <Compile Include="TreeViewListModel.vb" />
     <Compile Include="TreeViewModel.vb" />
     <Compile Include="ViewModel.vb" />
     <Compile Include="VMCommand.vb" />
-    <Compile Include="TreeViewVM.vb" />
+    <Compile Include="TreeViewViewModel.vb" />
     <Compile Include="Window1.xaml.vb">
       <DependentUpon>Window1.xaml</DependentUpon>
     </Compile>

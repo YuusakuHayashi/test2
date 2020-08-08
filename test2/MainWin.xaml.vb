@@ -10,7 +10,12 @@
 
 
         Dim pm As New ProjectModel
-        Me.TreeView.DataContext = New TreeViewVM(pm.LoadTreeViewModel)
+        'Dim ltvm As List(Of TreeViewModel)
+        'ltvm = pm.LoadTreeViewModel
+        Dim tvvm As New TreeViewViewModel(pm.LoadTreeViewModel)
+        'tvvm = TreeViewVMRecursive(ltvm)
+        Me.TreeView.DataContext = tvvm
+
 
 
         '-- Sql 関連 ---------------------------------------------'
@@ -28,6 +33,6 @@
         Me.AccessButton.DataContext = abvm
 
 
-        Me.SaveButton.DataContext = New SaveButtonVM(sm, ssvm, abvm)
+        Me.SaveButton.DataContext = New SaveButtonVM(sm, ssvm, abvm, tvvm)
     End Sub
 End Class

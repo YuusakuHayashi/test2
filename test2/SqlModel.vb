@@ -101,23 +101,27 @@ Public Class SqlModel : Inherits BaseModel
 
     Public Sub AccessTest()
         Me.Query = vbNullString
-        Call _DataBaseAccess(Me)
+        Call Me._DataBaseAccess(Me)
     End Sub
 
-    Public Sub Save()
-        Dim pm As New ProjectModel
-        Dim cfm As New ConfigFileModel
-        Dim f As String
-
-        f = pm.LoadFileManagerFile.ConfigFileName
-        cfm = pm.ModelLoad(Of ConfigFileModel)(f)
-        cfm.SqlStatus = Me
-
-        pm.ModelSave(Of ConfigFileModel)(f, cfm)
-
-        pm = Nothing
-        cfm = Nothing
+    Public Sub AccessTestProxy(ByVal b As Boolean)
+        Me.AccessFlag = b
     End Sub
+
+    'Public Sub Save()
+    '    Dim pm As New ProjectModel
+    '    Dim cfm As New ConfigFileModel
+    '    Dim f As String
+
+    '    f = pm.LoadFileManagerFile.ConfigFileName
+    '    cfm = pm.ModelLoad(Of ConfigFileModel)(f)
+    '    cfm.SqlStatus = Me
+
+    '    pm.ModelSave(Of ConfigFileModel)(f, cfm)
+
+    '    pm = Nothing
+    '    cfm = Nothing
+    'End Sub
 
     Private Sub _DataBaseAccess(ByVal sql As SqlModel)
         Dim scmd As SqlCommand
@@ -142,10 +146,10 @@ Public Class SqlModel : Inherits BaseModel
             sql.ServerVersion = scon.ServerVersion
 
             '成功
-            Me.AccessFlag = True
+            'Me.AccessFlag = True
         Catch ex As Exception
             '失敗
-            Me.AccessFlag = False
+            'Me.AccessFlag = False
 
             Try
                 If strn IsNot Nothing Then

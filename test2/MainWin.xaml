@@ -265,10 +265,20 @@
                  Grid.Row="30" Grid.RowSpan="3" 
                  FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
-        <TreeView x:Name="TreeView" ItemsSource="{Binding Path=Datas}" Grid.ColumnSpan="20" Grid.Column="0" HorizontalAlignment="Stretch" Grid.Row="0" Grid.RowSpan="50" VerticalAlignment="Stretch">
+        <TreeView x:Name="TreeView" 
+                  ItemsSource="{Binding Path=ModelList}" 
+                  Grid.ColumnSpan="20" Grid.Column="0" 
+                  HorizontalAlignment="Stretch" 
+                  Grid.Row="0" Grid.RowSpan="50" 
+                  VerticalAlignment="Stretch">
+            <TreeView.Resources>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="IsSelected" Value="False" />
+                </Style>
+            </TreeView.Resources>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Child}">
-                    <TextBlock Text="{Binding Path=RealName}" />
+                    <CheckBox Content="{Binding Path=RealName}" IsChecked="{Binding Checked}" />
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
