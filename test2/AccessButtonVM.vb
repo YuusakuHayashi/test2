@@ -84,7 +84,7 @@ Public Class AccessButtonVM
     Private Sub _AccessCommandExecute(ByVal parameter As Object)
 
         'テスト用
-        Call Me._Model.AccessTestProxy(True)
+        'Call Me._Model.AccessTestProxy(True)
 
         '本番
         'Call Me._Model.AccessTest()

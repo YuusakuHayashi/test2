@@ -16,12 +16,14 @@
         sm = pm.LoadSqlModel
         '---------------------------------------------------------'
 
-        '-- TreeViewViewModel 関連 (ViewModel) -------------------'
-        sm.TreeViewM = New TreeViewModel
-        Dim tvvm As New TreeViewViewModel(sm)
-        sm.ServerName = "hoge"
-        Me.TreeView.DataContext = tvvm
+        '-- TreeView (Model) -------------------------------------'
+        Dim tvm As New TreeViewModel
         '---------------------------------------------------------'
+
+        '-- SqlHandler (Model) -----------------------------------'
+        Dim shm As New SqlHandlerModel(sm, tvm)
+        '---------------------------------------------------------'
+
 
         '-- SqlStatusVM 関連 (ViewModel) -------------------------'
         Dim ssvm As New SqlStatusVM(sm)
@@ -31,6 +33,12 @@
         Me.FieldNameValue.DataContext = ssvm
         Me.SourceValue.DataContext = ssvm
         Me.DistinationValue.DataContext = ssvm
+        '---------------------------------------------------------'
+
+        '-- TreeViewViewModel 関連 (ViewModel) -------------------'
+        Dim tvvm As New TreeViewViewModel(tvm)
+        tvvm.Model.RealName = "hoge"
+        tvm.RealName = "hoge"
         '---------------------------------------------------------'
 
         Dim abvm As New AccessButtonVM(sm, ssvm)

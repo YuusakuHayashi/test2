@@ -5,55 +5,38 @@ Imports System.Collections.ObjectModel
 Public Class TreeViewViewModel
     Inherits ViewModel
 
-    Private __SqlM As SqlModel
-    Private Property _SqlM As SqlModel
-        Get
-            Return __SqlM
-        End Get
-        Set(value As SqlModel)
-            __SqlM = value
-        End Set
-    End Property
+    'Private __SqlM As SqlModel
+    'Private Property _SqlM As SqlModel
+    '    Get
+    '        Return __SqlM
+    '    End Get
+    '    Set(value As SqlModel)
+    '        __SqlM = value
+    '    End Set
+    'End Property
 
 
     'SqlModelの変更を自身に反映
-    Private Sub _SqlModelUpdate(ByVal sender As Object,
-                                ByVal e As PropertyChangedEventArgs)
-        Dim sm As SqlModel
-        sm = CType(sender, SqlModel)
-        Me._SqlM = sm
-        If e.PropertyName = "TreeViewM" Then
-            Call _ViewModelUpdate()
-        End If
-    End Sub
-
-
-    'SqlModel(TreeViewMプロパティ)の変更を自身に反映
-    Private Sub _ViewModelUpdate()
-        If Not Me._SqlM.TreeViewM.Equals(Me.Model) Then
-            Me.Model = Me._SqlM.TreeViewM
-        End If
-    End Sub
-
-    'Private Sub _ViewModelUpdate(ByVal sender As Object,
-    '                             ByVal e As PropertyChangedEventArgs)
+    'Private Sub _SqlModelUpdate(ByVal sender As Object,
+    '                            ByVal e As PropertyChangedEventArgs)
     '    Dim sm As SqlModel
-
-    '    Select Case e.PropertyName
-    '        Case "TreeViewM"
-    '        Case Else
-    '            Exit Sub
-    '    End Select
-
-
     '    sm = CType(sender, SqlModel)
-    '    Select Case e.PropertyName
-    '        Case "TreeViewM"
-    '            Me._Model = sm.TreeViewM
-    '        Case Else
-    '            Exit Sub
-    '    End Select
+    '    Me._SqlM = sm
+    '    If e.PropertyName = "TreeViewM" Then
+    '        Call _ViewModelUpdate()
+    '    End If
     'End Sub
+
+
+    'Modelの変更を自身に反映
+
+    Private Sub _ViewModelUpdate(ByVal sender As Object,
+                                 ByVal e As PropertyChangedEventArgs)
+        Dim tvm As TreeViewModel
+
+        tvm = CType(sender, TreeViewModel)
+        Me._Model = tvm
+    End Sub
 
 
     Private _Model As TreeViewModel
@@ -152,11 +135,13 @@ Public Class TreeViewViewModel
 
 
     'Sub New()
-    Sub New(ByRef sm As SqlModel)
-        Me._SqlM = sm
-        Me.Model = sm.TreeViewM
+    Sub New(ByRef tvm As TreeViewModel)
+        Me.Model = tvm
+        AddHandler Me.Model.PropertyChanged, AddressOf _ViewModelUpdate
+        'Me._SqlM = sm
+        'Me.Model = sm.TreeViewM
 
-        AddHandler Me._SqlM.PropertyChanged, AddressOf _SqlModelUpdate
+        'AddHandler Me._SqlM.PropertyChanged, AddressOf _SqlModelUpdate
         'AddHandler Me._SqlM.TreeViewM.PropertyChanged, AddressOf _ViewModelUpdate
 
         'Dim a As String

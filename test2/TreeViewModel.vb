@@ -13,6 +13,7 @@
         End Get
         Set(value As String)
             _RealName = value
+            RaisePropertyChanged("RealName")
         End Set
     End Property
 
