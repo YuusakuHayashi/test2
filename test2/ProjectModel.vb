@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports Newtonsoft.Json
 
-Delegate Function myModelLoad(Of T)(ByVal f As String) As T
+Delegate Function ModelLoadProxy(Of T)(ByVal f As String) As T
 
 Public Class ProjectModel
     Private Const SHIFT_JIS = "SHIFT_JIS"
@@ -32,11 +32,13 @@ Public Class ProjectModel
 
     '-- File Manager File ------------------------------------------------------------------'
     Public Function LoadFileManagerFile() As FileManagerFileModel
-        Dim myload As myModelLoad(Of FileManagerFileModel)
+        Dim myload As ModelLoadProxy(Of FileManagerFileModel)
 
         myload = AddressOf ModelLoad(Of FileManagerFileModel)
         LoadFileManagerFile = myload(Me._FileManagerFileName)
     End Function
+
+
 
     Private Function _FileManagerFileInitialize() As FileManagerFileModel
         Dim fmfm As New FileManagerFileModel
@@ -47,24 +49,25 @@ Public Class ProjectModel
     '---------------------------------------------------------------------------------------'
 
 
+
     '-- Tree Views -------------------------------------------------------------------------'
-    Public Function LoadTreeViewModel() As List(Of TreeViewModel)
-        Dim myload As myModelLoad(Of ConfigFileModel)
+    '   SqlStatus内に統合のため廃止
+    'Public Function LoadTreeViewModel() As List(Of TreeViewModel)
+    '    Dim myload As ModelLoadProxy(Of ConfigFileModel)
 
-        myload = AddressOf ModelLoad(Of ConfigFileModel)
-        LoadTreeViewModel = myload(Me.LoadFileManagerFile.ConfigFileName).TreeViews
-    End Function
-
+    '    myload = AddressOf ModelLoad(Of ConfigFileModel)
+    '    LoadTreeViewModel = myload(Me.LoadFileManagerFile.ConfigFileName).TreeViews
+    'End Function
     '---------------------------------------------------------------------------------------'
 
 
 
     '-- SqlStatus --------------------------------------------------------------------------'
     Public Function LoadSqlModel() As SqlModel
-        Dim myload As myModelLoad(Of ConfigFileModel)
+        Dim proxy As ModelLoadProxy(Of ConfigFileModel)
 
-        myload = AddressOf ModelLoad(Of ConfigFileModel)
-        LoadSqlModel = myload(Me.LoadFileManagerFile.ConfigFileName).SqlStatus
+        proxy = AddressOf ModelLoad(Of ConfigFileModel)
+        LoadSqlModel = proxy(Me.LoadFileManagerFile.ConfigFileName).SqlStatus
     End Function
     '---------------------------------------------------------------------------------------'
 

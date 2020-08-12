@@ -311,7 +311,7 @@
 '        Finally
 '            sda.Dispose()
 '            ds.Dispose()
-'            scmd.Dispose()
+'            scmd.Dispose() 
 '        End Try
 '        '---------------------------------------------------------------------------
 '    End Function

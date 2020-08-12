@@ -5,46 +5,65 @@ Imports System.Collections.ObjectModel
 Public Class TreeViewViewModel
     Inherits ViewModel
 
-    'Private __SqlM As SqlModel
-    'Private Property _SqlM As SqlModel
-    '    Get
-    '        Return __SqlM
-    '    End Get
-    '    Set(value As SqlModel)
-    '        __SqlM = value
-    '    End Set
-    'End Property
-
-    'モデルをUpdate
+    Private __SqlM As SqlModel
+    Private Property _SqlM As SqlModel
+        Get
+            Return __SqlM
+        End Get
+        Set(value As SqlModel)
+            __SqlM = value
+        End Set
+    End Property
 
 
-    'Private Sub _ModelUpdate(ByVal sender As Object,
-    '                          ByVal e As PropertyChangedEventArgs)
-    '    Dim tvvm As TreeViewViewModel
+    'SqlModelの変更を自身に反映
+    Private Sub _SqlModelUpdate(ByVal sender As Object,
+                                ByVal e As PropertyChangedEventArgs)
+        Dim sm As SqlModel
+        sm = CType(sender, SqlModel)
+        Me._SqlM = sm
+        If e.PropertyName = "TreeViewM" Then
+            Call _ViewModelUpdate()
+        End If
+    End Sub
+
+
+    'SqlModel(TreeViewMプロパティ)の変更を自身に反映
+    Private Sub _ViewModelUpdate()
+        If Not Me._SqlM.TreeViewM.Equals(Me.Model) Then
+            Me.Model = Me._SqlM.TreeViewM
+        End If
+    End Sub
+
+    'Private Sub _ViewModelUpdate(ByVal sender As Object,
+    '                             ByVal e As PropertyChangedEventArgs)
+    '    Dim sm As SqlModel
 
     '    Select Case e.PropertyName
-    '        Case "_ModelList"
+    '        Case "TreeViewM"
     '        Case Else
     '            Exit Sub
     '    End Select
 
 
-    '    tvvm = CType(sender, TreeViewViewModel)
+    '    sm = CType(sender, SqlModel)
     '    Select Case e.PropertyName
-    '        Case "_ModelList"
-    '            Me._ModelList = tvvm._ModelList
+    '        Case "TreeViewM"
+    '            Me._Model = sm.TreeViewM
     '        Case Else
     '            Exit Sub
     '    End Select
     'End Sub
 
-    Private _ModelList As List(Of TreeViewModel)
-    Public Property ModelList As List(Of TreeViewModel)
+
+    Private _Model As TreeViewModel
+    Public Property Model As TreeViewModel
         Get
-            Return _ModelList
+            Return _Model
         End Get
-        Set(value As List(Of TreeViewModel))
-            _ModelList = value
+        Set(value As TreeViewModel)
+            _Model = value
+            RaisePropertyChanged("Model")
         End Set
     End Property
 
@@ -96,20 +115,20 @@ Public Class TreeViewViewModel
     '    End Set
     'End Property
 
-    Private _ClickCommand As ICommand
-    Public ReadOnly Property ClickCommand As ICommand
-        Get
-            If _ClickCommand Is Nothing Then
-                _ClickCommand = New DelegateCommand With {
-                    .ExecuteHandler = AddressOf _ClickCommandExecute,
-                    .CanExecuteHandler = AddressOf _ClickCommandCanExecute
-                }
-                Return _ClickCommand
-            Else
-                Return _ClickCommand
-            End If
-        End Get
-    End Property
+    'Private _ClickCommand As ICommand
+    'Public ReadOnly Property ClickCommand As ICommand
+    '    Get
+    '        If _ClickCommand Is Nothing Then
+    '            _ClickCommand = New DelegateCommand With {
+    '                .ExecuteHandler = AddressOf _ClickCommandExecute,
+    '                .CanExecuteHandler = AddressOf _ClickCommandCanExecute
+    '            }
+    '            Return _ClickCommand
+    '        Else
+    '            Return _ClickCommand
+    '        End If
+    '    End Get
+    'End Property
 
     'Private _AccessEnableFlag As Boolean
     'Public Property AccessEnableFlag As Boolean
@@ -123,20 +142,22 @@ Public Class TreeViewViewModel
     '    End Set
     'End Property
 
-    Private Sub _ClickCommandExecute(ByVal parameter As Object)
-        MsgBox("hello")
-    End Sub
+    'Private Sub _ClickCommandExecute(ByVal parameter As Object)
+    '    MsgBox("hello")
+    'End Sub
 
-    Private Function _ClickCommandCanExecute(ByVal parameter As Object) As Boolean
-        Return True
-    End Function
+    'Private Function _ClickCommandCanExecute(ByVal parameter As Object) As Boolean
+    '    Return True
+    'End Function
 
 
     'Sub New()
-    Sub New(ByRef ltvm As List(Of TreeViewModel))
+    Sub New(ByRef sm As SqlModel)
+        Me._SqlM = sm
+        Me.Model = sm.TreeViewM
 
-        Me.ModelList = ltvm
-
+        AddHandler Me._SqlM.PropertyChanged, AddressOf _SqlModelUpdate
+        'AddHandler Me._SqlM.TreeViewM.PropertyChanged, AddressOf _ViewModelUpdate
 
         'Dim a As String
         'Dim b As String

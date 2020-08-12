@@ -10,16 +10,20 @@
 
 
         Dim pm As New ProjectModel
-        'Dim ltvm As List(Of TreeViewModel)
-        'ltvm = pm.LoadTreeViewModel
-        Dim tvvm As New TreeViewViewModel(pm.LoadTreeViewModel)
-        'tvvm = TreeViewVMRecursive(ltvm)
+
+        '-- Sql 関連 (Model) -------------------------------------'
+        Dim sm As New SqlModel
+        sm = pm.LoadSqlModel
+        '---------------------------------------------------------'
+
+        '-- TreeViewViewModel 関連 (ViewModel) -------------------'
+        sm.TreeViewM = New TreeViewModel
+        Dim tvvm As New TreeViewViewModel(sm)
+        sm.ServerName = "hoge"
         Me.TreeView.DataContext = tvvm
+        '---------------------------------------------------------'
 
-
-
-        '-- Sql 関連 ---------------------------------------------'
-        Dim sm As New SqlModel : sm = pm.LoadSqlModel
+        '-- SqlStatusVM 関連 (ViewModel) -------------------------'
         Dim ssvm As New SqlStatusVM(sm)
         Me.ServerNameValue.DataContext = ssvm
         Me.DataBaseValue.DataContext = ssvm

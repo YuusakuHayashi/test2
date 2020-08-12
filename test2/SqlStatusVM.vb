@@ -11,10 +11,38 @@ Public Class SqlStatusVM : Inherits ViewModel
     Public Const DEFAULT_DISTINATIONVALUE = "複製先フィールド値"
 
 
-    'モデルをUpdate
-    Private Sub _ModelUpdate(ByVal sender As Object,
-                              ByVal e As PropertyChangedEventArgs)
-        Dim ssvm As SqlStatusVM
+    'ViewModelの変更を、Modelに反映
+    Private Sub _ModelUpdate()
+        If Me.ServerName <> Me.Model.ServerName Then
+            Me.Model.ServerName = Me.ServerName
+        End If
+
+        If Me.DataBaseName <> Me.Model.DataBaseName Then
+            Me.Model.DataBaseName = Me.DataBaseName
+        End If
+
+        If Me.DataTableName <> Me.Model.DataTableName Then
+            Me.Model.DataTableName = Me.DataTableName
+        End If
+
+        If Me.FieldName <> Me.Model.FieldName Then
+            Me.Model.FieldName = Me.FieldName
+        End If
+
+        If Me.SourceValue <> Me.Model.SourceValue Then
+            Me.Model.SourceValue = Me.SourceValue
+        End If
+
+        If Me.DistinationValue <> Me.Model.DistinationValue Then
+            Me.Model.DistinationValue = Me.DistinationValue
+        End If
+    End Sub
+
+
+    'Modelの変更をViewModelに反映
+    Private Sub _ViewModelUpdate(ByVal sender As Object,
+                                 ByVal e As PropertyChangedEventArgs)
+        Dim sm As SqlModel
 
         Select Case e.PropertyName
             Case "ServerName"
@@ -27,34 +55,36 @@ Public Class SqlStatusVM : Inherits ViewModel
                 Exit Sub
         End Select
 
-        ssvm = CType(sender, SqlStatusVM)
+        sm = CType(sender, SqlModel)
 
         Select Case e.PropertyName
             Case "ServerName"
-                Me._Model.ServerName = ssvm.ServerName
+                Me.ServerName = sm.ServerName
             Case "DataBaseName"
-                Me._Model.DataBaseName = ssvm.DataBaseName
+                Me.DataBaseName = sm.DataBaseName
             Case "DataTableName"
-                Me._Model.DataTableName = ssvm.DataTableName
+                Me.DataTableName = sm.DataTableName
             Case "FieldName"
-                Me._Model.FieldName = ssvm.FieldName
+                Me.FieldName = sm.FieldName
             Case "SourceValue"
-                Me._Model.SourceValue = ssvm.SourceValue
+                Me.SourceValue = sm.SourceValue
             Case "DistinationValue"
-                Me._Model.DistinationValue = ssvm.DistinationValue
+                Me.DistinationValue = sm.DistinationValue
             Case Else
                 Exit Sub
         End Select
     End Sub
 
 
-    Private __Model As SqlModel
-    Private Property _Model As SqlModel
+
+    'SqlModelへの参照及び変更
+    Private _Model As SqlModel
+    Public Property Model As SqlModel
         Get
-            Return __Model
+            Return _Model
         End Get
         Set(value As SqlModel)
-            __Model = value
+            _Model = value
         End Set
     End Property
 
@@ -72,6 +102,7 @@ Public Class SqlStatusVM : Inherits ViewModel
                 Me._ServerName = value
             End If
             RaisePropertyChanged("ServerName")
+            Call Me._ModelUpdate()
         End Set
     End Property
     '--------------------------------------------------------------------'
@@ -90,6 +121,7 @@ Public Class SqlStatusVM : Inherits ViewModel
                 Me._DataBaseName = value
             End If
             RaisePropertyChanged("DataBaseName")
+            Call Me._ModelUpdate()
         End Set
     End Property
     '--------------------------------------------------------------------'
@@ -109,6 +141,7 @@ Public Class SqlStatusVM : Inherits ViewModel
                 Me._DataTableName = value
             End If
             RaisePropertyChanged("DataTableName")
+            Call Me._ModelUpdate()
         End Set
     End Property
     '--------------------------------------------------------------------'
@@ -129,6 +162,7 @@ Public Class SqlStatusVM : Inherits ViewModel
                 Me._FieldName = value
             End If
             RaisePropertyChanged("FieldName")
+            Call Me._ModelUpdate()
         End Set
     End Property
     '--------------------------------------------------------------------'
@@ -148,6 +182,7 @@ Public Class SqlStatusVM : Inherits ViewModel
                 Me._SourceValue = value
             End If
             RaisePropertyChanged("SourceValue")
+            Call Me._ModelUpdate()
         End Set
     End Property
     '--------------------------------------------------------------------'
@@ -167,49 +202,52 @@ Public Class SqlStatusVM : Inherits ViewModel
                 Me._DistinationValue = value
             End If
             RaisePropertyChanged("DistinationValue")
+            Call Me._ModelUpdate()
         End Set
     End Property
     '--------------------------------------------------------------------'
 
 
-    Sub New(ByRef sql As SqlModel)
-        If sql Is Nothing Then
-            sql.ServerName = DEFAULT_SERVERNAME
-            sql.DataBaseName = DEFAULT_DATABASENAME
-            sql.DataTableName = DEFAULT_DATATABLENAME
-            sql.FieldName = DEFAULT_FIELDNAME
-            sql.SourceValue = DEFAULT_SOURCEVALUE
-            sql.DistinationValue = DEFAULT_DISTINATIONVALUE
-        End If
+    Sub New(ByRef sm As SqlModel)
+        Me.Model = sm
+        AddHandler Me.Model.PropertyChanged, AddressOf Me._ViewModelUpdate
+        'If sql Is Nothing Then
+        '    sql.ServerName = DEFAULT_SERVERNAME
+        '    sql.DataBaseName = DEFAULT_DATABASENAME
+        '    sql.DataTableName = DEFAULT_DATATABLENAME
+        '    sql.FieldName = DEFAULT_FIELDNAME
+        '    sql.SourceValue = DEFAULT_SOURCEVALUE
+        '    sql.DistinationValue = DEFAULT_DISTINATIONVALUE
+        'End If
 
-        If String.IsNullOrEmpty(sql.ServerName) Then
-            sql.ServerName = DEFAULT_SERVERNAME
-        End If
-        If String.IsNullOrEmpty(sql.DataBaseName) Then
-            sql.ServerName = DEFAULT_DATABASENAME
-        End If
-        If String.IsNullOrEmpty(sql.DataTableName) Then
-            sql.ServerName = DEFAULT_DATATABLENAME
-        End If
-        If String.IsNullOrEmpty(sql.FieldName) Then
-            sql.ServerName = DEFAULT_FIELDNAME
-        End If
-        If String.IsNullOrEmpty(sql.SourceValue) Then
-            sql.ServerName = DEFAULT_SOURCEVALUE
-        End If
-        If String.IsNullOrEmpty(sql.DistinationValue) Then
-            sql.ServerName = DEFAULT_DISTINATIONVALUE
-        End If
+        'If String.IsNullOrEmpty(sql.ServerName) Then
+        '    sql.ServerName = DEFAULT_SERVERNAME
+        'End If
+        'If String.IsNullOrEmpty(sql.DataBaseName) Then
+        '    sql.ServerName = DEFAULT_DATABASENAME
+        'End If
+        'If String.IsNullOrEmpty(sql.DataTableName) Then
+        '    sql.ServerName = DEFAULT_DATATABLENAME
+        'End If
+        'If String.IsNullOrEmpty(sql.FieldName) Then
+        '    sql.ServerName = DEFAULT_FIELDNAME
+        'End If
+        'If String.IsNullOrEmpty(sql.SourceValue) Then
+        '    sql.ServerName = DEFAULT_SOURCEVALUE
+        'End If
+        'If String.IsNullOrEmpty(sql.DistinationValue) Then
+        '    sql.ServerName = DEFAULT_DISTINATIONVALUE
+        'End If
 
-        Me._Model = sql
+        'Me.Model = sql
 
-        Me.ServerName = sql.ServerName
-        Me.DataBaseName = sql.DataBaseName
-        Me.DataTableName = sql.DataTableName
-        Me.FieldName = sql.FieldName
-        Me.SourceValue = sql.SourceValue
-        Me.DistinationValue = sql.DistinationValue
+        'Me.ServerName = sql.ServerName
+        'Me.DataBaseName = sql.DataBaseName
+        'Me.DataTableName = sql.DataTableName
+        'Me.FieldName = sql.FieldName
+        'Me.SourceValue = sql.SourceValue
+        'Me.DistinationValue = sql.DistinationValue
 
-        AddHandler Me.PropertyChanged, AddressOf Me._ModelUpdate
+        'AddHandler Me.Model.PropertyChanged, AddressOf Me._ViewModelUpdate
     End Sub
 End Class
