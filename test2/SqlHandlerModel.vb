@@ -111,32 +111,32 @@ Public Class SqlHandlerModel : Inherits BaseModel
 
 
     'テーブル一覧の取得
-    Public Sub GetTables()
-        Dim ltvm As New List(Of TreeViewModel)
-        Dim parent As New TreeViewModel
-        Dim child As New TreeViewModel
-        Dim dt As DataTable
+    'Public Sub GetTables()
+    '    Dim ltvm As New List(Of TreeViewModel)
+    '    Dim parent As New TreeViewModel
+    '    Dim child As New TreeViewModel
+    '    Dim dt As DataTable
 
 
-        Me.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
-        Call Me._DataBaseAccess(Me.SqlM, AddressOf Me._GetDataSets)
+    '    Me.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
+    '    Call Me._DataBaseAccess(Me.SqlM, AddressOf Me._GetDataSets)
 
 
-        dt = Me._DS.Tables(0)
+    '    dt = Me._DS.Tables(0)
 
 
-        'TreeViewを構成
-        parent = New TreeViewModel With {.RealName = Me.SqlM.ServerName}
-        child = New TreeViewModel With {.RealName = Me.SqlM.DataBaseName}
-        For i As Integer = 0 To dt.Rows.Count - 1
-            child.Child.Add(New TreeViewModel With {.RealName = dt.Rows(i)("name")})
-        Next
-        parent.Child.Add(child)
+    '    'TreeViewを構成
+    '    parent = New TreeViewModel With {.RealName = Me.SqlM.ServerName}
+    '    child = New TreeViewModel With {.RealName = Me.SqlM.DataBaseName}
+    '    For i As Integer = 0 To dt.Rows.Count - 1
+    '        child.Child.Add(New TreeViewModel With {.RealName = dt.Rows(i)("name")})
+    '    Next
+    '    parent.Child.Add(child)
 
 
-        'TreeViewのリセット
-        Me.TreeViewM = parent
-    End Sub
+    '    'TreeViewのリセット
+    '    Me.TreeViewM = parent
+    'End Sub
 
 
     'メインメソッド

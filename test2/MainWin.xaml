@@ -265,22 +265,44 @@
                  Grid.Row="30" Grid.RowSpan="3" 
                  FontSize="10"
                  VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
-        <TreeView x:Name="TreeView" 
-                  ItemsSource="{Binding Path=ModelList}" 
+        <!--<TreeView x:Name="TreeView" 
+                  ItemsSource="{Binding Path=Model}" 
                   Grid.ColumnSpan="20" Grid.Column="0" 
                   HorizontalAlignment="Stretch" 
                   Grid.Row="0" Grid.RowSpan="50" 
                   VerticalAlignment="Stretch">
-            <TreeView.Resources>
-                <Style TargetType="TreeViewItem">
-                    <Setter Property="IsSelected" Value="False" />
-                </Style>
-            </TreeView.Resources>
             <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Child}">
-                    <CheckBox Content="{Binding Path=RealName}" IsChecked="{Binding Checked}" />
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=RealName}" />
+                </DataTemplate>
+            </TreeView.ItemTemplate>
+            --><!--<TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=Model}">
+                    <CheckBox Content="{Binding Path=RealName}" />
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>--><!--
+        </TreeView>-->
+        <TreeView x:Name="TreeView" ItemsSource="{Binding Model.Children}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                    <CheckBox Margin="5"
+                              VerticalContentAlignment="Center"
+                              IsChecked="{Binding IsChecked}" />
+                        <TextBlock Margin="5" Text="{Binding RealName}" />
+                        <Button Margin="5"
+                                Content="確認" />
+                        <Button Margin="5"
+                                Content="削除" />
+                    </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
         </TreeView>
         <TextBox x:Name="Execution" Grid.ColumnSpan="60" Grid.Column="20" HorizontalAlignment="Stretch" Grid.Row="41" Grid.RowSpan="10" Text="TextBox" VerticalAlignment="Stretch" />
     </Grid>

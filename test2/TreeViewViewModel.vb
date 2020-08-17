@@ -29,26 +29,26 @@ Public Class TreeViewViewModel
 
 
     'Modelの変更を自身に反映
+    'Private Sub _ViewModelUpdate(ByVal sender As Object,
+    '                             ByVal e As PropertyChangedEventArgs)
+    '    Dim tvm As TreeViewModel
 
-    Private Sub _ViewModelUpdate(ByVal sender As Object,
-                                 ByVal e As PropertyChangedEventArgs)
-        Dim tvm As TreeViewModel
-
-        tvm = CType(sender, TreeViewModel)
-        Me._Model = tvm
-    End Sub
+    '    tvm = CType(sender, TreeViewModel)
+    '    Me.Model = tvm
+    'End Sub
 
 
-    Private _Model As TreeViewModel
-    Public Property Model As TreeViewModel
+    Private _Model As List(Of TreeViewModel2)
+    Public Property Model As List(Of TreeViewModel2)
         Get
             Return _Model
         End Get
-        Set(value As TreeViewModel)
+        Set(value As List(Of TreeViewModel2))
             _Model = value
-            RaisePropertyChanged("Model")
+            'RaisePropertyChanged("Model")
         End Set
     End Property
+
 
     'Private Property _RealName As String
     'Public Property RealName As String
@@ -135,9 +135,11 @@ Public Class TreeViewViewModel
 
 
     'Sub New()
-    Sub New(ByRef tvm As TreeViewModel)
-        Me.Model = tvm
-        AddHandler Me.Model.PropertyChanged, AddressOf _ViewModelUpdate
+    Sub New(ByRef tvm As TreeViewModel2)
+        Me.Model = New List(Of TreeViewModel2)
+        Me.Model.Add(tvm)
+        'Me.Model = tvm
+        'AddHandler Me.Model.PropertyChanged, AddressOf _ViewModelUpdate
         'Me._SqlM = sm
         'Me.Model = sm.TreeViewM
 
@@ -161,16 +163,15 @@ Public Class TreeViewViewModel
         'AddHandler Me.PropertyChanged, AddressOf Me._ModelUpdate
 
         'Me.ModelList = New List(Of TreeViewModel) From {
-        '    New TreeViewModel With {
-        '        .RealName = "AAA", .Child = New List(Of TreeViewModel) From {
-        '            New TreeViewModel With {
-        '                .RealName = "ABA"
-        '            },
-        '            New TreeViewModel With {
-        '                .RealName = "ACA"
-        '            }
+        '    .RealName = "AAA", .Child = New List(Of TreeViewModel) From {
+        '        New TreeViewModel With {
+        '            .RealName = "ABA"
+        '        },
+        '        New TreeViewModel With {
+        '            .RealName = "ACA"
         '        }
-        '    },
+        '    }
+        '}
         '    New TreeViewModel With {
         '        .RealName = "BAA", .Child = New List(Of TreeViewModel) From {
         '            New TreeViewModel With {
