@@ -37,7 +37,7 @@
 
         '-- TreeViewModel 関連 (ViewModel) -----------------------'
         Dim tvm As New TreeViewModel
-        Me.TreeView.DataContext = tvm
+        Me.treeView.DataContext = tvm
         '---------------------------------------------------------'
 
         'Dim abvm As New AccessButtonVM(sm, ssvm)

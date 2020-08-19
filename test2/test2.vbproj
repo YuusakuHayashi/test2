@@ -90,6 +90,9 @@
     <Compile Include="SqlModel.vb" />
     <Compile Include="SqlStatusVM.vb" />
     <Compile Include="testmodule.vb" />
+    <Compile Include="TestWin.xaml.vb">
+      <DependentUpon>TestWin.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TreeModel.vb" />
     <Compile Include="TreeViewListModel.vb" />
     <Compile Include="TreeViewModel.vb" />
@@ -123,6 +126,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="TestWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Window1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

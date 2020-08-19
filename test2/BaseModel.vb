@@ -19,4 +19,13 @@ Public MustInherit Class BaseModel
             Me, New PropertyChangedEventArgs(PropertyName)
         )
     End Sub
+
+    '2020/08/18 Add .
+    'Friend Sub [Set](Of T)(ByRef storage As T, newValue As T, <CallerMemberName> Optional propertyName As String = Nothing)
+    '    If Object.Equals(storage, newValue) Then
+    '        Return
+    '    End If
+    '    storage = newValue
+    '    RaisePropertyChanged(propertyName)
+    'End Sub
 End Class

@@ -2,6 +2,7 @@
 Imports Newtonsoft.Json
 
 Delegate Function ModelLoadProxy(Of T)(ByVal f As String) As T
+Delegate Sub ModelSaveProxy(Of T)(ByVal f As String, ByVal m As T)
 
 Public Class ProjectModel
     Private Const SHIFT_JIS = "SHIFT_JIS"

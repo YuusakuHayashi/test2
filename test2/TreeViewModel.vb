@@ -10,6 +10,8 @@
         End Set
     End Property
 
+    'Public Property Model As TreeModel
+
 
     Sub New()
         Me.Model = New TreeModel("Root") From {
@@ -27,7 +29,23 @@
                 }
             }
         }
+
+        '子孫を全列挙
+
+        Dim pm As New ProjectModel
+        Dim proxy As ModelSaveProxy(Of IEnumerable(Of TreeModel))
+        Dim fn As String : fn = Environment.GetEnvironmentVariable("USERPROFILE") & "\test\ConfigFile.json"
+        proxy = AddressOf pm.ModelSave(Of IEnumerable(Of TreeModel))
+        Call proxy(fn, AllNodes(Me.Model))
     End Sub
+
+    '子孫を全列挙
+    Private Function AllNodes(node As TreeModel) As IEnumerable(Of TreeModel)
+        If node Is Nothing Then
+            Return Enumerable.Empty(Of TreeModel)
+        End If
+        Return node.Concat(node.SelectMany(Function(x) AllNodes(x)))
+    End Function
 
     'TreeView は考え方が複雑・・・
     '描画線用のデータ構造ではTreeViewのリスト型

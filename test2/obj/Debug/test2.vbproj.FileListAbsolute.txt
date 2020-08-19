@@ -106,3 +106,5 @@ C:\Users\yuusa\project\test2\test2\obj\Debug\test2.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.g.resources
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.vbproj.GenerateResource.Cache
+\\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\TestWin.g.vb
+\\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\TestWin.baml

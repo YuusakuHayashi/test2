@@ -1,12 +1,12 @@
-﻿<Window x:Class="MainWin"
+﻿<Window x:Class="TestWin"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:test2"
         mc:Ignorable="d"
-        Title="MainWin" Height="500" Width="800">
-    <Grid Background="White" OpacityMask="Black">
+        Title="TestWin" Height="500" Width="800">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="1*"/>
@@ -229,54 +229,60 @@
                  HorizontalAlignment="Stretch" 
                  Grid.Row="10" Grid.RowSpan="3" 
                  FontSize="10"
-                 VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
+                 VerticalAlignment="Bottom" 
+                 BorderThickness="0,0,0,1" />
         <TextBox x:Name="DataBaseValue" 
                  Text="{Binding DataBaseName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="14" Grid.RowSpan="3" 
                  FontSize="10"
-                 VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
+                 VerticalAlignment="Bottom" 
+                 BorderThickness="0,0,0,1" />
         <TextBox x:Name="DataTabelValue" 
                  Text="{Binding DataTableName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="18" Grid.RowSpan="3" 
                  FontSize="10"
-                 VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
+                 VerticalAlignment="Bottom" 
+                 BorderThickness="0,0,0,1" />
         <TextBox x:Name="FieldNameValue" 
                  Text="{Binding FieldName}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="22" Grid.RowSpan="3" 
                  FontSize="10"
-                 VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
+                 VerticalAlignment="Bottom" 
+                 BorderThickness="0,0,0,1" />
         <TextBox x:Name="SourceValue" 
                  Text="{Binding SourceValue}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="26" Grid.RowSpan="3"
                  FontSize="10"
-                 VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
+                 VerticalAlignment="Bottom" 
+                 BorderThickness="0,0,0,1" />
         <TextBox x:Name="DistinationValue" 
                  Text="{Binding DistinationValue}"
                  Grid.ColumnSpan="20" Grid.Column="34" 
                  HorizontalAlignment="Stretch" 
                  Grid.Row="30" Grid.RowSpan="3" 
                  FontSize="10"
-                 VerticalAlignment="Bottom" BorderThickness="0,0,0,1" />
-        <TreeView x:Name="treeView" ItemsSource="{Binding Path=Model.Children}">
+                 VerticalAlignment="Bottom" 
+                 BorderThickness="0,0,0,1" />
+        <TreeView x:Name="treeView" 
+                  ItemsSource="{Binding Model.Children}"
+                  Grid.Row="0" Grid.RowSpan="50"
+                  Grid.Column="0" Grid.ColumnSpan="20">
             <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
-                    <CheckBox Margin="5"
-                              VerticalContentAlignment="Center"
-                              IsChecked="{Binding IsChecked}" />
-                        <TextBlock Margin="5" Text="{Binding Path=RealName}" />
-                        <Button Margin="5"
-                                Content="確認" />
-                        <Button Margin="5"
-                                Content="削除" />
+                        <CheckBox Margin="5"
+                                  VerticalContentAlignment="Center"
+                                  IsChecked="{Binding IsChecked}" />
+                        <TextBlock Margin="5" 
+                                   Text="{Binding RealName}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
@@ -287,6 +293,5 @@
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
-        <TextBox x:Name="Execution" Grid.ColumnSpan="60" Grid.Column="20" HorizontalAlignment="Stretch" Grid.Row="41" Grid.RowSpan="10" Text="TextBox" VerticalAlignment="Stretch" />
     </Grid>
 </Window>

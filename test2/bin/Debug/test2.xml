@@ -64,6 +64,16 @@ MainWin
 InitializeComponent
 </summary>
 </member>
+<member name="T:test2.TestWin">
+<summary>
+TestWin
+</summary>
+</member>
+<member name="M:test2.TestWin.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
 <member name="T:test2.Window1">
 <summary>
 Window1

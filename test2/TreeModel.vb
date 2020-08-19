@@ -4,7 +4,7 @@ Public Class TreeModel
     Inherits BaseModel
     Implements IEnumerable(Of TreeModel)
 
-    '
+    '表示名
     Private _RealName As String
     Public Property RealName As String
         Get
@@ -12,15 +12,13 @@ Public Class TreeModel
         End Get
         Set(value As String)
             Me._RealName = value
+            RaisePropertyChanged("RealName")
         End Set
     End Property
 
     '
-    Public ReadOnly Property Children As ObservableCollection(Of TreeModel)
-        Get
-            Return New ObservableCollection(Of TreeModel)
-        End Get
-    End Property
+    Public ReadOnly Property Children As ObservableCollection(Of TreeModel) _
+        = New ObservableCollection(Of TreeModel)
 
     '
     Private _IsSelected As Boolean
@@ -30,6 +28,7 @@ Public Class TreeModel
         End Get
         Set(value As Boolean)
             Me._IsSelected = value
+            RaisePropertyChanged("_IsSelected")
         End Set
     End Property
 
@@ -41,6 +40,7 @@ Public Class TreeModel
         End Get
         Set(value As Boolean)
             Me._IsExpanded = value
+            RaisePropertyChanged("_IsExpanded")
         End Set
     End Property
 
@@ -52,6 +52,7 @@ Public Class TreeModel
         End Get
         Set(value As Boolean)
             Me._IsChecked = value
+            RaisePropertyChanged("_IsChecked")
         End Set
     End Property
 
@@ -70,15 +71,15 @@ Public Class TreeModel
     End Sub
 
     '
-    Sub New(rn As String)
+    Sub New(ByVal rn As String)
         Me.RealName = rn
     End Sub
 
     Public Function GetEnumerator() As IEnumerator(Of TreeModel) Implements IEnumerable(Of TreeModel).GetEnumerator
-        Throw New NotImplementedException()
+        Return Me.Children.GetEnumerator
     End Function
 
     Private Function IEnumerable_GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
-        Throw New NotImplementedException()
+        Return Me.GetEnumerator()
     End Function
 End Class
