@@ -86,6 +86,7 @@
     <Compile Include="MyCommand.vb" />
     <Compile Include="ProjectModel.vb" />
     <Compile Include="SaveButtonVM.vb" />
+    <Compile Include="SaveTreeModel.vb" />
     <Compile Include="SqlHandlerModel.vb" />
     <Compile Include="SqlModel.vb" />
     <Compile Include="SqlStatusVM.vb" />

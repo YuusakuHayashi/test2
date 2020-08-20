@@ -14,30 +14,83 @@
 
 
     Sub New()
-        Me.Model = New TreeModel("Root") From {
-            New TreeModel("Node1") From {
-                New TreeModel("Node1-1"),
-                New TreeModel("Node1-2") From {
-                    New TreeModel("Node1-2-1"),
-                    New TreeModel("Node1-2-2")
-                }
-            },
-            New TreeModel("Node2") From {
-                New TreeModel("Node2-1") From {
-                    New TreeModel("Node2-1-1"),
-                    New TreeModel("Node2-1-2")
-                }
-            }
-        }
+        'Dim tm As TreeModel
+        'tm = New TreeModel("Root") From {
+        '    New TreeModel("Node1") From {
+        '        New TreeModel("Node1-1"),
+        '        New TreeModel("Node1-2") From {
+        '            New TreeModel("Node1-2-1"),
+        '            New TreeModel("Node1-2-2")
+        '        }
+        '    },
+        '    New TreeModel("Node2") From {
+        '        New TreeModel("Node2-1") From {
+        '            New TreeModel("Node2-1-1"),
+        '            New TreeModel("Node2-1-2")
+        '        }
+        '    }
+        '}
+
+        'Dim lstm As List(Of SaveTreeModel)
+        'lstm = Recursive(tm)
+
 
         '子孫を全列挙
 
         Dim pm As New ProjectModel
-        Dim proxy As ModelSaveProxy(Of IEnumerable(Of TreeModel))
+        Dim proxy As ModelLoadProxy(Of List(Of SaveTreeModel))
         Dim fn As String : fn = Environment.GetEnvironmentVariable("USERPROFILE") & "\test\ConfigFile.json"
-        proxy = AddressOf pm.ModelSave(Of IEnumerable(Of TreeModel))
-        Call proxy(fn, AllNodes(Me.Model))
+        proxy = AddressOf pm.ModelLoad(Of List(Of SaveTreeModel))
+        Dim lstm As List(Of SaveTreeModel)
+        lstm = proxy(fn)
+        Me.Model = ConvertTreeModel(lstm)
     End Sub
+
+
+    Function ConvertTreeModel(lstm As List(Of SaveTreeModel),
+                              Optional tm As TreeModel = Nothing) As TreeModel
+
+        Dim youngest As TreeModel
+
+        If tm Is Nothing Then
+            tm = New TreeModel("Root")
+        End If
+        If lstm IsNot Nothing Then
+            For Each c In lstm
+                tm.Children.Add(New TreeModel(c.RealName))
+                If c.Children IsNot Nothing Then
+                    For Each c2 In c.Children
+                        youngest = tm.Children.Last
+                        ConvertTreeModel(c.Children, youngest)
+                    Next
+                End If
+            Next
+        End If
+        ConvertTreeModel = tm
+    End Function
+
+
+
+    Function ConvertSaveModel(tm As TreeModel) As List(Of SaveTreeModel)
+        Dim lstm As New List(Of SaveTreeModel)
+        Dim stm As SaveTreeModel
+
+        If tm IsNot Nothing Then
+            For Each c In tm
+                stm = New SaveTreeModel
+                stm.RealName = c.RealName
+                If c.Children.Count > 0 Then
+                    stm.Children = New List(Of SaveTreeModel)
+                    For Each c2 In ConvertSaveModel(c)
+                        stm.Children.Add(c2)
+                    Next
+                End If
+                lstm.Add(stm)
+            Next
+        End If
+        ConvertSaveModel = lstm
+    End Function
+
 
     '子孫を全列挙
     Private Function AllNodes(node As TreeModel) As IEnumerable(Of TreeModel)
