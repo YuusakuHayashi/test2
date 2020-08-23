@@ -30,12 +30,11 @@
         '        }
         '    }
         '}
-
-        'Dim lstm As List(Of SaveTreeModel)
-        'lstm = Recursive(tm)
-
-
-        '子孫を全列挙
+        'Dim pm As New ProjectModel
+        'Dim proxy As ModelSaveProxy(Of List(Of SaveTreeModel))
+        'Dim fn As String : fn = Environment.GetEnvironmentVariable("USERPROFILE") & "\test\ConfigFile.json"
+        'proxy = AddressOf pm.ModelSave(Of List(Of SaveTreeModel))
+        'Call proxy(fn, ConvertSaveModel(tm))
 
         Dim pm As New ProjectModel
         Dim proxy As ModelLoadProxy(Of List(Of SaveTreeModel))
@@ -59,10 +58,8 @@
             For Each c In lstm
                 tm.Children.Add(New TreeModel(c.RealName))
                 If c.Children IsNot Nothing Then
-                    For Each c2 In c.Children
-                        youngest = tm.Children.Last
-                        ConvertTreeModel(c.Children, youngest)
-                    Next
+                    youngest = tm.Children.Last
+                    ConvertTreeModel(c.Children, youngest)
                 End If
             Next
         End If

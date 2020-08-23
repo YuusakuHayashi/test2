@@ -108,3 +108,10 @@ C:\Users\yuusa\project\test2\test2\obj\Debug\test2.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.vbproj.GenerateResource.Cache
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\TestWin.g.vb
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\TestWin.baml
+C:\Users\yuusa\project\test2\test2\obj\Debug\TestWin.g.vb
+C:\Users\yuusa\project\test2\test2\obj\Debug\TestWin.baml
+C:\Users\yuusa\project\test2\test2\obj\Debug\GeneratedInternalTypeHelper.g.vb
+C:\Users\yuusa\project\test2\test2\obj\Debug\InitView.g.vb
+C:\Users\yuusa\project\test2\test2\obj\Debug\InitView.baml
+C:\Users\yuusa\project\test2\test2\obj\Debug\MenuView.g.vb
+C:\Users\yuusa\project\test2\test2\obj\Debug\MenuView.baml

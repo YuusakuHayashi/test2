@@ -77,11 +77,20 @@
     <Compile Include="ConfigFileVM.vb" />
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="FileManagerFileModel.vb" />
+    <Compile Include="InitModel.vb" />
+    <Compile Include="InitView.xaml.vb">
+      <DependentUpon>InitView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainModel.vb" />
     <Compile Include="MainWin.xaml.vb">
       <DependentUpon>MainWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="BaseModel.vb" />
+    <Compile Include="MenuModel.vb" />
+    <Compile Include="MenuView.xaml.vb">
+      <DependentUpon>MenuView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MenuViewModel.vb" />
     <Compile Include="MyModule.vb" />
     <Compile Include="MyCommand.vb" />
     <Compile Include="ProjectModel.vb" />
@@ -91,6 +100,7 @@
     <Compile Include="SqlModel.vb" />
     <Compile Include="SqlStatusVM.vb" />
     <Compile Include="testmodule.vb" />
+    <Compile Include="InitViewModel.vb" />
     <Compile Include="TestWin.xaml.vb">
       <DependentUpon>TestWin.xaml</DependentUpon>
     </Compile>
@@ -111,6 +121,10 @@
     <Compile Include="Window3.xaml.vb">
       <DependentUpon>Window3.xaml</DependentUpon>
     </Compile>
+    <Page Include="InitView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -127,6 +141,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MenuView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="TestWin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

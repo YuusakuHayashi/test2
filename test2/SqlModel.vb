@@ -76,27 +76,123 @@ Public Class SqlModel : Inherits BaseModel
     Public ServerVersion As String
 
 
-    Private _AccessFlag As Boolean
-    Public Property AccessFlag As Boolean
+    'Private _AccessFlag As Boolean
+    'Public Property AccessFlag As Boolean
+    '    Get
+    '        Return _AccessFlag
+    '    End Get
+    '    Set(value As Boolean)
+    '        _AccessFlag = value
+    '        RaisePropertyChanged("AccessFlag")
+    '    End Set
+    'End Property
+
+    Private _QueryResult As DataSet
+    Public ReadOnly Property QueryResult As DataSet
         Get
-            Return _AccessFlag
+            Return _QueryResult
         End Get
-        Set(value As Boolean)
-            _AccessFlag = value
-            RaisePropertyChanged("AccessFlag")
+    End Property
+
+    Private _ConnectionString As String
+    Public Property ConnectionString As String
+        Get
+            Return Me._ConnectionString
+        End Get
+        Set(value As String)
+            Me._ConnectionString = value
         End Set
     End Property
 
 
-    Private _ConnectionText As String
-    Public ReadOnly Property ConnectionText As String
+    'SQLコマンドをセットする必要があるが、空のデータセットを返す
+    Private Function _NoDataSets(scmd) As DataSet
+        _NoDataSets = New DataSet
+    End Function
+
+    Public Sub AccessTest()
+        Me.Query = vbNullString
+        Call Me._DataBaseAccess(AddressOf Me._NoDataSets)
+    End Sub
+
+    Private _AccessResult As Boolean
+    Public ReadOnly Property AccessResult As Boolean
         Get
-            Return "Data Source=" & Me.ServerName & ";" _
-                & "Initial Catalog=" & Me.DataBaseName & ";" _
-                & "Integrated Security=True;" _
-                & "Connect Timeout=05;"
+            Return Me._AccessResult
         End Get
     End Property
+
+    Private Sub _DataBaseAccess(ByRef proxy As GetDataSetProxy)
+
+        'proxy ... Func(SqlCommand) => DataSet
+
+        Dim scmd As SqlCommand
+        Dim scon As SqlConnection
+        Dim strn As SqlTransaction
+        Dim ds As DataSet
+
+        Me._AccessResult = False
+
+        Try
+            '接続開始
+            scon = New SqlConnection(Me.ConnectionString)
+            scon.Open()
+            strn = scon.BeginTransaction()
+
+            'コマンド作成
+            scmd = New System.Data.SqlClient.SqlCommand
+            scmd = scon.CreateCommand()
+            scmd.CommandText = Me.Query
+            scmd.CommandType = CommandType.Text
+            scmd.CommandTimeout = 30
+            scmd.Transaction = strn
+
+
+            '--- EXECUTE --------------------------------'
+            ds = proxy(scmd)
+            Me._QueryResult = ds
+            '--------------------------------------------'
+
+
+            Me.ServerVersion = scon.ServerVersion
+
+            Me._AccessResult = True
+
+            '成功
+            'Me.AccessFlag = True
+        Catch ex As Exception
+            '失敗
+            'Me.AccessFlag = False
+
+            Try
+                If strn IsNot Nothing Then
+                    strn.Rollback()
+                End If
+            Catch ex2 As Exception
+                '
+            End Try
+        Finally
+            If scmd IsNot Nothing Then
+                scmd.Dispose()
+            End If
+            If strn IsNot Nothing Then
+                strn.Dispose()
+            End If
+            If scon IsNot Nothing Then
+                scon.Close()
+                scon.Dispose()
+            End If
+        End Try
+    End Sub
+
+    'Public ReadOnly Property ConnectionText As String
+    '    Get
+    '        Return "Data Source=" & Me.ServerName & ";" _
+    '            & "Initial Catalog=" & Me.DataBaseName & ";" _
+    '            & "Integrated Security=True;" _
+    '            & "Connect Timeout=05;"
+    '    End Get
+    'End Property
 
 
     'Public Sub Save()

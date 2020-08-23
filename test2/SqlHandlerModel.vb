@@ -104,10 +104,10 @@ Public Class SqlHandlerModel : Inherits BaseModel
 
 
     '接続のみ
-    Public Sub AccessTest()
-        Me.Query = vbNullString
-        Call Me._DataBaseAccess(Me.SqlM, AddressOf Me._NoDataSets)
-    End Sub
+    'Public Sub AccessTest()
+    '    Me.Query = vbNullString
+    '    Call Me._DataBaseAccess(Me.SqlM, AddressOf Me._NoDataSets)
+    'End Sub
 
 
     'テーブル一覧の取得
@@ -140,66 +140,66 @@ Public Class SqlHandlerModel : Inherits BaseModel
 
 
     'メインメソッド
-    Private Sub _DataBaseAccess(ByRef sql As SqlModel,
-                                ByRef proxy As GetDataSetProxy)
+    'Private Sub _DataBaseAccess(ByRef sql As SqlModel,
+    '                            ByRef proxy As GetDataSetProxy)
 
-        'proxy ... Func(SqlCommand) => DataSet
+    '    'proxy ... Func(SqlCommand) => DataSet
 
-        Dim scmd As SqlCommand
-        Dim scon As SqlConnection
-        Dim strn As SqlTransaction
-        Dim ds As DataSet
+    '    Dim scmd As SqlCommand
+    '    Dim scon As SqlConnection
+    '    Dim strn As SqlTransaction
+    '    Dim ds As DataSet
 
-        Try
-            '接続開始
-            scon = New SqlConnection(Me.SqlM.ConnectionText)
-            scon.Open()
-            strn = scon.BeginTransaction()
+    '    Try
+    '        '接続開始
+    '        scon = New SqlConnection(Me.SqlM.ConnectionText)
+    '        scon.Open()
+    '        strn = scon.BeginTransaction()
 
-            'コマンド作成
-            scmd = New System.Data.SqlClient.SqlCommand
-            scmd = scon.CreateCommand()
-            scmd.CommandText = Me.Query
-            scmd.CommandType = CommandType.Text
-            scmd.CommandTimeout = 30
-            scmd.Transaction = strn
-
-
-            '--- EXECUTE --------------------------------'
-            ds = proxy(scmd)
-            Me._DS = ds
-            '--------------------------------------------'
+    '        'コマンド作成
+    '        scmd = New System.Data.SqlClient.SqlCommand
+    '        scmd = scon.CreateCommand()
+    '        scmd.CommandText = Me.Query
+    '        scmd.CommandType = CommandType.Text
+    '        scmd.CommandTimeout = 30
+    '        scmd.Transaction = strn
 
 
-            sql.ServerVersion = scon.ServerVersion
+    '        '--- EXECUTE --------------------------------'
+    '        ds = proxy(scmd)
+    '        Me._DS = ds
+    '        '--------------------------------------------'
 
 
-            '成功
-            'Me.AccessFlag = True
-        Catch ex As Exception
-            '失敗
-            'Me.AccessFlag = False
+    '        sql.ServerVersion = scon.ServerVersion
 
-            Try
-                If strn IsNot Nothing Then
-                    strn.Rollback()
-                End If
-            Catch ex2 As Exception
-                '
-            End Try
-        Finally
-            If scmd IsNot Nothing Then
-                scmd.Dispose()
-            End If
-            If strn IsNot Nothing Then
-                strn.Dispose()
-            End If
-            If scon IsNot Nothing Then
-                scon.Close()
-                scon.Dispose()
-            End If
-        End Try
-    End Sub
+
+    '        '成功
+    '        'Me.AccessFlag = True
+    '    Catch ex As Exception
+    '        '失敗
+    '        'Me.AccessFlag = False
+
+    '        Try
+    '            If strn IsNot Nothing Then
+    '                strn.Rollback()
+    '            End If
+    '        Catch ex2 As Exception
+    '            '
+    '        End Try
+    '    Finally
+    '        If scmd IsNot Nothing Then
+    '            scmd.Dispose()
+    '        End If
+    '        If strn IsNot Nothing Then
+    '            strn.Dispose()
+    '        End If
+    '        If scon IsNot Nothing Then
+    '            scon.Close()
+    '            scon.Dispose()
+    '        End If
+    '    End Try
+    'End Sub
 
 
 

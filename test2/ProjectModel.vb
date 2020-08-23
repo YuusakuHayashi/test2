@@ -3,26 +3,27 @@ Imports Newtonsoft.Json
 
 Delegate Function ModelLoadProxy(Of T)(ByVal f As String) As T
 Delegate Sub ModelSaveProxy(Of T)(ByVal f As String, ByVal m As T)
+Public Delegate Function ProjectCheckProxy(ByVal f As String) As Boolean
 
 Public Class ProjectModel
     Private Const SHIFT_JIS = "SHIFT_JIS"
     Private Const CONFIG_FILE_JSON = "ConfigFile.json"
 
-    Private ReadOnly Property _FileManagerFileName As String
-        Get
-            Return _MyDirectoryName & "\FileManager.json"
-        End Get
-    End Property
+    'Private ReadOnly Property _FileManagerFileName As String
+    '    Get
+    '        Return _MyDirectoryName & "\FileManager.json"
+    '    End Get
+    'End Property
 
-    Private ReadOnly Property _MyDirectoryName As String
+    Private ReadOnly Property _ProjectDirectoryName As String
         Get
             Return System.Environment.GetEnvironmentVariable("USERPROFILE") & "\test"
         End Get
     End Property
 
-    Private ReadOnly Property _IniFileName As String
+    Private ReadOnly Property _ProjectIniFileName As String
         Get
-            Return _MyDirectoryName & "\IniFile"
+            Return Me._ProjectDirectoryName & "\ProjectInit"
         End Get
     End Property
 
@@ -32,20 +33,20 @@ Public Class ProjectModel
 
 
     '-- File Manager File ------------------------------------------------------------------'
-    Public Function LoadFileManagerFile() As FileManagerFileModel
-        Dim myload As ModelLoadProxy(Of FileManagerFileModel)
+    'Public Function LoadFileManagerFile() As FileManagerFileModel
+    '    Dim myload As ModelLoadProxy(Of FileManagerFileModel)
 
-        myload = AddressOf ModelLoad(Of FileManagerFileModel)
-        LoadFileManagerFile = myload(Me._FileManagerFileName)
-    End Function
+    '    myload = AddressOf ModelLoad(Of FileManagerFileModel)
+    '    LoadFileManagerFile = myload(Me._FileManagerFileName)
+    'End Function
 
 
 
-    Private Function _FileManagerFileInitialize() As FileManagerFileModel
-        Dim fmfm As New FileManagerFileModel
-        fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
-        _FileManagerFileInitialize = fmfm
-    End Function
+    'Private Function _FileManagerFileInitialize() As FileManagerFileModel
+    '    Dim fmfm As New FileManagerFileModel
+    '    fmfm.ConfigFileName = Me._MyDirectoryName & "\" & CONFIG_FILE_JSON
+    '    _FileManagerFileInitialize = fmfm
+    'End Function
 
     '---------------------------------------------------------------------------------------'
 
@@ -64,28 +65,22 @@ Public Class ProjectModel
 
 
     '-- SqlStatus --------------------------------------------------------------------------'
-    Public Function LoadSqlModel() As SqlModel
-        Dim proxy As ModelLoadProxy(Of ConfigFileModel)
+    'Public Function LoadSqlModel() As SqlModel
+    '    Dim proxy As ModelLoadProxy(Of ConfigFileModel)
 
-        proxy = AddressOf ModelLoad(Of ConfigFileModel)
-        LoadSqlModel = proxy(Me.LoadFileManagerFile.ConfigFileName).SqlStatus
-    End Function
+    '    proxy = AddressOf ModelLoad(Of ConfigFileModel)
+    '    LoadSqlModel = proxy(Me.LoadFileManagerFile.ConfigFileName).SqlStatus
+    'End Function
     '---------------------------------------------------------------------------------------'
 
 
-    Private Function _MyProjectState() As Int32
-        'ディレクトリおよび、iniFileのチェック
-        Dim mbf As myBoolFunction
-        mbf = Function()
-                  Return True
-              End Function
-        _MyProjectState = _MyFileState(mbf)
-    End Function
 
-    Private Function _MyFileState(ByVal d As myBoolFunction) As Int32
-        If _DirectoryCheck(Me._MyDirectoryName) Then
-            If _FileCheck(Me._IniFileName) Then
-                If (d()) Then
+    '最初以外にもその都度、ProjectDirectory, ProjectIniFileはチェックする
+    Public Function ProjectCheck(ByVal proxy As ProjectCheckProxy, ByVal f As String) As Int32
+        f = _ProjectFile(f)
+        If Me.DirectoryCheck(Me._ProjectDirectoryName) Then
+            If Me.FileCheck(Me._ProjectIniFileName) Then
+                If (proxy(f)) Then
                     Return 0    '正常
                 Else
                     Return 1    '対象ファイルが存在しない
@@ -98,21 +93,32 @@ Public Class ProjectModel
         End If
     End Function
 
-    Private ReadOnly Property _DirectoryCheck(d) As Boolean
-        Get
-            Try
-                If System.IO.Directory.Exists(d) Then
-                    Return True
-                Else
-                    Return False
-                End If
-            Catch ex As Exception
-                Throw ex
-            End Try
-        End Get
-    End Property
+    'Public ReadOnly Property DirectoryCheck(d) As Boolean
+    '    Get
+    '        Try
+    '            If System.IO.Directory.Exists(d) Then
+    '                Return True
+    '            Else
+    '                Return False
+    '            End If
+    '        Catch ex As Exception
+    '            Throw ex
+    '        End Try
+    '    End Get
+    'End Property
 
-    Private Function _FileCheck(ByVal f As String) As Boolean
+    Public Function DirectoryCheck(ByVal d As String) As Boolean
+        d = _ProjectDirectory(d)
+        If Directory.Exists(d) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+
+    Public Function FileCheck(ByVal f As String) As Boolean
+        f = _ProjectFile(f)
         If File.Exists(f) Then
             Return True
         Else
@@ -120,15 +126,21 @@ Public Class ProjectModel
         End If
     End Function
 
-    Private Sub DirectoryEstablish(ByVal d As String)
+
+    Public Sub DirectoryEstablish(ByVal d As String)
+        d = _ProjectDirectory(d)
         System.IO.Directory.CreateDirectory(d)
     End Sub
 
-    Private Sub FileEstablish(ByVal f As String)
+
+    Public Sub FileEstablish(ByVal f As String)
+        f = _ProjectFile(f)
         System.IO.File.Create(f)
     End Sub
 
-    Private Sub FileWrite(ByVal f As String, ByVal txt As String)
+
+    Public Sub FileWrite(ByVal f As String, ByVal txt As String)
+        f = _ProjectFile(f)
         Dim sw As StreamWriter
         sw = New System.IO.StreamWriter(
             f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
@@ -137,6 +149,18 @@ Public Class ProjectModel
         sw.Close()
         sw.Dispose()
     End Sub
+
+    Private Function _ProjectFile(ByVal f As String) As String
+        If f.Contains(Me._ProjectDirectoryName) Then
+            _ProjectFile = f
+        Else
+            _ProjectFile = Me._ProjectDirectoryName & "\" & f
+        End If
+    End Function
+
+    Public Function _ProjectDirectory(ByVal d As String) As String
+        _ProjectDirectory = _ProjectFile(d)
+    End Function
 
 
     Public Function ModelLoad(Of T)(ByVal f As String) As T
@@ -147,6 +171,7 @@ Public Class ProjectModel
 
         'いずれの例外も初期化
         Try
+            f = _ProjectFile(f)
             sr = New System.IO.StreamReader(
                 f, System.Text.Encoding.GetEncoding(SHIFT_JIS)
             )
@@ -168,6 +193,7 @@ Public Class ProjectModel
         Dim sw As System.IO.StreamWriter
 
         Try
+            f = _ProjectFile(f)
             txt = JsonConvert.SerializeObject(m)
             sw = New System.IO.StreamWriter(
                 f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
@@ -185,37 +211,17 @@ Public Class ProjectModel
 
 
     Sub New()
-        Dim ms As mySub
-        Dim ms2 As mySub
-        Dim ms3 As mySub
-        Dim ms4 As mySub
-
-
+        Dim proxy As ProjectCheckProxy
+        proxy = AddressOf DirectoryCheck
         Try
-            ms = Sub()
-                     Call DirectoryEstablish(Me._MyDirectoryName)
-                 End Sub
-            ms2 = Sub()
-                      Call FileWrite(Me._IniFileName, vbNullString)
-                  End Sub
-            ms3 = Sub()
-                      Call FileWrite(Me._FileManagerFileName,
-                                     JsonConvert.SerializeObject(_FileManagerFileInitialize()))
-                  End Sub
-            ms4 = Sub()
-                      Call FileWrite(Me.LoadFileManagerFile.ConfigFileName,
-                                     JsonConvert.SerializeObject(New ConfigFileModel))
-                  End Sub
-            Select Case (Me._MyProjectState())
+            Select Case ProjectCheck(proxy, Me._ProjectDirectoryName)
                 Case 0
                     Exit Select
                 Case 99
                     Throw New Exception
                 Case 999
-                    Call ms()
-                    Call ms2()
-                    Call ms3()
-                    Call ms4()
+                    Call DirectoryEstablish(Me._ProjectDirectoryName)
+                    Call FileWrite(Me._ProjectIniFileName, vbNullString)
             End Select
         Catch ex As Exception
             '
