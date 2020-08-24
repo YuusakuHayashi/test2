@@ -54,6 +54,16 @@ test2
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="T:test2.BatchMenuView">
+<summary>
+BatchMenuView
+</summary>
+</member>
+<member name="M:test2.BatchMenuView.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
 <member name="T:test2.InitView">
 <summary>
 InitView

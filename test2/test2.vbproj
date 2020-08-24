@@ -73,6 +73,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AccessButtonVM.vb" />
+    <Compile Include="BatchMenuView.xaml.vb">
+      <DependentUpon>BatchMenuView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="BatchMenuViewModel.vb" />
     <Compile Include="ConfigFileModel.vb" />
     <Compile Include="ConfigFileVM.vb" />
     <Compile Include="DelegateCommand.vb" />
@@ -121,6 +125,10 @@
     <Compile Include="Window3.xaml.vb">
       <DependentUpon>Window3.xaml</DependentUpon>
     </Compile>
+    <Page Include="BatchMenuView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="InitView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

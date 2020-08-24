@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:test2"
         mc:Ignorable="d"
         Title="TestWin" Height="500" Width="800">
+    
     <!--<Window.Resources>
         <DataTemplate DataType="{x:Type local:InitViewModel}">
             <StackPanel
