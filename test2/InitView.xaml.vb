@@ -9,6 +9,7 @@
         ' InitializeComponent() 呼び出しの後で初期化を追加します。
         'Dim ivm As New InitViewModel()
         Me.DataContext = ivm
+
     End Sub
 
 End Class

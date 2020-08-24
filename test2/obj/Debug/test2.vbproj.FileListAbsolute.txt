@@ -122,3 +122,5 @@ C:\Users\yuusa\project\test2\test2\obj\Debug\MenuView.baml
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\MenuView.baml
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\BatchMenuView.g.vb
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\BatchMenuView.baml
+C:\Users\yuusa\project\test2\test2\obj\Debug\BatchMenuView.g.vb
+C:\Users\yuusa\project\test2\test2\obj\Debug\BatchMenuView.baml

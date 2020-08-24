@@ -79,6 +79,11 @@
     <Compile Include="BatchMenuViewModel.vb" />
     <Compile Include="ConfigFileModel.vb" />
     <Compile Include="ConfigFileVM.vb" />
+    <Compile Include="DataBaseModel.vb" />
+    <Compile Include="DataTableModel.vb" />
+    <Compile Include="DBExplorerView.xaml.vb">
+      <DependentUpon>DBExplorerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="FileManagerFileModel.vb" />
     <Compile Include="InitModel.vb" />
@@ -100,6 +105,7 @@
     <Compile Include="ProjectModel.vb" />
     <Compile Include="SaveButtonVM.vb" />
     <Compile Include="SaveTreeModel.vb" />
+    <Compile Include="ServerModel.vb" />
     <Compile Include="SqlHandlerModel.vb" />
     <Compile Include="SqlModel.vb" />
     <Compile Include="SqlStatusVM.vb" />
@@ -126,6 +132,10 @@
       <DependentUpon>Window3.xaml</DependentUpon>
     </Compile>
     <Page Include="BatchMenuView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DBExplorerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

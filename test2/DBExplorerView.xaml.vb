@@ -1,0 +1,3 @@
+﻿Class DBExplorerView
+
+End Class
