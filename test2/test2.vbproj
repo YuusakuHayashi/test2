@@ -84,6 +84,7 @@
     <Compile Include="DBExplorerView.xaml.vb">
       <DependentUpon>DBExplorerView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DBExplorerViewModel.vb" />
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="FileManagerFileModel.vb" />
     <Compile Include="InitModel.vb" />

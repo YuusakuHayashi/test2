@@ -64,6 +64,16 @@ BatchMenuView
 InitializeComponent
 </summary>
 </member>
+<member name="T:test2.DBExplorerView">
+<summary>
+DBExplorerView
+</summary>
+</member>
+<member name="M:test2.DBExplorerView.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
 <member name="T:test2.InitView">
 <summary>
 InitView

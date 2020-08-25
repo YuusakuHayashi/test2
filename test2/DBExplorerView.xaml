@@ -9,44 +9,49 @@
       Title="DBExplorerView">
     <DockPanel>
         <DockPanel.Resources>
-            <local:TreeViewList x:Key="ViewList" />
-            <HierarchicalDataTemplate 
-                DataType="{x:Type ServerModel}"
+            <HierarchicalDataTemplate
+                DataType="{x:Type local:ServerModel}"
                 ItemsSource="{Binding DataBases}" >
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox Margin="5"
-                        VerticalContentAlignment="Center"
-                        IsChecked="{Binding IsChecked}" />
-                    <TextBlock Margin="5" 
-                        Text="{Binding Name}" />
-                </StackPanel>
-            </HierarchicalDataTemplate>
-            <HierarchicalDataTemplate 
-                DataType="{x:Type DataBaseModel}" 
-                ItemsSource="{Binding DataTables}" >
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox Margin="5"
-                        VerticalContentAlignment="Center"
-                        IsChecked="{Binding IsChecked}" />
-                    <TextBlock Margin="5" 
-                        Text="{Binding Name}" />
-                </StackPanel>
-            </HierarchicalDataTemplate>
-            <DataTemplate 
-                DataType="{x:Type DataTableModel}">
-                <StackPanel>
                     <CheckBox 
-                        Margin="5"
+                        Margin="5,3,3,3"
                         VerticalContentAlignment="Center"
                         IsChecked="{Binding IsChecked}" />
                     <TextBlock 
-                        Margin="5" 
+                        Margin="5,3,3,3"
+                        Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            <HierarchicalDataTemplate
+                DataType="{x:Type local:DataBaseModel}"
+                ItemsSource="{Binding DataTables}" >
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox 
+                        Margin="5,3,3,3"
+                        VerticalContentAlignment="Center"
+                        IsChecked="{Binding IsChecked}" />
+                    <TextBlock 
+                        Margin="5,3,3,3"
+                        Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            <DataTemplate
+                DataType="{x:Type local:DataTableModel}">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox 
+                        Margin="5,3,3,3"
+                        VerticalContentAlignment="Center"
+                        IsChecked="{Binding IsChecked}" />
+                    <TextBlock 
+                        Margin="5,3,3,3" 
                         Text="{Binding Name}" />
                 </StackPanel>
             </DataTemplate>
         </DockPanel.Resources>
         <TreeView>
-            <TreeViewItem ></TreeViewItem>
+            <TreeViewItem
+                Header="{Binding Server.Name}"
+                ItemsSource="{Binding Server.DataBases}" />
         </TreeView>
     </DockPanel>
 </Page>

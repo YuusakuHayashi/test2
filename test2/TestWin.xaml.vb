@@ -1,7 +1,8 @@
 ﻿Imports System.ComponentModel
 Public Class TestWin
 
-    Private _Navi As NavigationService
+    Private _mnavi As NavigationService
+    Private _enavi As NavigationService
 
     Sub New()
 
@@ -15,35 +16,43 @@ Public Class TestWin
         'インスタンス化時に設定があれば、それをロードする
         Dim ivm As New InitViewModel
         Dim mvm As New MenuViewModel
+        Dim dbevm As New DBExplorerViewModel
 
 
         Dim iv As InitView
         Dim mv As MenuView
         Dim bmv As BatchMenuView
+        Dim dbev As DBExplorerView
 
 
-        Me._Navi = Me.MainFlame.NavigationService
+        Me._mnavi = Me.MainFlame.NavigationService
+        Me._enavi = Me.ExplorerFlame.NavigationService
 
 
-        '初期時の画面
+        'メイン画面
         If Not ivm.InitFlag Then
             iv = New InitView(ivm)
-            Me._Navi.Navigate(iv)
+            Me._mnavi.Navigate(iv)
         Else
             If Not mvm.MenuFlag Then
                 mv = New MenuView(mvm)
-                Me._Navi.Navigate(mv)
+                Me._mnavi.Navigate(mv)
             Else
                 bmv = New BatchMenuView
-                Me._Navi.Navigate(bmv)
+                Me._mnavi.Navigate(bmv)
             End If
         End If
 
 
-            'Dim tvm As New TreeViewModel
-            'Me.treeView.DataContext = tvm
+        'エクスプローラー画面
+        dbev = New DBExplorerView(dbevm)
+        Me._enavi.Navigate(dbev)
 
-            AddHandler ivm.PropertyChanged, AddressOf Me._PageNavigation
+
+        'Dim tvm As New TreeViewModel
+        'Me.treeView.DataContext = tvm
+
+        AddHandler ivm.PropertyChanged, AddressOf Me._PageNavigation
         AddHandler mvm.PropertyChanged, AddressOf Me._PageNavigation
     End Sub
 
@@ -61,7 +70,7 @@ Public Class TestWin
                     If ivm.InitFlag Then
                         mvm = New MenuViewModel
                         mv = New MenuView(mvm)
-                        Me._Navi.Navigate(mv)
+                        Me._mnavi.Navigate(mv)
                     End If
                 End If
             Case "MenuViewModel"
@@ -69,7 +78,7 @@ Public Class TestWin
                     mvm = CType(sender, MenuViewModel)
                     If mvm.MenuFlag Then
                         bmv = New BatchMenuView
-                        Me._Navi.Navigate(bmv)
+                        Me._mnavi.Navigate(bmv)
                     End If
                 End If
             Case Else
