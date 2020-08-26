@@ -16,6 +16,7 @@
                     <CheckBox 
                         Margin="5,3,3,3"
                         VerticalContentAlignment="Center"
+                        IsEnabled="{Binding IsEnabled}"
                         IsChecked="{Binding IsChecked}" />
                     <TextBlock 
                         Margin="5,3,3,3"
@@ -29,6 +30,7 @@
                     <CheckBox 
                         Margin="5,3,3,3"
                         VerticalContentAlignment="Center"
+                        IsEnabled="{Binding IsEnabled}"
                         IsChecked="{Binding IsChecked}"/>
                     <TextBlock 
                         Margin="5,3,3,3"
@@ -41,6 +43,7 @@
                     <CheckBox 
                         Margin="5,3,3,3"
                         VerticalContentAlignment="Center"
+                        IsEnabled="{Binding IsEnabled}"
                         IsChecked="{Binding IsChecked}"/>
                     <TextBlock 
                         Margin="5,3,3,3" 

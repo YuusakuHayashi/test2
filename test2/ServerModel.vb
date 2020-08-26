@@ -1,7 +1,10 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.Collections.Specialized
 
-Public Class ServerModel : Inherits BaseModel
+Public Class ServerModel
+    Inherits BaseModel
+    Implements TreeViewInterface
+
     Private _Name As String
     Public Property Name As String
         Get
@@ -13,41 +16,43 @@ Public Class ServerModel : Inherits BaseModel
         End Set
     End Property
 
-    Private _DataBases As ObservableCollection(Of DataBaseModel)
-    Public Property DataBases As ObservableCollection(Of DataBaseModel)
+    Private _DataBases As List(Of DataBaseModel)
+    Public Property DataBases As List(Of DataBaseModel)
         Get
             Return Me._DataBases
-End Get
-Set(value As ObservableCollection(Of DataBaseModel))
+        End Get
+        Set(value As List(Of DataBaseModel))
             Me._DataBases = value
             RaisePropertyChanged("DataBases")
         End Set
     End Property
 
-    'Private _IsSelected As Boolean
-    'Public Property IsSelected As Boolean
-    '    Get
-    '        Return Me._IsSelected
-    '    End Get
-    '    Set(value As Boolean)
-    '        Me._IsSelected = value
-    '        RaisePropertyChanged("_IsSelected")
-    '    End Set
-    'End Property
-
     Private _IsChecked As Boolean
-    Public Property IsChecked As Boolean
+    Public Property IsChecked As Boolean Implements TreeViewInterface.IsChecked
         Get
             Return Me._IsChecked
         End Get
         Set(value As Boolean)
             Me._IsChecked = value
             RaisePropertyChanged("_IsChecked")
+            Call CheckingChildren(Of DataBaseModel)(DataBases, value)
         End Set
     End Property
 
 
+    Private _IsEnabled As Boolean
+    Public Property IsEnabled As Boolean Implements TreeViewInterface.IsEnabled
+        Get
+            Return Me._IsEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsEnabled = value
+        End Set
+    End Property
+
     Sub New()
+        Me.IsChecked = True
+        Me.IsEnabled = True
     End Sub
 End Class
 

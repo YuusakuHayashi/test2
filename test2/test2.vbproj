@@ -77,6 +77,7 @@
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
+    <Compile Include="TreeViewModule.vb" />
     <Compile Include="ConfigFileModel.vb" />
     <Compile Include="ConfigFileVM.vb" />
     <Compile Include="DataBaseModel.vb" />
@@ -116,6 +117,7 @@
       <DependentUpon>TestWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="TreeModel.vb" />
+    <Compile Include="TreeViewInterface.vb" />
     <Compile Include="TreeViewListModel.vb" />
     <Compile Include="TreeViewModel.vb" />
     <Compile Include="TreeViewModel2.vb" />
