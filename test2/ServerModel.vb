@@ -1,4 +1,7 @@
-﻿Public Class ServerModel : Inherits BaseModel
+﻿Imports System.Collections.ObjectModel
+Imports System.Collections.Specialized
+
+Public Class ServerModel : Inherits BaseModel
     Private _Name As String
     Public Property Name As String
         Get
@@ -10,14 +13,14 @@
         End Set
     End Property
 
-    Private _DataBases As List(Of DataBaseModel)
-    Public Property DataBases As List(Of DataBaseModel)
+    Private _DataBases As ObservableCollection(Of DataBaseModel)
+    Public Property DataBases As ObservableCollection(Of DataBaseModel)
         Get
             Return Me._DataBases
-        End Get
-        Set(value As List(Of DataBaseModel))
+End Get
+Set(value As ObservableCollection(Of DataBaseModel))
             Me._DataBases = value
-            'RaisePropertyChanged("Name")
+            RaisePropertyChanged("DataBases")
         End Set
     End Property
 
@@ -42,5 +45,9 @@
             RaisePropertyChanged("_IsChecked")
         End Set
     End Property
+
+
+    Sub New()
+    End Sub
 End Class
 

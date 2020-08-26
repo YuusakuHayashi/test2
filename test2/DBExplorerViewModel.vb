@@ -1,4 +1,9 @@
-﻿Public Class DBExplorerViewModel
+﻿Imports System.ComponentModel
+Imports System.Collections.ObjectModel
+Imports System.Collections.Specialized
+
+Public Class DBExplorerViewModel : Inherits ViewModel
+
     Private Const _DBEXPLORERVIEW_FILE As String = "DBExplorerView.txt"
 
     Private _Server As ServerModel
@@ -8,6 +13,59 @@
         End Get
         Set(value As ServerModel)
             Me._Server = value
+            RaisePropertyChanged("Server")
+        End Set
+    End Property
+
+
+
+    Private _ClickCommand As ICommand
+    Public ReadOnly Property ClickCommand As ICommand
+        Get
+            If Me._ClickCommand Is Nothing Then
+                Me._ClickCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _ClickCommandExecute,
+                    .CanExecuteHandler = AddressOf _ClickCommandCanExecute
+                }
+                Return Me._ClickCommand
+            Else
+                Return Me._ClickCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckClickEnableFlag()
+        Me._ClickEnableFlag = True
+    End Sub
+
+
+    'コマンド実行可否のフラグ
+    Private __ClickEnableFlag As Boolean
+    Public Property _ClickEnableFlag As Boolean
+        Get
+            Return Me.__ClickEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__ClickEnableFlag = value
+            RaisePropertyChanged("ClickEnableFlag")
+            CType(ClickCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _ClickCommandExecute(ByVal parameter As Object)
+    End Sub
+
+    Private Function _ClickCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._ClickEnableFlag
+    End Function
+
+    Private _IsSelected As Boolean
+    Public Property IsSelected As Boolean
+        Get
+            Return Me._IsSelected
+        End Get
+        Set(value As Boolean)
+            Me._IsSelected = value
         End Set
     End Property
 
@@ -55,6 +113,13 @@
         '    }
         '}
         'Me.Server = test
+    End Sub
+
+    Sub Test1(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
+        MsgBox("hoge")
+    End Sub
+    Sub Test2(ByVal sender As Object, ByVal e As NotifyCollectionChangedEventArgs)
+        MsgBox("hoge")
     End Sub
 
     Sub New()
