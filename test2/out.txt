@@ -1,0 +1,13 @@
+./bin/Debug/test2.exe
+./bin/Debug/test2.pdb
+./bin/__Debug/test2.pdb
+./DBExplorerViewModel.vb
+./InitViewModel.vb
+./MenuViewModel.vb
+./obj/Debug/test2.exe
+./obj/Debug/test2.pdb
+./ProjectModel.vb
+./SaveButtonVM.vb
+./SqlModel.vb
+./TreeViewModel.vb
+./TreeViewViewModel.vb

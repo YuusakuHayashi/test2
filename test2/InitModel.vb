@@ -1,4 +1,6 @@
-﻿Public Class InitModel : Inherits BaseModel
+﻿Public Class InitModel
+    Inherits BaseModel
+    Implements ProjectInterface
 
     Private _InitFlag As Boolean
     Public Property InitFlag As Boolean

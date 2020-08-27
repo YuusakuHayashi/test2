@@ -77,6 +77,8 @@
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
+    <Compile Include="Model.vb" />
+    <Compile Include="ProjectInterface.vb" />
     <Compile Include="TreeViewModule.vb" />
     <Compile Include="ConfigFileModel.vb" />
     <Compile Include="ConfigFileVM.vb" />

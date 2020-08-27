@@ -1,13 +1,16 @@
 ﻿Public Class InitViewModel : Inherits ViewModel
 
-    Private Const DEFAULT_SERVERNAME As String = ""
-    Private Const DEFAULT_DATABASENAME As String = ""
-    'Private Const DEFUALT_OTHERPROPERTY As String = "Trusted_Connection=True"
+    Private Const DEFAULT_SERVER_NAME As String = ""
+    Private Const DEFAULT_DATABASE_NAME As String = ""
+    Private Const DEFUALT_OTHERPROPERTY As String = "Trusted_Connection=True"
     Private Const DEFAULT_CONNECTIONSTRING As String = ""
 
-    'Private Const INITVIEW_FILE As String = "InitView.txt"
+    Private Const INITVIEW_FILE As String = "InitView.txt"
 
-    ' モデル
+
+    'セーブ用にモデルを保持
+    'ビューモデルをテキストにデシリアライズしようとすると
+    'Newtonsoft.jsonでは、コマンドがデシリアライズ不可
     Private __Model As Model
     Private Property _Model As Model
         Get
@@ -20,8 +23,8 @@
     End Property
 
 
-    ' 遷移用フラグ
-    ' ウィンドウ側で購読する
+    'この画面に／から遷移するフラグ
+    'ウィンドウ側で購読する
     Private _NextViewFlag As Boolean
     Public Property NextViewFlag As Boolean
         Get
@@ -34,9 +37,6 @@
     End Property
 
 
-    ' サーバ名
-    ' 接続文字列にバインド
-    ' コマンド実行フラグをチェック
     Private _ServerName As String
     Public Property ServerName As String
         Get
@@ -50,10 +50,6 @@
         End Set
     End Property
 
-
-    ' ＤＢ名
-    ' 変更を接続文字列にバインドさせる
-    ' コマンド実行フラグをチェック
     Private _DataBaseName As String
     Public Property DataBaseName As String
         Get
@@ -67,8 +63,6 @@
         End Set
     End Property
 
-
-    ' コマンド実行フラグをチェック
     Private _ConnectionString As String
     Public Property ConnectionString As String
         Get
@@ -83,19 +77,16 @@
 
 
     Private __OtherProperty As String
-    Private Property _OtherProperty As String
+    Private ReadOnly Property _OtherProperty As String
         Get
             Return _GetOtherProperty()
         End Get
-        Set(value As String)
-            Me.__OtherProperty = value
-        End Set
     End Property
 
 
     Private Function _GetOtherProperty() As String
         Dim txt As String
-        txt = Me.ConnectionString
+        txt = InitViewModel.DEFUALT_OTHERPROPERTY
         If String.IsNullOrEmpty(Me.ConnectionString) Then
             '
         Else
@@ -109,11 +100,9 @@
         _GetOtherProperty = txt
     End Function
 
-
     Private Sub _GetConnectionString()
         Me.ConnectionString = $"Server={Me.ServerName};DataBase={Me.DataBaseName};{Me._OtherProperty};"
     End Sub
-
 
     Public ReadOnly Property ServerNameError As String
         Get
@@ -149,16 +138,12 @@
         End Get
     End Property
 
-
     Private Sub _CheckInitEnableFlag()
         Dim b As Boolean : b = True
         If Me.ServerName = vbNullString Then
             b = False
         End If
         If Me.DataBaseName = vbNullString Then
-            b = False
-        End If
-        If Me._OtherProperty = vbNullString Then
             b = False
         End If
         If Me.ConnectionString = vbNullString Then
@@ -176,7 +161,6 @@
         Me._InitEnableFlag = b
     End Sub
 
-
     'コマンド実行可否のフラグ
     Private __InitEnableFlag As Boolean
     Public Property _InitEnableFlag As Boolean
@@ -190,55 +174,47 @@
         End Set
     End Property
 
-
     Private Sub _InitCommandExecute(ByVal parameter As Object)
+        Dim sql As New SqlModel
         Dim pm As New ProjectModel
         Dim proxy As ProjectCheckProxy
+
+        sql.ServerName = Me.ServerName
+        sql.DataBaseName = Me.DataBaseName
+        sql.ConnectionString = Me.ConnectionString
+
+        Call sql.AccessTest()
+
+        If sql.AccessResult Then
+            Me.NextViewFlag = True
+        End If
 
         Me._Model.ServerName = Me.ServerName
         Me._Model.DataBaseName = Me.DataBaseName
         Me._Model.ConnectionString = Me.ConnectionString
-        Me._Model.OtherProperty = Me._OtherProperty
+        Me._Model.NextViewFlag = Me.NextViewFlag
 
-        Call Me._Model.AccessTest()
+        proxy = AddressOf pm.FileCheck
+        Select Case pm.ProjectCheck(proxy, INITVIEW_FILE)
+            Case 0
+                pm.ModelSave(Of Model)(INITVIEW_FILE, Me._Model)
+            Case 1
+                pm.FileEstablish(INITVIEW_FILE)
+                pm.ModelSave(Of Model)(INITVIEW_FILE, Me._Model)
+            Case 99
+            Case 999
+        End Select
 
-        If Me._Model.AccessResult Then
-            Me.NextViewFlag = True
-        End If
-
-        'Me._Model.ServerName = Me.ServerName
-        'Me._Model.DataBaseName = Me.DataBaseName
-        'Me._Model.ConnectionString = Me.ConnectionString
-        'Me._Model.NextViewFlag = Me.NextViewFlag
-
-        'proxy = AddressOf pm.FileCheck
-        'Select Case pm.ProjectCheck(proxy, INITVIEW_FILE)
-        '    Case 0
-        '        pm.ModelSave(Of Model)(INITVIEW_FILE, Me._Model)
-        '    Case 1
-        '        pm.FileEstablish(INITVIEW_FILE)
-        '        pm.ModelSave(Of Model)(INITVIEW_FILE, Me._Model)
-        '    Case 99
-        '    Case 999
-        'End Select
     End Sub
 
     Private Function _InitCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._InitEnableFlag
     End Function
 
-    'Private Sub _SetDefault()
-    '    Me.ServerName = InitViewModel.DEFAULT_SERVER_NAME
-    '    Me.DataBaseName = InitViewModel.DEFAULT_DATABASE_NAME
-    'End Sub
-
-    Private Sub _DefaultSet()
-        Me.ServerName = vbNullString
-        Me.DataBaseName = vbNullString
-        Me.ConnectionString = vbNullString
+    Private Sub _SetDefault()
+        Me.ServerName = InitViewModel.DEFAULT_SERVER_NAME
+        Me.DataBaseName = InitViewModel.DEFAULT_DATABASE_NAME
     End Sub
-
-
 
     Sub New(ByRef m As Model)
         Dim pm As New ProjectModel
@@ -248,43 +224,19 @@
         proxy = AddressOf pm.FileCheck
         proxy2 = AddressOf pm.ModelLoad(Of Model)
 
-
-        If m IsNot Nothing Then
-            ' 接続テスト
-            Call m.AccessTest()
-
+        If m Is Not Nothing Then
+            Call m.AccessTest
             If m.AccessResult Then
-                ' 接続成功
-                Me.NextViewFlag = True
+                Me.NextViewFlag = True    
                 Exit Sub
-            Else
-                ' 接続失敗
-                If String.IsNullOrEmpty(m.ServerName) Then
-                    m.ServerName = vbNullString
-                End If
-                If String.IsNullOrEmpty(m.DataBaseName) Then
-                    m.DataBaseName = vbNullString
-                End If
-                If String.IsNullOrEmpty(m.OtherProperty) Then
-                    m.OtherProperty = vbNullString
-                End If
             End If
-        Else
-            ' モデルなし
-            m.ServerName = vbNullString
-            m.DataBaseName = vbNullString
-            m.OtherProperty = vbNullString
         End If
 
-
-        Me._Model = m
         Me.NextViewFlag = False
-
         Me.ServerName = m.ServerName
-        Me.DataBaseName = m.DataBaseName
-        Me._OtherProperty = m.OtherProperty
-        Call Me._GetConnectionString()
-        'Me.ConnectionString = m.ConnectionString
+        Me.DataBaseName = m.DataBaseNamee
+        Me.ConnectionString = m.ConnectionString
+        Me.OtherProperty = m.OtherProperty
 
         'Select Case pm.ProjectCheck(proxy, INITVIEW_FILE)
         '    Case 0

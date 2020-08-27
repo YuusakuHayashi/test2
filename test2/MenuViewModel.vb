@@ -105,16 +105,16 @@
 
 
         '外部に記録
-        proxy = AddressOf pm.FileCheck
-        Select Case pm.ProjectCheck(proxy, _MENUVIEW_FILE)
-            Case 0
-                pm.ModelSave(Of MenuModel)(_MENUVIEW_FILE, Me._Model)
-            Case 1
-                pm.FileEstablish(_MENUVIEW_FILE)
-                pm.ModelSave(Of MenuModel)(_MENUVIEW_FILE, Me._Model)
-            Case 99
-            Case 999
-        End Select
+        'proxy = AddressOf pm.FileCheck
+        'Select Case pm.ProjectCheck(proxy, _MENUVIEW_FILE)
+        '    Case 0
+        '        pm.ModelSave(Of MenuModel)(_MENUVIEW_FILE, Me._Model)
+        '    Case 1
+        '        pm.FileEstablish(_MENUVIEW_FILE)
+        '        pm.ModelSave(Of MenuModel)(_MENUVIEW_FILE, Me._Model)
+        '    Case 99
+        '    Case 999
+        'End Select
     End Sub
 
 
@@ -139,26 +139,26 @@
         proxy = AddressOf pm.FileCheck
         proxy2 = AddressOf pm.ModelLoad(Of MenuModel)
 
-        Select Case pm.ProjectCheck(proxy, _MENUVIEW_FILE)
-            Case 0
-                Me._Model = proxy2(_MENUVIEW_FILE)
-                If Me._Model IsNot Nothing Then
-                    Me._DefaultMenu = Me._Model.DefaultMenu
-                    If String.IsNullOrEmpty(Me._DefaultMenu) Then
-                        Me._DefaultMenu = vbNullString
-                    End If
+        'Select Case pm.ProjectCheck(proxy, _MENUVIEW_FILE)
+        '    Case 0
+        '        Me._Model = proxy2(_MENUVIEW_FILE)
+        '        If Me._Model IsNot Nothing Then
+        '            Me._DefaultMenu = Me._Model.DefaultMenu
+        '            If String.IsNullOrEmpty(Me._DefaultMenu) Then
+        '                Me._DefaultMenu = vbNullString
+        '            End If
 
-                    Me.MenuFlag = Me._Model.MenuFlag
-                    If Me._Model.MenuFlag = Nothing Then
-                        Me.MenuFlag = False
-                    End If
-                Else
-                    Me._Model = New MenuModel
-                    Call Me._SetDefault()
-                End If
-            Case Else
-                Me._Model = New MenuModel
-                Call Me._SetDefault()
-        End Select
+        '            Me.MenuFlag = Me._Model.MenuFlag
+        '            If Me._Model.MenuFlag = Nothing Then
+        '                Me.MenuFlag = False
+        '            End If
+        '        Else
+        '            Me._Model = New MenuModel
+        '            Call Me._SetDefault()
+        '        End If
+        '    Case Else
+        '        Me._Model = New MenuModel
+        '        Call Me._SetDefault()
+        'End Select
     End Sub
 End Class

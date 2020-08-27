@@ -1,8 +1,8 @@
 ﻿Imports System.IO
 Imports Newtonsoft.Json
 
-Delegate Function ModelLoadProxy(Of T)(ByVal f As String) As T
-Delegate Sub ModelSaveProxy(Of T)(ByVal f As String, ByVal m As T)
+Delegate Function ModelLoadProxy(Of T)(ByVal f As String, ByVal key As String) As T
+Delegate Sub ModelSaveProxy(Of T)(ByVal f As String, ByVal m As T, ByVal key As String)
 Public Delegate Function ProjectCheckProxy(ByVal f As String) As Boolean
 
 Public Class ProjectModel
@@ -163,20 +163,40 @@ Public Class ProjectModel
     End Function
 
 
-    Public Function ModelLoad(Of T)(ByVal f As String) As T
+    Public Function ModelLoad(Of T As Class)(ByVal f As String, ByVal key As String) As T
         Dim txt As String
         Dim sr As System.IO.StreamReader
+        Dim obj As Object
+        Dim test As T
 
         ModelLoad = Nothing
 
-        'いずれの例外も初期化
         Try
             f = _ProjectFile(f)
+            If File.Exists(f) Then
+            End If
+
             sr = New System.IO.StreamReader(
-                f, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-            )
+                    f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
-            ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
+
+            obj = JsonConvert.DeserializeObject(txt)
+
+
+            ' 一部をロード
+            test = TryCast(obj(key), T)
+            If test IsNot Nothing Then
+                ModelLoad = obj(key)
+            Else
+                '' 新規作成(意味が分かってないので、要解読・・・)
+                'dic = New Dictionary(Of String, T)
+                't1 = dic.GetType.GetGenericTypeDefinition()
+
+                'args = {test2.GetType, test.GetType}
+                't2 = t1.MakeGenericType(args)
+
+                'test = Activator.CreateInstance(t2)
+            End If
         Catch ex As Exception
             '
         Finally
@@ -188,20 +208,65 @@ Public Class ProjectModel
     End Function
 
 
-    Public Sub ModelSave(Of T)(ByVal f As String, ByVal m As T)
+    Public Sub ModelSave(Of T As Class)(ByVal f As String,
+                                        ByVal m As T,
+                                        ByVal key As String)
         Dim txt As String
+        Dim txt2 As String
         Dim sw As System.IO.StreamWriter
+        Dim sr As System.IO.StreamReader
+        Dim obj As Object
+        'Dim test As T
+        'Dim test2 As String
+        'Dim t1 As Type
+        'Dim t2 As Type
+        'Dim args As Type()
+        'Dim dic As Dictionary(Of String, T)
 
         Try
             f = _ProjectFile(f)
-            txt = JsonConvert.SerializeObject(m)
+
+            ' 全体のオブジェクトを取得
+            sr = New System.IO.StreamReader(
+                f, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+            )
+            txt = sr.ReadToEnd()
+            obj = JsonConvert.DeserializeObject(txt)
+
+
+            ' 一部を更新            
+            obj(key) = m
+            'test = TryCast(obj(key), T)
+            'If test IsNot Nothing Then
+            '    ' 更新
+            '    obj(key) = m
+            'Else
+            '    ' 新規作成(意味が分かってないので、要解読・・・)
+            '    dic = New Dictionary(Of String, T)
+            '    t1 = dic.GetType.GetGenericTypeDefinition()
+
+            '    args = {test2.GetType, test.GetType}
+            '    t2 = t1.MakeGenericType(args)
+
+            '    obj(key) = Activator.CreateInstance(t2)
+            'End If
+
+
+            ' シリアライズ
+            txt2 = JsonConvert.SerializeObject(obj)
             sw = New System.IO.StreamWriter(
                 f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
             )
-            sw.Write(txt)
+
+            'ファイルへ保存
+            sw.Write(txt2)
         Catch ex As Exception
             '
         Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
             If sw IsNot Nothing Then
                 sw.Close()
                 sw.Dispose()

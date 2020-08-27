@@ -72,18 +72,19 @@ Public Class DBExplorerViewModel : Inherits ViewModel
 
     Sub _SetTest()
         '外部に記録
-        Dim pm As New ProjectModel
-        Dim proxy As ProjectCheckProxy
-        proxy = AddressOf pm.FileCheck
-        Select Case pm.ProjectCheck(proxy, _DBEXPLORERVIEW_FILE)
-            Case 0
-                pm.ModelSave(Of ServerModel)(_DBEXPLORERVIEW_FILE, Me.Server)
-            Case 1
-                pm.FileEstablish(_DBEXPLORERVIEW_FILE)
-                pm.ModelSave(Of ServerModel)(_DBEXPLORERVIEW_FILE, Me.Server)
-            Case 99
-            Case 999
-        End Select
+        'Dim pm As New ProjectModel
+        'Dim proxy As ProjectCheckProxy
+        'proxy = AddressOf pm.FileCheck
+        'Select Case pm.ProjectCheck(proxy, _DBEXPLORERVIEW_FILE)
+        '    Case 0
+        '        pm.ModelSave(Of ServerModel)(_DBEXPLORERVIEW_FILE, Me.Server)
+        '    Case 1
+        '        pm.FileEstablish(_DBEXPLORERVIEW_FILE)
+        '        pm.ModelSave(Of ServerModel)(_DBEXPLORERVIEW_FILE, Me.Server)
+        '    Case 99
+        '    Case 999
+        'End Select
+
         'Dim test As ServerModel
         'test = New ServerModel With {
         '    .Name = "root",
@@ -130,18 +131,18 @@ Public Class DBExplorerViewModel : Inherits ViewModel
         proxy = AddressOf pm.FileCheck
         proxy2 = AddressOf pm.ModelLoad(Of ServerModel)
 
-        Select Case pm.ProjectCheck(proxy, _DBEXPLORERVIEW_FILE)
-            Case 0
-                Me.Server = proxy2(_DBEXPLORERVIEW_FILE)
-                If Me.Server IsNot Nothing Then
+        'Select Case pm.ProjectCheck(proxy, _DBEXPLORERVIEW_FILE)
+        '    Case 0
+        '        Me.Server = proxy2(_DBEXPLORERVIEW_FILE)
+        '        If Me.Server IsNot Nothing Then
 
-                Else
-                    'Call Me._SetDefault()
-                    Call Me._SetTest()
-                End If
-            Case Else
-                'Call Me._SetDefault()
-                Call Me._SetTest()
-        End Select
+        '        Else
+        '            'Call Me._SetDefault()
+        '            Call Me._SetTest()
+        '        End If
+        '    Case Else
+        '        'Call Me._SetDefault()
+        '        Call Me._SetTest()
+        'End Select
     End Sub
 End Class

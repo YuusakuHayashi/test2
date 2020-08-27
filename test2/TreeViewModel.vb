@@ -36,13 +36,13 @@
         'proxy = AddressOf pm.ModelSave(Of List(Of SaveTreeModel))
         'Call proxy(fn, ConvertSaveModel(tm))
 
-        Dim pm As New ProjectModel
-        Dim proxy As ModelLoadProxy(Of List(Of SaveTreeModel))
-        Dim fn As String : fn = Environment.GetEnvironmentVariable("USERPROFILE") & "\test\ConfigFile.json"
-        proxy = AddressOf pm.ModelLoad(Of List(Of SaveTreeModel))
-        Dim lstm As List(Of SaveTreeModel)
-        lstm = proxy(fn)
-        Me.Model = ConvertTreeModel(lstm)
+        'Dim pm As New ProjectModel
+        'Dim proxy As ModelLoadProxy(Of List(Of SaveTreeModel))
+        'Dim fn As String : fn = Environment.GetEnvironmentVariable("USERPROFILE") & "\test\ConfigFile.json"
+        'proxy = AddressOf pm.ModelLoad(Of List(Of SaveTreeModel))
+        'Dim lstm As List(Of SaveTreeModel)
+        'lstm = proxy(fn)
+        'Me.Model = ConvertTreeModel(lstm)
     End Sub
 
 
