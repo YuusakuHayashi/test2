@@ -71,37 +71,42 @@ Public Class TestWin
         'dbev = New DBExplorerView(dbevm)
         'Me._enavi.Navigate(dbev)
 
-        'AddHandler ivm.PropertyChanged, AddressOf Me._PageNavigation
+        AddHandler m.PropertyChanged, AddressOf Me._PageNavigation
         'AddHandler mvm.PropertyChanged, AddressOf Me._PageNavigation
     End Sub
 
     Private Sub _PageNavigation(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
-        '    Dim ivm As InitViewModel
-        '    Dim mvm As MenuViewModel
+        Dim m As Model
+        Dim pm As New ProjectModel
+        Dim saveproxy As ModelSaveProxy(Of Model)
 
-        '    Dim mv As MenuView
-        '    Dim bmv As BatchMenuView
+        saveproxy = AddressOf pm.ModelSave(Of Model)
 
-        '    Select Case sender.GetType.Name
-        '        Case "InitViewModel"
-        '            If e.PropertyName = "InitFlag" Then
-        '                ivm = CType(sender, InitViewModel)
-        '                If ivm.InitFlag Then
-        '                    mvm = New MenuViewModel
-        '                    mv = New MenuView(mvm)
-        '                    Me._mnavi.Navigate(mv)
-        '                End If
+        If e.PropertyName = "ChangePageStrings" Then
+            m = CType(sender, Model)
+            saveproxy(DEFAULTSETTING, m, "All")
+        End If
+
+        'Select Case sender.GetType.Name
+        '    Case "InitViewModel"
+        '        If e.PropertyName = "InitFlag" Then
+        '            ivm = CType(sender, InitViewModel)
+        '            If ivm.InitFlag Then
+        '                mvm = New MenuViewModel
+        '                mv = New MenuView(mvm)
+        '                Me._mnavi.Navigate(mv)
         '            End If
-        '        Case "MenuViewModel"
-        '            If e.PropertyName = "MenuFlag" Then
-        '                mvm = CType(sender, MenuViewModel)
-        '                If mvm.MenuFlag Then
-        '                    bmv = New BatchMenuView
-        '                    Me._mnavi.Navigate(bmv)
-        '                End If
-        '            End If
-        '        Case Else
-        '            Exit Sub
-        '    End Select
+        '        End If
+        '        'Case "MenuViewModel"
+        '        '    If e.PropertyName = "MenuFlag" Then
+        '        '        mvm = CType(sender, MenuViewModel)
+        '        '        If mvm.MenuFlag Then
+        '        '            bmv = New BatchMenuView
+        '        '            Me._mnavi.Navigate(bmv)
+        '        '        End If
+        '        '    End If
+        '    Case Else
+        '        Exit Sub
+        'End Select
     End Sub
 End Class

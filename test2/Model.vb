@@ -2,6 +2,20 @@
 Imports System.Data.SqlClient
 
 Public Class Model : Inherits BaseModel
+
+    Private _ChangePageStrings As String()
+    Public Property ChangePageStrings As String()
+        Get
+            Return Me._ChangePageStrings
+        End Get
+        Set(value As String())
+            If value.Length = 2 Then
+                Me._ChangePageStrings = value
+                RaisePropertyChanged("ChangePageStrings")
+            End If
+        End Set
+    End Property
+
     Private _ServerName As String
     Public Property ServerName As String
         Get

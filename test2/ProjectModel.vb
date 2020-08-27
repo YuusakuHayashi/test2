@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Delegate Function ModelLoadProxy(Of T)(ByVal f As String, ByVal key As String) As T
 Delegate Sub ModelSaveProxy(Of T)(ByVal f As String, ByVal m As T, ByVal key As String)
@@ -177,7 +178,7 @@ Public Class ProjectModel
             End If
 
             sr = New System.IO.StreamReader(
-                    f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+                f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
 
             obj = JsonConvert.DeserializeObject(txt)
@@ -216,7 +217,8 @@ Public Class ProjectModel
         Dim sw As System.IO.StreamWriter
         Dim sr As System.IO.StreamReader
         Dim obj As Object
-        'Dim test As T
+        Dim test As T
+        Dim jobj As JObject
         'Dim test2 As String
         'Dim t1 As Type
         'Dim t2 As Type
@@ -227,19 +229,33 @@ Public Class ProjectModel
             f = _ProjectFile(f)
 
             ' 全体のオブジェクトを取得
-            sr = New System.IO.StreamReader(
-                f, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-            )
-            txt = sr.ReadToEnd()
-            obj = JsonConvert.DeserializeObject(txt)
+            If File.Exists(f) Then
+                sr = New System.IO.StreamReader(
+                    f, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+                )
+                txt = sr.ReadToEnd()
+                obj = JsonConvert.DeserializeObject(txt)
 
+                test = TryCast(obj(key), T)
+                If test IsNot Nothing Then
+                    ' 更新
+                    obj(key) = m
+                End If
 
-            ' 一部を更新            
-            obj(key) = m
-            'test = TryCast(obj(key), T)
-            'If test IsNot Nothing Then
-            '    ' 更新
-            '    obj(key) = m
+                ' シリアライズ
+                txt2 = JsonConvert.SerializeObject(obj)
+                sw = New System.IO.StreamWriter(
+                    f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+                )
+            Else
+                jobj = New JObject()
+                jobj.Add(key, New JValue(m))
+                txt2 = JsonConvert.SerializeObject(jobj)
+                sw = New System.IO.StreamWriter(
+                    f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+                )
+            End If
+
             'Else
             '    ' 新規作成(意味が分かってないので、要解読・・・)
             '    dic = New Dictionary(Of String, T)
@@ -250,13 +266,6 @@ Public Class ProjectModel
 
             '    obj(key) = Activator.CreateInstance(t2)
             'End If
-
-
-            ' シリアライズ
-            txt2 = JsonConvert.SerializeObject(obj)
-            sw = New System.IO.StreamWriter(
-                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-            )
 
             'ファイルへ保存
             sw.Write(txt2)

@@ -1,12 +1,5 @@
 ﻿Public Class InitViewModel : Inherits ViewModel
 
-    Private Const DEFAULT_SERVERNAME As String = ""
-    Private Const DEFAULT_DATABASENAME As String = ""
-    'Private Const DEFUALT_OTHERPROPERTY As String = "Trusted_Connection=True"
-    Private Const DEFAULT_CONNECTIONSTRING As String = ""
-
-    'Private Const INITVIEW_FILE As String = "InitView.txt"
-
     ' モデル
     Private __Model As Model
     Private Property _Model As Model
@@ -77,6 +70,7 @@
         Set(value As String)
             Me._ConnectionString = value
             RaisePropertyChanged("ConnectionString")
+            Call Me._GetOtherProperty()
             Call Me._CheckInitEnableFlag()
         End Set
     End Property
@@ -85,7 +79,7 @@
     Private __OtherProperty As String
     Private Property _OtherProperty As String
         Get
-            Return _GetOtherProperty()
+            Return Me.__OtherProperty
         End Get
         Set(value As String)
             Me.__OtherProperty = value
@@ -93,7 +87,7 @@
     End Property
 
 
-    Private Function _GetOtherProperty() As String
+    Private Sub _GetOtherProperty()
         Dim txt As String
         txt = Me.ConnectionString
         If String.IsNullOrEmpty(Me.ConnectionString) Then
@@ -106,8 +100,8 @@
                 End If
             End If
         End If
-        _GetOtherProperty = txt
-    End Function
+        Me._OtherProperty = txt
+    End Sub
 
 
     Private Sub _GetConnectionString()
@@ -150,6 +144,7 @@
     End Property
 
 
+    'コマンド実行可否のチェック
     Private Sub _CheckInitEnableFlag()
         Dim b As Boolean : b = True
         If Me.ServerName = vbNullString Then
@@ -203,34 +198,15 @@
         Call Me._Model.AccessTest()
 
         If Me._Model.AccessResult Then
-            Me.NextViewFlag = True
+            Me._Model.ChangePageStrings = {Me.GetType.Name, "MenuViewModel"}
         End If
-
-        'Me._Model.ServerName = Me.ServerName
-        'Me._Model.DataBaseName = Me.DataBaseName
-        'Me._Model.ConnectionString = Me.ConnectionString
-        'Me._Model.NextViewFlag = Me.NextViewFlag
-
-        'proxy = AddressOf pm.FileCheck
-        'Select Case pm.ProjectCheck(proxy, INITVIEW_FILE)
-        '    Case 0
-        '        pm.ModelSave(Of Model)(INITVIEW_FILE, Me._Model)
-        '    Case 1
-        '        pm.FileEstablish(INITVIEW_FILE)
-        '        pm.ModelSave(Of Model)(INITVIEW_FILE, Me._Model)
-        '    Case 99
-        '    Case 999
-        'End Select
     End Sub
+
 
     Private Function _InitCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._InitEnableFlag
     End Function
 
-    'Private Sub _SetDefault()
-    '    Me.ServerName = InitViewModel.DEFAULT_SERVER_NAME
-    '    Me.DataBaseName = InitViewModel.DEFAULT_DATABASE_NAME
-    'End Sub
 
     Private Sub _DefaultSet()
         Me.ServerName = vbNullString
@@ -271,11 +247,11 @@
             End If
         Else
             ' モデルなし
+            m = New Model
             m.ServerName = vbNullString
             m.DataBaseName = vbNullString
             m.OtherProperty = vbNullString
         End If
-
 
         Me._Model = m
         Me.NextViewFlag = False
@@ -284,38 +260,5 @@
         Me.DataBaseName = m.DataBaseName
         Me._OtherProperty = m.OtherProperty
         Call Me._GetConnectionString()
-        'Me.ConnectionString = m.ConnectionString
-
-        'Select Case pm.ProjectCheck(proxy, INITVIEW_FILE)
-        '    Case 0
-        '        Me._Model = proxy2(INITVIEW_FILE)
-        '        If Me._Model IsNot Nothing Then
-        '            Me.ServerName = Me._Model.ServerName
-        '            If String.IsNullOrEmpty(Me.ServerName) Then
-        '                Me.ServerName = InitViewModel.DEFAULT_SERVER_NAME
-        '            End If
-
-        '            Me.DataBaseName = Me._Model.DataBaseName
-        '            If String.IsNullOrEmpty(Me.DataBaseName) Then
-        '                Me.DataBaseName = InitViewModel.DEFAULT_DATABASE_NAME
-        '            End If
-
-        '            Me.ConnectionString = Me._Model.ConnectionString
-        '            If String.IsNullOrEmpty(Me.ConnectionString) Then
-        '                Me.ConnectionString = InitViewModel.DEFAULT_CONNECTIONSTRING
-        '            End If
-
-        '            Me.NextViewFlag = Me._Model.NextViewFlag
-        '            If Me._Model.NextViewFlag = Nothing Then
-        '                Me.NextViewFlag = False
-        '            End If
-        '        Else
-        '            Me._Model = New Model
-        '            Call Me._SetDefault()
-        '        End If
-        '    Case Else
-        '        Me._Model = New Model
-        '        Call Me._SetDefault()
-        'End Select
     End Sub
 End Class
