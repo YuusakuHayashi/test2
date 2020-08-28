@@ -132,12 +132,12 @@
 
 
     Sub New()
-        Dim pm As New ProjectModel
-        Dim proxy As ProjectCheckProxy
-        Dim proxy2 As ModelLoadProxy(Of MenuModel)
+        'Dim pm As New ProjectModel
+        'Dim proxy As ProjectCheckProxy
+        'Dim proxy2 As ModelLoadProxy(Of MenuModel)
 
-        proxy = AddressOf pm.FileCheck
-        proxy2 = AddressOf pm.ModelLoad(Of MenuModel)
+        'proxy = AddressOf pm.FileCheck
+        'proxy2 = AddressOf pm.ModelLoad(Of MenuModel)
 
         'Select Case pm.ProjectCheck(proxy, _MENUVIEW_FILE)
         '    Case 0

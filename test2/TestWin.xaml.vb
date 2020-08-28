@@ -14,7 +14,8 @@ Public Class TestWin
         ' InitializeComponent() 呼び出しの後で初期化を追加します。
 
 
-        Dim loadproxy As ModelLoadProxy(Of Model)
+        Dim loadproxy As ModelLoadProxy1(Of Model)
+        Dim saveproxy As ModelSaveProxy1(Of Model)
 
         ' Models
         Dim m As Model
@@ -22,53 +23,53 @@ Public Class TestWin
 
         ' ViewModels
         Dim ivm As InitViewModel
+        Dim dbevm As DBExplorerViewModel
         'Dim mvm As MenuViewModel
 
         ' Views
         Dim iv As InitView
+        Dim dbev As DBExplorerView
         'Dim mv As MenuView
-
-
 
 
         Me._mnavi = Me.MainFlame.NavigationService
         Me._enavi = Me.ExplorerFlame.NavigationService
 
-
         loadproxy = AddressOf pm.ModelLoad(Of Model)
+        saveproxy = AddressOf pm.ModelSave(Of Model)
+
 
         ' モデルのロード
-        m = loadproxy(DEFAULTSETTING, "All")
+        m = loadproxy(DEFAULTSETTING)
 
 
+        ' なければＪＳＯＮをとりあえず作っておく
         If m Is Nothing Then
             m = New Model
+            Call saveproxy(DEFAULTSETTING, m)
         End If
 
 
-        ' ビューモデルのロード
-        ' インスタンス化時に設定があれば、それをロードする
-        ivm = New InitViewModel(m)
-        'mvm = New MenuViewModel(m)
-        'bmvm = New BatchMenuViewModel(m)
 
-        ' 起動時画面遷移
-        If ivm.NextViewFlag Then
-            'If mvm.NextViewFlag Then
-            '    bmv = New BatchMenuView(bmvm)
-            '    Me._mnavi.Navigate(bmv)
-            'Else
-            '    mv = New MenuView(mvm)
-            '    Me._mnavi.Navigate(mv)
-            'End If
+        ' メイン画面ビューモデル
+        ivm = New InitViewModel(m)
+
+        ' 初期メイン画面
+        If ivm.NextFlag Then
         Else
             iv = New InitView(ivm)
             Me._mnavi.Navigate(iv)
         End If
 
 
-        'エクスプローラー画面
-        'dbev = New DBExplorerView(dbevm)
+        ' エクスプローラー画面ビューモデル
+        dbevm = New DBExplorerViewModel(m)
+
+
+
+
+        ' 初期エクスプローラー画面
+        dbev = New DBExplorerView(dbevm)
         'Me._enavi.Navigate(dbev)
 
         AddHandler m.PropertyChanged, AddressOf Me._PageNavigation
@@ -78,13 +79,14 @@ Public Class TestWin
     Private Sub _PageNavigation(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         Dim m As Model
         Dim pm As New ProjectModel
-        Dim saveproxy As ModelSaveProxy(Of Model)
+        Dim saveproxy As ModelSaveProxy1(Of Model)
 
         saveproxy = AddressOf pm.ModelSave(Of Model)
 
         If e.PropertyName = "ChangePageStrings" Then
             m = CType(sender, Model)
-            saveproxy(DEFAULTSETTING, m, "All")
+            saveproxy(DEFAULTSETTING, m)
+            MsgBox("hoge")
         End If
 
         'Select Case sender.GetType.Name

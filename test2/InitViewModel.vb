@@ -1,5 +1,4 @@
 ﻿Public Class InitViewModel : Inherits ViewModel
-
     ' モデル
     Private __Model As Model
     Private Property _Model As Model
@@ -13,16 +12,15 @@
     End Property
 
 
-    ' 遷移用フラグ
-    ' ウィンドウ側で購読する
-    Private _NextViewFlag As Boolean
-    Public Property NextViewFlag As Boolean
+    ' 初期画面用フラグ
+    Private _NextFlag As Boolean
+    Public Property NextFlag As Boolean
         Get
-            Return Me._NextViewFlag
+            Return Me._NextFlag
         End Get
         Set(value As Boolean)
-            Me._NextViewFlag = value
-            RaisePropertyChanged("NextViewFlag")
+            Me._NextFlag = value
+            RaisePropertyChanged("NextFlag")
         End Set
     End Property
 
@@ -217,23 +215,11 @@
 
 
     Sub New(ByRef m As Model)
-        Dim pm As New ProjectModel
-        Dim proxy As ProjectCheckProxy
-        Dim proxy2 As ModelLoadProxy(Of Model)
-
-        proxy = AddressOf pm.FileCheck
-        proxy2 = AddressOf pm.ModelLoad(Of Model)
-
-
         If m IsNot Nothing Then
             ' 接続テスト
             Call m.AccessTest()
-
-            If m.AccessResult Then
-                ' 接続成功
-                Me.NextViewFlag = True
-                Exit Sub
-            Else
+            Me.NextFlag = True
+            If Not m.AccessResult Then
                 ' 接続失敗
                 If String.IsNullOrEmpty(m.ServerName) Then
                     m.ServerName = vbNullString
@@ -254,7 +240,6 @@
         End If
 
         Me._Model = m
-        Me.NextViewFlag = False
 
         Me.ServerName = m.ServerName
         Me.DataBaseName = m.DataBaseName

@@ -2,8 +2,11 @@
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
-Delegate Function ModelLoadProxy(Of T)(ByVal f As String, ByVal key As String) As T
-Delegate Sub ModelSaveProxy(Of T)(ByVal f As String, ByVal m As T, ByVal key As String)
+Delegate Function ModelLoadProxy1(Of T)(ByVal f As String) As T
+Delegate Function ModelLoadProxy2(Of T)(ByVal f As String, ByVal k As String) As T
+Delegate Sub ModelSaveProxy1(Of T)(ByVal f As String, ByVal m As T)
+Delegate Sub ModelSaveProxy2(Of T)(ByVal f As String, ByVal m As T, ByVal key As String)
+
 Public Delegate Function ProjectCheckProxy(ByVal f As String) As Boolean
 
 Public Class ProjectModel
@@ -164,40 +167,20 @@ Public Class ProjectModel
     End Function
 
 
-    Public Function ModelLoad(Of T As Class)(ByVal f As String, ByVal key As String) As T
+    Public Overloads Function ModelLoad(Of T)(ByVal f As String) As T
         Dim txt As String
         Dim sr As System.IO.StreamReader
-        Dim obj As Object
-        Dim test As T
 
         ModelLoad = Nothing
 
         Try
             f = _ProjectFile(f)
-            If File.Exists(f) Then
-            End If
 
             sr = New System.IO.StreamReader(
                 f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
 
-            obj = JsonConvert.DeserializeObject(txt)
-
-
-            ' 一部をロード
-            test = TryCast(obj(key), T)
-            If test IsNot Nothing Then
-                ModelLoad = obj(key)
-            Else
-                '' 新規作成(意味が分かってないので、要解読・・・)
-                'dic = New Dictionary(Of String, T)
-                't1 = dic.GetType.GetGenericTypeDefinition()
-
-                'args = {test2.GetType, test.GetType}
-                't2 = t1.MakeGenericType(args)
-
-                'test = Activator.CreateInstance(t2)
-            End If
+            ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
         Catch ex As Exception
             '
         Finally
@@ -209,63 +192,107 @@ Public Class ProjectModel
     End Function
 
 
-    Public Sub ModelSave(Of T As Class)(ByVal f As String,
-                                        ByVal m As T,
-                                        ByVal key As String)
+    Public Overloads Function ModelLoad(Of T As Class)(ByVal f As String, ByVal key As String) As T
+        Dim txt As String
+        Dim sr As System.IO.StreamReader
+        Dim obj As Object
+
+        ModelLoad = Nothing
+
+        Try
+            f = _ProjectFile(f)
+
+            sr = New System.IO.StreamReader(
+                f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+            txt = sr.ReadToEnd()
+
+            obj = JsonConvert.DeserializeObject(txt)
+
+            ' 一部をロード
+            ModelLoad = obj(key)
+        Catch ex As Exception
+            '
+        Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
+        End Try
+    End Function
+
+
+    Public Overloads Sub ModelSave(Of T)(ByVal f As String,
+                                        ByVal m As T)
+        Dim txt As String
+        Dim sw As System.IO.StreamWriter
+
+        Try
+            f = _ProjectFile(f)
+
+            sw = New System.IO.StreamWriter(
+                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+            )
+
+            txt = JsonConvert.SerializeObject(m)
+
+            'ファイルへ保存
+            sw.Write(txt)
+        Catch ex As Exception
+            '
+        Finally
+            If sw IsNot Nothing Then
+                sw.Close()
+                sw.Dispose()
+            End If
+        End Try
+    End Sub
+
+
+    Public Overloads Sub ModelSave(Of T As Class)(ByVal f As String,
+                                                  ByVal m As T,
+                                                  ByVal key As String)
         Dim txt As String
         Dim txt2 As String
         Dim sw As System.IO.StreamWriter
         Dim sr As System.IO.StreamReader
         Dim obj As Object
         Dim test As T
-        Dim jobj As JObject
-        'Dim test2 As String
-        'Dim t1 As Type
-        'Dim t2 As Type
-        'Dim args As Type()
-        'Dim dic As Dictionary(Of String, T)
 
         Try
             f = _ProjectFile(f)
 
-            ' 全体のオブジェクトを取得
             If File.Exists(f) Then
+
+                ' ファイルあり
                 sr = New System.IO.StreamReader(
                     f, System.Text.Encoding.GetEncoding(SHIFT_JIS)
                 )
                 txt = sr.ReadToEnd()
+
+                ' 全体のオブジェクトを取得
                 obj = JsonConvert.DeserializeObject(txt)
 
+                ' キーチェック
                 test = TryCast(obj(key), T)
-                If test IsNot Nothing Then
-                    ' 更新
+                If test Is Nothing Then
+                    ' キー無し
+                    ' キー＆値を生成する方法を検討中
+                    Throw New Exception
+                Else
+                    ' キーあり
+                    ' 部分更新
                     obj(key) = m
+                    txt2 = JsonConvert.SerializeObject(obj)
                 End If
-
-                ' シリアライズ
-                txt2 = JsonConvert.SerializeObject(obj)
-                sw = New System.IO.StreamWriter(
-                    f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-                )
             Else
-                jobj = New JObject()
-                jobj.Add(key, New JValue(m))
-                txt2 = JsonConvert.SerializeObject(jobj)
-                sw = New System.IO.StreamWriter(
-                    f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
-                )
+
+                ' ファイルなし
+                Throw New Exception
             End If
 
-            'Else
-            '    ' 新規作成(意味が分かってないので、要解読・・・)
-            '    dic = New Dictionary(Of String, T)
-            '    t1 = dic.GetType.GetGenericTypeDefinition()
-
-            '    args = {test2.GetType, test.GetType}
-            '    t2 = t1.MakeGenericType(args)
-
-            '    obj(key) = Activator.CreateInstance(t2)
-            'End If
+            sw = New System.IO.StreamWriter(
+                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+            )
 
             'ファイルへ保存
             sw.Write(txt2)
