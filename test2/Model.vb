@@ -1,7 +1,19 @@
 ﻿Imports System.Data
 Imports System.Data.SqlClient
+Imports System.Collections.ObjectModel
 
 Public Class Model : Inherits BaseModel
+
+    ' このモデルを生成したＪＳＯＮファイル
+    Private _SourceFile As String
+    Public Property SourceFile As String
+        Get
+            Return Me._SourceFile
+        End Get
+        Set(value As String)
+            Me._SourceFile = value
+        End Set
+    End Property
 
     Private _ChangePageStrings As String()
     Public Property ChangePageStrings As String()
@@ -9,9 +21,11 @@ Public Class Model : Inherits BaseModel
             Return Me._ChangePageStrings
         End Get
         Set(value As String())
-            If value.Length = 2 Then
-                Me._ChangePageStrings = value
-                RaisePropertyChanged("ChangePageStrings")
+            If value IsNot Nothing Then
+                If value.Length = 2 Then
+                    Me._ChangePageStrings = value
+                    RaisePropertyChanged("ChangePageStrings")
+                End If
             End If
         End Set
     End Property
@@ -45,7 +59,6 @@ Public Class Model : Inherits BaseModel
             Me._ConnectionString = value
         End Set
     End Property
-
 
     Public OtherProperty As String
 
@@ -100,6 +113,98 @@ Public Class Model : Inherits BaseModel
                 Return New DataSet
             End Function)
     End Sub
+
+
+    ' テーブル一覧の取得
+    'Public Sub GetUserTables()
+    '    Dim proxy As GetDataSetProxy
+    '    Dim dt As DataTable
+
+    '    Me.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
+    '    proxy = AddressOf Me._GetSqlDataSet
+    '    Call Me._DataBaseAccess(proxy)
+
+    '    dt = Me._QueryResult.Tables(0)
+
+    '    Me.Server.DataBases(0).DataTables = Nothing
+    '    Me.Server.DataBases(0).DataTables = New ObservableCollection(Of DataTableModel)
+
+    '    For Each r In dt.Rows
+    '        Me.Server.DataBases(0).DataTables.Add(New DataTableModel With {.Name = r("name")})
+    '    Next
+    'End Sub
+
+
+    ' サーバー全体の更新
+    Public Sub ReLoadServer()
+        Dim sm As ServerModel
+        Dim proxy As GetDataSetProxy
+        Dim dt As DataTable
+        Dim dbs As ObservableCollection(Of DataBaseModel)
+        Dim dts As ObservableCollection(Of DataTableModel)
+
+        Me.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
+        proxy = AddressOf Me._GetSqlDataSet
+        Call Me._DataBaseAccess(proxy)
+
+        dt = Me._QueryResult.Tables(0)
+
+        dts = New ObservableCollection(Of DataTableModel)
+        For Each r In dt.Rows
+            dts.Add(New DataTableModel With {
+                .Name = r("name")
+            })
+        Next
+
+        dbs = New ObservableCollection(Of DataBaseModel)
+        dbs.Add(New DataBaseModel With {
+            .Name = Me.DataBaseName,
+            .DataTables = dts
+        })
+
+        sm = New ServerModel With {
+            .Name = Me.ServerName,
+            .DataBases = dbs,
+            .IsChecked = False
+        }
+
+        Me.Server = sm
+
+        dt.Dispose()
+        dts = Nothing
+        dbs = Nothing
+        sm = Nothing
+    End Sub
+
+
+
+
+    ' データセット取得
+    Private Function _GetSqlDataSet(ByVal scmd As SqlCommand) As DataSet
+        Dim sda As System.Data.SqlClient.SqlDataAdapter
+        Dim ds As DataSet
+        Try
+            sda = New System.Data.SqlClient.SqlDataAdapter(scmd)
+            ds = New System.Data.DataSet
+            sda.Fill(ds)
+
+            _GetSqlDataSet = ds
+        Catch ex As Exception
+
+            _GetSqlDataSet = Nothing
+            Throw New Exception
+        Finally
+            If sda IsNot Nothing Then
+                sda.Dispose()
+            End If
+            If ds IsNot Nothing Then
+                ds.Dispose()
+            End If
+        End Try
+    End Function
+
+
+
 
 
     ' データベースアクセス
@@ -159,5 +264,60 @@ Public Class Model : Inherits BaseModel
                 scon.Dispose()
             End If
         End Try
+    End Sub
+
+    Public Sub MemberCheck()
+        '
+        If String.IsNullOrEmpty(Me.SourceFile) Then
+            Me.SourceFile = vbNullString
+        End If
+
+        '
+        If Me.ChangePageStrings Is Nothing Then
+            Me.ChangePageStrings = {vbNullString, vbNullString}
+        End If
+
+        '
+        If String.IsNullOrEmpty(Me.ServerName) Then
+            Me.ServerName = vbNullString
+        End If
+
+        '
+        If String.IsNullOrEmpty(Me.DataBaseName) Then
+            Me.DataBaseName = vbNullString
+        End If
+
+        '
+        If String.IsNullOrEmpty(Me.ConnectionString) Then
+            Me.ConnectionString = vbNullString
+        End If
+
+        '
+        If String.IsNullOrEmpty(Me.OtherProperty) Then
+            Me.OtherProperty = vbNullString
+        End If
+
+        '
+        If String.IsNullOrEmpty(Me.ServerVersion) Then
+            Me.ServerVersion = vbNullString
+        End If
+
+        '
+        If Me.Server Is Nothing Then
+            Me.Server = New ServerModel
+        End If
+
+        '
+        If String.IsNullOrEmpty(Me.Query) Then
+            Me.Query = vbNullString
+        End If
+
+        If Me._QueryResult Is Nothing Then
+            Me._QueryResult = New DataSet
+        End If
+    End Sub
+
+    Sub New()
+        Call Me.MemberCheck()
     End Sub
 End Class

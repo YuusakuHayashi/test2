@@ -91,8 +91,8 @@
     'バッチ処理画面へ遷移する。および設定ファイルへの記録
     'メニューフラグを変更することで、ウィンドウ側はその変更を購読し、切り替えをする
     Private Sub _BatchMenuCommandExecute(ByVal parameter As Object)
-        Dim pm As New ProjectModel
-        Dim proxy As ProjectCheckProxy
+        'Dim pm As New ProjectModel
+        'Dim proxy As ProjectCheckProxy
 
 
         Me._DefaultMenu = MenuViewModel._BATCHMENU

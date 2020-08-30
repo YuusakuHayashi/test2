@@ -9,7 +9,7 @@
         End Get
         Set(value As String)
             Me._Name = value
-            'RaisePropertyChanged("Name")
+            RaisePropertyChanged("Name")
         End Set
     End Property
 
@@ -36,14 +36,24 @@
         End Set
     End Property
 
+    Public Sub MemberCheck()
+        '
+        If String.IsNullOrEmpty(Me.Name) Then
+            Me.Name = vbNullString
+        End If
 
-    'Public Property IsChecked As Boolean
-    '    Get
-    '        Return Me._IsChecked
-    '    End Get
-    '    Set(value As Boolean)
-    '        Me._IsChecked = value
-    '        RaisePropertyChanged("_IsChecked")
-    '    End Set
-    'End Property
+        '
+        If Me.IsChecked = Nothing Then
+            Me.IsChecked = False
+        End If
+
+        '
+        If Me.IsEnabled = Nothing Then
+            Me.IsEnabled = False
+        End If
+    End Sub
+
+    Sub New()
+        Call Me.MemberCheck()
+    End Sub
 End Class

@@ -185,9 +185,6 @@
 
 
     Private Sub _InitCommandExecute(ByVal parameter As Object)
-        Dim pm As New ProjectModel
-        Dim proxy As ProjectCheckProxy
-
         Me._Model.ServerName = Me.ServerName
         Me._Model.DataBaseName = Me.DataBaseName
         Me._Model.ConnectionString = Me.ConnectionString
@@ -218,7 +215,7 @@
         If m IsNot Nothing Then
             ' 接続テスト
             Call m.AccessTest()
-            Me.NextFlag = True
+            Me.NextFlag = m.AccessResult
             If Not m.AccessResult Then
                 ' 接続失敗
                 If String.IsNullOrEmpty(m.ServerName) Then

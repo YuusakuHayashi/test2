@@ -6,8 +6,10 @@ Delegate Function ModelLoadProxy1(Of T)(ByVal f As String) As T
 Delegate Function ModelLoadProxy2(Of T)(ByVal f As String, ByVal k As String) As T
 Delegate Sub ModelSaveProxy1(Of T)(ByVal f As String, ByVal m As T)
 Delegate Sub ModelSaveProxy2(Of T)(ByVal f As String, ByVal m As T, ByVal key As String)
+Delegate Sub ProjectProxy(ByVal f As String)
+Delegate Sub ProjectProxy2(ByVal f As String, ByVal txt As String)
 
-Public Delegate Function ProjectCheckProxy(ByVal f As String) As Boolean
+'Public Delegate Function ProjectCheckProxy(ByVal f As String) As Boolean
 
 Public Class ProjectModel
     Private Const SHIFT_JIS = "SHIFT_JIS"
@@ -31,9 +33,17 @@ Public Class ProjectModel
         End Get
     End Property
 
+    Public ReadOnly Property FileManagerFileName As String
+        Get
+            Return Me._ProjectDirectoryName & "\FileManager"
+        End Get
+    End Property
 
-
-
+    Public ReadOnly Property DefaultSettingFileName As String
+        Get
+            Return Me._ProjectDirectoryName & "\defaultSetting.json"
+        End Get
+    End Property
 
 
     '-- File Manager File ------------------------------------------------------------------'
@@ -80,22 +90,22 @@ Public Class ProjectModel
 
 
     '最初以外にもその都度、ProjectDirectory, ProjectIniFileはチェックする
-    Public Function ProjectCheck(ByVal proxy As ProjectCheckProxy, ByVal f As String) As Int32
-        f = _ProjectFile(f)
-        If Me.DirectoryCheck(Me._ProjectDirectoryName) Then
-            If Me.FileCheck(Me._ProjectIniFileName) Then
-                If (proxy(f)) Then
-                    Return 0    '正常
-                Else
-                    Return 1    '対象ファイルが存在しない
-                End If
-            Else
-                Return 99       '既に同名ディレクトリが存在
-            End If
-        Else
-            Return 999          'ディレクトリが存在しない
-        End If
-    End Function
+    'Public Function ProjectCheck(ByVal proxy As ProjectCheckProxy, ByVal f As String) As Int32
+    '    f = _ProjectFile(f)
+    '    If Me.DirectoryCheck(Me._ProjectDirectoryName) Then
+    '        If Me.FileCheck(Me._ProjectIniFileName) Then
+    '            If (proxy(f)) Then
+    '                Return 0    '正常
+    '            Else
+    '                Return 1    '対象ファイルが存在しない
+    '            End If
+    '        Else
+    '            Return 99       '既に同名ディレクトリが存在
+    '        End If
+    '    Else
+    '        Return 999          'ディレクトリが存在しない
+    '    End If
+    'End Function
 
     'Public ReadOnly Property DirectoryCheck(d) As Boolean
     '    Get
@@ -248,44 +258,34 @@ Public Class ProjectModel
     End Sub
 
 
-    Public Overloads Sub ModelSave(Of T As Class)(ByVal f As String,
-                                                  ByVal m As T,
-                                                  ByVal key As String)
+    Public Overloads Sub ModelSave(Of T, T2)(ByVal f As String,
+                                             ByVal m As T2,
+                                             ByVal key As String)
+
+        ' T  ... 更新するメンバー
+        ' T2 ... 全体のクラス
         Dim txt As String
         Dim txt2 As String
         Dim sw As System.IO.StreamWriter
         Dim sr As System.IO.StreamReader
-        Dim obj As Object
+        Dim obj As T
         Dim test As T
 
         Try
             f = _ProjectFile(f)
 
             If File.Exists(f) Then
-
                 ' ファイルあり
                 sr = New System.IO.StreamReader(
                     f, System.Text.Encoding.GetEncoding(SHIFT_JIS)
                 )
                 txt = sr.ReadToEnd()
-
-                ' 全体のオブジェクトを取得
                 obj = JsonConvert.DeserializeObject(txt)
 
-                ' キーチェック
-                test = TryCast(obj(key), T)
-                If test Is Nothing Then
-                    ' キー無し
-                    ' キー＆値を生成する方法を検討中
-                    Throw New Exception
-                Else
-                    ' キーあり
-                    ' 部分更新
-                    obj(key) = m
-                    txt2 = JsonConvert.SerializeObject(obj)
-                End If
-            Else
+                obj(key) = m
 
+                txt2 = JsonConvert.SerializeObject(obj)
+            Else
                 ' ファイルなし
                 Throw New Exception
             End If
@@ -312,21 +312,31 @@ Public Class ProjectModel
 
 
     Sub New()
-        Dim proxy As ProjectCheckProxy
-        proxy = AddressOf DirectoryCheck
+        Dim mkdir As ProjectProxy : mkdir = AddressOf Me.DirectoryEstablish
+        Dim mkfil As ProjectProxy : mkfil = AddressOf Me.FileEstablish
+
         Try
-            Select Case ProjectCheck(proxy, Me._ProjectDirectoryName)
-                Case 0
-                    Exit Select
-                Case 99
+            If Not Directory.Exists(Me._ProjectDirectoryName) Then
+                Call mkdir(Me._ProjectDirectoryName)
+                Call mkfil(Me._ProjectIniFileName)
+                Call mkfil(Me.FileManagerFileName)
+                Call mkfil(Me.DefaultSettingFileName)
+            Else
+                If Not File.Exists(Me._ProjectIniFileName) Then
                     Throw New Exception
-                Case 999
-                    Call DirectoryEstablish(Me._ProjectDirectoryName)
-                    Call FileWrite(Me._ProjectIniFileName, vbNullString)
-            End Select
+                Else
+                    If Not File.Exists(Me.FileManagerFileName) Then
+                        Call mkfil(Me.FileManagerFileName)
+                    End If
+                    If Not File.Exists(Me.DefaultSettingFileName) Then
+                        Call mkfil(Me.DefaultSettingFileName)
+                    End If
+                End If
+            End If
         Catch ex As Exception
             '
         Finally
+            '
         End Try
     End Sub
 End Class

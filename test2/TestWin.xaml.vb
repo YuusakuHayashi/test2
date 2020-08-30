@@ -1,8 +1,5 @@
 ﻿Imports System.ComponentModel
 Public Class TestWin
-
-    Private Const DEFAULTSETTING As String = "defaultSetting.json"
-
     Private _mnavi As NavigationService
     Private _enavi As NavigationService
 
@@ -14,12 +11,16 @@ Public Class TestWin
         ' InitializeComponent() 呼び出しの後で初期化を追加します。
 
 
-        Dim loadproxy As ModelLoadProxy1(Of Model)
-        Dim saveproxy As ModelSaveProxy1(Of Model)
+        ' Delegater
+        Dim loader As ModelLoadProxy1(Of Model)
+        Dim loader2 As ModelLoadProxy1(Of FileManagerModel)
+        Dim saver As ModelSaveProxy1(Of Model)
+        Dim saver2 As ModelSaveProxy1(Of FileManagerModel)
 
         ' Models
         Dim m As Model
         Dim pm As New ProjectModel
+        Dim fmm As FileManagerModel
 
         ' ViewModels
         Dim ivm As InitViewModel
@@ -35,21 +36,40 @@ Public Class TestWin
         Me._mnavi = Me.MainFlame.NavigationService
         Me._enavi = Me.ExplorerFlame.NavigationService
 
-        loadproxy = AddressOf pm.ModelLoad(Of Model)
-        saveproxy = AddressOf pm.ModelSave(Of Model)
+        loader = AddressOf pm.ModelLoad(Of Model)
+        loader2 = AddressOf pm.ModelLoad(Of FileManagerModel)
+        saver = AddressOf pm.ModelSave(Of Model)
+        saver2 = AddressOf pm.ModelSave(Of FileManagerModel)
+
+
+        ' ファイル管理モデルのロード
+        fmm = New FileManagerModel
+        fmm = loader2(pm.FileManagerFileName)
+
+        ' なければＪＳＯＮをとりあえず作っておく
+        If fmm Is Nothing Then
+            fmm = New FileManagerModel
+            fmm.LatestSettingFileName = pm.DefaultSettingFileName
+            Call saver2(pm.FileManagerFileName, fmm)
+        Else
+            If String.IsNullOrEmpty(fmm.LatestSettingFileName) Then
+                fmm.LatestSettingFileName = pm.DefaultSettingFileName
+                Call saver2(pm.FileManagerFileName, fmm)
+            End If
+        End If
 
 
         ' モデルのロード
-        m = loadproxy(DEFAULTSETTING)
-
+        m = loader(fmm.LatestSettingFileName)
 
         ' なければＪＳＯＮをとりあえず作っておく
         If m Is Nothing Then
             m = New Model
-            Call saveproxy(DEFAULTSETTING, m)
+            Call saver(fmm.LatestSettingFileName, m)
         End If
 
 
+        m.SourceFile = fmm.LatestSettingFileName
 
         ' メイン画面ビューモデル
         ivm = New InitViewModel(m)
@@ -65,12 +85,11 @@ Public Class TestWin
         ' エクスプローラー画面ビューモデル
         dbevm = New DBExplorerViewModel(m)
 
-
-
-
         ' 初期エクスプローラー画面
         dbev = New DBExplorerView(dbevm)
-        'Me._enavi.Navigate(dbev)
+        Me._enavi.Navigate(dbev)
+
+
 
         AddHandler m.PropertyChanged, AddressOf Me._PageNavigation
         'AddHandler mvm.PropertyChanged, AddressOf Me._PageNavigation
@@ -79,14 +98,13 @@ Public Class TestWin
     Private Sub _PageNavigation(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         Dim m As Model
         Dim pm As New ProjectModel
-        Dim saveproxy As ModelSaveProxy1(Of Model)
+        Dim saver As ModelSaveProxy1(Of Model)
 
-        saveproxy = AddressOf pm.ModelSave(Of Model)
+        saver = AddressOf pm.ModelSave(Of Model)
 
         If e.PropertyName = "ChangePageStrings" Then
             m = CType(sender, Model)
-            saveproxy(DEFAULTSETTING, m)
-            MsgBox("hoge")
+            saver(m.SourceFile, m)
         End If
 
         'Select Case sender.GetType.Name
