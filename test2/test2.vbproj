@@ -77,10 +77,12 @@
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
+    <Compile Include="ConditionModel.vb" />
     <Compile Include="FileManagerModel.vb" />
     <Compile Include="ImigraterView.xaml.vb">
       <DependentUpon>ImigraterView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ImigraterViewModel.vb" />
     <Compile Include="Model.vb" />
     <Compile Include="ProjectInterface.vb" />
     <Compile Include="TreeViewModule.vb" />
