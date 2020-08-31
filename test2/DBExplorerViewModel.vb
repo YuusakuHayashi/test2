@@ -118,11 +118,11 @@ Public Class DBExplorerViewModel : Inherits ViewModel
     ' コマンド実行(セーブ)
     Private Sub _SaveCommandExecute(ByVal parameter As Object)
         Dim pm As New ProjectModel
-        Dim proxy As ModelSaveProxy2(Of ServerModel)
+        Dim proxy As ModelSaveProxy1(Of Model)
 
-        proxy = AddressOf pm.ModelSave(Of ServerModel)
+        proxy = AddressOf pm.ModelSave(Of Model)
 
-        Call proxy(Me._Model.SourceFile, Me.Server, "Server")
+        Call proxy(Me._Model.SourceFile, Me._Model)
     End Sub
 
     ' コマンド有効／無効化(リロード)
@@ -136,6 +136,7 @@ Public Class DBExplorerViewModel : Inherits ViewModel
     End Function
 
     Sub New(ByRef m As Model)
+        ' モデルの設定
         If m IsNot Nothing Then
             If m.Server IsNot Nothing Then
             Else
@@ -145,40 +146,43 @@ Public Class DBExplorerViewModel : Inherits ViewModel
             m = New Model
         End If
 
-        '--- TEST ----------------------------------------------------------------'
-        m.Server = New ServerModel With {
-            .Name = "root",
-            .DataBases = New ObservableCollection(Of DataBaseModel) From {
-                New DataBaseModel With {
-                    .Name = "hoge",
-                    .DataTables = New ObservableCollection(Of DataTableModel) From {
-                        New DataTableModel With {.Name = "hogehoge"},
-                        New DataTableModel With {.Name = "hogefuga"},
-                        New DataTableModel With {.Name = "hogepiyo"}
-                    }
-                },
-                New DataBaseModel With {
-                    .Name = "fuga",
-                    .DataTables = New ObservableCollection(Of DataTableModel) From {
-                        New DataTableModel With {.Name = "fugafuga"}
-                    }
-                },
-                New DataBaseModel With {
-                    .Name = "piyo",
-                    .DataTables = New ObservableCollection(Of DataTableModel) From {
-                        New DataTableModel With {.Name = "piyohoge"},
-                        New DataTableModel With {.Name = "piyofuga"},
-                        New DataTableModel With {.Name = "piyopiyo"}
-                    }
-                }
-            }
-        }
+        ''--- TEST ----------------------------------------------------------------'
+        'm.Server = New ServerModel With {
+        '    .Name = "root",
+        '    .DataBases = New ObservableCollection(Of DataBaseModel) From {
+        '        New DataBaseModel With {
+        '            .Name = "hoge",
+        '            .DataTables = New ObservableCollection(Of DataTableModel) From {
+        '                New DataTableModel With {.Name = "hogehoge"},
+        '                New DataTableModel With {.Name = "hogefuga"},
+        '                New DataTableModel With {.Name = "hogepiyo"}
+        '            }
+        '        },
+        '        New DataBaseModel With {
+        '            .Name = "fuga",
+        '            .DataTables = New ObservableCollection(Of DataTableModel) From {
+        '                New DataTableModel With {.Name = "fugafuga"}
+        '            }
+        '        },
+        '        New DataBaseModel With {
+        '            .Name = "piyo",
+        '            .DataTables = New ObservableCollection(Of DataTableModel) From {
+        '                New DataTableModel With {.Name = "piyohoge"},
+        '                New DataTableModel With {.Name = "piyofuga"},
+        '                New DataTableModel With {.Name = "piyopiyo"}
+        '            }
+        '        }
+        '    }
+        '}
         '-------------------------------------------------------------------------'
-
         Me._Model = m
-        Me.Server = m.Server
-        Call Me.Server.MemberCheck()
 
+
+        ' ビューモデルの設定
+        Me.Server = m.Server
+
+
+        ' コマンドフラグの有効／無効化
         Call Me._CheckDBLoadEnableFlag()
         Call Me._CheckSaveEnableFlag()
     End Sub

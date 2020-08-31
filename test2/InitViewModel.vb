@@ -203,44 +203,35 @@
     End Function
 
 
-    Private Sub _DefaultSet()
-        Me.ServerName = vbNullString
-        Me.DataBaseName = vbNullString
-        Me.ConnectionString = vbNullString
-    End Sub
+    'Private Sub _DefaultSet()
+    '    Me.ServerName = vbNullString
+    '    Me.DataBaseName = vbNullString
+    '    Me.ConnectionString = vbNullString
+    'End Sub
 
 
 
     Sub New(ByRef m As Model)
+        ' モデルの設定
         If m IsNot Nothing Then
             ' 接続テスト
             Call m.AccessTest()
             Me.NextFlag = m.AccessResult
-            If Not m.AccessResult Then
-                ' 接続失敗
-                If String.IsNullOrEmpty(m.ServerName) Then
-                    m.ServerName = vbNullString
-                End If
-                If String.IsNullOrEmpty(m.DataBaseName) Then
-                    m.DataBaseName = vbNullString
-                End If
-                If String.IsNullOrEmpty(m.OtherProperty) Then
-                    m.OtherProperty = vbNullString
-                End If
-            End If
         Else
             ' モデルなし
             m = New Model
-            m.ServerName = vbNullString
-            m.DataBaseName = vbNullString
-            m.OtherProperty = vbNullString
         End If
-
         Me._Model = m
 
+
+        ' ビューモデルの設定
         Me.ServerName = m.ServerName
         Me.DataBaseName = m.DataBaseName
         Me._OtherProperty = m.OtherProperty
         Call Me._GetConnectionString()
+
+
+        ' コマンドフラグの有効／無効化
+        Call Me._CheckInitEnableFlag()
     End Sub
 End Class

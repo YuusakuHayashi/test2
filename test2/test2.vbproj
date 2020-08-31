@@ -78,6 +78,9 @@
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
     <Compile Include="FileManagerModel.vb" />
+    <Compile Include="ImigraterView.xaml.vb">
+      <DependentUpon>ImigraterView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model.vb" />
     <Compile Include="ProjectInterface.vb" />
     <Compile Include="TreeViewModule.vb" />
@@ -142,6 +145,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DBExplorerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImigraterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

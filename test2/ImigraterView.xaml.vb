@@ -1,0 +1,3 @@
+﻿Class ImigraterView
+
+End Class

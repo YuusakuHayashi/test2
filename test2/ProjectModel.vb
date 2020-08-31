@@ -5,7 +5,7 @@ Imports Newtonsoft.Json.Linq
 Delegate Function ModelLoadProxy1(Of T)(ByVal f As String) As T
 Delegate Function ModelLoadProxy2(Of T)(ByVal f As String, ByVal k As String) As T
 Delegate Sub ModelSaveProxy1(Of T)(ByVal f As String, ByVal m As T)
-Delegate Sub ModelSaveProxy2(Of T)(ByVal f As String, ByVal m As T, ByVal key As String)
+Delegate Sub ModelSaveProxy2(Of T, T2)(ByVal f As String, ByVal m As T, ByVal key As String)
 Delegate Sub ProjectProxy(ByVal f As String)
 Delegate Sub ProjectProxy2(ByVal f As String, ByVal txt As String)
 
@@ -202,7 +202,8 @@ Public Class ProjectModel
     End Function
 
 
-    Public Overloads Function ModelLoad(Of T As Class)(ByVal f As String, ByVal key As String) As T
+    Public Overloads Function ModelLoad(Of T As Class)(ByVal f As String, 
+                                                       ByVal key As String) As T
         Dim txt As String
         Dim sr As System.IO.StreamReader
         Dim obj As Object
@@ -232,7 +233,7 @@ Public Class ProjectModel
 
 
     Public Overloads Sub ModelSave(Of T)(ByVal f As String,
-                                        ByVal m As T)
+                                         ByVal m As T)
         Dim txt As String
         Dim sw As System.IO.StreamWriter
 
@@ -243,7 +244,7 @@ Public Class ProjectModel
                 f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
             )
 
-            txt = JsonConvert.SerializeObject(m)
+            txt = JsonConvert.SerializeObject(m, Formatting.Indented)
 
             'ファイルへ保存
             sw.Write(txt)
@@ -259,7 +260,7 @@ Public Class ProjectModel
 
 
     Public Overloads Sub ModelSave(Of T, T2)(ByVal f As String,
-                                             ByVal m As T2,
+                                             ByVal m As T,
                                              ByVal key As String)
 
         ' T  ... 更新するメンバー
@@ -282,7 +283,7 @@ Public Class ProjectModel
                 txt = sr.ReadToEnd()
                 obj = JsonConvert.DeserializeObject(txt)
 
-                obj(key) = m
+                'obj(key) = m
 
                 txt2 = JsonConvert.SerializeObject(obj)
             Else
