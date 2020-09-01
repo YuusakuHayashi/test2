@@ -25,11 +25,13 @@ Public Class TestWin
         ' ViewModels
         Dim ivm As InitViewModel
         Dim dbevm As DBExplorerViewModel
+        Dim mvm As MigraterViewModel
         'Dim mvm As MenuViewModel
 
         ' Views
         Dim iv As InitView
         Dim dbev As DBExplorerView
+        Dim mv As MigraterView
         'Dim mv As MenuView
 
 
@@ -73,9 +75,12 @@ Public Class TestWin
 
         ' メイン画面ビューモデル
         ivm = New InitViewModel(m)
+        mvm = New MigraterViewModel(m)
 
         ' 初期メイン画面
         If ivm.NextFlag Then
+            mv = New MigraterView(mvm)
+            Me._mnavi.Navigate(mv)
         Else
             iv = New InitView(ivm)
             Me._mnavi.Navigate(iv)
