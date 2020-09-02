@@ -123,25 +123,23 @@
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.Resources>
+            <DataTemplate
+                x:Key="DeleteCommandButton"
+                DataType="{x:Type local:ConditionModel}">
+                <Button Content="Delete" Command="{Binding DeleteCommand}" />
+            </DataTemplate>            
             <HierarchicalDataTemplate
                 DataType="{x:Type local:ConditionModel}"
                 ItemsSource="{Binding Conditions}" >
                 <StackPanel Orientation="Horizontal">
-                    <Button
-                        Content="＋" />
                     <TextBlock 
                         Margin="5,3,3,3"
-                        IsEnabled="{Binding IsEnabled}"
                         Text="{Binding FieldName}" />
                     <TextBlock 
                         Margin="5,3,3,3"
-                        IsEnabled="{Binding IsEnabled}"
                         Text="{Binding FieldValue}" />
-                    <Button
-                        Command="{Binding OrCommand}"
-                        Content="＋" />
-                    <Button
-                        Content="－" />
+                    <Button Content="Add" Command="{Binding AddCommand}" />
+                    <Button Template="{StaticResource DeleteCommandButton}" />
                 </StackPanel>
             </HierarchicalDataTemplate>
         </Grid.Resources>

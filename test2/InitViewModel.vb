@@ -178,7 +178,7 @@
         End Get
         Set(value As Boolean)
             Me.__InitEnableFlag = value
-            RaisePropertyChanged("InitEnableFlag")
+            RaisePropertyChanged("_InitEnableFlag")
             CType(InitCommand, DelegateCommand).RaiseCanExecuteChanged()
         End Set
     End Property
