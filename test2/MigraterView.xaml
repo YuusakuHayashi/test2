@@ -123,32 +123,140 @@
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.Resources>
-            <DataTemplate
-                x:Key="DeleteCommandButton"
-                DataType="{x:Type local:ConditionModel}">
-                <Button Content="Delete" Command="{Binding DeleteCommand}" />
-            </DataTemplate>            
+            <ControlTemplate x:Key="AddButton" TargetType="Button">
+                <StackPanel>
+                    <Image
+                        Source="C:\Users\yuusa\project\test2\test2\AddImage.png"
+                        Height="{TemplateBinding Height}"
+                        Width="{TemplateBinding Width}"/>
+                </StackPanel>
+            </ControlTemplate>
+            <ControlTemplate x:Key="DeleteButton" TargetType="Button">
+                <StackPanel>
+                    <Image
+                        Source="C:\Users\yuusa\project\test2\test2\MinusImage.png"
+                        Height="{TemplateBinding Height}"
+                        Width="{TemplateBinding Width}"/>
+                </StackPanel>
+            </ControlTemplate>
+            <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
+            <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusa\project\test2\test2\MinusImage.png"/>
+
             <HierarchicalDataTemplate
                 DataType="{x:Type local:ConditionModel}"
                 ItemsSource="{Binding Conditions}" >
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock 
+                    <TextBlock
+                        Margin="5,3,3,3"                        
+                        Width="25"                        
+                        Text="{Binding Logic}" />
+                    <TextBlock
+                        Margin="5,3,3,3"                        
+                        Text="フィールド名" />
+                    <TextBox
                         Margin="5,3,3,3"
+                        Width="100"
                         Text="{Binding FieldName}" />
-                    <TextBlock 
+                    <TextBlock
+                        Margin="5,3,3,3"                        
+                        Text="フィールド値" />
+                    <TextBox 
                         Margin="5,3,3,3"
+                        Width="100"
                         Text="{Binding FieldValue}" />
-                    <Button Content="Add" Command="{Binding AddCommand}" />
-                    <Button Template="{StaticResource DeleteCommandButton}" />
+                    <Button
+                        Height="20"
+                        Width="20"
+                        Template="{StaticResource AddButton}"
+                        Command="{Binding AddCommand}" />
+                    <Button
+                        Height="20"
+                        Width="20"
+                        Template="{StaticResource DeleteButton}"
+                        Command="{Binding DeleteCommand}" />
                 </StackPanel>
             </HierarchicalDataTemplate>
         </Grid.Resources>
-        <TreeView            
-            Grid.Row="0" Grid.RowSpan="50"
+        <StackPanel 
+            Grid.Row="0" Grid.RowSpan="2"
             Grid.Column="0" Grid.ColumnSpan="60"
-            VerticalAlignment="Stretch">
+            Margin="10,0,0,0"
+            Orientation="Horizontal">
+            <TextBlock Text="条件を指定してください" />
+            <Button
+                Height="20"
+                Width="20"                
+                Template="{StaticResource AddButton}"
+                Command="{Binding AddCommand}" />
+        </StackPanel>
+        <TreeView      
+            BorderThickness="0,0,0,0"
+            Grid.Row="2" Grid.RowSpan="30"
+            Grid.Column="0" Grid.ColumnSpan="60"
+            VerticalAlignment="Stretch" Margin="0,5">
             <TreeViewItem
-                ItemsSource="{Binding Conditions}" />
+                Header="条件"
+                ItemsSource="{Binding Conditions}"
+                IsExpanded="True">
+                <TreeViewItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="True" />
+                    </Style>
+                </TreeViewItem.ItemContainerStyle>
+            </TreeViewItem>
         </TreeView>
+        <StackPanel 
+            Grid.Row="30" Grid.RowSpan="2"
+            Grid.Column="0" Grid.ColumnSpan="60"
+            Margin="10,0,0,0"
+            Orientation="Horizontal">
+            <TextBlock Text="条件を指定してください" />
+            <Button
+                Height="20"
+                Width="20"                
+                Template="{StaticResource AddButton}"
+                Command="{Binding MigrateConditionAddCommand}" />
+        </StackPanel>
+        <ListBox
+            Grid.Row="32" Grid.RowSpan="14"
+            Grid.Column="0" Grid.ColumnSpan="60"
+            ItemsSource="{Binding Migrates}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="5,3,3,3"                        
+                            Width="25"                        
+                            Text="{Binding Logic}" />
+                        <TextBlock
+                            Margin="5,3,3,3"                        
+                            Text="フィールド名" />
+                        <TextBox
+                            Margin="5,3,3,3"
+                            Width="100"
+                            Text="{Binding FieldName}" />
+                        <TextBlock
+                            Margin="5,3,3,3"                        
+                            Text="フィールド値" />
+                        <TextBox 
+                            Margin="5,3,3,3"
+                            Width="100"
+                            Text="{Binding FieldValue}" />
+                        <Button
+                            Height="20"
+                            Width="20"
+                            Template="{StaticResource DeleteButton}"
+                            Command="{Binding DeleteCommand}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button 
+            Grid.Row="46" Grid.RowSpan="3"
+            Grid.Column="50" Grid.ColumnSpan="4" />
+        <Button 
+            Grid.Row="46" Grid.RowSpan="3"
+            Grid.Column="55" Grid.ColumnSpan="4"
+            Command="{Binding PublishQueryCommand}"/>
     </Grid>
 </Page>

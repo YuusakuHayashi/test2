@@ -77,8 +77,11 @@
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
+    <Compile Include="ConditionChangedEventListener.vb" />
     <Compile Include="ConditionModel.vb" />
     <Compile Include="FileManagerModel.vb" />
+    <Compile Include="HeaderConditionModel.vb" />
+    <Compile Include="MigrateModel.vb" />
     <Compile Include="MigraterView.xaml.vb">
       <DependentUpon>MigraterView.xaml</DependentUpon>
     </Compile>

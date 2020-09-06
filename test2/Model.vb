@@ -136,6 +136,11 @@ Public Class Model : Inherits BaseModel
 
 
     ' サーバー全体の更新
+    Public Sub ReloadDataBaseDependsConditionModel
+    End Sub
+
+
+    ' サーバー全体の更新
     Public Sub ReLoadServer()
         Dim sm As ServerModel
         Dim proxy As GetDataSetProxy
