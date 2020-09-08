@@ -117,12 +117,12 @@ Public Class DBExplorerViewModel : Inherits ViewModel
 
     ' コマンド実行(セーブ)
     Private Sub _SaveCommandExecute(ByVal parameter As Object)
-        Dim pm As New ProjectModel
-        Dim proxy As ModelSaveProxy1(Of Model)
+        'Dim pm As New ProjectModel
+        'Dim proxy As ModelSaveProxy1(Of Model)
 
-        proxy = AddressOf pm.ModelSave(Of Model)
+        'proxy = AddressOf pm.ModelSave(Of Model)
 
-        Call proxy(Me._Model.SourceFile, Me._Model)
+        'Call proxy(Me._Model.SourceFile, Me._Model)
     End Sub
 
     ' コマンド有効／無効化(リロード)

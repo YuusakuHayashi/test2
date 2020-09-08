@@ -115,6 +115,8 @@ Public Class Model : Inherits BaseModel
     End Sub
 
 
+    'Public ReloadDataBase
+    'End Sub
     ' テーブル一覧の取得
     'Public Sub GetUserTables()
     '    Dim proxy As GetDataSetProxy
@@ -136,8 +138,6 @@ Public Class Model : Inherits BaseModel
 
 
     ' サーバー全体の更新
-    Public Sub ReloadDataBaseDependsConditionModel
-    End Sub
 
 
     ' サーバー全体の更新
@@ -182,9 +182,16 @@ Public Class Model : Inherits BaseModel
     End Sub
 
 
-
-
     ' データセット取得
+    'Public Function GetSqlDataSet() As DataSet
+    '    Dim proxy As GetDataSetProxy
+
+    '    proxy = AddressOf Me._GetSqlDataSet
+    '    Call Me._DataBaseAccess(proxy)
+
+    '    GetSqlDataSet = Me._QueryResult
+    'End Sub
+
     Private Function _GetSqlDataSet(ByVal scmd As SqlCommand) As DataSet
         Dim sda As System.Data.SqlClient.SqlDataAdapter
         Dim ds As DataSet

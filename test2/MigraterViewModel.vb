@@ -317,6 +317,17 @@ Public Class MigraterViewModel : Inherits ViewModel
     End Function
 
 
+    Private Sub SearchTablesInConditions
+        'For Each dbs In Me.Model.Server
+        '    If dbs.Name = Me.Model.DataBaseName Then
+        '        For Each dts In dbs.DataTables
+        '        Next
+        '        Exit For
+        '    End If
+        'Next
+    End Sub
+
+
     Sub New(ByRef m As Model)
         ' モデルの設定
         If m IsNot Nothing Then

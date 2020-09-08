@@ -12,14 +12,14 @@ Public Class TestWin
 
 
         ' Delegater
-        Dim loader As ModelLoadProxy1(Of Model)
-        Dim loader2 As ModelLoadProxy1(Of FileManagerModel)
-        Dim saver As ModelSaveProxy1(Of Model)
-        Dim saver2 As ModelSaveProxy1(Of FileManagerModel)
+        'Dim loader As ModelLoadProxy1(Of Model)
+        'Dim loader2 As ModelLoadProxy1(Of FileManagerModel)
+        'Dim saver As ModelSaveProxy1(Of Model)
+        'Dim saver2 As ModelSaveProxy1(Of FileManagerModel)
 
         ' Models
         Dim m As Model
-        Dim pm As New ProjectModel
+        'Dim pm As New ProjectModel
         Dim fmm As FileManagerModel
 
         ' ViewModels
@@ -35,82 +35,127 @@ Public Class TestWin
         'Dim mv As MenuView
 
 
-        Me._mnavi = Me.MainFlame.NavigationService
-        Me._enavi = Me.ExplorerFlame.NavigationService
+        'Me._mnavi = Me.MainFlame.NavigationService
+        'Me._enavi = Me.ExplorerFlame.NavigationService
 
-        loader = AddressOf pm.ModelLoad(Of Model)
-        loader2 = AddressOf pm.ModelLoad(Of FileManagerModel)
-        saver = AddressOf pm.ModelSave(Of Model)
-        saver2 = AddressOf pm.ModelSave(Of FileManagerModel)
 
+        'loader2 = AddressOf pm.ModelLoad(Of FileManagerModel)
+        'saver = AddressOf pm.ModelSave(Of Model)
+        'saver2 = AddressOf pm.ModelSave(Of FileManagerModel)
+
+        ' 1. 初期状態の時
+        '    各クラスのデフォルト設定ファイルパスをファイルマネージャに登録する
+        '    そのファイルにNewしたオブジェクトをセーブする
+        ' 2. 次回以降
+        '    ファイルマネージャに登録されたファイルからオブジェクトをロードする
 
         ' ファイル管理モデルのロード
-        fmm = New FileManagerModel
-        fmm = loader2(pm.FileManagerFileName)
+        Dim saver As Action(Of String, FileManagerModel)
+        Dim loader As Func(Of String, FileManagerModel)
 
-        ' なければＪＳＯＮをとりあえず作っておく
+        fmm = New FileManagerModel
+        loader = fmm.LoadHandler
+        saver = fmm.SaveHandler
+        fmm = loader(fmm.FileManagerFileName)
+
         If fmm Is Nothing Then
             fmm = New FileManagerModel
-            fmm.LatestSettingFileName = pm.DefaultSettingFileName
-            Call saver2(pm.FileManagerFileName, fmm)
+            fmm.CurrentModelJson = fmm.DefaultModelJson
+            fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
+            fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
+
+            Call saver(fmm.FileManagerFileName, fmm)
         Else
-            If String.IsNullOrEmpty(fmm.LatestSettingFileName) Then
-                fmm.LatestSettingFileName = pm.DefaultSettingFileName
-                Call saver2(pm.FileManagerFileName, fmm)
+            If String.IsNullOrEmpty(fmm.CurrentModelJson) Then
+                fmm.CurrentModelJson = fmm.DefaultModelJson
             End If
+            If String.IsNullOrEmpty(fmm.CurrentInitViewModelJson) Then
+                fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
+            End If
+            If String.IsNullOrEmpty(fmm.CurrentDBExplorerViewModelJson) Then
+                fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
+            End If
+            Call saver(fmm.FileManagerFileName, fmm)
         End If
 
 
-        ' モデルのロード
-        m = loader(fmm.LatestSettingFileName)
-
-        ' なければＪＳＯＮをとりあえず作っておく
-        If m Is Nothing Then
-            m = New Model
-            Call saver(fmm.LatestSettingFileName, m)
-        End If
+        'loader = AddressOf fmm.ModelLoad(Of Model)
 
 
-        m.SourceFile = fmm.LatestSettingFileName
+        'fmm = loader2(fmm.FileManagerFileName)
 
-        ' メイン画面ビューモデル
-        ivm = New InitViewModel(m)
-        mvm = New MigraterViewModel(m)
+        '' なければＪＳＯＮをとりあえず作っておく
+        'If fmm Is Nothing Then
+        '    fmm = New FileManagerModel
+        '    fmm.CurrentModelJson = fmm.DefaultModelJson
+        '    fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
+        '    fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
 
-        ' 初期メイン画面
-        If ivm.NextFlag Then
-            mv = New MigraterView(mvm)
-            Me._mnavi.Navigate(mv)
-        Else
-            iv = New InitView(ivm)
-            Me._mnavi.Navigate(iv)
-        End If
+        '    Call saver2(pm.FileManagerFileName, fmm)
+        'Else
+        '    If String.IsNullOrEmpty(fmm.CurrentModelJson) Then
+        '        fmm.CurrentModelJson = fmm.DefaultModelJson
+        '    End If
+        '    If String.IsNullOrEmpty(fmm.CurrentInitViewModelJson) Then
+        '        fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
+        '    End If
+        '    If String.IsNullOrEmpty(fmm.CurrentDBExplorerViewModelJson) Then
+        '        fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
+        '    End If
+        '    Call saver2(pm.FileManagerFileName, fmm)
+        'End If
 
 
-        ' エクスプローラー画面ビューモデル
-        dbevm = New DBExplorerViewModel(m)
+        '' モデルのロード
+        'm = loader(fmm.LatestSettingFileName)
 
-        ' 初期エクスプローラー画面
-        dbev = New DBExplorerView(dbevm)
-        Me._enavi.Navigate(dbev)
+        '' なければＪＳＯＮをとりあえず作っておく
+        'If m Is Nothing Then
+        '    m = New Model
+        '    Call saver(fmm.LatestSettingFileName, m)
+        'End If
+
+
+        'm.SourceFile = fmm.LatestSettingFileName
+
+        '' メイン画面ビューモデル
+        'ivm = New InitViewModel(m)
+        'mvm = New MigraterViewModel(m)
+
+        '' 初期メイン画面
+        'If ivm.NextFlag Then
+        '    mv = New MigraterView(mvm)
+        '    Me._mnavi.Navigate(mv)
+        'Else
+        '    iv = New InitView(ivm)
+        '    Me._mnavi.Navigate(iv)
+        'End If
+
+
+        '' エクスプローラー画面ビューモデル
+        'dbevm = New DBExplorerViewModel(m)
+
+        '' 初期エクスプローラー画面
+        'dbev = New DBExplorerView(dbevm)
+        'Me._enavi.Navigate(dbev)
 
 
 
-        AddHandler m.PropertyChanged, AddressOf Me._PageNavigation
+        'AddHandler m.PropertyChanged, AddressOf Me._PageNavigation
         'AddHandler mvm.PropertyChanged, AddressOf Me._PageNavigation
     End Sub
 
     Private Sub _PageNavigation(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
-        Dim m As Model
-        Dim pm As New ProjectModel
-        Dim saver As ModelSaveProxy1(Of Model)
+        'Dim m As Model
+        'Dim pm As New ProjectModel
+        'Dim saver As ModelSaveProxy1(Of Model)
 
-        saver = AddressOf pm.ModelSave(Of Model)
+        'saver = AddressOf pm.ModelSave(Of Model)
 
-        If e.PropertyName = "ChangePageStrings" Then
-            m = CType(sender, Model)
-            saver(m.SourceFile, m)
-        End If
+        'If e.PropertyName = "ChangePageStrings" Then
+        '    m = CType(sender, Model)
+        '    saver(m.SourceFile, m)
+        'End If
 
         'Select Case sender.GetType.Name
         '    Case "InitViewModel"

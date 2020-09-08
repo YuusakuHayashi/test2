@@ -185,16 +185,16 @@
 
 
     Private Sub _InitCommandExecute(ByVal parameter As Object)
-        Me._Model.ServerName = Me.ServerName
-        Me._Model.DataBaseName = Me.DataBaseName
-        Me._Model.ConnectionString = Me.ConnectionString
-        Me._Model.OtherProperty = Me._OtherProperty
+        'Me._Model.ServerName = Me.ServerName
+        'Me._Model.DataBaseName = Me.DataBaseName
+        'Me._Model.ConnectionString = Me.ConnectionString
+        'Me._Model.OtherProperty = Me._OtherProperty
 
-        Call Me._Model.AccessTest()
+        'Call Me._Model.AccessTest()
 
-        If Me._Model.AccessResult Then
-            Me._Model.ChangePageStrings = {Me.GetType.Name, "MenuViewModel"}
-        End If
+        'If Me._Model.AccessResult Then
+        '    Me._Model.ChangePageStrings = {Me.GetType.Name, "MenuViewModel"}
+        'End If
     End Sub
 
 
