@@ -1,4 +1,7 @@
-﻿Imports System.ComponentModel
+﻿Option Explicit On
+
+
+Imports System.ComponentModel
 Public Class TestWin
     Private _mnavi As NavigationService
     Private _enavi As NavigationService
@@ -50,71 +53,44 @@ Public Class TestWin
         '    ファイルマネージャに登録されたファイルからオブジェクトをロードする
 
         ' ファイル管理モデルのロード
-        Dim saver As Action(Of String, FileManagerModel)
-        Dim loader As Func(Of String, FileManagerModel)
+        'Dim saver As Action(Of String, FileManagerModel)
+        'Dim loader As Func(Of String, FileManagerModel)
+
+        Dim MemberCheckProxy As Action
+
+        ' 要変更(要素数に注意)
+        Dim mcp(1) As Action
+
+
+
 
         fmm = New FileManagerModel
-        loader = fmm.LoadHandler
-        saver = fmm.SaveHandler
-        fmm = loader(fmm.FileManagerFileName)
-
+        fmm = fmm.ModelLoad(fmm.FileManagerFileName)
         If fmm Is Nothing Then
             fmm = New FileManagerModel
-            fmm.CurrentModelJson = fmm.DefaultModelJson
-            fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
-            fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
-
-            Call saver(fmm.FileManagerFileName, fmm)
-        Else
-            If String.IsNullOrEmpty(fmm.CurrentModelJson) Then
-                fmm.CurrentModelJson = fmm.DefaultModelJson
-            End If
-            If String.IsNullOrEmpty(fmm.CurrentInitViewModelJson) Then
-                fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
-            End If
-            If String.IsNullOrEmpty(fmm.CurrentDBExplorerViewModelJson) Then
-                fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
-            End If
-            Call saver(fmm.FileManagerFileName, fmm)
         End If
+        mcp(0) = AddressOf fmm.MemberCheck
 
 
-        'loader = AddressOf fmm.ModelLoad(Of Model)
+        ' モデルのロード
+        m = New Model
+        m = m.ModelLoad(fmm.CurrentModelJson)
+        If m Is Nothing Then
+            m = New Model
+        End If
+        mcp(1) = AddressOf m.MemberCheck
 
 
-        'fmm = loader2(fmm.FileManagerFileName)
+        MemberCheckProxy = [Delegate].Combine(mcp)
 
-        '' なければＪＳＯＮをとりあえず作っておく
-        'If fmm Is Nothing Then
-        '    fmm = New FileManagerModel
-        '    fmm.CurrentModelJson = fmm.DefaultModelJson
-        '    fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
-        '    fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
+        MemberCheckProxy()
 
-        '    Call saver2(pm.FileManagerFileName, fmm)
-        'Else
-        '    If String.IsNullOrEmpty(fmm.CurrentModelJson) Then
-        '        fmm.CurrentModelJson = fmm.DefaultModelJson
-        '    End If
-        '    If String.IsNullOrEmpty(fmm.CurrentInitViewModelJson) Then
-        '        fmm.CurrentInitViewModelJson = fmm.DefaultInitViewModelJson
-        '    End If
-        '    If String.IsNullOrEmpty(fmm.CurrentDBExplorerViewModelJson) Then
-        '        fmm.CurrentDBExplorerViewModelJson = fmm.DefaultDBExplorerViewModelJson
-        '    End If
-        '    Call saver2(pm.FileManagerFileName, fmm)
-        'End If
+        Call fmm.ModelSave(fmm.FileManagerFileName, fmm)
+        Call m.ModelSave(fmm.CurrentModelJson, m)
 
+        ivm = New InitViewModel(m)
 
-        '' モデルのロード
-        'm = loader(fmm.LatestSettingFileName)
-
-        '' なければＪＳＯＮをとりあえず作っておく
-        'If m Is Nothing Then
-        '    m = New Model
-        '    Call saver(fmm.LatestSettingFileName, m)
-        'End If
-
+        Me.MainFlame.DataContext = ivm
 
         'm.SourceFile = fmm.LatestSettingFileName
 

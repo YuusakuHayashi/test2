@@ -9,20 +9,6 @@
       Title="DBExplorerView">
     <Grid>
         <Grid.Resources>
-            <!--<DataTemplate
-                DataType="{x:Type local:ServerModel}">
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox 
-                        Margin="5,3,3,3"
-                        VerticalContentAlignment="Center"
-                        IsEnabled="{Binding IsEnabled}"
-                        IsChecked="{Binding IsChecked}"/>
-                    <TextBlock 
-                        Margin="5,3,3,3" 
-                        IsEnabled="{Binding IsEnabled}"
-                        Text="{Binding Name}" />
-                </StackPanel>
-            </DataTemplate>-->
             <HierarchicalDataTemplate
                 DataType="{x:Type local:ServerModel}"
                 ItemsSource="{Binding DataBases}">

@@ -1,7 +1,6 @@
 ﻿Imports System.Data
 Imports System.Data.SqlClient
 
-Delegate Function GetDataSetProxy(ByVal scmd As SqlCommand) As DataSet
 
 Public Class SqlHandlerModel : Inherits BaseModel
 

@@ -2,7 +2,7 @@
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
-Public Class ProjectModel(Of T)
+Public Class ProjectModel(Of T) : Inherits BaseModel
     Private Const SHIFT_JIS = "SHIFT_JIS"
 
     Protected ReadOnly Property ProjectDirectoryName As String
@@ -86,19 +86,20 @@ Public Class ProjectModel(Of T)
         _ProjectDirectory = ProjectFile(d)
     End Function
 
-    Public ReadOnly Property LoadHandler As Func(Of String, T)
-        Get
-            Return AddressOf Me.ModelLoad
-        End Get
-    End Property
+    'Public ReadOnly Property LoadHandler As Func(Of String, T)
+    '    Get
+    '        Return AddressOf Me.ModelLoad
+    '    End Get
+    'End Property
 
-    Public ReadOnly Property SaveHandler As Action(Of String, T)
-        Get
-            Return AddressOf Me.ModelSave
-        End Get
-    End Property
+    'Public ReadOnly Property SaveHandler As Action(Of String, T)
+    '    Get
+    '        Return AddressOf Me.ModelSave
+    '    End Get
+    'End Property
 
-    Public Overloads Function ModelLoad(Of T)(ByVal f As String) As T
+
+    Public Overloads Function ModelLoad(ByVal f As String) As T
         Dim txt As String
         Dim sr As System.IO.StreamReader
 
@@ -123,8 +124,10 @@ Public Class ProjectModel(Of T)
     End Function
 
 
-    Public Overloads Function ModelLoad(Of T As Class)(ByVal f As String,
-                                                       ByVal key As String) As T
+    'Public Overloads Function ModelLoad(Of T As Class)(ByVal f As String,
+    '                                                   ByVal key As String) As T
+    Public Overloads Function ModelLoad(ByVal f As String,
+                                        ByVal key As String) As T
         Dim txt As String
         Dim sr As System.IO.StreamReader
         Dim obj As Object
@@ -153,8 +156,10 @@ Public Class ProjectModel(Of T)
     End Function
 
 
-    Public Overloads Sub ModelSave(Of T)(ByVal f As String,
-                                         ByVal m As T)
+    'Public Overloads Sub ModelSave(Of T)(ByVal f As String,
+    '                                     ByVal m As T)
+    Public Overloads Sub ModelSave(ByVal f As String,
+                                   ByVal m As T)
         Dim txt As String
         Dim sw As System.IO.StreamWriter
 

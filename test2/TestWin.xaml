@@ -141,11 +141,118 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Frame
+        <Grid.Resources>
+            <DataTemplate
+                DataType="{x:Type local:InitViewModel}">
+                <StackPanel>
+                    <StackPanel 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                        <TextBlock 
+                            Text="設定ファイルが見つかりません。初期設定を行います" 
+                            Width="500" />
+                        <StackPanel 
+                            Orientation="Horizontal" >
+                            <TextBlock 
+                                Text="サーバ名" 
+                                Width="100"/>
+                            <TextBox 
+                                Text="{Binding ServerName}"
+                                Width="300" />
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding ServerNameError}"/>
+                        <StackPanel 
+                            Orientation="Horizontal" >
+                            <TextBlock 
+                                Text="データベース名"
+                                Width="100"/>
+                            <TextBox
+                                Text="{Binding DataBaseName}"
+                                Width="300"/>
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding DataBaseNameError}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock 
+                                Text="接続文字列"
+                                Width="100"/>
+                            <TextBox
+                                Text="{Binding ConnectionString}"
+                                Width="300"/>
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding ConnectionStringError}"/>
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Right">
+                        <Button
+                            Command="{Binding InitCommand}"
+                            Content="Connection"
+                            Width="100" />
+                        <Button
+                            Content="Close" 
+                            Width="100" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+            <!--<HierarchicalDataTemplate
+                DataType="{x:Type local:ServerModel}"
+                ItemsSource="{Binding DataBases}">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox 
+                        Margin="5,3,3,3"
+                        VerticalContentAlignment="Center"
+                        IsEnabled="{Binding IsEnabled}"
+                        IsChecked="{Binding IsChecked}" />
+                    <TextBlock 
+                        Margin="5,3,3,3"
+                        IsEnabled="{Binding IsEnabled}"
+                        Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            <HierarchicalDataTemplate
+                DataType="{x:Type local:DataBaseModel}"
+                ItemsSource="{Binding DataTables}" >
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox 
+                        Margin="5,3,3,3"
+                        VerticalContentAlignment="Center"
+                        IsEnabled="{Binding IsEnabled}"
+                        IsChecked="{Binding IsChecked}"/>
+                    <TextBlock 
+                        Margin="5,3,3,3"
+                        IsEnabled="{Binding IsEnabled}"
+                        Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            <DataTemplate
+                DataType="{x:Type local:DataTableModel}">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox 
+                        Margin="5,3,3,3"
+                        VerticalContentAlignment="Center"
+                        IsEnabled="{Binding IsEnabled}"
+                        IsChecked="{Binding IsChecked}"/>
+                    <TextBlock 
+                        Margin="5,3,3,3"
+                        IsEnabled="{Binding IsEnabled}"
+                        Text="{Binding Name}" />
+                </StackPanel>
+            </DataTemplate>-->
+        </Grid.Resources>
+        <!--<Frame
             x:Name="MainFlame"
             Grid.Row="3" Grid.RowSpan="47"
             Grid.Column="20" Grid.ColumnSpan="60"
-            NavigationUIVisibility="Hidden" />
+            NavigationUIVisibility="Hidden" />-->
+        <ContentControl
+            x:Name="MainFlame"
+            Content="{Binding}"
+            Grid.Row="3" Grid.RowSpan="47"
+            Grid.Column="20" Grid.ColumnSpan="60" />
         <Frame 
             x:Name="ExplorerFlame"
             Grid.Row="0"

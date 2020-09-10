@@ -2,7 +2,8 @@
 Imports System.Data.SqlClient
 Imports System.Collections.ObjectModel
 
-Public Class Model : Inherits BaseModel
+Public Class Model
+    Inherits ProjectModel(Of Model)
 
     ' このモデルを生成したＪＳＯＮファイル
     Private _SourceFile As String
@@ -278,55 +279,114 @@ Public Class Model : Inherits BaseModel
         End Try
     End Sub
 
+
+    Public Sub DataBaseAccess(ByRef proxy As GetDataSetProxy)
+        Dim scmd As SqlCommand
+        Dim scon As SqlConnection
+        Dim strn As SqlTransaction
+        Dim ds As DataSet
+
+        Me._AccessResult = False
+
+        Try
+            '接続開始
+            scon = New SqlConnection(Me.ConnectionString)
+            scon.Open()
+            strn = scon.BeginTransaction()
+
+            'コマンド作成
+            scmd = New System.Data.SqlClient.SqlCommand
+            scmd = scon.CreateCommand()
+            scmd.CommandText = Me.Query
+            scmd.CommandType = CommandType.Text
+            scmd.CommandTimeout = 30
+            scmd.Transaction = strn
+
+            '--- EXECUTE --------------------------------'
+            ds = proxy(scmd)
+            Me._QueryResult = ds
+            '--------------------------------------------'
+
+            Me.ServerVersion = scon.ServerVersion
+
+            Me._AccessResult = True
+
+            '成功
+            'Me.AccessFlag = True
+        Catch ex As Exception
+            '失敗
+            'Me.AccessFlag = False
+
+            Try
+                If strn IsNot Nothing Then
+                    strn.Rollback()
+                End If
+            Catch ex2 As Exception
+                '
+            End Try
+        Finally
+            If scmd IsNot Nothing Then
+                scmd.Dispose()
+            End If
+            If strn IsNot Nothing Then
+                strn.Dispose()
+            End If
+            If scon IsNot Nothing Then
+                scon.Close()
+                scon.Dispose()
+            End If
+        End Try
+    End Sub
+
     Public Sub MemberCheck()
-        '
-        If String.IsNullOrEmpty(Me.SourceFile) Then
-            Me.SourceFile = vbNullString
-        End If
+        ''
+        'If String.IsNullOrEmpty(Me.SourceFile) Then
+        '    Me.SourceFile = vbNullString
+        'End If
 
-        '
-        If Me.ChangePageStrings Is Nothing Then
-            Me.ChangePageStrings = {vbNullString, vbNullString}
-        End If
+        ''
+        'If Me.ChangePageStrings Is Nothing Then
+        '    Me.ChangePageStrings = {vbNullString, vbNullString}
+        'End If
 
-        '
-        If String.IsNullOrEmpty(Me.ServerName) Then
-            Me.ServerName = vbNullString
-        End If
+        ''
+        'If String.IsNullOrEmpty(Me.ServerName) Then
+        '    Me.ServerName = vbNullString
+        'End If
 
-        '
-        If String.IsNullOrEmpty(Me.DataBaseName) Then
-            Me.DataBaseName = vbNullString
-        End If
+        ''
+        'If String.IsNullOrEmpty(Me.DataBaseName) Then
+        '    Me.DataBaseName = vbNullString
+        'End If
 
-        '
-        If String.IsNullOrEmpty(Me.ConnectionString) Then
-            Me.ConnectionString = vbNullString
-        End If
+        ''
+        'If String.IsNullOrEmpty(Me.ConnectionString) Then
+        '    Me.ConnectionString = vbNullString
+        'End If
 
-        '
-        If String.IsNullOrEmpty(Me.OtherProperty) Then
-            Me.OtherProperty = vbNullString
-        End If
+        ''
+        'If String.IsNullOrEmpty(Me.OtherProperty) Then
+        '    Me.OtherProperty = vbNullString
+        'End If
 
-        '
-        If String.IsNullOrEmpty(Me.ServerVersion) Then
-            Me.ServerVersion = vbNullString
-        End If
+        ''
+        'If String.IsNullOrEmpty(Me.ServerVersion) Then
+        '    Me.ServerVersion = vbNullString
+        'End If
 
-        '
-        If Me.Server Is Nothing Then
-            Me.Server = New ServerModel
-        End If
+        ''
+        'If Me.Server Is Nothing Then
+        '    Me.Server = New ServerModel
+        'End If
 
-        '
-        If String.IsNullOrEmpty(Me.Query) Then
-            Me.Query = vbNullString
-        End If
+        ''
+        'If String.IsNullOrEmpty(Me.Query) Then
+        '    Me.Query = vbNullString
+        'End If
 
-        If Me._QueryResult Is Nothing Then
-            Me._QueryResult = New DataSet
-        End If
+        'If Me._QueryResult Is Nothing Then
+        '    Me._QueryResult = New DataSet
+        'End If
     End Sub
 
     Sub New()
