@@ -1,4 +1,4 @@
-﻿Public Class MenuViewModel : Inherits ViewModel
+﻿Public Class MenuViewModel : Inherits BaseViewModel
 
     Private Const _MENUVIEW_FILE As String = "MenuView.txt"
     Private Const _BATCHMENU As String = "BatchMenu"

@@ -3,7 +3,7 @@ Imports System.Data.SqlClient
 Imports System.Collections.ObjectModel
 
 Public Class Model
-    Inherits ProjectModel(Of Model)
+    Inherits ProjectBaseModel(Of Model)
 
     ' このモデルを生成したＪＳＯＮファイル
     Private _SourceFile As String
@@ -13,21 +13,6 @@ Public Class Model
         End Get
         Set(value As String)
             Me._SourceFile = value
-        End Set
-    End Property
-
-    Private _ChangePageStrings As String()
-    Public Property ChangePageStrings As String()
-        Get
-            Return Me._ChangePageStrings
-        End Get
-        Set(value As String())
-            If value IsNot Nothing Then
-                If value.Length = 2 Then
-                    Me._ChangePageStrings = value
-                    RaisePropertyChanged("ChangePageStrings")
-                End If
-            End If
         End Set
     End Property
 
@@ -338,58 +323,67 @@ Public Class Model
         End Try
     End Sub
 
-    Public Sub MemberCheck()
-        ''
-        'If String.IsNullOrEmpty(Me.SourceFile) Then
-        '    Me.SourceFile = vbNullString
-        'End If
-
-        ''
-        'If Me.ChangePageStrings Is Nothing Then
-        '    Me.ChangePageStrings = {vbNullString, vbNullString}
-        'End If
-
-        ''
-        'If String.IsNullOrEmpty(Me.ServerName) Then
-        '    Me.ServerName = vbNullString
-        'End If
-
-        ''
-        'If String.IsNullOrEmpty(Me.DataBaseName) Then
-        '    Me.DataBaseName = vbNullString
-        'End If
-
-        ''
-        'If String.IsNullOrEmpty(Me.ConnectionString) Then
-        '    Me.ConnectionString = vbNullString
-        'End If
-
-        ''
-        'If String.IsNullOrEmpty(Me.OtherProperty) Then
-        '    Me.OtherProperty = vbNullString
-        'End If
-
-        ''
-        'If String.IsNullOrEmpty(Me.ServerVersion) Then
-        '    Me.ServerVersion = vbNullString
-        'End If
-
-        ''
-        'If Me.Server Is Nothing Then
-        '    Me.Server = New ServerModel
-        'End If
-
-        ''
-        'If String.IsNullOrEmpty(Me.Query) Then
-        '    Me.Query = vbNullString
-        'End If
-
-        'If Me._QueryResult Is Nothing Then
-        '    Me._QueryResult = New DataSet
-        'End If
+    Public Overrides Sub MemberCheck()
+        If Server Is Nothing Then
+            Server = New ServerModel With {
+                .Name = "No Server",
+                .IsEnabled = False,
+                .IsChecked = False,
+                .DataBases = New ObservableCollection(Of DataBaseModel) From {
+                    New DataBaseModel With {
+                        .Name = "No DataBase",
+                        .IsEnabled = False,
+                        .IsChecked = False,
+                        .DataTables = New ObservableCollection(Of DataTableModel) From {
+                            New DataTableModel With {
+                                .Name = "No DataTable",
+                                .IsEnabled = False,
+                                .IsChecked = False
+                            }
+                        }
+                    }
+                }
+            }
+        End If
+        If Server.DataBases Is Nothing Then
+            Server.DataBases = New ObservableCollection(Of DataBaseModel) From {
+                New DataBaseModel With {
+                    .Name = "No DataBase",
+                    .IsEnabled = False,
+                    .IsChecked = False,
+                    .DataTables = New ObservableCollection(Of DataTableModel) From {
+                        New DataTableModel With {
+                            .Name = "No DataTable",
+                            .IsEnabled = False,
+                            .IsChecked = False
+                        }
+                    }
+                }
+            }
+        End If
+        If Server.DataBases.Count = 0 Then
+            Server.DataBases.Add(New DataBaseModel With {
+                .Name = "No DataBase",
+                .IsEnabled = False,
+                .IsChecked = False,
+                .DataTables = New ObservableCollection(Of DataTableModel) From {
+                    New DataTableModel With {
+                        .Name = "No DataTable",
+                        .IsEnabled = False,
+                        .IsChecked = False
+                    }
+                }
+            })
+        End If
+        If Server.DataBases(0).DataTables.Count = 0 Then
+            Server.DataBases(0).DataTables.Add(New DataTableModel With {
+                .Name = "No DataTable",
+                .IsChecked = False,
+                .IsEnabled = False
+            })
+        End If
     End Sub
 
     Sub New()
-        Call Me.MemberCheck()
     End Sub
 End Class

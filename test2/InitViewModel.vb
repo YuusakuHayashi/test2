@@ -1,29 +1,5 @@
-﻿Public Class InitViewModel : Inherits ViewModel
-    ' モデル
-    Private __Model As Model
-    Private Property _Model As Model
-        Get
-            Return Me.__Model
-        End Get
-        Set(value As Model)
-            Me.__Model = value
-            RaisePropertyChanged("Model")
-        End Set
-    End Property
-
-
-    ' 初期画面用フラグ
-    Private _NextFlag As Boolean
-    Public Property NextFlag As Boolean
-        Get
-            Return Me._NextFlag
-        End Get
-        Set(value As Boolean)
-            Me._NextFlag = value
-            RaisePropertyChanged("NextFlag")
-        End Set
-    End Property
-
+﻿Public Class InitViewModel
+    Inherits ProjectBaseViewModel(Of InitViewModel)
 
     ' サーバ名
     ' 接続文字列にバインド
@@ -37,7 +13,7 @@
             Me._ServerName = value
             RaisePropertyChanged("ServerName")
             Call Me._GetConnectionString()
-            Call Me._CheckInitEnableFlag()
+            Call Me._CheckInitCommandEnabled()
         End Set
     End Property
 
@@ -54,7 +30,7 @@
             Me._DataBaseName = value
             RaisePropertyChanged("DataBaseName")
             Call Me._GetConnectionString()
-            Call Me._CheckInitEnableFlag()
+            Call Me._CheckInitCommandEnabled()
         End Set
     End Property
 
@@ -69,7 +45,7 @@
             Me._ConnectionString = value
             RaisePropertyChanged("ConnectionString")
             Call Me._GetOtherProperty()
-            Call Me._CheckInitEnableFlag()
+            Call Me._CheckInitCommandEnabled()
         End Set
     End Property
 
@@ -143,7 +119,7 @@
 
 
     'コマンド実行可否のチェック
-    Private Sub _CheckInitEnableFlag()
+    Private Sub _CheckInitCommandEnabled()
         Dim b As Boolean : b = True
         If Me.ServerName = vbNullString Then
             b = False
@@ -185,16 +161,19 @@
 
 
     Private Sub _InitCommandExecute(ByVal parameter As Object)
-        'Me._Model.ServerName = Me.ServerName
-        'Me._Model.DataBaseName = Me.DataBaseName
-        'Me._Model.ConnectionString = Me.ConnectionString
-        'Me._Model.OtherProperty = Me._OtherProperty
+        Dim mvm As MigraterViewModel
+        Me.Model.ServerName = Me.ServerName
+        Me.Model.DataBaseName = Me.DataBaseName
+        Me.Model.ConnectionString = Me.ConnectionString
+        Me.Model.OtherProperty = Me._OtherProperty
 
-        'Call Me._Model.AccessTest()
+        Call Me.Model.AccessTest()
 
-        'If Me._Model.AccessResult Then
-        '    Me._Model.ChangePageStrings = {Me.GetType.Name, "MenuViewModel"}
-        'End If
+        If Me.Model.AccessResult Then
+            ModelSave(Of Model)(Me.Model.CurrentModelJson, Me.Model)
+            Me.ViewModel.ContextModel = New MigraterViewModel(Me.Model, Me.ViewModel)
+        End If
+
     End Sub
 
 
@@ -202,36 +181,40 @@
         Return Me._InitEnableFlag
     End Function
 
+    Protected Overrides Sub MyInitializing()
+        Me.ServerName = Me.Model.ServerName
+        Me.DataBaseName = Me.Model.DataBaseName
+        Me._OtherProperty = Me.Model.OtherProperty
+        Call Me._GetConnectionString()
+    End Sub
 
-    'Private Sub _DefaultSet()
-    '    Me.ServerName = vbNullString
-    '    Me.DataBaseName = vbNullString
-    '    Me.ConnectionString = vbNullString
-    'End Sub
-
-
-
-    Sub New(ByRef m As Model)
-        ' モデルの設定
-        If m IsNot Nothing Then
-            ' 接続テスト
-            Call m.AccessTest()
-            Me.NextFlag = m.AccessResult
-        Else
-            ' モデルなし
-            m = New Model
+    Protected Overrides Sub ContextModelCheck()
+        Dim b As Boolean : b = False
+        If String.IsNullOrEmpty(Me.ServerName) Then
+            b = True
         End If
-        Me._Model = m
+        If String.IsNullOrEmpty(Me.DataBaseName) Then
+            b = True
+        End If
+        If String.IsNullOrEmpty(Me._OtherProperty) Then
+            b = True
+        End If
+        If b Then
+            ViewModel.ContextModel = Me
+        End If
+    End Sub
+
+    Sub New(ByRef m As Model,
+            ByRef vm As ViewModel)
+
+        Dim ccep(0) As CheckCommandEnabledProxy
+        Dim ccep2 As CheckCommandEnabledProxy
+
+        ccep(0) = AddressOf Me._CheckInitCommandEnabled
+        ccep2 = [Delegate].Combine(ccep)
 
 
         ' ビューモデルの設定
-        Me.ServerName = m.ServerName
-        Me.DataBaseName = m.DataBaseName
-        Me._OtherProperty = m.OtherProperty
-        Call Me._GetConnectionString()
-
-
-        ' コマンドフラグの有効／無効化
-        Call Me._CheckInitEnableFlag()
+        Initializing(m, vm, ccep2)
     End Sub
 End Class

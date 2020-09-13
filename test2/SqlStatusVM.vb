@@ -1,7 +1,7 @@
 ﻿Imports System.Reflection
 Imports System.ComponentModel
 
-Public Class SqlStatusVM : Inherits ViewModel
+Public Class SqlStatusVM : Inherits BaseViewModel
 
     Public Const DEFAULT_SERVERNAME = "サーバ名"
     Public Const DEFAULT_DATABASENAME = "データベース名"

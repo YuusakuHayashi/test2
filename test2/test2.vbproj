@@ -73,10 +73,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AccessButtonVM.vb" />
+    <Compile Include="BaseModel.vb" />
+    <Compile Include="BaseViewModel.vb" />
     <Compile Include="BatchMenuView.xaml.vb">
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
+    <Compile Include="FileContentsModel.vb" />
     <Compile Include="MyDelegater.vb" />
     <Compile Include="ConditionChangedEventListener.vb" />
     <Compile Include="ConditionModel.vb" />
@@ -108,7 +111,7 @@
     <Compile Include="MainWin.xaml.vb">
       <DependentUpon>MainWin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BaseModel.vb" />
+    <Compile Include="ProjectBaseModel.vb" />
     <Compile Include="MenuModel.vb" />
     <Compile Include="MenuView.xaml.vb">
       <DependentUpon>MenuView.xaml</DependentUpon>
@@ -134,7 +137,9 @@
     <Compile Include="TreeViewModel.vb" />
     <Compile Include="TreeViewModel2.vb" />
     <Compile Include="TreeViewOrigin.vb" />
+    <Compile Include="ProjectBaseViewModel.vb" />
     <Compile Include="ViewModel.vb" />
+    <Compile Include="ViewModelChangedEventListener.vb" />
     <Compile Include="VMCommand.vb" />
     <Compile Include="TreeViewViewModel.vb" />
     <Compile Include="Window1.xaml.vb">

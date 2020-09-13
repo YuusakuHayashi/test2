@@ -1,20 +1,10 @@
 ﻿Imports System.ComponentModel
 Imports System.Collections.ObjectModel
 
-Public Class DBExplorerViewModel : Inherits ViewModel
+Public Class DBExplorerViewModel
+    Inherits ProjectBaseViewModel(Of DBExplorerViewModel)
+
     ' モデル
-    Private __Model As Model
-    Private Property _Model As Model
-        Get
-            Return Me.__Model
-        End Get
-        Set(value As Model)
-            Me.__Model = value
-            RaisePropertyChanged("Model")
-        End Set
-    End Property
-
-
     Private _Server As ServerModel
     Public Property Server As ServerModel
         Get
@@ -61,9 +51,9 @@ Public Class DBExplorerViewModel : Inherits ViewModel
     End Property
 
     ' コマンド有効／無効判定(リロード)
-    Private Sub _CheckDBLoadEnableFlag()
+    Private Sub _CheckDBReLoadCommandEnabled()
         Dim b As Boolean
-        If String.IsNullOrEmpty(Me._Model.ConnectionString) Then
+        If String.IsNullOrEmpty(Me.Model.ConnectionString) Then
             b = False
         Else
             b = True
@@ -72,11 +62,11 @@ Public Class DBExplorerViewModel : Inherits ViewModel
     End Sub
 
     ' コマンド有効／無効判定(セーブ)
-    Private Sub _CheckSaveEnableFlag()
+    Private Sub _CheckSaveCommandEnabled()
         Dim b As Boolean
         b = False
         If Me.Server IsNot Nothing Then
-            If Not String.IsNullOrEmpty(Me._Model.SourceFile) Then
+            If Not String.IsNullOrEmpty(Me.Model.SourceFile) Then
                 b = True
             End If
         End If
@@ -111,8 +101,8 @@ Public Class DBExplorerViewModel : Inherits ViewModel
 
     ' コマンド実行(リロード)
     Private Sub _DBLoadCommandExecute(ByVal parameter As Object)
-        Call Me._Model.ReLoadServer()
-        Me.Server = Me._Model.Server
+        Call Me.Model.ReLoadServer()
+        Me.Server = Me.Model.Server
     End Sub
 
     ' コマンド実行(セーブ)
@@ -122,7 +112,7 @@ Public Class DBExplorerViewModel : Inherits ViewModel
 
         'proxy = AddressOf pm.ModelSave(Of Model)
 
-        'Call proxy(Me._Model.SourceFile, Me._Model)
+        'Call proxy(Me.Model.SourceFile, Me.Model)
     End Sub
 
     ' コマンド有効／無効化(リロード)
@@ -135,55 +125,23 @@ Public Class DBExplorerViewModel : Inherits ViewModel
         Return Me._SaveEnableFlag
     End Function
 
-    Sub New(ByRef m As Model)
-        ' モデルの設定
-        If m IsNot Nothing Then
-            If m.Server IsNot Nothing Then
-            Else
-            End If
-        Else
-            ' モデルなし
-            m = New Model
-        End If
+    Protected Overrides Sub MyInitializing()
+        Me.Server = Model.Server
+    End Sub
 
-        ''--- TEST ----------------------------------------------------------------'
-        'm.Server = New ServerModel With {
-        '    .Name = "root",
-        '    .DataBases = New ObservableCollection(Of DataBaseModel) From {
-        '        New DataBaseModel With {
-        '            .Name = "hoge",
-        '            .DataTables = New ObservableCollection(Of DataTableModel) From {
-        '                New DataTableModel With {.Name = "hogehoge"},
-        '                New DataTableModel With {.Name = "hogefuga"},
-        '                New DataTableModel With {.Name = "hogepiyo"}
-        '            }
-        '        },
-        '        New DataBaseModel With {
-        '            .Name = "fuga",
-        '            .DataTables = New ObservableCollection(Of DataTableModel) From {
-        '                New DataTableModel With {.Name = "fugafuga"}
-        '            }
-        '        },
-        '        New DataBaseModel With {
-        '            .Name = "piyo",
-        '            .DataTables = New ObservableCollection(Of DataTableModel) From {
-        '                New DataTableModel With {.Name = "piyohoge"},
-        '                New DataTableModel With {.Name = "piyofuga"},
-        '                New DataTableModel With {.Name = "piyopiyo"}
-        '            }
-        '        }
-        '    }
-        '}
-        '-------------------------------------------------------------------------'
-        Me._Model = m
+    Protected Overrides Sub ContextModelCheck()
+        ViewModel.ContextModel = Me
+    End Sub
 
+    Sub New(ByRef m As Model,
+            ByRef vm As ViewModel)
+        Dim ccep(1) As CheckCommandEnabledProxy
+        Dim ccep2 As CheckCommandEnabledProxy
 
-        ' ビューモデルの設定
-        Me.Server = m.Server
+        ccep(0) = AddressOf Me._CheckDBReLoadCommandEnabled
+        ccep(1) = AddressOf Me._CheckSaveCommandEnabled
+        ccep2 = [Delegate].Combine(ccep)
 
-
-        ' コマンドフラグの有効／無効化
-        Call Me._CheckDBLoadEnableFlag()
-        Call Me._CheckSaveEnableFlag()
+        Initializing(m, vm, ccep2)
     End Sub
 End Class

@@ -142,6 +142,8 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.Resources>
+
+            <!-- InitView Bgn -->
             <DataTemplate
                 DataType="{x:Type local:InitViewModel}">
                 <StackPanel>
@@ -198,7 +200,148 @@
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>
-            <!--<HierarchicalDataTemplate
+            <!-- InitView End -->
+            
+            <ControlTemplate x:Key="AddButton" TargetType="Button">
+                <StackPanel>
+                    <Image
+                        Source="C:\Users\yuusa\project\test2\test2\AddImage.png"
+                        Height="20"
+                        Width="20" />
+                </StackPanel>
+            </ControlTemplate>
+            <ControlTemplate x:Key="DeleteButton" TargetType="Button">
+                <StackPanel>
+                    <Image
+                        Source="C:\Users\yuusa\project\test2\test2\DeleteImage.png"
+                        Height="20"
+                        Width="20" />
+                </StackPanel>
+            </ControlTemplate>
+            <ControlTemplate x:Key="PublishQueryButton" TargetType="Button">
+                <StackPanel>
+                    <Image
+                        Source="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png"
+                        Height="20"
+                        Width="20" />
+                </StackPanel>
+            </ControlTemplate>
+
+            <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
+            <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusa\project\test2\test2\DeleteImage.png"/>
+            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png"/>
+            
+            
+            <HierarchicalDataTemplate
+                DataType="{x:Type local:ConditionModel}"
+                ItemsSource="{Binding Conditions}" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        Margin="5,3,3,3"                        
+                        Width="25"                        
+                        Text="{Binding Logic}" />
+                    <TextBlock
+                        Margin="5,3,3,3"                        
+                        Text="フィールド名" />
+                    <TextBox
+                        Margin="5,3,3,3"
+                        Width="100"
+                        Text="{Binding FieldName}" />
+                    <TextBlock
+                        Margin="5,3,3,3"                        
+                        Text="フィールド値" />
+                    <TextBox 
+                        Margin="5,3,3,3"
+                        Width="100"
+                        Text="{Binding FieldValue}" />
+                    <Button
+                        Template="{StaticResource AddButton}"
+                        Command="{Binding AddCommand}" />
+                    <Button
+                        Template="{StaticResource DeleteButton}"
+                        Command="{Binding DeleteCommand}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            
+            
+            <DataTemplate
+                DataType="{x:Type local:MigraterViewModel}">
+                <StackPanel>
+                    <StackPanel 
+                        Margin="10,0,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock Text="条件を指定してください" />
+                        <Button
+                            Template="{StaticResource AddButton}"
+                            Command="{Binding AddCommand}" />
+                    </StackPanel>
+                    <TreeView      
+                        BorderThickness="0,0,0,0"
+                        VerticalAlignment="Stretch" Margin="0,5">
+                        <TreeViewItem
+                            Header="条件"
+                            ItemsSource="{Binding Conditions}"
+                            IsExpanded="True">
+                            <TreeViewItem.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="IsExpanded" Value="True" />
+                                </Style>
+                            </TreeViewItem.ItemContainerStyle>
+                        </TreeViewItem>
+                    </TreeView>
+                    <StackPanel 
+                        Margin="10,0,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock Text="条件を指定してください" />
+                        <Button
+                            Template="{StaticResource AddButton}"
+                            Command="{Binding MigrateConditionAddCommand}" />
+                    </StackPanel>
+                    <ListBox
+                        ItemsSource="{Binding Migrates}"
+                        BorderThickness="0,0,0,0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock
+                                        Margin="5,3,3,3"                        
+                                        Width="25"                        
+                                        Text="{Binding Logic}" />
+                                    <TextBlock
+                                        Margin="5,3,3,3"                        
+                                        Text="フィールド名" />
+                                    <TextBox
+                                        Margin="5,3,3,3"
+                                        Width="100"
+                                        Text="{Binding FieldName}" />
+                                    <TextBlock
+                                        Margin="5,3,3,3"                        
+                                        Text="フィールド値" />
+                                    <TextBox 
+                                        Margin="5,3,3,3"
+                                        Width="100"
+                                        Text="{Binding FieldValue}" />
+                                    <Button
+                                        Template="{StaticResource DeleteButton}"
+                                        Command="{Binding DeleteCommand}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <StackPanel Orientation="Horizontal">
+                        <Button
+                            Height="30" Width="50" />
+                        <Button 
+                            Height="30" Width="50"                            
+                            Command="{Binding PublishQueryCommand}">
+                            <Image Source="{StaticResource PublishQueryImage}" />
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+            
+            
+            <HierarchicalDataTemplate
                 DataType="{x:Type local:ServerModel}"
                 ItemsSource="{Binding DataBases}">
                 <StackPanel Orientation="Horizontal">
@@ -241,24 +384,43 @@
                         IsEnabled="{Binding IsEnabled}"
                         Text="{Binding Name}" />
                 </StackPanel>
-            </DataTemplate>-->
+            </DataTemplate>
+
+            <DataTemplate
+                DataType="{x:Type local:DBExplorerViewModel}">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button
+                            Command="{Binding DBLoadCommand}"
+                            Content="Reload"/>
+                        <Button
+                            Command="{Binding SaveCommand}"
+                            Content="Save"/>
+                    </StackPanel>
+                    <TreeView            
+                        VerticalAlignment="Stretch"
+                        BorderThickness="0,0,1,0">
+                        <TreeViewItem
+                            Header="{Binding Server.Name}"
+                            ItemsSource="{Binding Server.DataBases}" />
+                    </TreeView>
+                </StackPanel>
+            </DataTemplate>
+
+            
         </Grid.Resources>
-        <!--<Frame
-            x:Name="MainFlame"
+
+        <ContentControl
+            x:Name="ExplorerFlame"
+            Content="{Binding ContextModel}"
             Grid.Row="3" Grid.RowSpan="47"
-            Grid.Column="20" Grid.ColumnSpan="60"
-            NavigationUIVisibility="Hidden" />-->
+            Grid.Column="0" Grid.ColumnSpan="20" />
+
         <ContentControl
             x:Name="MainFlame"
-            Content="{Binding}"
+            Content="{Binding ContextModel}"
             Grid.Row="3" Grid.RowSpan="47"
             Grid.Column="20" Grid.ColumnSpan="60" />
-        <Frame 
-            x:Name="ExplorerFlame"
-            Grid.Row="0"
-            Grid.RowSpan="50" 
-            Grid.Column="0" 
-            Grid.ColumnSpan="20" />
         <Button x:Name="AccessButton"
             Grid.ColumnSpan="6" Grid.Column="20" 
             Content="接続"  HorizontalAlignment="Stretch"
@@ -389,28 +551,5 @@
                  FontSize="10"
                  VerticalAlignment="Bottom" 
                  BorderThickness="0,0,0,1" />-->
-        <!--<TreeView x:Name="treeView" 
-                  ItemsSource="{Binding Model.Children}"
-                  Grid.Row="0" Grid.RowSpan="50"
-                  Grid.Column="0" Grid.ColumnSpan="20">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Margin="5"
-                                  VerticalContentAlignment="Center"
-                                  IsChecked="{Binding IsChecked}" />
-                        <TextBlock Margin="5" 
-                                   Text="{Binding RealName}" />
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <Setter Property="FontSize" Value="10" />
-                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                </Style>
-            </TreeView.ItemContainerStyle>
-        </TreeView>-->
     </Grid>
 </Window>

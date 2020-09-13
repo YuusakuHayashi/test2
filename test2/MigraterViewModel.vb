@@ -1,18 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 
-Public Class MigraterViewModel : Inherits ViewModel
-    ' モデル
-    Private __Model As Model
-    Private Property _Model As Model
-        Get
-            Return Me.__Model
-        End Get
-        Set(value As Model)
-            Me.__Model = value
-            RaisePropertyChanged("Model")
-        End Set
-    End Property
-
+Public Class MigraterViewModel
+    Inherits ProjectBaseViewModel(Of MigraterViewModel)
     ' 条件
     Private _Conditions As ObservableCollection(Of ConditionModel)
     Public Property Conditions As ObservableCollection(Of ConditionModel)
@@ -22,7 +11,7 @@ Public Class MigraterViewModel : Inherits ViewModel
         Set(value As ObservableCollection(Of ConditionModel))
             Me._Conditions = value
             RaisePropertyChanged("Conditions")
-            Call Me._CheckAddCommandEnableFlag()
+            Call Me._CheckAddCommandEnabled()
         End Set
     End Property
 
@@ -35,7 +24,7 @@ Public Class MigraterViewModel : Inherits ViewModel
         Set(value As ObservableCollection(Of MigrateModel))
             Me._Migrates = value
             RaisePropertyChanged("Migrates")
-            Call Me._CheckMigrateConditionAddCommandEnableFlag()
+            Call Me._CheckMigrateConditionAddEnabled()
         End Set
     End Property
 
@@ -153,7 +142,7 @@ Public Class MigraterViewModel : Inherits ViewModel
     End Property
 
     ' コマンド有効／無効判定(ＡＤＤ)
-    Private Sub _CheckAddCommandEnableFlag()
+    Private Sub _CheckAddCommandEnabled()
         Dim b As Boolean : b = True
         If Me.Conditions.Count > 0 Then
             For Each bro In Me.Conditions
@@ -173,7 +162,7 @@ Public Class MigraterViewModel : Inherits ViewModel
 
 
     ' コマンド有効／無効判定(移行後ＡＤＤ)
-    Private Sub _CheckMigrateConditionAddCommandEnableFlag()
+    Private Sub _CheckMigrateConditionAddEnabled()
         Dim b As Boolean : b = True
         If Me.Migrates.Count > 0 Then
             For Each bro In Me.Migrates
@@ -192,7 +181,7 @@ Public Class MigraterViewModel : Inherits ViewModel
     End Sub
 
     ' コマンド有効／無効判定(クエリ発行)
-    Private Sub _CheckPublishQueryCommandEnableFlag()
+    Private Sub _CheckPublishQueryCommandEnabled()
         Dim b As Boolean : b = True
         Me._PublishQueryCommandEnableFlag = b
     End Sub
@@ -317,27 +306,7 @@ Public Class MigraterViewModel : Inherits ViewModel
     End Function
 
 
-    Private Sub SearchTablesInConditions
-        'For Each dbs In Me.Model.Server
-        '    If dbs.Name = Me.Model.DataBaseName Then
-        '        For Each dts In dbs.DataTables
-        '        Next
-        '        Exit For
-        '    End If
-        'Next
-    End Sub
-
-
-    Sub New(ByRef m As Model)
-        ' モデルの設定
-        If m IsNot Nothing Then
-        Else
-            ' モデルなし
-            m = New Model
-        End If
-        Me._Model = m
-
-
+    Protected Overrides Sub MyInitializing()
         Me.Conditions = New ObservableCollection(Of ConditionModel) From {
             New ConditionModel
         }
@@ -345,23 +314,57 @@ Public Class MigraterViewModel : Inherits ViewModel
         Me.Migrates = New ObservableCollection(Of MigrateModel) From {
             New MigrateModel
         }
+    End Sub
 
-        ' コマンドフラグの有効／無効化
-        Call Me._CheckAddCommandEnableFlag()
-        Call Me._CheckMigrateConditionAddCommandEnableFlag()
-        Call Me._CheckPublishQueryCommandEnableFlag()
 
+    Protected Overrides Sub ContextModelCheck()
+        ViewModel.ContextModel = Me
+    End Sub
+
+    Private Sub DeleteRequestAddHandler()
         AddHandler _
             ConditionChangedEventListener.Instance.DeleteRequested,
             AddressOf Me.DeleteRequestReview
+    End Sub
+
+    Private Sub ChildrenUpdatedAddHandler()
         AddHandler _
             ConditionChangedEventListener.Instance.ChildrenUpdated,
-            AddressOf Me._CheckAddCommandEnableFlag
+            AddressOf Me._CheckAddCommandEnabled
+    End Sub
+
+    Private Sub MigrateConditionUpdatedAddHandler()
         AddHandler _
             ConditionChangedEventListener.Instance.MigrateConditionUpdated,
-            AddressOf Me._CheckMigrateConditionAddCommandEnableFlag
+            AddressOf Me._CheckMigrateConditionAddEnabled
+    End Sub
+
+    Private Sub MigrateConditionDeleteRequestedAddHandler()
         AddHandler _
             ConditionChangedEventListener.Instance.MigrateConditionDeleteRequested,
             AddressOf Me._MigrateConditionDeleteRequestReview
+    End Sub
+
+    Sub New(ByRef m As Model,
+            ByRef vm As ViewModel)
+        Dim ccep(2) As CheckCommandEnabledProxy
+        Dim ccep2 As CheckCommandEnabledProxy
+        Dim ahp(3) As AddHandlerProxy
+        Dim ahp2 As AddHandlerProxy
+
+        ccep(0) = AddressOf Me._CheckAddCommandEnabled
+        ccep(1) = AddressOf Me._CheckMigrateConditionAddEnabled
+        ccep(2) = AddressOf Me._CheckPublishQueryCommandEnabled
+
+        ahp(0) = AddressOf Me.DeleteRequestAddHandler
+        ahp(1) = AddressOf Me.ChildrenUpdatedAddHandler
+        ahp(2) = AddressOf Me.MigrateConditionUpdatedAddHandler
+        ahp(3) = AddressOf Me.MigrateConditionDeleteRequestedAddHandler
+
+        ccep2 = [Delegate].Combine(ccep)
+        ahp2 = [Delegate].Combine(ahp)
+
+
+        Initializing(m, vm, ccep2, ahp2)
     End Sub
 End Class

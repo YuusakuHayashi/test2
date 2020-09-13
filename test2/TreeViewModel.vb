@@ -1,4 +1,4 @@
-﻿Public Class TreeViewModel : Inherits ViewModel
+﻿Public Class TreeViewModel : Inherits BaseViewModel
 
     Private _Model As TreeModel
     Public Property Model As TreeModel

@@ -2,34 +2,8 @@
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
-Public Class ProjectModel(Of T) : Inherits BaseModel
+Public Class ProjectModel(Of T) : Inherits FileContentsModel
     Private Const SHIFT_JIS = "SHIFT_JIS"
-
-    Protected ReadOnly Property ProjectDirectoryName As String
-        Get
-            Return System.Environment.GetEnvironmentVariable("USERPROFILE") & "\test"
-        End Get
-    End Property
-
-    Private ReadOnly Property _ProjectIniFileName As String
-        Get
-            Return Me.ProjectDirectoryName & "\ProjectInit"
-        End Get
-    End Property
-
-    Public ReadOnly Property FileManagerFileName As String
-        Get
-            Return Me.ProjectDirectoryName & "\FileManager"
-        End Get
-    End Property
-
-    Public ReadOnly Property DefaultSettingFileName As String
-        Get
-            Return Me.ProjectDirectoryName & "\defaultSetting.json"
-        End Get
-    End Property
-
-
 
     Public Function DirectoryCheck(ByVal d As String) As Boolean
         d = _ProjectDirectory(d)
@@ -73,30 +47,6 @@ Public Class ProjectModel(Of T) : Inherits BaseModel
         sw.Close()
         sw.Dispose()
     End Sub
-
-    Protected Function ProjectFile(ByVal f As String) As String
-        If f.Contains(Me.ProjectDirectoryName) Then
-            ProjectFile = f
-        Else
-            ProjectFile = Me.ProjectDirectoryName & "\" & f
-        End If
-    End Function
-
-    Public Function _ProjectDirectory(ByVal d As String) As String
-        _ProjectDirectory = ProjectFile(d)
-    End Function
-
-    'Public ReadOnly Property LoadHandler As Func(Of String, T)
-    '    Get
-    '        Return AddressOf Me.ModelLoad
-    '    End Get
-    'End Property
-
-    'Public ReadOnly Property SaveHandler As Action(Of String, T)
-    '    Get
-    '        Return AddressOf Me.ModelSave
-    '    End Get
-    'End Property
 
 
     Public Overloads Function ModelLoad(ByVal f As String) As T
@@ -184,10 +134,36 @@ Public Class ProjectModel(Of T) : Inherits BaseModel
         End Try
     End Sub
 
+    Public Overloads Sub ModelSave(Of T2)(ByVal f As String,
+                                          ByVal m As T2)
+        Dim txt As String
+        Dim sw As System.IO.StreamWriter
 
-    Public Overloads Sub ModelSave(Of T, T2)(ByVal f As String,
-                                             ByVal m As T,
-                                             ByVal key As String)
+        Try
+            f = ProjectFile(f)
+
+            sw = New System.IO.StreamWriter(
+                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+            )
+
+            txt = JsonConvert.SerializeObject(m, Formatting.Indented)
+
+            'ファイルへ保存
+            sw.Write(txt)
+        Catch ex As Exception
+            '
+        Finally
+            If sw IsNot Nothing Then
+                sw.Close()
+                sw.Dispose()
+            End If
+        End Try
+    End Sub
+
+
+    Public Overloads Sub ModelSave(Of T2)(ByVal f As String,
+                                          ByVal m As T,
+                                          ByVal key As String)
 
         ' T  ... 更新するメンバー
         ' T2 ... 全体のクラス
@@ -237,33 +213,43 @@ Public Class ProjectModel(Of T) : Inherits BaseModel
         End Try
     End Sub
 
+    'Public Overrides Sub MemberCheck()
+    '    ' メンバのデフォルト値を設定したい場合、ここに記述
+    '    If String.IsNullOrEmpty(Me.CurrentModelJson) Then
+    '        Me.CurrentModelJson = Me.DefaultModelJson
+    '    End If
+    '    If String.IsNullOrEmpty(Me.CurrentInitViewModelJson) Then
+    '        Me.CurrentInitViewModelJson = Me.DefaultInitViewModelJson
+    '    End If
+    '    If String.IsNullOrEmpty(Me.CurrentDBExplorerViewModelJson) Then
+    '        Me.CurrentDBExplorerViewModelJson = Me.DefaultDBExplorerViewModelJson
+    '    End If
+    'End Sub
+
 
     Sub New()
-        Dim mkdir As ProjectProxy : mkdir = AddressOf Me.DirectoryEstablish
-        Dim mkfil As ProjectProxy : mkfil = AddressOf Me.FileEstablish
 
-        Try
-            If Not Directory.Exists(Me.ProjectDirectoryName) Then
-                Call mkdir(Me.ProjectDirectoryName)
-                Call mkfil(Me._ProjectIniFileName)
-                Call mkfil(Me.FileManagerFileName)
-                Call mkfil(Me.DefaultSettingFileName)
-            Else
-                If Not File.Exists(Me._ProjectIniFileName) Then
-                    Throw New Exception
-                Else
-                    If Not File.Exists(Me.FileManagerFileName) Then
-                        Call mkfil(Me.FileManagerFileName)
-                    End If
-                    If Not File.Exists(Me.DefaultSettingFileName) Then
-                        Call mkfil(Me.DefaultSettingFileName)
-                    End If
-                End If
-            End If
-        Catch ex As Exception
-            '
-        Finally
-            '
-        End Try
+        'Dim mkdir As ProjectProxy : mkdir = AddressOf Me.DirectoryEstablish
+        'Dim mkfil As ProjectProxy : mkfil = AddressOf Me.FileEstablish
+
+        'Try
+        '    If Not Directory.Exists(Me.ProjectDirectoryName) Then
+        '        Call mkdir(Me.ProjectDirectoryName)
+        '        Call mkfil(Me._ProjectIniFile)
+        '        Call mkfil(Me.FileManagerJson)
+        '    Else
+        '        If Not File.Exists(Me._ProjectIniFile) Then
+        '            Throw New Exception
+        '        Else
+        '            If Not File.Exists(Me.FileManagerJson) Then
+        '                Call mkfil(Me.FileManagerJson)
+        '            End If
+        '        End If
+        '    End If
+        'Catch ex As Exception
+        '    '
+        'Finally
+        '    '
+        'End Try
     End Sub
 End Class

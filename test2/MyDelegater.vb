@@ -10,3 +10,8 @@ Delegate Sub ProjectProxy2(ByVal f As String, ByVal txt As String)
 Delegate Function SaveHandler(Of T)(ByVal f As String, ByVal m As T)
 Public Delegate Function GetDataSetProxy(ByVal scmd As SqlCommand) As DataSet
 Public Delegate Function LoadHandler(Of T)(ByVal f As String) As T
+
+Module MyDelegater
+    Public Sub ViewFlagCheck(ByVal obj As Object)
+    End Sub
+End Module

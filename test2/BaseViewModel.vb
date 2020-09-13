@@ -1,8 +1,9 @@
 ﻿Imports System.ComponentModel
 
-Public MustInherit Class BaseModel
+Public Class BaseViewModel
     Implements INotifyPropertyChanged
 
+    '--- INortify -------------------------------------------------------------------------------------'
     Public Event PropertyChanged As PropertyChangedEventHandler _
         Implements INotifyPropertyChanged.PropertyChanged
 
@@ -11,4 +12,5 @@ Public MustInherit Class BaseModel
             Me, New PropertyChangedEventArgs(PropertyName)
         )
     End Sub
+    '--------------------------------------------------------------------------------------------------'
 End Class

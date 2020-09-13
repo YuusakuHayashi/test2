@@ -2,7 +2,7 @@
 Imports System.Windows.Forms
 
 Public Class ConfigFileVM
-    Inherits ViewModel
+    Inherits BaseViewModel
 
     Public Const PLEASE_INPUT = "Please Input Config File Name"
 

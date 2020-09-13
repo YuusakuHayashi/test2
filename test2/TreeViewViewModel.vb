@@ -3,7 +3,7 @@ Imports System.Collections.ObjectModel
 
 
 Public Class TreeViewViewModel
-    Inherits ViewModel
+    Inherits BaseViewModel
 
     'Private __SqlM As SqlModel
     'Private Property _SqlM As SqlModel
