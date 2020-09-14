@@ -202,32 +202,32 @@
             </DataTemplate>
             <!-- InitView End -->
             
-            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
+            <ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusa\project\test2\test2\AddImage.png"
-                        Height="20"
-                        Width="20" />
+                        Height="15"
+                        Width="15" />
                 </StackPanel>
             </ControlTemplate>
             <ControlTemplate x:Key="DeleteButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusa\project\test2\test2\DeleteImage.png"
-                        Height="20"
-                        Width="20" />
+                        Height="15"
+                        Width="15" />
                 </StackPanel>
             </ControlTemplate>
             <ControlTemplate x:Key="PublishQueryButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png"
-                        Height="20"
-                        Width="20" />
+                        Height="15"
+                        Width="15" />
                 </StackPanel>
-            </ControlTemplate>-->
+            </ControlTemplate>
 
-            <ControlTemplate x:Key="AddButton" TargetType="Button">
+            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"
@@ -250,14 +250,14 @@
                         Height="20"
                         Width="20" />
                 </StackPanel>
-            </ControlTemplate>
+            </ControlTemplate>-->
 
-            <!--<BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
+            <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusa\project\test2\test2\DeleteImage.png"/>
-            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png"/>-->
-            <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"/>
+            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png" />
+            <!--<BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\DeleteImage.png"/>
-            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\PublishQueryImage.png"/>
+            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\PublishQueryImage.png"/>-->
 
 
             <HierarchicalDataTemplate
@@ -435,6 +435,13 @@
                 </StackPanel>
             </DataTemplate>
 
+            <DataTemplate
+                DataType="{x:Type local:ResultViewModel}">
+                <StackPanel>
+                    <TextBlock />
+                </StackPanel>
+            </DataTemplate>
+
             
         </Grid.Resources>
 
@@ -447,9 +454,15 @@
         <ContentControl
             x:Name="MainFlame"
             Content="{Binding ContextModel}"
-            Grid.Row="3" Grid.RowSpan="47"
+            Grid.Row="3" Grid.RowSpan="37"
             Grid.Column="20" Grid.ColumnSpan="60" />
-        
+
+        <ContentControl
+            x:Name="ResultFlame"
+            Content="{Binding ContextModel}"
+            Grid.Row="40" Grid.RowSpan="10"
+            Grid.Column="20" Grid.ColumnSpan="60" />
+
         <Button x:Name="AccessButton"
             Grid.ColumnSpan="6" Grid.Column="20" 
             Content="接続"  HorizontalAlignment="Stretch"

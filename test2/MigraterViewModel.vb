@@ -257,9 +257,14 @@ Public Class MigraterViewModel
             For Each db In Me.Model.Server.DataBases
                 If db.Name = Me.Model.DataBaseName Then
                     For Each dt In db.DataTables
-                        Model.Query = "SELECT COUNT(*) FROM ${dt.Name} " & WherePhrase
+                        dt.IsChecked = False
+                        Model.Query = "SELECT COUNT(*) FROM " & dt.Name & " " & WherePhrase
                         Model.DataBaseAccess(AddressOf Model.GetSqlDataSet)
-                        Debug.Print(Model.QueryResult.Tables(0).Rows(0)(2).ToString)
+                        If Model.AccessResult Then
+                            If Model.QueryResult.Tables(0).Rows(0)(0) > 0 Then
+                                dt.IsChecked = True
+                            End If
+                        End If
                     Next
                 End If
             Next
@@ -303,7 +308,7 @@ Public Class MigraterViewModel
             wpb &= " "
             wpb &= child.FieldName
             wpb &= "="
-            wpb &= child.FieldValue
+            wpb &= "'" & child.FieldValue & "'"
             If child.Conditions IsNot Nothing Then
                 If child.Conditions.Count > 0 Then
                     wpb &= Me._AssembleWherePhraseBody(child.Conditions)

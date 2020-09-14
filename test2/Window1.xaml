@@ -141,8 +141,8 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Label x:Name="Contents" Grid.ColumnSpan="76" HorizontalAlignment="Left" Content="はじめての場合、少し設定が必要です。" Grid.Column="2"  Grid.Row="2" Grid.RowSpan="6" VerticalAlignment="Center" FontSize="36" IsEnabled="False" Cursor="None" FontFamily="Yu Gothic UI Light" />
-        <Label x:Name="ServerLabel" Content="テストテーブル" Grid.Column="2" Grid.ColumnSpan="8" HorizontalAlignment="Right" Grid.Row="9" Grid.RowSpan="3" VerticalAlignment="Bottom" FontSize="12" />
-        <TextBox x:Name="ServerName" Grid.ColumnSpan="40" Grid.Column="11" HorizontalAlignment="Stretch" Grid.Row="9" Grid.RowSpan="3"  Text="TextBox" VerticalAlignment="Bottom" FontSize="12" BorderThickness="0,0,0,1" />
+        <TextBlock>
+            
+        </TextBlock>
     </Grid>
 </Window>
