@@ -13,8 +13,6 @@ Public Class TestWin
         ' この呼び出しはデザイナーで必要です。
         InitializeComponent()
 
-        ' Models
-        Dim m As Model
         Dim fmm As New FileManagerModel
         fmm = fmm.ModelLoad(fmm.FileManagerJson)
         If fmm Is Nothing Then
@@ -30,14 +28,13 @@ Public Class TestWin
 
 
         ' モデルのロード
-        m = New Model
-        m.CurrentModelJson = fmm.CurrentModelJson
-        m = m.ModelLoad(m.CurrentModelJson)
+        Dim m As New Model
+        m = m.ModelLoad(fmm.CurrentModelJson)
         If m Is Nothing Then
             m = New Model
         End If
         Call m.MemberCheck()
-        Call m.ModelSave(fmm.CurrentModelJson, m)
+        Call m.ModelSave(m.CurrentModelJson, m)
 
 
 
@@ -53,8 +50,8 @@ Public Class TestWin
         Dim dbevm As New DBExplorerViewModel(m, vm2)
         Me.ExplorerFlame.DataContext = vm2
 
-        AddHandler vm1.PropertyChanged, AddressOf Me._PageShift
-        AddHandler vm2.PropertyChanged, AddressOf Me._PageShift
+        'AddHandler vm1.PropertyChanged, AddressOf Me._PageShift
+        'AddHandler vm2.PropertyChanged, AddressOf Me._PageShift
     End Sub
 
     Private Sub _PageShift(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)

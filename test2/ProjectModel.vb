@@ -73,14 +73,9 @@ Public Class ProjectModel(Of T) : Inherits FileContentsModel
         End Try
     End Function
 
-
-    'Public Overloads Function ModelLoad(Of T As Class)(ByVal f As String,
-    '                                                   ByVal key As String) As T
-    Public Overloads Function ModelLoad(ByVal f As String,
-                                        ByVal key As String) As T
+    Public Overloads Function ModelLoad(Of T2)(ByVal f As String) As T2
         Dim txt As String
         Dim sr As System.IO.StreamReader
-        Dim obj As Object
 
         ModelLoad = Nothing
 
@@ -91,10 +86,7 @@ Public Class ProjectModel(Of T) : Inherits FileContentsModel
                 f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
 
-            obj = JsonConvert.DeserializeObject(txt)
-
-            ' 一部をロード
-            ModelLoad = obj(key)
+            ModelLoad = JsonConvert.DeserializeObject(Of T2)(txt)
         Catch ex As Exception
             '
         Finally
@@ -104,6 +96,31 @@ Public Class ProjectModel(Of T) : Inherits FileContentsModel
             End If
         End Try
     End Function
+
+    'Public Overloads Function ModelLoad(ByVal f As String) As T
+    '    Dim txt As String
+    '    Dim sr As System.IO.StreamReader
+
+    '    ModelLoad = Nothing
+
+    '    Try
+    '        f = ProjectFile(f)
+
+    '        sr = New System.IO.StreamReader(
+    '            f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+    '        txt = sr.ReadToEnd()
+
+    '        ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
+    '    Catch ex As Exception
+    '        '
+    '    Finally
+    '        If sr IsNot Nothing Then
+    '            sr.Close()
+    '            sr.Dispose()
+    '        End If
+    '    End Try
+    'End Function
+
 
 
     'Public Overloads Sub ModelSave(Of T)(ByVal f As String,

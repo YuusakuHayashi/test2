@@ -94,10 +94,7 @@ Public Class Model
         Me.Query = vbNullString
 
         ' 取得するＤＳは不要
-        Call Me._DataBaseAccess(
-            Function()
-                Return New DataSet
-            End Function)
+        Call Me._DataBaseAccess(AddressOf Me._GetNoDataSet)
     End Sub
 
 
@@ -178,6 +175,15 @@ Public Class Model
     '    GetSqlDataSet = Me._QueryResult
     'End Sub
 
+    Private Function _GetNoDataSet(ByVal scmd As SqlCommand) As DataSet
+        _GetNoDataSet = New DataSet
+    End Function
+
+
+    Public Function GetSqlDataSet(ByVal scmd As SqlCommand) As DataSet
+        GetSqlDataSet = _GetSqlDataSet(scmd)
+    End Function
+
     Private Function _GetSqlDataSet(ByVal scmd As SqlCommand) As DataSet
         Dim sda As System.Data.SqlClient.SqlDataAdapter
         Dim ds As DataSet
@@ -203,6 +209,10 @@ Public Class Model
 
 
 
+    ' データベースアクセス
+    Public Sub DataBaseAccess(ByRef proxy As GetDataSetProxy)
+        Call _DataBaseAccess(proxy)
+    End Sub
 
 
     ' データベースアクセス
@@ -265,63 +275,63 @@ Public Class Model
     End Sub
 
 
-    Public Sub DataBaseAccess(ByRef proxy As GetDataSetProxy)
-        Dim scmd As SqlCommand
-        Dim scon As SqlConnection
-        Dim strn As SqlTransaction
-        Dim ds As DataSet
+    'Public Sub DataBaseAccess(ByRef proxy As GetDataSetProxy)
+    '    Dim scmd As SqlCommand
+    '    Dim scon As SqlConnection
+    '    Dim strn As SqlTransaction
+    '    Dim ds As DataSet
 
-        Me._AccessResult = False
+    '    Me._AccessResult = False
 
-        Try
-            '接続開始
-            scon = New SqlConnection(Me.ConnectionString)
-            scon.Open()
-            strn = scon.BeginTransaction()
+    '    Try
+    '        '接続開始
+    '        scon = New SqlConnection(Me.ConnectionString)
+    '        scon.Open()
+    '        strn = scon.BeginTransaction()
 
-            'コマンド作成
-            scmd = New System.Data.SqlClient.SqlCommand
-            scmd = scon.CreateCommand()
-            scmd.CommandText = Me.Query
-            scmd.CommandType = CommandType.Text
-            scmd.CommandTimeout = 30
-            scmd.Transaction = strn
+    '        'コマンド作成
+    '        scmd = New System.Data.SqlClient.SqlCommand
+    '        scmd = scon.CreateCommand()
+    '        scmd.CommandText = Me.Query
+    '        scmd.CommandType = CommandType.Text
+    '        scmd.CommandTimeout = 30
+    '        scmd.Transaction = strn
 
-            '--- EXECUTE --------------------------------'
-            ds = proxy(scmd)
-            Me._QueryResult = ds
-            '--------------------------------------------'
+    '        '--- EXECUTE --------------------------------'
+    '        ds = proxy(scmd)
+    '        Me._QueryResult = ds
+    '        '--------------------------------------------'
 
-            Me.ServerVersion = scon.ServerVersion
+    '        Me.ServerVersion = scon.ServerVersion
 
-            Me._AccessResult = True
+    '        Me._AccessResult = True
 
-            '成功
-            'Me.AccessFlag = True
-        Catch ex As Exception
-            '失敗
-            'Me.AccessFlag = False
+    '        '成功
+    '        'Me.AccessFlag = True
+    '    Catch ex As Exception
+    '        '失敗
+    '        'Me.AccessFlag = False
 
-            Try
-                If strn IsNot Nothing Then
-                    strn.Rollback()
-                End If
-            Catch ex2 As Exception
-                '
-            End Try
-        Finally
-            If scmd IsNot Nothing Then
-                scmd.Dispose()
-            End If
-            If strn IsNot Nothing Then
-                strn.Dispose()
-            End If
-            If scon IsNot Nothing Then
-                scon.Close()
-                scon.Dispose()
-            End If
-        End Try
-    End Sub
+    '        Try
+    '            If strn IsNot Nothing Then
+    '                strn.Rollback()
+    '            End If
+    '        Catch ex2 As Exception
+    '            '
+    '        End Try
+    '    Finally
+    '        If scmd IsNot Nothing Then
+    '            scmd.Dispose()
+    '        End If
+    '        If strn IsNot Nothing Then
+    '            strn.Dispose()
+    '        End If
+    '        If scon IsNot Nothing Then
+    '            scon.Close()
+    '            scon.Dispose()
+    '        End If
+    '    End Try
+    'End Sub
 
     Public Overrides Sub MemberCheck()
         If Server Is Nothing Then

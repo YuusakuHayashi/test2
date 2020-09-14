@@ -251,7 +251,19 @@ Public Class MigraterViewModel
 
     ' コマンド実行(クエリ発行)
     Private Sub _PublishQueryCommandExecute(ByVal parameter As Object)
-        Call Me._AssembleQuery()
+        Dim WherePhrase As String : WherePhrase = _AssembleWherePhrase()
+
+        If Model.ServerName = Me.Model.Server.Name Then
+            For Each db In Me.Model.Server.DataBases
+                If db.Name = Me.Model.DataBaseName Then
+                    For Each dt In db.DataTables
+                        Model.Query = "SELECT COUNT(*) FROM ${dt.Name} " & WherePhrase
+                        Model.DataBaseAccess(AddressOf Model.GetSqlDataSet)
+                        Debug.Print(Model.QueryResult.Tables(0).Rows(0)(2).ToString)
+                    Next
+                End If
+            Next
+        End If
     End Sub
 
     ' コマンド有効／無効化(ＡＤＤ)
@@ -270,39 +282,40 @@ Public Class MigraterViewModel
     End Function
 
 
-    Private Sub _AssembleQuery()
-        Dim WherePhrase As String
-        WherePhrase = "WHERE "
-        WherePhrase &= _AssembleQueryBody(Me.Conditions)
-        WherePhrase &= ";"
-    End Sub
+    Private Function _AssembleWherePhrase() As String
+        Dim wp As String
+        wp = "WHERE "
+        wp &= _AssembleWherePhraseBody(Me.Conditions)
+        wp &= ";"
+        _AssembleWherePhrase = wp
+    End Function
 
-    Private Function _AssembleQueryBody(ByVal occm As ObservableCollection(Of ConditionModel))
-        Dim phrase As String : phrase = vbNullString
+    Private Function _AssembleWherePhraseBody(ByVal occm As ObservableCollection(Of ConditionModel)) As String
+        Dim wpb As String : wpb = vbNullString
         For Each child In occm
             If child.Logic = "And" Then
-                phrase &= " "
-                phrase &= child.Logic
+                wpb &= " "
+                wpb &= child.Logic
             Else
-                phrase &= child.Logic
-                phrase &= " ("
+                wpb &= child.Logic
+                wpb &= " ("
             End If
-            phrase &= " "
-            phrase &= child.FieldName
-            phrase &= "="
-            phrase &= child.FieldValue
+            wpb &= " "
+            wpb &= child.FieldName
+            wpb &= "="
+            wpb &= child.FieldValue
             If child.Conditions IsNot Nothing Then
                 If child.Conditions.Count > 0 Then
-                    phrase &= Me._AssembleQueryBody(child.Conditions)
+                    wpb &= Me._AssembleWherePhraseBody(child.Conditions)
                 End If
             End If
             If child.Logic = "And" Then
-                phrase &= " "
+                wpb &= " "
             Else
-                phrase &= ") "
+                wpb &= ") "
             End If
         Next
-        _AssembleQueryBody = phrase
+        _AssembleWherePhraseBody = wpb
     End Function
 
 
