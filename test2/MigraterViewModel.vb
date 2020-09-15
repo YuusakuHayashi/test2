@@ -263,6 +263,11 @@ Public Class MigraterViewModel
                         If Model.AccessResult Then
                             If Model.QueryResult.Tables(0).Rows(0)(0) > 0 Then
                                 dt.IsChecked = True
+                                Model.History.AddLine(dt.Name & "は指定条件に一致しました")
+                            End If
+                        Else
+                            If String.IsNullOrEmpty(Model.AccessMessage) Then
+                                Model.History.AddLine(Model.AccessMessage)
                             End If
                         End If
                     Next

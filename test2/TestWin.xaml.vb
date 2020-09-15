@@ -40,6 +40,7 @@ Public Class TestWin
 
         Dim vm1 As New ViewModel
         Dim vm2 As New ViewModel
+        Dim vm3 As New ViewModel
 
         ' 呼び出し順で優先度を変える。下に行くほど優先
         Dim mvm As New MigraterViewModel(m, vm1)
@@ -49,6 +50,9 @@ Public Class TestWin
 
         Dim dbevm As New DBExplorerViewModel(m, vm2)
         Me.ExplorerFlame.DataContext = vm2
+
+        Dim hvm As New HistoryViewModel(m, vm3)
+        Me.HistoryFlame.DataContext = vm3
 
         'AddHandler vm1.PropertyChanged, AddressOf Me._PageShift
         'AddHandler vm2.PropertyChanged, AddressOf Me._PageShift

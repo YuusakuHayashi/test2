@@ -74,7 +74,6 @@ Public MustInherit Class ProjectBaseViewModel(Of T)
     Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
                                          ByRef cccep As CheckCommandEnabledProxy)
-
         Initializing(m, vm)
 
         ' コマンド実行可否の設定
@@ -83,9 +82,17 @@ Public MustInherit Class ProjectBaseViewModel(Of T)
 
     Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
+                                         ByRef ahp As AddHandlerProxy)
+        Initializing(m, vm)
+
+        ' イベントハンドラの登録
+        ahp()
+    End Sub
+
+    Protected Overloads Sub Initializing(ByRef m As Model,
+                                         ByRef vm As ViewModel,
                                          ByRef cccep As CheckCommandEnabledProxy,
                                          ByRef ahp As AddHandlerProxy)
-
         Initializing(m, vm, cccep)
 
         ' イベントハンドラの登録

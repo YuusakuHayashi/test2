@@ -202,7 +202,7 @@
             </DataTemplate>
             <!-- InitView End -->
             
-            <ControlTemplate x:Key="AddButton" TargetType="Button">
+            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusa\project\test2\test2\AddImage.png"
@@ -225,9 +225,9 @@
                         Height="15"
                         Width="15" />
                 </StackPanel>
-            </ControlTemplate>
+            </ControlTemplate>-->
 
-            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
+            <ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"
@@ -250,14 +250,14 @@
                         Height="20"
                         Width="20" />
                 </StackPanel>
-            </ControlTemplate>-->
+            </ControlTemplate>
 
-            <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
+            <!--<BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusa\project\test2\test2\DeleteImage.png"/>
-            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png" />
-            <!--<BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"/>
+            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png" />-->
+            <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\DeleteImage.png"/>
-            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\PublishQueryImage.png"/>-->
+            <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\PublishQueryImage.png"/>
 
 
             <HierarchicalDataTemplate
@@ -414,10 +414,15 @@
                 </StackPanel>
             </DataTemplate>
 
-            <DataTemplate
+            <DataTemplate                
                 DataType="{x:Type local:DBExplorerViewModel}">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
+                <DockPanel
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    LastChildFill="True">
+                    <StackPanel 
+                        DockPanel.Dock="Top"
+                        Orientation="Horizontal">
                         <Button
                             Command="{Binding DBLoadCommand}"
                             Content="Reload"/>
@@ -425,21 +430,29 @@
                             Command="{Binding SaveCommand}"
                             Content="Save"/>
                     </StackPanel>
-                    <TreeView            
+                    <TreeView
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.HorizontalScrollBarVisibility="Visible"
                         VerticalAlignment="Stretch"
-                        BorderThickness="0,0,1,0">
+                        HorizontalAlignment="Stretch"
+                        BorderThickness="0,0,0,0">
                         <TreeViewItem
+                            FontSize="11"
                             Header="{Binding Server.Name}"
                             ItemsSource="{Binding Server.DataBases}" />
                     </TreeView>
-                </StackPanel>
+                </DockPanel>
             </DataTemplate>
 
             <DataTemplate
-                DataType="{x:Type local:ResultViewModel}">
-                <StackPanel>
-                    <TextBlock />
-                </StackPanel>
+                DataType="{x:Type local:HistoryViewModel}">
+                <TextBox
+                    IsReadOnly="True"
+                    VerticalScrollBarVisibility="Visible"
+                    HorizontalScrollBarVisibility="Visible"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding HistoryContents}"/>
             </DataTemplate>
 
             
@@ -458,7 +471,7 @@
             Grid.Column="20" Grid.ColumnSpan="60" />
 
         <ContentControl
-            x:Name="ResultFlame"
+            x:Name="HistoryFlame"
             Content="{Binding ContextModel}"
             Grid.Row="40" Grid.RowSpan="10"
             Grid.Column="20" Grid.ColumnSpan="60" />

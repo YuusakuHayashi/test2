@@ -60,6 +60,19 @@ Public Class Model
         End Set
     End Property
 
+    ' 履歴 ------------------------------------------------------------'
+    Private _History As HistoryModel
+    Public Property History As HistoryModel
+        Get
+            Return Me._History
+        End Get
+        Set(value As HistoryModel)
+            Me._History = value
+            RaisePropertyChanged("History")
+        End Set
+    End Property
+    '------------------------------------------------------------------'
+
 
     Public ServerVersion As String
 
@@ -88,6 +101,18 @@ Public Class Model
     End Property
 
 
+    ' 接続結果メッセージ
+    Private _AccessMessage As String
+    Public Property AccessMessage As String
+        Get
+            Return Me._AccessMessage
+        End Get
+        Set(value As String)
+            Me._AccessMessage = value
+        End Set
+    End Property
+
+
     ' 接続のみ確認する
     Public Sub AccessTest()
         ' クエリ文は不要
@@ -98,29 +123,6 @@ Public Class Model
     End Sub
 
 
-    'Public ReloadDataBase
-    'End Sub
-    ' テーブル一覧の取得
-    'Public Sub GetUserTables()
-    '    Dim proxy As GetDataSetProxy
-    '    Dim dt As DataTable
-
-    '    Me.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
-    '    proxy = AddressOf Me._GetSqlDataSet
-    '    Call Me._DataBaseAccess(proxy)
-
-    '    dt = Me._QueryResult.Tables(0)
-
-    '    Me.Server.DataBases(0).DataTables = Nothing
-    '    Me.Server.DataBases(0).DataTables = New ObservableCollection(Of DataTableModel)
-
-    '    For Each r In dt.Rows
-    '        Me.Server.DataBases(0).DataTables.Add(New DataTableModel With {.Name = r("name")})
-    '    Next
-    'End Sub
-
-
-    ' サーバー全体の更新
 
 
     ' サーバー全体の更新
@@ -196,7 +198,7 @@ Public Class Model
         Catch ex As Exception
 
             _GetSqlDataSet = Nothing
-            Throw New Exception
+            Throw New Exception(ex.Message)
         Finally
             If sda IsNot Nothing Then
                 sda.Dispose()
@@ -223,6 +225,7 @@ Public Class Model
         Dim ds As DataSet
 
         Me._AccessResult = False
+        Me.AccessMessage = vbNullString
 
         Try
             '接続開始
@@ -259,6 +262,8 @@ Public Class Model
                 End If
             Catch ex2 As Exception
                 '
+            Finally
+                Me.AccessMessage = ex.Message
             End Try
         Finally
             If scmd IsNot Nothing Then
@@ -275,65 +280,12 @@ Public Class Model
     End Sub
 
 
-    'Public Sub DataBaseAccess(ByRef proxy As GetDataSetProxy)
-    '    Dim scmd As SqlCommand
-    '    Dim scon As SqlConnection
-    '    Dim strn As SqlTransaction
-    '    Dim ds As DataSet
-
-    '    Me._AccessResult = False
-
-    '    Try
-    '        '接続開始
-    '        scon = New SqlConnection(Me.ConnectionString)
-    '        scon.Open()
-    '        strn = scon.BeginTransaction()
-
-    '        'コマンド作成
-    '        scmd = New System.Data.SqlClient.SqlCommand
-    '        scmd = scon.CreateCommand()
-    '        scmd.CommandText = Me.Query
-    '        scmd.CommandType = CommandType.Text
-    '        scmd.CommandTimeout = 30
-    '        scmd.Transaction = strn
-
-    '        '--- EXECUTE --------------------------------'
-    '        ds = proxy(scmd)
-    '        Me._QueryResult = ds
-    '        '--------------------------------------------'
-
-    '        Me.ServerVersion = scon.ServerVersion
-
-    '        Me._AccessResult = True
-
-    '        '成功
-    '        'Me.AccessFlag = True
-    '    Catch ex As Exception
-    '        '失敗
-    '        'Me.AccessFlag = False
-
-    '        Try
-    '            If strn IsNot Nothing Then
-    '                strn.Rollback()
-    '            End If
-    '        Catch ex2 As Exception
-    '            '
-    '        End Try
-    '    Finally
-    '        If scmd IsNot Nothing Then
-    '            scmd.Dispose()
-    '        End If
-    '        If strn IsNot Nothing Then
-    '            strn.Dispose()
-    '        End If
-    '        If scon IsNot Nothing Then
-    '            scon.Close()
-    '            scon.Dispose()
-    '        End If
-    '    End Try
-    'End Sub
 
     Public Overrides Sub MemberCheck()
+        If History Is Nothing Then
+            History = New HistoryModel
+        End If
+
         If Server Is Nothing Then
             Server = New ServerModel With {
                 .Name = "No Server",
