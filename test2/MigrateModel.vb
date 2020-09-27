@@ -18,7 +18,7 @@
         End Get
         Set(value As String)
             Me._FieldName = value
-            ConditionChangedEventListener.Instance.RaiseMigrateConditionUpdated(Me)
+            MyEventListener.Instance.RaiseMigrateConditionUpdated(Me)
         End Set
     End Property
 
@@ -29,7 +29,7 @@
         End Get
         Set(value As Object)
             Me._FieldValue = value
-            ConditionChangedEventListener.Instance.RaiseMigrateConditionUpdated(Me)
+            MyEventListener.Instance.RaiseMigrateConditionUpdated(Me)
         End Set
     End Property
 
@@ -85,7 +85,7 @@
     ' コマンド実行(ＤＥＬＥＴＥ)
     Private Sub _DeleteCommandExecute(ByVal parameter As Object)
         Me.DeleteRequest = True
-        ConditionChangedEventListener.Instance.RaiseMigrateConditionDeleteRequested(Me)
+        MyEventListener.Instance.RaiseMigrateConditionDeleteRequested(Me)
     End Sub
 
     ' コマンド有効／無効化(ＤＥＬＥＴＥ)

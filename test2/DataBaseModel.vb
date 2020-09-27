@@ -4,6 +4,9 @@ Public Class DataBaseModel
     Inherits BaseModel
     Implements TreeViewInterface
 
+    ' ロード時の挙動の対応
+    ' 本来モデルに書きたくなかったが、妥協。改善案検討
+    Private _LoadState As Integer
 
     Private _Name As String
     Public Property Name As String
@@ -35,9 +38,13 @@ Public Class DataBaseModel
             Return Me._IsChecked
         End Get
         Set(value As Boolean)
+            ' ロードした場合には子要素を更新させない
+            If Me._LoadState > 0 Then
+                Call CheckingChildren(Of DataTableModel)(Me.DataTables, value)
+            End If
+            Me._LoadState += 1
             Me._IsChecked = value
             RaisePropertyChanged("IsChecked")
-            Call CheckingChildren(Of DataTableModel)(Me.DataTables, value)
         End Set
     End Property
 
@@ -49,33 +56,46 @@ Public Class DataBaseModel
         End Get
         Set(value As Boolean)
             Me._IsEnabled = value
+            RaisePropertyChanged("IsEnabled")
         End Set
     End Property
 
 
-    Public Sub MemberCheck()
-        '
-        If String.IsNullOrEmpty(Me.Name) Then
-            Me.Name = vbNullString
-        End If
+    Private _IsExpanded As Boolean
+    Public Property IsExpanded As Boolean
+        Get
+            Return Me._IsExpanded
+        End Get
+        Set(value As Boolean)
+            Me._IsExpanded = value
+            RaisePropertyChanged("IsExpanded")
+        End Set
+    End Property
 
-        '
-        If Me.DataTables Is Nothing Then
-            Me.DataTables = New ObservableCollection(Of DataTableModel)
-        End If
 
-        '
-        If Me.IsChecked = Nothing Then
-            Me.IsChecked = False
-        End If
+    'Public Sub MemberCheck()
+    '    '
+    '    If String.IsNullOrEmpty(Me.Name) Then
+    '        Me.Name = vbNullString
+    '    End If
 
-        '
-        If Me.IsEnabled = Nothing Then
-            Me.IsEnabled = False
-        End If
-    End Sub
+    '    '
+    '    If Me.DataTables Is Nothing Then
+    '        Me.DataTables = New ObservableCollection(Of DataTableModel)
+    '    End If
 
-    Sub New()
-        Call Me.MemberCheck()
-    End Sub
+    '    '
+    '    If Me.IsChecked = Nothing Then
+    '        Me.IsChecked = False
+    '    End If
+
+    '    '
+    '    If Me.IsEnabled = Nothing Then
+    '        Me.IsEnabled = False
+    '    End If
+    'End Sub
+
+    'Sub New()
+    '    Me.IsChecked = vbNull
+    'End Sub
 End Class

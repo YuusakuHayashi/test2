@@ -2,7 +2,7 @@
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
-Public Class ProjectModel(Of T) : Inherits FileContentsModel
+Public MustInherit Class ProjectModel(Of T) : Inherits FileContentsModel
     Private Const SHIFT_JIS = "SHIFT_JIS"
 
     Public Function DirectoryCheck(ByVal d As String) As Boolean
@@ -49,11 +49,36 @@ Public Class ProjectModel(Of T) : Inherits FileContentsModel
     End Sub
 
 
+    Private Property _SaveState As Integer
+    Protected Property SaveState As Integer
+        Get
+            Return _SaveState
+        End Get
+        Set(value As Integer)
+            _SaveState = value
+        End Set
+    End Property
+
+
+    Public Delegate Sub LoadedMethodProxy(ByRef m As T)
+
     Public Overloads Function ModelLoad(ByVal f As String) As T
+        Dim lambda As LoadedMethodProxy
+
+        lambda = Sub()
+                     ' Nothing To Do
+                 End Sub
+
+        ModelLoad = ModelLoad(f, lambda)
+    End Function
+
+
+    Public Overloads Function ModelLoad(ByVal f As String, ByRef lm As LoadedMethodProxy) As T
         Dim txt As String
         Dim sr As System.IO.StreamReader
+        Dim m As T
 
-        ModelLoad = Nothing
+        m = Nothing
 
         Try
             f = ProjectFile(f)
@@ -62,7 +87,10 @@ Public Class ProjectModel(Of T) : Inherits FileContentsModel
                 f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
 
-            ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
+            m = JsonConvert.DeserializeObject(Of T)(txt)
+
+            ' ロード後実行したいメソッド
+            lm(m)
         Catch ex As Exception
             '
         Finally
@@ -70,6 +98,8 @@ Public Class ProjectModel(Of T) : Inherits FileContentsModel
                 sr.Close()
                 sr.Dispose()
             End If
+
+            ModelLoad = m
         End Try
     End Function
 

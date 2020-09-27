@@ -1,4 +1,6 @@
-﻿Public Class InitViewModel
+﻿Imports System.Data
+
+Public Class InitViewModel
     Inherits ProjectBaseViewModel(Of InitViewModel)
 
     ' サーバ名
@@ -161,21 +163,62 @@
 
 
     Private Sub _InitCommandExecute(ByVal parameter As Object)
+        Dim mysql As MySql
         Dim mvm As MigraterViewModel
+
         Me.Model.ServerName = Me.ServerName
         Me.Model.DataBaseName = Me.DataBaseName
         Me.Model.ConnectionString = Me.ConnectionString
         Me.Model.OtherProperty = Me._OtherProperty
 
-        Call Me.Model.AccessTest()
-
-        If Me.Model.AccessResult Then
-            ModelSave(Of Model)(Me.Model.CurrentModelJson, Me.Model)
-            Me.ViewModel.ContextModel = New MigraterViewModel(Me.Model, Me.ViewModel)
+        'Call mysql.AccessTest()
+        mysql = Model.AccessTest()
+        If mysql.ResultFlag Then
+            Me._GetTestTableName()
         End If
 
+        If mysql.ResultFlag Then
+            'mvm = New MigraterViewModel(Me.Model, Me.ViewModel)
+            'ViewModel.ChangeContext(ViewModel.MAIN_VIEW, mvm.GetType.Name, mvm)
+        End If
+
+        mysql = Nothing
     End Sub
 
+    Private Sub _GetTestTableName()
+        Dim mysql As MySql
+        Dim i As Integer
+        Dim pseudonym As String
+        Dim exit_flg As Boolean
+        Dim dt As DataTable
+        Dim list As New List(Of String)
+
+        mysql = Model.GetUserTables()
+        dt = mysql.Result.Tables(0)
+
+        For Each r In dt.Rows
+            list.Add(r("name"))
+        Next
+
+
+        i = 0
+        Do
+            pseudonym = "TEST" & (i).ToString
+            exit_flg = False
+            For Each l In list
+                If l = pseudonym Then
+                    exit_flg = False
+                    Exit For
+                End If
+            Next
+
+            If exit_flg Then
+                Exit Do
+            End If
+        Loop Until 1 = 1
+
+        Model.TestTableName = pseudonym
+    End Sub
 
     Private Function _InitCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._InitEnableFlag
@@ -189,19 +232,7 @@
     End Sub
 
     Protected Overrides Sub ContextModelCheck()
-        Dim b As Boolean : b = False
-        If String.IsNullOrEmpty(Me.ServerName) Then
-            b = True
-        End If
-        If String.IsNullOrEmpty(Me.DataBaseName) Then
-            b = True
-        End If
-        If String.IsNullOrEmpty(Me._OtherProperty) Then
-            b = True
-        End If
-        If b Then
-            ViewModel.ContextModel = Me
-        End If
+        ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
     End Sub
 
     Sub New(ByRef m As Model,

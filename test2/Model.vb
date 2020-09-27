@@ -5,6 +5,11 @@ Imports System.Collections.ObjectModel
 Public Class Model
     Inherits ProjectBaseModel(Of Model)
 
+    ' このクラスに登録するプロパティに
+    ' ＶｉｅｗＭｏｄｅｌプロパティを持つオブジェクトを登録してはいけない
+    ' （セーブ対象のクラスのため）
+
+
     ' このモデルを生成したＪＳＯＮファイル
     Private _SourceFile As String
     Public Property SourceFile As String
@@ -36,6 +41,16 @@ Public Class Model
         End Set
     End Property
 
+    Private _TestTableName As String
+    Public Property TestTableName As String
+        Get
+            Return Me._TestTableName
+        End Get
+        Set(value As String)
+            Me._TestTableName = value
+        End Set
+    End Property
+
     Private _ConnectionString As String
     Public Property ConnectionString As String
         Get
@@ -60,6 +75,17 @@ Public Class Model
         End Set
     End Property
 
+    Private _MenuFolder As MenuFolderModel
+    Public Property MenuFolder As MenuFolderModel
+        Get
+            Return Me._MenuFolder
+        End Get
+        Set(value As MenuFolderModel)
+            Me._MenuFolder = value
+            RaisePropertyChanged("MenuFolder")
+        End Set
+    End Property
+
     ' 履歴 ------------------------------------------------------------'
     Private _History As HistoryModel
     Public Property History As HistoryModel
@@ -74,88 +100,111 @@ Public Class Model
     '------------------------------------------------------------------'
 
 
-    Public ServerVersion As String
+    'Public ServerVersion As String
 
 
     ' 接続関連 --------------------------------------------------------'
+    'Public Query As String
 
     ' クエリ
-    Public Query As String
+    'Public Query As String
 
 
-    ' クエリ結果
-    Private _QueryResult As DataSet
-    Public ReadOnly Property QueryResult As DataSet
-        Get
-            Return _QueryResult
-        End Get
-    End Property
+    '' クエリ結果
+    'Private _QueryResult As DataSet
+    'Public ReadOnly Property QueryResult As DataSet
+    '    Get
+    '        Return _QueryResult
+    '    End Get
+    'End Property
 
 
-    ' 接続結果
-    Private _AccessResult As Boolean
-    Public ReadOnly Property AccessResult As Boolean
-        Get
-            Return Me._AccessResult
-        End Get
-    End Property
+    '' 接続結果
+    'Private _AccessResult As Boolean
+    'Public ReadOnly Property AccessResult As Boolean
+    '    Get
+    '        Return Me._AccessResult
+    '    End Get
+    'End Property
 
 
-    ' 接続結果メッセージ
-    Private _AccessMessage As String
-    Public Property AccessMessage As String
-        Get
-            Return Me._AccessMessage
-        End Get
-        Set(value As String)
-            Me._AccessMessage = value
-        End Set
-    End Property
+    '' 接続結果メッセージ
+    'Private _AccessMessage As String
+    'Public Property AccessMessage As String
+    '    Get
+    '        Return Me._AccessMessage
+    '    End Get
+    '    Set(value As String)
+    '        Me._AccessMessage = value
+    '    End Set
+    'End Property
 
 
     ' 接続のみ確認する
-    Public Sub AccessTest()
-        ' クエリ文は不要
-        Me.Query = vbNullString
+    'Public Sub AccessTest()
+    '    ' クエリ文は不要
+    '    Me.Query = vbNullString
 
-        ' 取得するＤＳは不要
-        Call Me._DataBaseAccess(AddressOf Me._GetNoDataSet)
-    End Sub
+    '    ' 取得するＤＳは不要
+    '    Call Me._DataBaseAccess(AddressOf Me._GetNoDataSet)
+    'End Sub
 
 
+    ' ＳＱＬ関係の汎用ロジック ------------------------------------------------------------------------
+    Public Function AccessTest() As MySql
+        Dim mysql As New MySql
 
+        mysql.ConnectionString = Me.ConnectionString
+
+        mysql.AccessTest()
+
+        AccessTest = mysql
+    End Function
+
+    Public Function GetUserTables() As MySql
+        Dim mysql As New MySql
+
+        mysql.ConnectionString = Me.ConnectionString
+        mysql.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
+        mysql.Execute(AddressOf mysql.GetSqlData)
+
+        GetUserTables = mysql
+    End Function
 
     ' サーバー全体の更新
     Public Sub ReLoadServer()
         Dim sm As ServerModel
-        Dim proxy As GetDataSetProxy
         Dim dt As DataTable
         Dim dbs As ObservableCollection(Of DataBaseModel)
         Dim dts As ObservableCollection(Of DataTableModel)
+        Dim mysql As MySql
 
-        Me.Query = "SELECT * FROM SYS.OBJECTS WHERE TYPE = 'U'"
-        proxy = AddressOf Me._GetSqlDataSet
-        Call Me._DataBaseAccess(proxy)
+        mysql = GetUserTables()
 
-        dt = Me._QueryResult.Tables(0)
+        dt = mysql.Result.Tables(0)
 
         dts = New ObservableCollection(Of DataTableModel)
         For Each r In dt.Rows
             dts.Add(New DataTableModel With {
-                .Name = r("name")
+                .Name = r("name"),
+                .IsEnabled = True,
+                .IsChecked = True
             })
         Next
 
         dbs = New ObservableCollection(Of DataBaseModel)
         dbs.Add(New DataBaseModel With {
             .Name = Me.DataBaseName,
-            .DataTables = dts
+            .DataTables = dts,
+            .IsEnabled = True,
+            .IsChecked = True
         })
 
         sm = New ServerModel With {
             .Name = Me.ServerName,
             .DataBases = dbs,
-            .IsChecked = False
+            .IsEnabled = True,
+            .IsChecked = True
         }
 
         Me.Server = sm
@@ -167,130 +216,40 @@ Public Class Model
     End Sub
 
 
-    ' データセット取得
-    'Public Function GetSqlDataSet() As DataSet
-    '    Dim proxy As GetDataSetProxy
 
-    '    proxy = AddressOf Me._GetSqlDataSet
-    '    Call Me._DataBaseAccess(proxy)
+    Public Overloads Function ModelLoad(ByVal f As String) As Model
+        Dim proxy As LoadedMethodProxy
 
-    '    GetSqlDataSet = Me._QueryResult
-    'End Sub
+        proxy = Sub(ByRef m As Model)
+                    If m.History Is Nothing Then
+                        m.History = New HistoryModel
+                    End If
+                    m.History.AddLine(f & "が読み込まれました。")
+                End Sub
 
-    Private Function _GetNoDataSet(ByVal scmd As SqlCommand) As DataSet
-        _GetNoDataSet = New DataSet
+        ModelLoad = ModelLoad(f, proxy)
     End Function
 
-
-    Public Function GetSqlDataSet(ByVal scmd As SqlCommand) As DataSet
-        GetSqlDataSet = _GetSqlDataSet(scmd)
-    End Function
-
-    Private Function _GetSqlDataSet(ByVal scmd As SqlCommand) As DataSet
-        Dim sda As System.Data.SqlClient.SqlDataAdapter
-        Dim ds As DataSet
-        Try
-            sda = New System.Data.SqlClient.SqlDataAdapter(scmd)
-            ds = New System.Data.DataSet
-            sda.Fill(ds)
-
-            _GetSqlDataSet = ds
-        Catch ex As Exception
-
-            _GetSqlDataSet = Nothing
-            Throw New Exception(ex.Message)
-        Finally
-            If sda IsNot Nothing Then
-                sda.Dispose()
-            End If
-            If ds IsNot Nothing Then
-                ds.Dispose()
-            End If
-        End Try
-    End Function
-
-
-
-    ' データベースアクセス
-    Public Sub DataBaseAccess(ByRef proxy As GetDataSetProxy)
-        Call _DataBaseAccess(proxy)
-    End Sub
-
-
-    ' データベースアクセス
-    Private Sub _DataBaseAccess(ByRef proxy As GetDataSetProxy)
-        Dim scmd As SqlCommand
-        Dim scon As SqlConnection
-        Dim strn As SqlTransaction
-        Dim ds As DataSet
-
-        Me._AccessResult = False
-        Me.AccessMessage = vbNullString
-
-        Try
-            '接続開始
-            scon = New SqlConnection(Me.ConnectionString)
-            scon.Open()
-            strn = scon.BeginTransaction()
-
-            'コマンド作成
-            scmd = New System.Data.SqlClient.SqlCommand
-            scmd = scon.CreateCommand()
-            scmd.CommandText = Me.Query
-            scmd.CommandType = CommandType.Text
-            scmd.CommandTimeout = 30
-            scmd.Transaction = strn
-
-            '--- EXECUTE --------------------------------'
-            ds = proxy(scmd)
-            Me._QueryResult = ds
-            '--------------------------------------------'
-
-            Me.ServerVersion = scon.ServerVersion
-
-            Me._AccessResult = True
-
-            '成功
-            'Me.AccessFlag = True
-        Catch ex As Exception
-            '失敗
-            'Me.AccessFlag = False
-
-            Try
-                If strn IsNot Nothing Then
-                    strn.Rollback()
-                End If
-            Catch ex2 As Exception
-                '
-            Finally
-                Me.AccessMessage = ex.Message
-            End Try
-        Finally
-            If scmd IsNot Nothing Then
-                scmd.Dispose()
-            End If
-            If strn IsNot Nothing Then
-                strn.Dispose()
-            End If
-            If scon IsNot Nothing Then
-                scon.Close()
-                scon.Dispose()
-            End If
-        End Try
-    End Sub
-
-
-
+    
+    ' ウィンドウイニシャライズ時にメンバのチェックを行う
+    ' セット後、メンバチェックを行いたいオブジェクトは、継承したMemberCheckメソッドを
+    ' ここで呼び出す
     Public Overrides Sub MemberCheck()
         If History Is Nothing Then
             History = New HistoryModel
         End If
+        History.CheckLineCounts()
+
+        If MenuFolder Is Nothing Then
+            MenuFolder = New MenuFolderModel
+        End If
+        MenuFolder.MemberCheck()
 
         If Server Is Nothing Then
             Server = New ServerModel With {
                 .Name = "No Server",
-                .IsEnabled = False,
-                .IsChecked = False,
+                .IsEnabled = True,
+                .IsChecked = True,
                 .DataBases = New ObservableCollection(Of DataBaseModel) From {
                     New DataBaseModel With {
                         .Name = "No DataBase",

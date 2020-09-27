@@ -22,6 +22,7 @@
         Set(value As Boolean)
             Me._IsChecked = value
             RaisePropertyChanged("IsChecked")
+            MyEventListener.Instance.RaiseDataTableCheckChanged()
         End Set
     End Property
 
@@ -33,27 +34,28 @@
         End Get
         Set(value As Boolean)
             Me._IsEnabled = value
+            RaisePropertyChanged("IsEnabled")
         End Set
     End Property
 
-    Public Sub MemberCheck()
-        '
-        If String.IsNullOrEmpty(Me.Name) Then
-            Me.Name = vbNullString
-        End If
+    'Public Sub MemberCheck()
+    '    '
+    '    If String.IsNullOrEmpty(Me.Name) Then
+    '        Me.Name = vbNullString
+    '    End If
 
-        '
-        If Me.IsChecked = Nothing Then
-            Me.IsChecked = False
-        End If
+    '    '
+    '    If Me.IsChecked = Nothing Then
+    '        Me.IsChecked = False
+    '    End If
 
-        '
-        If Me.IsEnabled = Nothing Then
-            Me.IsEnabled = False
-        End If
-    End Sub
+    '    '
+    '    If Me.IsEnabled = Nothing Then
+    '        Me.IsEnabled = False
+    '    End If
+    'End Sub
 
-    Sub New()
-        Call Me.MemberCheck()
-    End Sub
+    'Sub New()
+    '    Call Me.MemberCheck()
+    'End Sub
 End Class

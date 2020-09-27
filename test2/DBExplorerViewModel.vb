@@ -16,7 +16,19 @@ Public Class DBExplorerViewModel
         End Set
     End Property
 
+    ' モデル
+    Private _MenuFolder As MenuFolderModel
+    Public Property MenuFolder As MenuFolderModel
+        Get
+            Return Me._MenuFolder
+        End Get
+        Set(value As MenuFolderModel)
+            Me._MenuFolder = value
+            RaisePropertyChanged("MenuFolder")
+        End Set
+    End Property
 
+'--- リロード ----------------------------------------------------------------------'
     ' コマンドプロパティ(リロード)
     Private _DBLoadCommand As ICommand
     Public ReadOnly Property DBLoadCommand As ICommand
@@ -33,7 +45,44 @@ Public Class DBExplorerViewModel
         End Get
     End Property
 
+    ' コマンド有効／無効判定(リロード)
+    Private Sub _CheckDBReLoadCommandEnabled()
+        Dim b As Boolean
+        If String.IsNullOrEmpty(Me.Model.ConnectionString) Then
+            b = False
+        Else
+            b = True
+        End If
+        Me._DBLoadEnableFlag = b
+    End Sub
 
+    ' コマンド有効／無効フラグ(リロード)
+    Private __DBLoadEnableFlag As Boolean
+    Public Property _DBLoadEnableFlag As Boolean
+        Get
+            Return Me.__DBLoadEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__DBLoadEnableFlag = value
+            RaisePropertyChanged("DBLoadEnableFlag")
+            CType(DBLoadCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    ' コマンド実行(リロード)
+    Private Sub _DBLoadCommandExecute(ByVal parameter As Object)
+        Call Me.Model.ReLoadServer()
+        Me.Server = Me.Model.Server
+    End Sub
+
+    ' コマンド有効／無効化(リロード)
+    Private Function _DBLoadCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._DBLoadEnableFlag
+    End Function
+'-----------------------------------------------------------------------------------'
+
+
+'--- セーブ ------------------------------------------------------------------------'
     ' コマンドプロパティ(セーブ)
     Private _SaveCommand As ICommand
     Public ReadOnly Property SaveCommand As ICommand
@@ -50,41 +99,12 @@ Public Class DBExplorerViewModel
         End Get
     End Property
 
-    ' コマンド有効／無効判定(リロード)
-    Private Sub _CheckDBReLoadCommandEnabled()
-        Dim b As Boolean
-        If String.IsNullOrEmpty(Me.Model.ConnectionString) Then
-            b = False
-        Else
-            b = True
-        End If
-        Me._DBLoadEnableFlag = b
-    End Sub
-
     ' コマンド有効／無効判定(セーブ)
     Private Sub _CheckSaveCommandEnabled()
         Dim b As Boolean
-        b = False
-        If Me.Server IsNot Nothing Then
-            If Not String.IsNullOrEmpty(Me.Model.SourceFile) Then
-                b = True
-            End If
-        End If
+        b = True
         Me._SaveEnableFlag = b
     End Sub
-
-    ' コマンド有効／無効フラグ(リロード)
-    Private __DBLoadEnableFlag As Boolean
-    Public Property _DBLoadEnableFlag As Boolean
-        Get
-            Return Me.__DBLoadEnableFlag
-        End Get
-        Set(value As Boolean)
-            Me.__DBLoadEnableFlag = value
-            RaisePropertyChanged("DBLoadEnableFlag")
-            CType(DBLoadCommand, DelegateCommand).RaiseCanExecuteChanged()
-        End Set
-    End Property
 
     ' コマンド有効／無効のフラグ(セーブ)
     Private __SaveEnableFlag As Boolean
@@ -99,40 +119,35 @@ Public Class DBExplorerViewModel
         End Set
     End Property
 
-    ' コマンド実行(リロード)
-    Private Sub _DBLoadCommandExecute(ByVal parameter As Object)
-        Call Me.Model.ReLoadServer()
-        Me.Server = Me.Model.Server
-    End Sub
-
     ' コマンド実行(セーブ)
     Private Sub _SaveCommandExecute(ByVal parameter As Object)
-        'Dim pm As New ProjectModel
-        'Dim proxy As ModelSaveProxy1(Of Model)
-
-        'proxy = AddressOf pm.ModelSave(Of Model)
-
-        'Call proxy(Me.Model.SourceFile, Me.Model)
+        Call ModelSave(Of Model)(Model.CurrentModelJson, Me.Model)
     End Sub
-
-    ' コマンド有効／無効化(リロード)
-    Private Function _DBLoadCommandCanExecute(ByVal parameter As Object) As Boolean
-        Return Me._DBLoadEnableFlag
-    End Function
 
     ' コマンド有効／無効化(セーブ)
     Private Function _SaveCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._SaveEnableFlag
     End Function
+'-----------------------------------------------------------------------------------'
 
+
+    ' このメソッドはInitializing実行時に実行されます
     Protected Overrides Sub MyInitializing()
         Me.Server = Model.Server
+
+        ' イベント購読メソッドの呼び出し方法については現状これで妥協している
+        ' 他の方法も検討中
+        Model.MenuFolder.MenuChangeRequestedAddHandler()
+        Me.MenuFolder = Model.MenuFolder
     End Sub
+
 
     Protected Overrides Sub ContextModelCheck()
-        ViewModel.ContextModel = Me
+        ViewModel.SetContext(ViewModel.EXPLORER_VIEW, Me.GetType.Name, Me)
     End Sub
 
+
+    ' Initializingメソッド
     Sub New(ByRef m As Model,
             ByRef vm As ViewModel)
         Dim ccep(1) As CheckCommandEnabledProxy

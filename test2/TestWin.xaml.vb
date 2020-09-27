@@ -13,109 +13,75 @@ Public Class TestWin
         ' この呼び出しはデザイナーで必要です。
         InitializeComponent()
 
+        ' 実装メモ
+        '   - FileContentsModel
+        '     |   + Ｐｒｏｊｅｃｔの固定ファイル名を取り扱う
+        '     |
+        '     +-- ProjectModel(Of T)
+        '         |   + Ｐｒｏｊｅｃｔのセーブ＆ロード等
+        '         |
+        '         +-- FileManagerModel(Of FileManagerModel)
+        '         |       + 可変ファイル名の取り扱い
+        '         |
+        '         +-- ProjectBaseModel(Of T)
+        '         |       + ＩＮｏｒｔｉｆｙ実装
+        '         |
+        '         +-- ProjectBaseViewModel(Of T)
+        '             |   + ＩＮｏｒｔｉｆｙ実装
+        '             |   + Ｍｏｄｅｌクラスプロパティ実装
+        '             |   + ＶｉｅｗＭｏｄｅｌクラスプロパティ実装
+        '             |
+        '             +-- 各種ＶｉｅｗＭｏｄｅｌ
+        '
+        '   - BaseModel
+        '         + ＩＮｏｒｔｉｆｙ実装
+        '
+        '   - BaseViewModel
+        '         + ＩＮｏｒｔｉｆｙ実装
+        '
+        '   - Ｍｏｄｅｌ、ＶｉｅｗＭｏｄｅｌの実装は親クラスから継承すること。
+        '   - コマンド（ＩＣＯＭＭＡＮＤ）のプロパティは
+        '     ＶｉｅｗＭｏｄｅｌを実装するクラスのみ実装すること。
+        '     つまり、Ｍｏｄｅｌにはコマンドを実装しないこと
+        '     また、ＶｉｅｗＭｏｄｅｌはコマンドを実装するため、
+
+        ' 可変ファイル名のロード
         Dim fmm As New FileManagerModel
         fmm = fmm.ModelLoad(fmm.FileManagerJson)
         If fmm Is Nothing Then
             fmm = New FileManagerModel
         End If
-        Call fmm.MemberCheck()
-        Call fmm.ModelSave(fmm.FileManagerJson, fmm)
-        ' 1. 初期状態の時
-        '    各クラスのデフォルト設定ファイルパスをファイルマネージャに登録する
-        '    そのファイルにNewしたオブジェクトをセーブする
-        ' 2. 次回以降
-        '    ファイルマネージャに登録されたファイルからオブジェクトをロードする
+        fmm.MemberCheck()
+        fmm.ModelSave(fmm.FileManagerJson, fmm)
 
 
         ' モデルのロード
         Dim m As New Model
+        ' fmm.ModelLoadと違い、こちらはオーバロードしている
         m = m.ModelLoad(fmm.CurrentModelJson)
         If m Is Nothing Then
             m = New Model
         End If
-        Call m.MemberCheck()
-        Call m.ModelSave(m.CurrentModelJson, m)
+        m.MemberCheck()
+        'm.ModelSave(m.CurrentModelJson, m)
 
 
 
-        Dim vm1 As New ViewModel
-        Dim vm2 As New ViewModel
-        Dim vm3 As New ViewModel
+        Dim vm As New ViewModel
 
-        ' 呼び出し順で優先度を変える。下に行くほど優先
-        Dim mvm As New MigraterViewModel(m, vm1)
-        Dim ivm As New InitViewModel(m, vm1)
+        Me.DataContext = vm
 
-        Me.MainFlame.DataContext = vm1
+        ' 呼び出し順で優先度を変える。上に行くほど優先
+        Dim ivm As New InitViewModel(m, vm)
+        Dim mvm As New MigraterViewModel(m, vm)
+        Me.MainFlame.DataContext = vm
 
-        Dim dbevm As New DBExplorerViewModel(m, vm2)
-        Me.ExplorerFlame.DataContext = vm2
+        Dim dbevm As New DBExplorerViewModel(m, vm)
+        Me.ExplorerFlame.DataContext = vm
 
-        Dim hvm As New HistoryViewModel(m, vm3)
-        Me.HistoryFlame.DataContext = vm3
+        Dim hvm As New HistoryViewModel(m, vm)
+        Me.HistoryFlame.DataContext = vm
 
-        'AddHandler vm1.PropertyChanged, AddressOf Me._PageShift
-        'AddHandler vm2.PropertyChanged, AddressOf Me._PageShift
-    End Sub
-
-    Private Sub _PageShift(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
-
-        Dim m As Model
-        Dim vm As ViewModel
-        Dim mvm As MigraterViewModel
-        Dim ivm As InitViewModel
-
-        Me.MainFlame.DataContext = Nothing
-
-        If Not e.PropertyName = "ContextDistination" Then
-            Exit Sub
-        End If
-
-        Select Case sender.GetType.Name
-            Case "InitViewModel"
-                ivm = CType(sender, InitViewModel)
-                m = ivm.Model
-                vm = ivm.ViewModel
-            Case "MigraterViewModel"
-                mvm = CType(sender, MigraterViewModel)
-                m = mvm.Model
-                vm = mvm.ViewModel
-        End Select
-
-        'Select Case sender.GetType.Name
-        '    Case "InitViewModel"
-        'End Select
-        'Dim m As Model
-        'Dim pm As New ProjectModel
-        'Dim saver As ModelSaveProxy1(Of Model)
-
-        'saver = AddressOf pm.ModelSave(Of Model)
-
-        'If e.PropertyName = "ChangePageStrings" Then
-        '    m = CType(sender, Model)
-        '    saver(m.SourceFile, m)
-        'End If
-
-        'Select Case sender.GetType.Name
-        '    Case "InitViewModel"
-        '        If e.PropertyName = "InitFlag" Then
-        '            ivm = CType(sender, InitViewModel)
-        '            If ivm.InitFlag Then
-        '                mvm = New MenuViewModel
-        '                mv = New MenuView(mvm)
-        '                Me._mnavi.Navigate(mv)
-        '            End If
-        '        End If
-        '        'Case "MenuViewModel"
-        '        '    If e.PropertyName = "MenuFlag" Then
-        '        '        mvm = CType(sender, MenuViewModel)
-        '        '        If mvm.MenuFlag Then
-        '        '            bmv = New BatchMenuView
-        '        '            Me._mnavi.Navigate(bmv)
-        '        '        End If
-        '        '    End If
-        '    Case Else
-        '        Exit Sub
-        'End Select
+        m.MenuFolder.MemberCheck(vm)
     End Sub
 End Class

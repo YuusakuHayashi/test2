@@ -29,7 +29,7 @@ Public Class HistoryViewModel
     Protected Overrides Sub ContextModelCheck()
         Dim b As Boolean : b = True
         If b Then
-            ViewModel.ContextModel = Me
+            ViewModel.SetContext(ViewModel.HISTORY_VIEW, Me.GetType.Name, Me)
         End If
     End Sub
 
@@ -38,17 +38,72 @@ Public Class HistoryViewModel
     End Sub
 
 
+    ' コマンドプロパティ（クリア）
+    Private _ClearCommand As ICommand
+    Public ReadOnly Property ClearCommand As ICommand
+        Get
+            If Me._ClearCommand Is Nothing Then
+                Me._ClearCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _ClearCommandExecute,
+                    .CanExecuteHandler = AddressOf _ClearCommandCanExecute
+                }
+                Return Me._ClearCommand
+            Else
+                Return Me._ClearCommand
+            End If
+        End Get
+    End Property
+
+
+    'コマンド実行可否フラグチェック（クリア）
+    Private Sub _CheckClearCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._ClearEnableFlag = b
+    End Sub
+
+
+    'コマンド実行可否のフラグ（クリア）
+    Private __ClearEnableFlag As Boolean
+    Public Property _ClearEnableFlag As Boolean
+        Get
+            Return Me.__ClearEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__ClearEnableFlag = value
+            RaisePropertyChanged("_ClearEnableFlag")
+            CType(ClearCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+
+    ' コマンド実行（クリア）
+    Private Sub _ClearCommandExecute(ByVal parameter As Object)
+        Model.History.ClearContents()
+    End Sub
+
+
+    ' コマンド実行可否（クリア）
+    Private Function _ClearCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._ClearEnableFlag
+    End Function
+
+
     Sub New(ByRef m As Model,
             ByRef vm As ViewModel)
+
+        Dim ccep(0) As CheckCommandEnabledProxy
+        Dim ccep2 As CheckCommandEnabledProxy
 
         Dim ahp(0) As AddHandlerProxy
         Dim ahp2 As AddHandlerProxy
 
-        ahp(0) = AddressOf Me._AddHandlerHistoryChanged
+        ccep(0) = AddressOf Me._CheckClearCommandEnabled
+        ccep2 = [Delegate].Combine(ccep)
 
+        ahp(0) = AddressOf Me._AddHandlerHistoryChanged
         ahp2 = [Delegate].Combine(ahp)
 
         ' ビューモデルの設定
-        Initializing(m, vm, ahp2)
+        Initializing(m, vm, ccep2, ahp2)
     End Sub
 End Class

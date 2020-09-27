@@ -6,9 +6,12 @@ Public MustInherit Class BaseModel
     Public Event PropertyChanged As PropertyChangedEventHandler _
         Implements INotifyPropertyChanged.PropertyChanged
 
-    Protected Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
+    Public Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
         RaiseEvent PropertyChanged(
             Me, New PropertyChangedEventArgs(PropertyName)
         )
+    End Sub
+
+    Public Overridable Sub MemberCheck()
     End Sub
 End Class
