@@ -6,11 +6,6 @@
         xmlns:local="clr-namespace:test2"
         mc:Ignorable="d"
         Title="MainWin" Height="500" Width="800">
-    <Window.Resources>
-        <DataTemplate DataType="{x:Type local:InitViewModel}">
-            <Button></Button>
-        </DataTemplate>
-    </Window.Resources>
     <Grid Background="White" OpacityMask="Black">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>

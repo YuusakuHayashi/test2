@@ -192,6 +192,51 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.Resources>
+            
+            <DataTemplate
+                DataType="{x:Type local:UserDirectoryViewModel}">
+                <DockPanel>
+                    <ListBox
+                        DockPanel.Dock="Left"
+                        ItemsSource="{Binding CurrentProjects}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                        <TextBlock 
+                            Text="ディレクトリ名" />
+                        <TextBox 
+                            Text="{Binding UserDirectoryName}" />
+                        <Button 
+                            Content="..."
+                            Command="{Binding InputBoxCommand}"/>
+                    </StackPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <TextBlock Text="プロジェクト名" />
+                        <TextBox Text="{Binding ProjectName}" />
+                    </StackPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <TextBlock Text="{Binding ProjectDirectoryName}" />
+                    </StackPanel>
+                    <StackPanel
+                        DockPanel.Dock="Right">
+                        <Button
+                            Content="作成"
+                            Command="{Binding ProjectAddCommand}"/>
+                    </StackPanel>
+                </DockPanel>
+            </DataTemplate>
+                
+            
             <!-- InitView Bgn -->
             <DataTemplate
                 DataType="{x:Type local:InitViewModel}">

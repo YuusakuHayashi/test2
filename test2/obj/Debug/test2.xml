@@ -64,36 +64,6 @@ BatchMenuView
 InitializeComponent
 </summary>
 </member>
-<member name="T:test2.MigraterView">
-<summary>
-MigraterView
-</summary>
-</member>
-<member name="M:test2.MigraterView.InitializeComponent">
-<summary>
-InitializeComponent
-</summary>
-</member>
-<member name="T:test2.DBExplorerView">
-<summary>
-DBExplorerView
-</summary>
-</member>
-<member name="M:test2.DBExplorerView.InitializeComponent">
-<summary>
-InitializeComponent
-</summary>
-</member>
-<member name="T:test2.InitView">
-<summary>
-InitView
-</summary>
-</member>
-<member name="M:test2.InitView.InitializeComponent">
-<summary>
-InitializeComponent
-</summary>
-</member>
 <member name="T:test2.MainWin">
 <summary>
 MainWin
@@ -147,6 +117,36 @@ InitializeComponent
 <member name="M:test2.Application.Main">
 <summary>
 Application Entry Point.
+</summary>
+</member>
+<member name="T:test2.DBExplorerView">
+<summary>
+DBExplorerView
+</summary>
+</member>
+<member name="M:test2.DBExplorerView.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
+<member name="T:test2.MigraterView">
+<summary>
+MigraterView
+</summary>
+</member>
+<member name="M:test2.MigraterView.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
+<member name="T:test2.InitView">
+<summary>
+InitView
+</summary>
+</member>
+<member name="M:test2.InitView.InitializeComponent">
+<summary>
+InitializeComponent
 </summary>
 </member>
 <member name="T:test2.MainWindow">

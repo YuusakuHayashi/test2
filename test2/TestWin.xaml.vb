@@ -14,24 +14,19 @@ Public Class TestWin
         InitializeComponent()
 
         ' 実装メモ
-        '   - FileContentsModel
-        '     |   + Ｐｒｏｊｅｃｔの固定ファイル名を取り扱う
+        '   - ProjectModel2
         '     |
-        '     +-- ProjectModel(Of T)
-        '         |   + Ｐｒｏｊｅｃｔのセーブ＆ロード等
+        '     +-- BaseViewModel2 ... Inortify 実装
         '         |
-        '         +-- FileManagerModel(Of FileManagerModel)
-        '         |       + 可変ファイル名の取り扱い
+        '         +-- Each ViewModel
+        '
+        '   - AppDirectoryModel
+        '     |
+        '     +-- Project
         '         |
-        '         +-- ProjectBaseModel(Of T)
-        '         |       + ＩＮｏｒｔｉｆｙ実装
-        '         |
-        '         +-- ProjectBaseViewModel(Of T)
-        '             |   + ＩＮｏｒｔｉｆｙ実装
-        '             |   + Ｍｏｄｅｌクラスプロパティ実装
-        '             |   + ＶｉｅｗＭｏｄｅｌクラスプロパティ実装
+        '         +-- BaseViewModel2
         '             |
-        '             +-- 各種ＶｉｅｗＭｏｄｅｌ
+        '             +-- Each ViewModel
         '
         '   - BaseModel
         '         + ＩＮｏｒｔｉｆｙ実装
@@ -45,43 +40,52 @@ Public Class TestWin
         '     つまり、Ｍｏｄｅｌにはコマンドを実装しないこと
         '     また、ＶｉｅｗＭｏｄｅｌはコマンドを実装するため、
 
-        ' 可変ファイル名のロード
-        Dim fmm As New FileManagerModel
-        fmm = fmm.ModelLoad(fmm.FileManagerJson)
-        If fmm Is Nothing Then
-            fmm = New FileManagerModel
-        End If
-        fmm.MemberCheck()
-        fmm.ModelSave(fmm.FileManagerJson, fmm)
-
-
-        ' モデルのロード
-        Dim m As New Model
-        ' fmm.ModelLoadと違い、こちらはオーバロードしている
-        m = m.ModelLoad(fmm.CurrentModelJson)
-        If m Is Nothing Then
-            m = New Model
-        End If
-        m.MemberCheck()
-        'm.ModelSave(m.CurrentModelJson, m)
-
-
-
+        Dim m As New Model2
         Dim vm As New ViewModel
+        Dim pim As New ProjectInfoModel
 
-        Me.DataContext = vm
+        Dim udvm As New UserDirectoryViewModel(m, vm, pim)
 
-        ' 呼び出し順で優先度を変える。上に行くほど優先
-        Dim ivm As New InitViewModel(m, vm)
-        Dim mvm As New MigraterViewModel(m, vm)
         Me.MainFlame.DataContext = vm
 
-        Dim dbevm As New DBExplorerViewModel(m, vm)
-        Me.ExplorerFlame.DataContext = vm
 
-        Dim hvm As New HistoryViewModel(m, vm)
-        Me.HistoryFlame.DataContext = vm
+        '' 可変ファイル名のロード
+        'Dim fmm As New FileManagerModel
+        'fmm = fmm.ModelLoad(fmm.FileManagerJson)
+        'If fmm Is Nothing Then
+        '    fmm = New FileManagerModel
+        'End If
+        'fmm.MemberCheck()
+        'fmm.ModelSave(fmm.FileManagerJson, fmm)
 
-        m.MenuFolder.MemberCheck(vm)
+
+        '' モデルのロード
+        'Dim m As New Model
+        '' fmm.ModelLoadと違い、こちらはオーバロードしている
+        'm = m.ModelLoad(fmm.CurrentModelJson)
+        'If m Is Nothing Then
+        '    m = New Model
+        'End If
+        'm.MemberCheck()
+        ''m.ModelSave(m.CurrentModelJson, m)
+
+
+
+        'Dim vm As New ViewModel
+
+        'Me.DataContext = vm
+
+        '' 呼び出し順で優先度を変える。上に行くほど優先
+        'Dim ivm As New InitViewModel(m, vm)
+        'Dim mvm As New MigraterViewModel(m, vm)
+        'Me.MainFlame.DataContext = vm
+
+        'Dim dbevm As New DBExplorerViewModel(m, vm)
+        'Me.ExplorerFlame.DataContext = vm
+
+        'Dim hvm As New HistoryViewModel(m, vm)
+        'Me.HistoryFlame.DataContext = vm
+
+        'm.MenuFolder.MemberCheck(vm)
     End Sub
 End Class

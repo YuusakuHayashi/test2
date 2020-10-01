@@ -1,4 +1,10 @@
 ﻿Public Class FileContentsModel
+    Protected ReadOnly Property AppDirectory As String
+        Get
+            Return System.Environment.GetEnvironmentVariable("USERPROFILE") & "\hys"
+        End Get
+    End Property
+
     Protected Function ProjectFile(ByVal f As String) As String
         If f.Contains(Me.ProjectDirectoryName) Then
             ProjectFile = f
