@@ -40,6 +40,26 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
         End Set
     End Property
 
+    Private Const _DB_TEST As String = "データベーステスト(.dbt)"
+    Public ReadOnly Property ProjectKindList As List(Of String)
+        Get
+            Return New List(Of String) From {
+                _DB_TEST
+            }
+        End Get
+    End Property
+
+    Private _ProjectKind As String
+    Public Property ProjectKind As String
+        Get
+            Return _ProjectKind
+        End Get
+        Set(value As String)
+            _ProjectKind = value
+            RaisePropertyChanged("ProjectKind")
+        End Set
+    End Property
+
     Private Sub _UpdateProjectDirectoryName()
         ProjectDirectoryName = UserDirectoryName & "\" & ProjectName
     End Sub
@@ -160,14 +180,14 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
 
     ' コマンド実行（Ｐｒｏｊｅｃｔ追加）
     Private Sub _ProjectAddCommandExecute(ByVal parameter As Object)
-        Dim [new] As ObservableCollection(Of AppDirectoryModel.ProjectModel)
         Dim elm As New AppDirectoryModel.ProjectModel With {
             .Directory = Me.ProjectDirectoryName,
             .Name = ProjectName
         }
-        [new] = StackModule.Push(Of ObservableCollection(Of AppDirectoryModel.ProjectModel), AppDirectoryModel.ProjectModel)(elm, Me.CurrentProjects)
-
-        Me.CurrentProjects = [new]
+        If ProjectInfo.ProjectLaunch(elm) = 0 Then
+            Me.ProjectInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of AppDirectoryModel.ProjectModel), AppDirectoryModel.ProjectModel)(elm, Me.CurrentProjects)
+            Me.CurrentProjects = Me.ProjectInfo.CurrentProjects
+        End If
     End Sub
 
 

@@ -211,6 +211,16 @@
                         Orientation="Horizontal"
                         DockPanel.Dock="Top">
                         <TextBlock 
+                            Text="プロジェクトの種類" />
+                        <ComboBox
+                            SelectedIndex="0"
+                            SelectedValue="{Binding ProjectKind}"
+                            ItemsSource="{Binding ProjectKindList}" />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                        <TextBlock 
                             Text="ディレクトリ名" />
                         <TextBox 
                             Text="{Binding UserDirectoryName}" />
@@ -219,6 +229,7 @@
                             Command="{Binding InputBoxCommand}"/>
                     </StackPanel>
                     <StackPanel
+                        Orientation="Horizontal"
                         DockPanel.Dock="Top">
                         <TextBlock Text="プロジェクト名" />
                         <TextBox Text="{Binding ProjectName}" />
@@ -296,7 +307,7 @@
             </DataTemplate>
             <!-- InitView End -->
             
-            <ControlTemplate x:Key="AddButton" TargetType="Button">
+            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusa\project\test2\test2\AddImage.png"
@@ -347,9 +358,9 @@
                         Height="10"
                         Width="10" />
                 </StackPanel>
-            </ControlTemplate>
+            </ControlTemplate>-->
 
-            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
+            <ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"
@@ -372,14 +383,14 @@
                         Height="20"
                         Width="20" />
                 </StackPanel>
-            </ControlTemplate>-->
+            </ControlTemplate>
 
-            <BitmapImage x:Key="DataTableImage" UriSource="C:\Users\yuusa\project\test2\test2\DataTableImage.png"/>
+            <!--<BitmapImage x:Key="DataTableImage" UriSource="C:\Users\yuusa\project\test2\test2\DataTableImage.png"/>
             <BitmapImage x:Key="DataBaseImage" UriSource="C:\Users\yuusa\project\test2\test2\DataBaseImage.png"/>
             <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusa\project\test2\test2\DeleteImage.png"/>
             <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png" />
-            <BitmapImage x:Key="ViewContextImage" UriSource="C:\Users\yuusa\project\test2\test2\ViewContextImage.png" />
+            <BitmapImage x:Key="ViewContextImage" UriSource="C:\Users\yuusa\project\test2\test2\ViewContextImage.png" />-->
             <!--<BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\DeleteImage.png"/>
             <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\PublishQueryImage.png"/>-->
