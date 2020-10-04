@@ -1,5 +1,5 @@
 ﻿Public Class DataTableModel
-    Inherits BaseModel
+    Inherits BaseModel(Of DataTableModel)
     Implements TreeViewInterface
 
     Private _Name As String

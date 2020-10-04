@@ -1,4 +1,4 @@
-﻿Public Class MenuModel : Inherits BaseModel
+﻿Public Class MenuModel : Inherits BaseModel(Of MenuModel)
     Private _ViewName As String
     Public Property ViewName As String
         Get

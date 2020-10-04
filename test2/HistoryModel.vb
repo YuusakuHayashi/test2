@@ -1,4 +1,4 @@
-﻿Public Class HistoryModel : Inherits BaseModel
+﻿Public Class HistoryModel : Inherits BaseModel(Of HistoryModel)
 
     Private Const DELETE_OVER_LINES As String = "DeleteOverLines"
     Private Const RESET_HISTORIES As String = "ResetHistories"
@@ -92,19 +92,19 @@
         Me._LineCounts -= 1
     End Sub
 
-    Public Overrides Sub MemberCheck()
-        If Me.MaxLine = Nothing Or 0 Then
-            Me.MaxLine = 100
-        End If
-        If String.IsNullOrEmpty(Me.Contents) Then
-            Me.NewLine("Historyは初期化されました")
-        End If
-        If String.IsNullOrEmpty(Me.BehavierWhenMaxLine) Then
-            Me.BehavierWhenMaxLine = RESET_HISTORIES
-        End If
-    End Sub
+    'Public Overrides Sub MemberCheck()
+    '    If Me.MaxLine = Nothing Or 0 Then
+    '        Me.MaxLine = 100
+    '    End If
+    '    If String.IsNullOrEmpty(Me.Contents) Then
+    '        Me.NewLine("Historyは初期化されました")
+    '    End If
+    '    If String.IsNullOrEmpty(Me.BehavierWhenMaxLine) Then
+    '        Me.BehavierWhenMaxLine = RESET_HISTORIES
+    '    End If
+    'End Sub
 
-    Sub New()
-        Call Me.MemberCheck()
-    End Sub
+    'Sub New()
+    '    Call Me.MemberCheck()
+    'End Sub
 End Class

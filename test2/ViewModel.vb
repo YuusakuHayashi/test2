@@ -1,9 +1,21 @@
 ﻿Public Class ViewModel
-    Inherits BaseViewModel
+    Inherits BaseModel(Of ViewModel)
 
     Public Const MAIN_VIEW As String = "MainView"
     Public Const EXPLORER_VIEW As String = "ExplorerView"
     Public Const HISTORY_VIEW As String = "HistoryView"
+
+
+    Private _ProjectKind As String
+    Public Property ProjectKind As String
+        Get
+            Return Me._ProjectKind
+        End Get
+        Set(value As String)
+            Me._ProjectKind = value
+            RaisePropertyChanged("ProjectKind")
+        End Set
+    End Property
 
     Private _MainViewContext As Object
     Public Property MainViewContext As Object
@@ -114,7 +126,9 @@
         End Set
     End Property
 
-    Private Sub _DictionaryCheck(ByVal view As String, ByVal nm As String)
+    ' コンテキストディクショナリが存在しない場合、新規作成し
+    ' ビューディクショナリが存在しない場合、追加します
+    Private Sub _AddViewToDictionary(ByVal view As String)
         If Me.ContextDictionary Is Nothing Then
             Me.ContextDictionary = New Dictionary(Of String, Dictionary(Of String, Object))
         End If
@@ -123,6 +137,7 @@
         End If
     End Sub
 
+    ' ビューのDataContextに実際にセットします
     Private Sub _SetContextObject(ByVal view As String, ByVal nm As String)
         Dim o As Object
         o = Me.ContextDictionary(view)(nm)
@@ -139,22 +154,58 @@
         End Select
     End Sub
 
-    ' Protectedだとアクセスできない。原因追及後回し
-    Public Sub SetContext(ByVal view As String, ByVal nm As String, ByRef m As Object)
-        Call Me._DictionaryCheck(view, nm)
-        If Not Me.ContextDictionary(view).ContainsKey(nm) Then
-            Me.ContextDictionary(view).Add(nm, m)
-        Else
-            Me.ContextDictionary(view)(nm) = m
+    ' コンテキストをディクショナリにセットします
+    Private Sub _AddContextToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+        Call Me._AddViewToDictionary(viewName)
+        If Not Me.ContextDictionary(viewName).ContainsKey(modelName) Then
+            Me.ContextDictionary(viewName).Add(modelName, context)
         End If
-        Call Me._SetContextObject(view, nm)
     End Sub
 
-    Public Sub ChangeContext(ByVal view As String, ByVal nm As String, ByRef m As Object)
-        Call Me._DictionaryCheck(view, nm)
-        If Not Me.ContextDictionary(view).ContainsKey(nm) Then
-            Me.ContextDictionary(view).Add(nm, m)
-        End If
-        Call Me._SetContextObject(view, nm)
+    ' コンテキストをディクショナリにセット＆更新します
+    Private Sub _UpdateContextToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+        Call Me._AddContextToDictionary(viewName, modelName, context)
+        Me.ContextDictionary(viewName)(modelName) = context
     End Sub
+
+    ' コンテキストをディクショナリにセット＆ビューの切り替えを行います
+    Public Sub ChangeContext(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+        Call Me._AddContextToDictionary(viewName, modelName, context)
+        Call Me._SetContextObject(viewName, modelName)
+    End Sub
+
+    ' コンテキストをディクショナリにセット＆更新＆ビューの切り替えを行います
+    Public Sub SetContext(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+        Call Me._UpdateContextToDictionary(viewName, modelName, context)
+        Call Me._SetContextObject(viewName, modelName)
+    End Sub
+
+
+    ' 初回時に必要なビューモデルコンテキストを全てディクショナリにセットします
+    Public Function InitializeContext() As ViewModel
+        Dim cvm As ConnectionViewModel
+        Dim dbtvm As DBTestViewModel
+        Dim dbevm As DBExplorerViewModel
+        Dim hvm As HistoryViewModel
+
+        '-- you henkou --------------------------------'
+        Select Case Me.ProjectKind
+            Case AppDirectoryModel.DB_TEST
+                cvm = New ConnectionViewModel
+                dbtvm = New DBTestViewModel
+                dbevm = New DBExplorerViewModel
+                hvm = New HistoryViewModel
+                Call _UpdateContextToDictionary(ViewModel.MAIN_VIEW, cvm.GetType.Name, cvm)
+                Call _UpdateContextToDictionary(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
+                Call _UpdateContextToDictionary(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
+                Call _UpdateContextToDictionary(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
+                Call ChangeContext(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
+                Call ChangeContext(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
+                Call ChangeContext(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
+            Case Else
+        End Select
+        '----------------------------------------------'
+
+        InitializeContext = Me
+    End Function
 End Class

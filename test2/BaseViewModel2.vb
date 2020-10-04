@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
 
-Public Class BaseViewModel2 : Inherits ProjectModel2
+Public Class BaseViewModel2(Of T)
+    Inherits ModelLoader(Of T)
     Implements INotifyPropertyChanged
     '--- INortify -------------------------------------------------------------------------------------'
     Public Event PropertyChanged As PropertyChangedEventHandler _
@@ -13,15 +14,25 @@ Public Class BaseViewModel2 : Inherits ProjectModel2
     End Sub
     '--------------------------------------------------------------------------------------------------'
 
-    Private _Model As Model2
-    Public Property Model As Model2
+    Private _Model As Model
+    Public Property Model As Model
         Get
             Return _Model
         End Get
-        Set(value As Model2)
+        Set(value As Model)
             _Model = value
         End Set
     End Property
+
+    'Private _Model As Object
+    'Public Property Model As Object
+    '    Get
+    '        Return _Model
+    '    End Get
+    '    Set(value As Object)
+    '        _Model = value
+    '    End Set
+    'End Property
 
     Private _ViewModel As ViewModel
     Public Property ViewModel As ViewModel
@@ -30,6 +41,16 @@ Public Class BaseViewModel2 : Inherits ProjectModel2
         End Get
         Set(value As ViewModel)
             _ViewModel = value
+        End Set
+    End Property
+
+    Private _AppInfo As AppDirectoryModel
+    Public Property AppInfo As AppDirectoryModel
+        Get
+            Return _AppInfo
+        End Get
+        Set(value As AppDirectoryModel)
+            _AppInfo = value
         End Set
     End Property
 
@@ -58,30 +79,34 @@ Public Class BaseViewModel2 : Inherits ProjectModel2
     End Sub
 
 
-    Protected Overloads Sub Initializing(ByRef m As Model2,
+    Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
+                                         ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel)
         Model = m
         ViewModel = vm
+        AppInfo = adm
         ProjectInfo = pim
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model2,
+    Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
+                                         ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel,
                                          ByRef cmcp As ContextModelCheckProxy)
-        Initializing(m, vm, pim)
+        Initializing(m, vm, adm, pim)
 
         ' ビューモデルの設定（画面登録など）を行います
         cmcp()
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model2,
+    Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
+                                         ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy,
                                          ByRef cmcp As ContextModelCheckProxy)
-        Initializing(m, vm, pim)
+        Initializing(m, vm, adm, pim)
 
         ' 自身(ビューモデル）の初期化設定を行います
         ip()
@@ -90,38 +115,41 @@ Public Class BaseViewModel2 : Inherits ProjectModel2
         cmcp()
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model2,
+    Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
+                                         ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy,
                                          ByRef cmcp As ContextModelCheckProxy,
                                          ByRef cccep As CheckCommandEnabledProxy)
-        Initializing(m, vm, pim, ip, cmcp)
+        Initializing(m, vm, adm, pim, ip, cmcp)
 
         ' コマンド実行可否の設定
         cccep()
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model2,
+    Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
+                                         ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy,
                                          ByRef cmcp As ContextModelCheckProxy,
                                          ByRef ahp As AddHandlerProxy)
-        Initializing(m, vm, pim, ip, cmcp)
+        Initializing(m, vm, adm, pim, ip, cmcp)
 
         ' イベントハンドラの登録
         ahp()
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model2,
+    Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
+                                         ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy,
                                          ByRef cmcp As ContextModelCheckProxy,
                                          ByRef cccep As CheckCommandEnabledProxy,
                                          ByRef ahp As AddHandlerProxy)
-        Initializing(m, vm, pim, ip, cmcp, cccep)
+        Initializing(m, vm, adm, pim, ip, cmcp, cccep)
 
         ' イベントハンドラの登録
         ahp()

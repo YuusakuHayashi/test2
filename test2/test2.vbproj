@@ -48,6 +48,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -82,12 +85,17 @@
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
+    <Compile Include="ConnectionModel.vb" />
+    <Compile Include="ConnectionViewModel.vb" />
+    <Compile Include="DBTestModel.vb" />
+    <Compile Include="DBTestViewModel.vb" />
     <Compile Include="FileContentsModel.vb" />
     <Compile Include="MenuChangedEventListener.vb" />
     <Compile Include="MenuFolderModel.vb" />
     <Compile Include="HistoryModel.vb" />
     <Compile Include="MigraterViewModelCommands.vb" />
     <Compile Include="Model2.vb" />
+    <Compile Include="ModelLoader.vb" />
     <Compile Include="MyDelegater.vb" />
     <Compile Include="ConditionChangedEventListener.vb" />
     <Compile Include="ConditionModel.vb" />
@@ -105,6 +113,7 @@
     <Compile Include="ProjectInterface.vb" />
     <Compile Include="HistoryViewModel.vb" />
     <Compile Include="ProjectModel2.vb" />
+    <Compile Include="ProjectModule.vb" />
     <Compile Include="ProjectStackModel.vb" />
     <Compile Include="SaveConditionModel.vb" />
     <Compile Include="SaveMigrateModel.vb" />

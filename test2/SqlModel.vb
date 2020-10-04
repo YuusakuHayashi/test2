@@ -1,7 +1,7 @@
 ﻿Imports System.Data
 Imports System.Data.SqlClient
 
-Public Class SqlModel : Inherits BaseModel
+Public Class SqlModel : Inherits BaseModel(Of SqlModel)
 
     Private Property _ServerName As String
     Public Property ServerName As String

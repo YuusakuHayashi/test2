@@ -1,4 +1,4 @@
-﻿Public Class MigrateModel : Inherits BaseModel
+﻿Public Class MigrateModel : Inherits BaseModel(Of MigrateModel)
 
     Private _Logic As String
     Public Property Logic As String

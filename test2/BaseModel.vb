@@ -1,7 +1,14 @@
 ﻿Imports System.ComponentModel
 
-Public MustInherit Class BaseModel
+Public MustInherit Class BaseModel(Of T)
+    Inherits ModelLoader(Of T)
     Implements INotifyPropertyChanged
+
+    'Public ReadOnly Property ClassName As String
+    '    Get
+    '        Return Me.GetType.Name
+    '    End Get
+    'End Property
 
     Public Event PropertyChanged As PropertyChangedEventHandler _
         Implements INotifyPropertyChanged.PropertyChanged
@@ -10,8 +17,5 @@ Public MustInherit Class BaseModel
         RaiseEvent PropertyChanged(
             Me, New PropertyChangedEventArgs(PropertyName)
         )
-    End Sub
-
-    Public Overridable Sub MemberCheck()
     End Sub
 End Class

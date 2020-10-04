@@ -1,5 +1,5 @@
 ﻿Public Class InitModel
-    Inherits BaseModel
+    Inherits BaseModel(Of InitModel)
     Implements ProjectInterface
 
     Private _InitFlag As Boolean

@@ -1,7 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 
 Public Class DataBaseModel
-    Inherits BaseModel
+    Inherits BaseModel(Of DataBaseModel)
     Implements TreeViewInterface
 
     ' ロード時の挙動の対応

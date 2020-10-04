@@ -14,37 +14,28 @@ Public Class TestWin
         InitializeComponent()
 
         ' 実装メモ
-        '   - ProjectModel2
-        '     |
-        '     +-- BaseViewModel2 ... Inortify 実装
-        '         |
-        '         +-- Each ViewModel
+        '   - AppDirectoryModel ... アプリケーションの構成を定義
+        '   - ProjectInfoModel  ... プロジェクトの構成を定義
         '
-        '   - AppDirectoryModel
-        '     |
-        '     +-- Project
-        '         |
-        '         +-- BaseViewModel2
-        '             |
-        '             +-- Each ViewModel
-        '
-        '   - BaseModel
-        '         + ＩＮｏｒｔｉｆｙ実装
-        '
-        '   - BaseViewModel
-        '         + ＩＮｏｒｔｉｆｙ実装
-        '
-        '   - Ｍｏｄｅｌ、ＶｉｅｗＭｏｄｅｌの実装は親クラスから継承すること。
-        '   - コマンド（ＩＣＯＭＭＡＮＤ）のプロパティは
-        '     ＶｉｅｗＭｏｄｅｌを実装するクラスのみ実装すること。
-        '     つまり、Ｍｏｄｅｌにはコマンドを実装しないこと
-        '     また、ＶｉｅｗＭｏｄｅｌはコマンドを実装するため、
 
-        Dim m As New Model2
-        Dim vm As New ViewModel
+        ' Of T型は何でも良い
+        Dim ml As New ModelLoader(Of Nullable)
+
+        ' AppDirectoryModelはここでロード
+        Dim adm As AppDirectoryModel
+
+        ' ProjectInfoModel, Model, ViewModelは各プログラムでロード（更新）
         Dim pim As New ProjectInfoModel
+        Dim m As New Model
+        Dim vm As New ViewModel
 
-        Dim udvm As New UserDirectoryViewModel(m, vm, pim)
+        adm = ml.ModelLoad(Of AppDirectoryModel)(AppDirectoryModel.ModelFileName)
+        If adm Is Nothing Then
+            adm = New AppDirectoryModel
+        End If
+        adm.ModelSave(AppDirectoryModel.ModelFileName, adm)
+
+        Dim udvm As New UserDirectoryViewModel(m, vm, adm, pim)
 
         Me.MainFlame.DataContext = vm
 

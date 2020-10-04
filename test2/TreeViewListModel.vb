@@ -1,4 +1,4 @@
-﻿Public Class TreeViewListModel : Inherits BaseModel
+﻿Public Class TreeViewListModel : Inherits BaseModel(Of TreeViewListModel)
     Private _ModelList As List(Of TreeViewModel)
     Public Property ModelList As List(Of TreeViewModel)
         Get

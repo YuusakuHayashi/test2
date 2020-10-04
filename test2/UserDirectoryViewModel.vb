@@ -1,7 +1,13 @@
 ﻿Imports System.Windows.Forms
 Imports System.Collections.ObjectModel
+Imports System.IO
 
-Public Class UserDirectoryViewModel : Inherits BaseViewModel2
+Public Class UserDirectoryViewModel
+    Inherits BaseViewModel2(Of UserDirectoryViewModel)
+
+    Private Const _PROJECT_LOAD_FAILED As String = "プロジェクトのロードに失敗しました"
+    Private Const _ISNOT_PROJECT_DIRECTORY As String = "このフォルダはプロジェクトディレクトリではありません"
+    Private Const _DIRECTORY_ALREADY_EXIST As String = "このフォルダは既に存在しています"
 
     Private _UserDirectoryName As String
     Public Property UserDirectoryName As String
@@ -12,7 +18,7 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
             _UserDirectoryName = value
             RaisePropertyChanged("UserDirectoryName")
             Call _UpdateProjectDirectoryName()
-            Call _CheckProjectAddCommandEnabled()
+            Call _CheckAddProjectCommandEnabled()
         End Set
     End Property
 
@@ -25,7 +31,7 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
             _ProjectName = value
             RaisePropertyChanged("ProjectName")
             Call _UpdateProjectDirectoryName()
-            Call _CheckProjectAddCommandEnabled()
+            Call _CheckAddProjectCommandEnabled()
         End Set
     End Property
 
@@ -40,13 +46,15 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
         End Set
     End Property
 
-    Private Const _DB_TEST As String = "データベーステスト(.dbt)"
-    Public ReadOnly Property ProjectKindList As List(Of String)
+    Private Property _ProjectKindList As List(Of String)
+    Public Property ProjectKindList As List(Of String)
         Get
-            Return New List(Of String) From {
-                _DB_TEST
-            }
+            Return Me._ProjectKindList
         End Get
+        Set(value As List(Of String))
+            Me._ProjectKindList = value
+            RaisePropertyChanged("ProjectKindList")
+        End Set
     End Property
 
     Private _ProjectKind As String
@@ -60,20 +68,160 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
         End Set
     End Property
 
+    Private _SelectedProject As ProjectInfoModel
+    Public Property SelectedProject As ProjectInfoModel
+        Get
+            Return _SelectedProject
+        End Get
+        Set(value As ProjectInfoModel)
+            _SelectedProject = value
+            RaisePropertyChanged("SelectedProject")
+        End Set
+    End Property
+
+    Private _Message As String
+    Public Property Message As String
+        Get
+            Return _Message
+        End Get
+        Set(value As String)
+            _Message = value
+            RaisePropertyChanged("Message")
+        End Set
+    End Property
+
     Private Sub _UpdateProjectDirectoryName()
         ProjectDirectoryName = UserDirectoryName & "\" & ProjectName
     End Sub
 
-    Private _CurrentProjects As ObservableCollection(Of AppDirectoryModel.ProjectModel)
-    Public Property CurrentProjects As ObservableCollection(Of AppDirectoryModel.ProjectModel)
+    Private _CurrentProjects As ObservableCollection(Of ProjectInfoModel)
+    Public Property CurrentProjects As ObservableCollection(Of ProjectInfoModel)
         Get
             Return _CurrentProjects
         End Get
-        Set(value As ObservableCollection(Of ProjectInfoModel.ProjectModel))
+        Set(value As ObservableCollection(Of ProjectInfoModel))
             _CurrentProjects = value
             RaisePropertyChanged("CurrentProjects")
         End Set
     End Property
+
+
+    ' コマンドプロパティ（Ｐｒｏｊｅｃｔを選択）
+    Private _SelectProjectCommand As ICommand
+    Public ReadOnly Property SelectProjectCommand As ICommand
+        Get
+            If Me._SelectProjectCommand Is Nothing Then
+                Me._SelectProjectCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _SelectProjectCommandExecute,
+                    .CanExecuteHandler = AddressOf _SelectProjectCommandCanExecute
+                }
+                Return Me._SelectProjectCommand
+            Else
+                Return Me._SelectProjectCommand
+            End If
+        End Get
+    End Property
+
+
+    'コマンド実行可否のチェック（Ｐｒｏｊｅｃｔを選択）
+    Private Sub _CheckSelectProjectCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._SelectProjectCommandEnableFlag = b
+    End Sub
+
+
+    'コマンド実行可否のフラグ（Ｐｒｏｊｅｃｔを選択）
+    Private __SelectProjectCommandEnableFlag As Boolean
+    Public Property _SelectProjectCommandEnableFlag As Boolean
+        Get
+            Return Me.__SelectProjectCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__SelectProjectCommandEnableFlag = value
+            RaisePropertyChanged("_SelectProjectCommandEnableFlag")
+            CType(SelectProjectCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+
+    ' コマンド実行（Ｐｒｏｊｅｃｔを選択）
+    Private Sub _SelectProjectCommandExecute(ByVal parameter As Object)
+        Dim project As ProjectInfoModel
+
+        project = Me.SelectedProject
+
+        Call _CheckProject(project)
+    End Sub
+
+
+    ' コマンド有効／無効（Ｐｒｏｊｅｃｔを選択）
+    Private Function _SelectProjectCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._SelectProjectCommandEnableFlag
+    End Function
+
+
+    ' コマンドプロパティ（Ｐｒｏｊｅｃｔを開く）
+    Private _OpenProjectCommand As ICommand
+    Public ReadOnly Property OpenProjectCommand As ICommand
+        Get
+            If Me._OpenProjectCommand Is Nothing Then
+                Me._OpenProjectCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _OpenProjectCommandExecute,
+                    .CanExecuteHandler = AddressOf _OpenProjectCommandCanExecute
+                }
+                Return Me._OpenProjectCommand
+            Else
+                Return Me._OpenProjectCommand
+            End If
+        End Get
+    End Property
+
+
+    'コマンド実行可否のチェック（Ｐｒｏｊｅｃｔを開く）
+    Private Sub _CheckOpenProjectCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._OpenProjectCommandEnableFlag = b
+    End Sub
+
+
+    'コマンド実行可否のフラグ（Ｐｒｏｊｅｃｔを開く）
+    Private __OpenProjectCommandEnableFlag As Boolean
+    Public Property _OpenProjectCommandEnableFlag As Boolean
+        Get
+            Return Me.__OpenProjectCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__OpenProjectCommandEnableFlag = value
+            RaisePropertyChanged("_OpenProjectCommandEnableFlag")
+            CType(OpenProjectCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+
+    ' コマンド実行（Ｐｒｏｊｅｃｔを開く）
+    Private Sub _OpenProjectCommandExecute(ByVal parameter As Object)
+        Dim project As ProjectInfoModel
+        Dim fbd As New FolderBrowserDialog With {
+             .Description = "プロジェクトを開く",
+             .RootFolder = Environment.SpecialFolder.Desktop,
+             .SelectedPath = Environment.SpecialFolder.Desktop,
+             .ShowNewFolderButton = False
+        }
+
+        If fbd.ShowDialog() = DialogResult.OK Then
+            project = New ProjectInfoModel With {
+                .DirectoryName = fbd.SelectedPath
+            }
+            Call _CheckProject(project)
+        End If
+    End Sub
+
+
+    ' コマンド有効／無効（Ｐｒｏｊｅｃｔを開く）
+    Private Function _OpenProjectCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._OpenProjectCommandEnableFlag
+    End Function
+
 
     ' コマンドプロパティ（ＩｎｐｕｔＢｏｘ）
     Private _InputBoxCommand As ICommand
@@ -121,11 +269,11 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
              .SelectedPath = Environment.SpecialFolder.Desktop,
              .ShowNewFolderButton = True
         }
-
         If fbd.ShowDialog() = DialogResult.OK Then
             UserDirectoryName = fbd.SelectedPath
         End If
     End Sub
+
 
     ' コマンド有効／無効（ＩｎｐｕｔＢｏｘ）
     Private Function _InputBoxCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -133,81 +281,127 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
     End Function
 
 
-
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔ追加）
-    Private _ProjectAddCommand As ICommand
-    Public ReadOnly Property ProjectAddCommand As ICommand
+    Private _AddProjectCommand As ICommand
+    Public ReadOnly Property AddProjectCommand As ICommand
         Get
-            If Me._ProjectAddCommand Is Nothing Then
-                Me._ProjectAddCommand = New DelegateCommand With {
-                    .ExecuteHandler = AddressOf _ProjectAddCommandExecute,
-                    .CanExecuteHandler = AddressOf _ProjectAddCommandCanExecute
+            If Me._AddProjectCommand Is Nothing Then
+                Me._AddProjectCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _AddProjectCommandExecute,
+                    .CanExecuteHandler = AddressOf _AddProjectCommandCanExecute
                 }
-                Return Me._ProjectAddCommand
+                Return Me._AddProjectCommand
             Else
-                Return Me._ProjectAddCommand
+                Return Me._AddProjectCommand
             End If
         End Get
     End Property
 
 
     'コマンド実行可否のチェック（Ｐｒｏｊｅｃｔ追加）
-    Private Sub _CheckProjectAddCommandEnabled()
+    Private Sub _CheckAddProjectCommandEnabled()
         Dim b As Boolean : b = True
+
+        Me.Message = vbNullString
         If String.IsNullOrEmpty(Me.UserDirectoryName) Then
             b = False
         End If
         If String.IsNullOrEmpty(Me.ProjectName) Then
             b = False
         End If
-        Me._ProjectAddCommandEnableFlag = b
+        If b Then
+            If Directory.Exists(Me.ProjectDirectoryName) Then
+                b = False
+                Me.Message = _DIRECTORY_ALREADY_EXIST
+            End If
+        End If
+        Me._AddProjectCommandEnableFlag = b
     End Sub
 
 
     'コマンド実行可否のフラグ（Ｐｒｏｊｅｃｔ追加）
-    Private __ProjectAddCommandEnableFlag As Boolean
-    Public Property _ProjectAddCommandEnableFlag As Boolean
+    Private __AddProjectCommandEnableFlag As Boolean
+    Public Property _AddProjectCommandEnableFlag As Boolean
         Get
-            Return Me.__ProjectAddCommandEnableFlag
+            Return Me.__AddProjectCommandEnableFlag
         End Get
         Set(value As Boolean)
-            Me.__ProjectAddCommandEnableFlag = value
-            RaisePropertyChanged("_ProjectAddCommandEnableFlag")
-            CType(ProjectAddCommand, DelegateCommand).RaiseCanExecuteChanged()
+            Me.__AddProjectCommandEnableFlag = value
+            RaisePropertyChanged("_AddProjectCommandEnableFlag")
+            CType(AddProjectCommand, DelegateCommand).RaiseCanExecuteChanged()
         End Set
     End Property
 
 
     ' コマンド実行（Ｐｒｏｊｅｃｔ追加）
-    Private Sub _ProjectAddCommandExecute(ByVal parameter As Object)
-        Dim elm As New AppDirectoryModel.ProjectModel With {
-            .Directory = Me.ProjectDirectoryName,
+    Private Sub _AddProjectCommandExecute(ByVal parameter As Object)
+        Dim elm As New ProjectInfoModel With {
+            .DirectoryName = Me.ProjectDirectoryName,
             .Name = ProjectName
         }
-        If ProjectInfo.ProjectLaunch(elm) = 0 Then
-            Me.ProjectInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of AppDirectoryModel.ProjectModel), AppDirectoryModel.ProjectModel)(elm, Me.CurrentProjects)
-            Me.CurrentProjects = Me.ProjectInfo.CurrentProjects
+        If elm.ProjectLaunch() = 0 Then
+            ' AppInfo更新
+            Me.AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(elm, Me.CurrentProjects, 5)
+            Me.AppInfo.ModelSave(AppDirectoryModel.ModelFileName, Me.AppInfo)
+
+            ' Model更新
+            Me.Model.ProjectKind = Me.ProjectKind
+            Me.Model = Me.Model.InitializeData()
+            Call Me.Model.ModelSave(elm.ModelFileName, Me.Model)
+
+            ' ViewModel更新
+            Me.ViewModel.ProjectKind = Me.ProjectKind
+            Me.ViewModel = Me.ViewModel.InitializeContext()
+            ' ViewModelは循環参照するのでセーブ不可
+            'Call Me.ViewModel.ModelSave(elm.ViewModelFileName, Me.ViewModel)
+
+            Me.CurrentProjects = Me.AppInfo.CurrentProjects
         End If
     End Sub
 
 
     ' コマンド有効／無効（Ｐｒｏｊｅｃｔ追加）
-    Private Function _ProjectAddCommandCanExecute(ByVal parameter As Object) As Boolean
-        Return Me._ProjectAddCommandEnableFlag
+    Private Function _AddProjectCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._AddProjectCommandEnableFlag
     End Function
 
-    Protected Overrides Sub ViewInitializing()
-        Me.UserDirectoryName = Me.ProjectInfo.UserDirectoryName
-        Me.ProjectName = Me.ProjectInfo.ProjectName
-        Me.CurrentProjects = Me.ProjectInfo.CurrentProjects
-        If Me.CurrentProjects Is Nothing Then
-            Me.CurrentProjects = New ObservableCollection(Of AppDirectoryModel.ProjectModel)
+    ' プロジェクトをチェックし、正当な場合、プロジェクトをスタートします
+    Private Sub _CheckProject(ByVal project As ProjectInfoModel)
+        Dim msg As String : msg = vbNullString
+
+        Me.Message = vbNullString
+
+        Select Case project.CheckProjectDirectory()
+            Case 0
+                Me.Model = ModelLoad(Of Model)(project.ModelFileName)
+                If Me.Model Is Nothing Then
+                    msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
+                Else
+                    If Me.ProjectKindList.Contains(Me.Model.ProjectKind) Then
+                        Me.ViewModel.ProjectKind = Me.Model.ProjectKind
+                        Me.ViewModel = Me.ViewModel.InitializeContext()
+                        msg = vbNullString
+                    Else
+                        msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
+                    End If
+                End If
+            Case Else
+                msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
+        End Select
+
+        If Not String.IsNullOrEmpty(msg) Then
+            Me.Message = msg
         End If
-        'Me.CurrentProjects = New ObservableCollection(Of AppDirectoryModel.ProjectModel) From {
-        '    New AppDirectoryModel.ProjectModel With {.Name = "Test1"},
-        '    New AppDirectoryModel.ProjectModel With {.Name = "Test2"},
-        '    New AppDirectoryModel.ProjectModel With {.Name = "Test3"}
-        '}
+    End Sub
+
+    Protected Overrides Sub ViewInitializing()
+        Me.UserDirectoryName = Me.ProjectInfo.DirectoryName
+        Me.ProjectName = Me.ProjectInfo.Name
+        Me.ProjectKindList = AppDirectoryModel.ProjectKindList
+        Me.CurrentProjects = Me.AppInfo.CurrentProjects
+        If Me.CurrentProjects Is Nothing Then
+            Me.CurrentProjects = New ObservableCollection(Of ProjectInfoModel)
+        End If
     End Sub
 
     ' ビューモデルへの自身の登録を行うメソッドを慣習的にこの名前でオーバライドしています
@@ -216,8 +410,9 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
     End Sub
 
     ' ビューモデルは必ず、Initializingメソッドを呼び出すこと
-    Sub New(ByRef m As Model2,
+    Sub New(ByRef m As Model,
             ByRef vm As ViewModel,
+            ByRef adm As AppDirectoryModel,
             ByRef pim As ProjectInfoModel)
 
         Dim ip As InitializingProxy
@@ -228,11 +423,13 @@ Public Class UserDirectoryViewModel : Inherits BaseViewModel2
         cmcp(0) = AddressOf Me.ContextModelCheck
         cmcp2 = [Delegate].Combine(cmcp)
 
-        Dim ccep(0) As CheckCommandEnabledProxy
+        Dim ccep(2) As CheckCommandEnabledProxy
         Dim ccep2 As CheckCommandEnabledProxy
         ccep(0) = AddressOf Me._CheckInputBoxCommandEnabled
+        ccep(1) = AddressOf Me._CheckOpenProjectCommandEnabled
+        ccep(2) = AddressOf Me._CheckSelectProjectCommandEnabled
         ccep2 = [Delegate].Combine(ccep)
 
-        Call Initializing(m, vm, pim, ip, cmcp2, ccep2)
+        Call Initializing(m, vm, adm, pim, ip, cmcp2, ccep2)
     End Sub
 End Class

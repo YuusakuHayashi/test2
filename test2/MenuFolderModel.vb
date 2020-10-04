@@ -1,7 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 
 Public Class MenuFolderModel
-    Inherits BaseModel
+    Inherits BaseModel(Of MenuFolderModel)
 
     ' 親クラスからＶｉｅｗＭｏｄｅｌを継承すると、Ｓａｖｅが失敗するため
 

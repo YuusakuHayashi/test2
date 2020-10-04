@@ -1,6 +1,6 @@
 ﻿Imports System.Collections.ObjectModel
 
-Public Class ConditionModel : Inherits BaseModel
+Public Class ConditionModel : Inherits BaseModel(Of ConnectionModel)
     Private _Logic As String
     Public Property Logic As String
         Get

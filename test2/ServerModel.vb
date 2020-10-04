@@ -1,7 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 
 Public Class ServerModel
-    Inherits BaseModel
+    Inherits BaseModel(Of ServerModel)
     Implements TreeViewInterface
 
     ' ロード時の挙動の対応

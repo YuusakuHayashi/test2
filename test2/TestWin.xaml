@@ -1,10 +1,11 @@
 ﻿<Window x:Class="TestWin"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:test2"
+        xmlns:local="clr-namespace:test2"        
         mc:Ignorable="d"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
         Title="TestWin" Height="500" Width="800">
     <Window.Resources>
         <Style TargetType="TreeViewItem">
@@ -196,17 +197,31 @@
             <DataTemplate
                 DataType="{x:Type local:UserDirectoryViewModel}">
                 <DockPanel>
-                    <ListBox
-                        DockPanel.Dock="Left"
-                        ItemsSource="{Binding CurrentProjects}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Name}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <StackPanel
+                        DockPanel.Dock="Left">
+                        <TextBlock Text="プロジェクト" />
+                        <ListBox
+                            DockPanel.Dock="Top"
+                            SelectedItem="{Binding SelectedProject}"
+                            BorderThickness="0,0,0,0"                            
+                            ItemsSource="{Binding CurrentProjects}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock 
+                                            Text="{Binding Name}">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <behaviors:Interaction.Triggers>
+                                <behaviors:EventTrigger 
+                                    EventName="MouseDoubleClick">
+                                    <behaviors:InvokeCommandAction Command="{Binding SelectProjectCommand}" />
+                                </behaviors:EventTrigger>
+                            </behaviors:Interaction.Triggers>
+                        </ListBox>
+                    </StackPanel>
                     <StackPanel
                         Orientation="Horizontal"
                         DockPanel.Dock="Top">
@@ -223,6 +238,7 @@
                         <TextBlock 
                             Text="ディレクトリ名" />
                         <TextBox 
+                            Width="250"
                             Text="{Binding UserDirectoryName}" />
                         <Button 
                             Content="..."
@@ -232,17 +248,33 @@
                         Orientation="Horizontal"
                         DockPanel.Dock="Top">
                         <TextBlock Text="プロジェクト名" />
-                        <TextBox Text="{Binding ProjectName}" />
+                        <TextBox 
+                            Width="250"
+                            Text="{Binding ProjectName}" />
                     </StackPanel>
                     <StackPanel
                         DockPanel.Dock="Top">
                         <TextBlock Text="{Binding ProjectDirectoryName}" />
                     </StackPanel>
                     <StackPanel
-                        DockPanel.Dock="Right">
-                        <Button
-                            Content="作成"
-                            Command="{Binding ProjectAddCommand}"/>
+                        HorizontalAlignment="Stretch"
+                        DockPanel.Dock="Top">
+                        <StackPanel
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                            <Button
+                                x:Name="OpenProjectButton"
+                                Content="開く"
+                                Command="{Binding OpenProjectCommand}"/>
+                            <Button
+                                Content="作成"
+                                Command="{Binding AddProjectCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <TextBlock
+                            Text="{Binding Message}"/>
                     </StackPanel>
                 </DockPanel>
             </DataTemplate>
@@ -307,7 +339,7 @@
             </DataTemplate>
             <!-- InitView End -->
             
-            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
+            <ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusa\project\test2\test2\AddImage.png"
@@ -358,9 +390,9 @@
                         Height="10"
                         Width="10" />
                 </StackPanel>
-            </ControlTemplate>-->
+            </ControlTemplate>
 
-            <ControlTemplate x:Key="AddButton" TargetType="Button">
+            <!--<ControlTemplate x:Key="AddButton" TargetType="Button">
                 <StackPanel>
                     <Image
                         Source="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"
@@ -383,14 +415,14 @@
                         Height="20"
                         Width="20" />
                 </StackPanel>
-            </ControlTemplate>
+            </ControlTemplate>-->
 
-            <!--<BitmapImage x:Key="DataTableImage" UriSource="C:\Users\yuusa\project\test2\test2\DataTableImage.png"/>
+            <BitmapImage x:Key="DataTableImage" UriSource="C:\Users\yuusa\project\test2\test2\DataTableImage.png"/>
             <BitmapImage x:Key="DataBaseImage" UriSource="C:\Users\yuusa\project\test2\test2\DataBaseImage.png"/>
             <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusa\project\test2\test2\DeleteImage.png"/>
             <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png" />
-            <BitmapImage x:Key="ViewContextImage" UriSource="C:\Users\yuusa\project\test2\test2\ViewContextImage.png" />-->
+            <BitmapImage x:Key="ViewContextImage" UriSource="C:\Users\yuusa\project\test2\test2\ViewContextImage.png" />
             <!--<BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\DeleteImage.png"/>
             <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\PublishQueryImage.png"/>-->

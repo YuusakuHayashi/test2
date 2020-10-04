@@ -1,7 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 
 Public Class TreeModel
-    Inherits BaseModel
+    Inherits BaseModel(Of TreeModel)
     Implements IEnumerable(Of TreeModel)
 
     '表示名

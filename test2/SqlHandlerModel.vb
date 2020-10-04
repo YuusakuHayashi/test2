@@ -2,7 +2,7 @@
 Imports System.Data.SqlClient
 
 
-Public Class SqlHandlerModel : Inherits BaseModel
+Public Class SqlHandlerModel : Inherits BaseModel(Of SqlHandlerModel)
 
 
     Private _SqlM As SqlModel
