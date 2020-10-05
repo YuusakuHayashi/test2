@@ -182,7 +182,10 @@
 
 
     ' 初回時に必要なビューモデルコンテキストを全てディクショナリにセットします
-    Public Function InitializeContext() As ViewModel
+    Public Function InitializeContext(ByRef m As Model,
+                                      ByRef vm As ViewModel,
+                                      ByRef adm As AppDirectoryModel,
+                                      ByRef pim As ProjectInfoModel) As ViewModel
         Dim cvm As ConnectionViewModel
         Dim dbtvm As DBTestViewModel
         Dim dbevm As DBExplorerViewModel
@@ -191,15 +194,17 @@
         '-- you henkou --------------------------------'
         Select Case Me.ProjectKind
             Case AppDirectoryModel.DB_TEST
-                cvm = New ConnectionViewModel
-                dbtvm = New DBTestViewModel
-                dbevm = New DBExplorerViewModel
-                hvm = New HistoryViewModel
+                cvm = New ConnectionViewModel(m, vm, adm, pim)
+                dbtvm = New DBTestViewModel(m, vm, adm, pim)
+                dbevm = New DBExplorerViewModel(m, vm, adm, pim)
+                hvm = New HistoryViewModel(m, vm, adm, pim)
+
                 Call _UpdateContextToDictionary(ViewModel.MAIN_VIEW, cvm.GetType.Name, cvm)
                 Call _UpdateContextToDictionary(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
                 Call _UpdateContextToDictionary(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
                 Call _UpdateContextToDictionary(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
-                Call ChangeContext(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
+                'Call ChangeContext(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
+                Call ChangeContext(ViewModel.MAIN_VIEW, cvm.GetType.Name, cvm)
                 Call ChangeContext(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
                 Call ChangeContext(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
             Case Else

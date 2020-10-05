@@ -351,7 +351,10 @@ Public Class UserDirectoryViewModel
 
             ' ViewModel更新
             Me.ViewModel.ProjectKind = Me.ProjectKind
-            Me.ViewModel = Me.ViewModel.InitializeContext()
+            Me.ViewModel = Me.ViewModel.InitializeContext(Me.Model,
+                                                          Me.ViewModel,
+                                                          Me.AppInfo,
+                                                          Me.ProjectInfo)
             ' ViewModelは循環参照するのでセーブ不可
             'Call Me.ViewModel.ModelSave(elm.ViewModelFileName, Me.ViewModel)
 
@@ -373,13 +376,13 @@ Public Class UserDirectoryViewModel
 
         Select Case project.CheckProjectDirectory()
             Case 0
-                Me.Model = ModelLoad(Of Model)(project.ModelFileName)
+                Me.Model = Me.Model.ModelLoad(Of Model)(project.ModelFileName)
                 If Me.Model Is Nothing Then
                     msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
                 Else
                     If Me.ProjectKindList.Contains(Me.Model.ProjectKind) Then
                         Me.ViewModel.ProjectKind = Me.Model.ProjectKind
-                        Me.ViewModel = Me.ViewModel.InitializeContext()
+                        Me.ViewModel = Me.ViewModel.InitializeContext(Me.Model, Me.ViewModel, Me.AppInfo, Me.ProjectInfo)
                         msg = vbNullString
                     Else
                         msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
@@ -402,12 +405,13 @@ Public Class UserDirectoryViewModel
         If Me.CurrentProjects Is Nothing Then
             Me.CurrentProjects = New ObservableCollection(Of ProjectInfoModel)
         End If
+        Me.ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
     End Sub
 
     ' ビューモデルへの自身の登録を行うメソッドを慣習的にこの名前でオーバライドしています
-    Protected Overrides Sub ContextModelCheck()
-        ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
-    End Sub
+    'Protected Overrides Sub ContextModelCheck()
+    '    ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
+    'End Sub
 
     ' ビューモデルは必ず、Initializingメソッドを呼び出すこと
     Sub New(ByRef m As Model,
@@ -418,10 +422,10 @@ Public Class UserDirectoryViewModel
         Dim ip As InitializingProxy
         ip = AddressOf ViewInitializing
 
-        Dim cmcp(0) As ContextModelCheckProxy
-        Dim cmcp2 As ContextModelCheckProxy
-        cmcp(0) = AddressOf Me.ContextModelCheck
-        cmcp2 = [Delegate].Combine(cmcp)
+        'Dim cmcp(0) As ContextModelCheckProxy
+        'Dim cmcp2 As ContextModelCheckProxy
+        'cmcp(0) = AddressOf Me.ContextModelCheck
+        'cmcp2 = [Delegate].Combine(cmcp)
 
         Dim ccep(2) As CheckCommandEnabledProxy
         Dim ccep2 As CheckCommandEnabledProxy
@@ -430,6 +434,6 @@ Public Class UserDirectoryViewModel
         ccep(2) = AddressOf Me._CheckSelectProjectCommandEnabled
         ccep2 = [Delegate].Combine(ccep)
 
-        Call Initializing(m, vm, adm, pim, ip, cmcp2, ccep2)
+        Call Initializing(m, vm, adm, pim, ip, ccep2)
     End Sub
 End Class

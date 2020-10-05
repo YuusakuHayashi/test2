@@ -2,6 +2,7 @@
 'Imports System.Collections.ObjectModel
 
 Public Class DBExplorerViewModel
+    Inherits BaseViewModel2(Of DBExplorerModel)
     '    Inherits ProjectBaseViewModel(Of DBExplorerViewModel)
 
     '    ' モデル
@@ -159,4 +160,9 @@ Public Class DBExplorerViewModel
 
     '        Initializing(m, vm, ccep2)
     '    End Sub
+    Sub New(ByRef m As Model,
+            ByRef vm As ViewModel,
+            ByRef adm As AppDirectoryModel,
+            ByRef pim As ProjectInfoModel)
+    End Sub
 End Class

@@ -135,3 +135,6 @@ C:\Users\yuusa\project\test2\test2\obj\Debug\MigraterView.baml
 C:\Users\yuusa\project\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.dll
 C:\Users\yuusa\project\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.pdb
 C:\Users\yuusa\project\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.xml
+\\Coral\個人情報-林祐\project\wpf\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.xml
+\\Coral\個人情報-林祐\project\wpf\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.dll

@@ -87,6 +87,7 @@
     <Compile Include="BatchMenuViewModel.vb" />
     <Compile Include="ConnectionModel.vb" />
     <Compile Include="ConnectionViewModel.vb" />
+    <Compile Include="DBExplorerModel.vb" />
     <Compile Include="DBTestModel.vb" />
     <Compile Include="DBTestViewModel.vb" />
     <Compile Include="FileContentsModel.vb" />
@@ -117,6 +118,7 @@
     <Compile Include="ProjectStackModel.vb" />
     <Compile Include="SaveConditionModel.vb" />
     <Compile Include="SaveMigrateModel.vb" />
+    <Compile Include="SqlHandler.vb" />
     <Compile Include="StackInterface.vb" />
     <Compile Include="StackModule.vb" />
     <Compile Include="TreeViewModule.vb" />

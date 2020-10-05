@@ -282,7 +282,7 @@
             
             <!-- InitView Bgn -->
             <DataTemplate
-                DataType="{x:Type local:InitViewModel}">
+                DataType="{x:Type local:ConnectionViewModel}">
                 <StackPanel>
                     <StackPanel 
                         VerticalAlignment="Center"
@@ -417,12 +417,12 @@
                 </StackPanel>
             </ControlTemplate>-->
 
-            <BitmapImage x:Key="DataTableImage" UriSource="C:\Users\yuusa\project\test2\test2\DataTableImage.png"/>
+            <!--<BitmapImage x:Key="DataTableImage" UriSource="C:\Users\yuusa\project\test2\test2\DataTableImage.png"/>
             <BitmapImage x:Key="DataBaseImage" UriSource="C:\Users\yuusa\project\test2\test2\DataBaseImage.png"/>
             <BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusa\project\test2\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusa\project\test2\test2\DeleteImage.png"/>
             <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusa\project\test2\test2\PublishQueryImage.png" />
-            <BitmapImage x:Key="ViewContextImage" UriSource="C:\Users\yuusa\project\test2\test2\ViewContextImage.png" />
+            <BitmapImage x:Key="ViewContextImage" UriSource="C:\Users\yuusa\project\test2\test2\ViewContextImage.png" />-->
             <!--<BitmapImage x:Key="AddImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\AddImage.png"/>
             <BitmapImage x:Key="DeleteImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\DeleteImage.png"/>
             <BitmapImage x:Key="PublishQueryImage" UriSource="C:\Users\yuusaku.hayashi.MBC\Documents\test2\PublishQueryImage.png"/>-->
