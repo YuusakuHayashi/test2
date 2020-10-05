@@ -1,6 +1,6 @@
 ﻿Imports System.ComponentModel
 
-Public Class BaseViewModel2(Of T)
+Public Class BaseViewModel2(Of T As {New})
     Implements INotifyPropertyChanged
     '--- INortify -------------------------------------------------------------------------------------'
     Public Event PropertyChanged As PropertyChangedEventHandler _
@@ -93,11 +93,14 @@ Public Class BaseViewModel2(Of T)
                                          ByRef vm As ViewModel,
                                          ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel)
+        Dim mm As New T
         Model = m
         ViewModel = vm
         AppInfo = adm
         ProjectInfo = pim
-        MyModel = Model.DataDictionary(MyModel.GetType.Name)
+        If Model.DataDictionary IsNot Nothing Then
+            MyModel = Model.DataDictionary(mm.GetType.Name)
+        End If
     End Sub
 
     Protected Overloads Sub Initializing(ByRef m As Model,
@@ -147,70 +150,4 @@ Public Class BaseViewModel2(Of T)
         ' イベントハンドラの登録
         Call ahp()
     End Sub
-
-    'Protected Overloads Sub Initializing(ByRef m As Model,
-    '                                     ByRef vm As ViewModel,
-    '                                     ByRef adm As AppDirectoryModel,
-    '                                     ByRef pim As ProjectInfoModel,
-    '                                     ByRef cmcp As ContextModelCheckProxy)
-    '    Initializing(m, vm, adm, pim)
-
-    '    ' ビューモデルの設定（画面登録など）を行います
-    '    cmcp()
-    'End Sub
-
-    'Protected Overloads Sub Initializing(ByRef m As Model,
-    '                                     ByRef vm As ViewModel,
-    '                                     ByRef adm As AppDirectoryModel,
-    '                                     ByRef pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializingProxy,
-    '                                     ByRef cmcp As ContextModelCheckProxy)
-    '    Initializing(m, vm, adm, pim)
-
-    '    ' 自身(ビューモデル）の初期化設定を行います
-    '    ip()
-
-    '    ' ビューモデルの設定（画面登録など）を行います
-    '    cmcp()
-    'End Sub
-
-    'Protected Overloads Sub Initializing(ByRef m As Model,
-    '                                     ByRef vm As ViewModel,
-    '                                     ByRef adm As AppDirectoryModel,
-    '                                     ByRef pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializingProxy,
-    '                                     ByRef cmcp As ContextModelCheckProxy,
-    '                                     ByRef cccep As CheckCommandEnabledProxy)
-    '    Initializing(m, vm, adm, pim, ip, cmcp)
-
-    '    ' コマンド実行可否の設定
-    '    cccep()
-    'End Sub
-
-    'Protected Overloads Sub Initializing(ByRef m As Model,
-    '                                     ByRef vm As ViewModel,
-    '                                     ByRef adm As AppDirectoryModel,
-    '                                     ByRef pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializingProxy,
-    '                                     ByRef cmcp As ContextModelCheckProxy,
-    '                                     ByRef ahp As AddHandlerProxy)
-    '    Initializing(m, vm, adm, pim, ip, cmcp)
-
-    '    ' イベントハンドラの登録
-    '    ahp()
-    'End Sub
-
-    'Protected Overloads Sub Initializing(ByRef m As Model,
-    '                                     ByRef vm As ViewModel,
-    '                                     ByRef adm As AppDirectoryModel,
-    '                                     ByRef pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializingProxy,
-    '                                     ByRef cmcp As ContextModelCheckProxy,
-    '                                     ByRef cccep As CheckCommandEnabledProxy,
-    '                                     ByRef ahp As AddHandlerProxy)
-    '    Initializing(m, vm, adm, pim, ip, cmcp, cccep)
-
-    '    ' イベントハンドラの登録
-    '    ahp()
-    'End Sub
 End Class

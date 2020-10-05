@@ -2,10 +2,7 @@
 
 Public Class HistoryViewModel
     Inherits BaseViewModel2(Of HistoryModel)
-    Sub New(ByRef m As Model,
-            ByRef vm As ViewModel,
-            ByRef adm As AppDirectoryModel,
-            ByRef pim As ProjectInfoModel)
+    Sub New()
     End Sub
     '    Inherits ProjectBaseViewModel(Of HistoryViewModel)
 

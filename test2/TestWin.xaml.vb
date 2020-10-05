@@ -35,7 +35,9 @@ Public Class TestWin
         End If
         adm.ModelSave(AppDirectoryModel.ModelFileName, adm)
 
-        Dim udvm As New UserDirectoryViewModel(m, vm, adm, pim)
+        'Dim udvm As New UserDirectoryViewModel(m, vm, adm, pim)
+        Dim udvm As New UserDirectoryViewModel
+        Call udvm.MyInitializing(m, vm, adm, pim)
 
         Me.MainFlame.DataContext = vm
 

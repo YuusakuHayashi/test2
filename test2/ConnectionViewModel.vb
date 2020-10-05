@@ -125,11 +125,10 @@
     Protected Overrides Sub ViewInitializing()
     End Sub
 
-    Sub New(ByRef m As Model,
-            ByRef vm As ViewModel,
-            ByRef adm As AppDirectoryModel,
-            ByRef pim As ProjectInfoModel)
-
+    Public Sub MyInitializing(ByRef m As Model, 
+                              ByRef vm As ViewModel, 
+                              ByRef adm As AppDirectoryModel,
+                              ByRef pim As ProjectInfoModel)
         Dim ip As InitializingProxy
         ip = AddressOf ViewInitializing
 
@@ -139,5 +138,8 @@
         ccep2 = [Delegate].Combine(ccep)
 
         Call Initializing(m, vm, adm, pim, ip, ccep2)
+    End Sub
+
+    Sub New()
     End Sub
 End Class

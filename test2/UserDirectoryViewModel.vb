@@ -351,10 +351,8 @@ Public Class UserDirectoryViewModel
 
             ' ViewModel更新
             Me.ViewModel.ProjectKind = Me.ProjectKind
-            Me.ViewModel = Me.ViewModel.InitializeContext(Me.Model,
-                                                          Me.ViewModel,
-                                                          Me.AppInfo,
-                                                          Me.ProjectInfo)
+            Me.ViewModel = Me.ViewModel.InitializeContext(Me.Model, Me.ViewModel, Me.AppInfo, Me.ProjectInfo)
+
             ' ViewModelは循環参照するのでセーブ不可
             'Call Me.ViewModel.ModelSave(elm.ViewModelFileName, Me.ViewModel)
 
@@ -408,24 +406,12 @@ Public Class UserDirectoryViewModel
         Me.ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
     End Sub
 
-    ' ビューモデルへの自身の登録を行うメソッドを慣習的にこの名前でオーバライドしています
-    'Protected Overrides Sub ContextModelCheck()
-    '    ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
-    'End Sub
-
-    ' ビューモデルは必ず、Initializingメソッドを呼び出すこと
-    Sub New(ByRef m As Model,
-            ByRef vm As ViewModel,
-            ByRef adm As AppDirectoryModel,
-            ByRef pim As ProjectInfoModel)
-
+    Public Sub MyInitializing(ByRef m As Model,
+                              ByRef vm As ViewModel,
+                              ByRef adm As AppDirectoryModel,
+                              ByRef pim As ProjectInfoModel)
         Dim ip As InitializingProxy
         ip = AddressOf ViewInitializing
-
-        'Dim cmcp(0) As ContextModelCheckProxy
-        'Dim cmcp2 As ContextModelCheckProxy
-        'cmcp(0) = AddressOf Me.ContextModelCheck
-        'cmcp2 = [Delegate].Combine(cmcp)
 
         Dim ccep(2) As CheckCommandEnabledProxy
         Dim ccep2 As CheckCommandEnabledProxy
@@ -435,5 +421,9 @@ Public Class UserDirectoryViewModel
         ccep2 = [Delegate].Combine(ccep)
 
         Call Initializing(m, vm, adm, pim, ip, ccep2)
+    End Sub
+
+    ' ビューモデルは必ず、Initializingメソッドを呼び出すこと
+    Sub New()
     End Sub
 End Class
