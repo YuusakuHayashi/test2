@@ -142,7 +142,7 @@ Public Class SqlHandler
 
     ' 一連のＳＱＬ実行を行う（ＳＱＬ文はユーザ指定）
     Public Overloads Sub Execute(ByVal query As String)
-        _DataBaseAccessCoreProcess(
+        _Main(
             AddressOf _ConnectionStart,
             query,
             AddressOf _ExecuteMyQuery,
@@ -154,7 +154,7 @@ Public Class SqlHandler
 
     ' 一連のＳＱＬ実行を行う（実行内容はユーザ指定）
     Public Overloads Sub Execute(ByRef proxy As ConnectionExecuteProxy)
-        _DataBaseAccessCoreProcess(
+        _Main(
             AddressOf _ConnectionStart,
             proxy,
             AddressOf _ConnectionCommit,
@@ -164,15 +164,25 @@ Public Class SqlHandler
     End Sub
 
     ' 汎用のアクセステスト
-    Public Overloads Sub AccessTest()
-        _DataBaseAccessCoreProcess(
-            AddressOf _ConnectionStart,
-            AddressOf _NoDataGet,
-            AddressOf _ConnectionCommit,
-            AddressOf _ConnectionFailed,
-            AddressOf _ConnectionClose
-        )
-    End Sub
+    'Public Overloads Sub AccessTest()
+    '    _Main(
+    '        AddressOf _ConnectionStart,
+    '        AddressOf _NoDataGet,
+    '        AddressOf _ConnectionCommit,
+    '        AddressOf _ConnectionFailed,
+    '        AddressOf _ConnectionClose
+    '    )
+    'End Sub
+
+    ' 汎用のアクセステスト
+    Public Overloads Function AccessTest() As Boolean
+        Call Me._Main(AddressOf _ConnectionStart,
+                      AddressOf _NoDataGet,
+                      AddressOf _ConnectionCommit,
+                      AddressOf _ConnectionFailed,
+                      AddressOf _ConnectionClose)
+        AccessTest = Me.ResultFlag
+    End Function
     '----------------------------------------------------------------------------------------------
 
 
@@ -402,11 +412,12 @@ Public Class SqlHandler
     '--------------------------------------------------------------------------------------------------
 
 
-    Private Overloads Sub _DataBaseAccessCoreProcess(ByRef startProxy As ConnectionStartProxy,
-                                                     ByRef executeProxy As ConnectionExecuteProxy,
-                                                     ByRef commitProxy As ConnectionCommitProxy,
-                                                     ByRef failedProxy As ConnectionFailedProxy,
-                                                     ByRef closeProxy As ConnectionCloseProxy)
+    Private Overloads Sub _Main(ByRef startProxy As ConnectionStartProxy,
+                                ByRef executeProxy As ConnectionExecuteProxy,
+                                ByRef commitProxy As ConnectionCommitProxy,
+                                ByRef failedProxy As ConnectionFailedProxy,
+                                ByRef closeProxy As ConnectionCloseProxy)
+        Dim b As Boolean : b = False
         Try
             ' アクセス開始
             startProxy()
@@ -417,23 +428,25 @@ Public Class SqlHandler
             commitProxy()
 
             ' Success
-            Me._ResultFlag = True
+            b = True
         Catch ex As Exception
             ' アクセス失敗
             failedProxy()
         Finally
+            Me._ResultFlag = b
             ' アクセス終了
             closeProxy()
         End Try
     End Sub
 
 
-    Private Overloads Sub _DataBaseAccessCoreProcess(ByRef startProxy As ConnectionStartProxy,
-                                                     ByVal query As String,
-                                                     ByRef executeProxy As ConnectionExecuteProxyWithQuery,
-                                                     ByRef commitProxy As ConnectionCommitProxy,
-                                                     ByRef failedProxy As ConnectionFailedProxy,
-                                                     ByRef closeProxy As ConnectionCloseProxy)
+    Private Overloads Sub _Main(ByRef startProxy As ConnectionStartProxy,
+                                ByVal query As String,
+                                ByRef executeProxy As ConnectionExecuteProxyWithQuery,
+                                ByRef commitProxy As ConnectionCommitProxy,
+                                ByRef failedProxy As ConnectionFailedProxy,
+                                ByRef closeProxy As ConnectionCloseProxy)
+        Dim b As Boolean : b = False
         Try
             ' アクセス開始
             startProxy()
@@ -444,11 +457,12 @@ Public Class SqlHandler
             commitProxy()
 
             ' Success
-            Me._ResultFlag = True
+            b = True
         Catch ex As Exception
             ' アクセス失敗
             failedProxy()
         Finally
+            Me._ResultFlag = b
             ' アクセス終了
             closeProxy()
         End Try

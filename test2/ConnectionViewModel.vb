@@ -4,6 +4,8 @@ Imports Newtonsoft.Json.Linq
 Public Class ConnectionViewModel
     Inherits BaseViewModel2(Of ConnectionModel)
 
+    Private Const _SUCCESS_MESSAGE As String = "接続に成功しました"
+
     Private _ServerName As String
     Public Property ServerName As String
         Get
@@ -11,6 +13,10 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ServerName = value
+            Me.MyModel.ServerName = value
+            RaisePropertyChanged("ServerName")
+            Call _GetConnectionString()
+            Call _CheckConnectionCommandEnabled()
         End Set
     End Property
 
@@ -21,6 +27,10 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._DataBaseName = value
+            Me.MyModel.DataBaseName = value
+            RaisePropertyChanged("DataBaseName")
+            Call _GetConnectionString()
+            Call _CheckConnectionCommandEnabled()
         End Set
     End Property
 
@@ -41,16 +51,30 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ConnectionString = value
+            Me.MyModel.ConnectionString = value
+            RaisePropertyChanged("ConnectionString")
+            Call _GetOtherProperty()
         End Set
     End Property
 
-    Private _OtherProperty As String
-    Private Property OtherProperty As String
+    Private __OtherProperty As String
+    Private Property _OtherProperty As String
         Get
-            Return Me._OtherProperty
+            Return Me.__OtherProperty
         End Get
         Set(value As String)
-            Me._OtherProperty = value
+            Me.__OtherProperty = value
+            Call _CheckConnectionCommandEnabled()
+        End Set
+    End Property
+
+    Private _Message As String
+    Private Property Message As String
+        Get
+            Return Me._Message
+        End Get
+        Set(value As String)
+            Me._Message = value
         End Set
     End Property
 
@@ -58,6 +82,22 @@ Public Class ConnectionViewModel
         Me.ConnectionString _
             = $"Server={Me.ServerName};DataBase={Me.DataBaseName};{Me._OtherProperty};"
     End Sub
+
+    ' 
+    Private Sub _GetOtherProperty()
+        Dim txt As String
+        txt = Me.ConnectionString
+        If Not String.IsNullOrEmpty(Me.ConnectionString) Then
+            If txt.Contains($"Server={Me.ServerName};DataBase={Me.DataBaseName};") Then
+                txt = Me.ConnectionString.Replace($"Server={Me.ServerName};DataBase={Me.DataBaseName};", "")
+                If txt.Contains(";") Then
+                    txt = txt.TrimEnd(";")
+                End If
+            End If
+        End If
+        Me._OtherProperty = txt
+    End Sub
+
 
     ' コマンドプロパティ（接続確認）
     Private _ConnectionCommand As ICommand
@@ -77,15 +117,13 @@ Public Class ConnectionViewModel
 
     'コマンド実行可否のチェック（接続確認）
     Private Sub _CheckConnectionCommandEnabled()
-        Dim b As Boolean : b = True
-        If String.IsNullOrEmpty(Me.ServerName) Then
-            b = False
-        End If
-        If String.IsNullOrEmpty(Me.DataBaseName) Then
-            b = False
-        End If
-        If String.IsNullOrEmpty(Me._OtherProperty) Then
-            b = False
+        Dim b As Boolean : b = False
+        If Not String.IsNullOrEmpty(Me.ServerName) Then
+            If Not String.IsNullOrEmpty(Me.DataBaseName) Then
+                If Not String.IsNullOrEmpty(Me._OtherProperty) Then
+                    b = True
+                End If
+            End If
         End If
         Me._ConnectionCommandEnableFlag = b
     End Sub
@@ -105,20 +143,20 @@ Public Class ConnectionViewModel
 
     ' コマンド実行（接続確認）
     Private Sub _ConnectionCommandExecute(ByVal parameter As Object)
-        'Dim mysql As MySql
-
-        'Call mysql.AccessTest()
-        'mysql = Model.AccessTest()
-        'If mysql.ResultFlag Then
-        '    Me._GetTestTableName()
-        'End If
-
-        'If mysql.ResultFlag Then
-        '    'mvm = New MigraterViewModel(Me.Model, Me.ViewModel)
-        '    'ViewModel.ChangeContext(ViewModel.MAIN_VIEW, mvm.GetType.Name, mvm)
-        'End If
-
-        'mysql = Nothing
+        ' ビジネスロジックに該当しそうだが、こちらで実行する
+        Dim b As Boolean
+        Dim sh As New SqlHandler With {
+            .ConnectionString = Me.MyModel.ConnectionString
+        }
+        b = sh.AccessTest()
+        Me.MyModel.ConnectionResult = b
+        If b Then
+            Me.Message = _SUCCESS_MESSAGE
+            Call Me.Model.SetData(Me.MyModel.GetType.Name, Me.MyModel)
+            Call Me.Model.ModelSave(ProjectInfo.ModelFileName, Model)
+        Else
+            Me.Message = sh.ResultMessage
+        End If
     End Sub
 
     Private Function _ConnectionCommandCanExecute(ByVal parameter As Object) As Boolean

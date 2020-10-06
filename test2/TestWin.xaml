@@ -328,7 +328,7 @@
                         VerticalAlignment="Bottom"
                         HorizontalAlignment="Right">
                         <Button
-                            Command="{Binding InitCommand}"
+                            Command="{Binding ConnectionCommand}"
                             Content="Connection"
                             Width="100" />
                         <Button

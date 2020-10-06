@@ -203,10 +203,10 @@
                 Call _UpdateContextToDictionary(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
                 Call _UpdateContextToDictionary(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
                 Call _UpdateContextToDictionary(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
-                'Call ChangeContext(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
 
                 Call cvm.MyInitializing(m, vm, adm, pim)
 
+                'Call ChangeContext(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
                 Call ChangeContext(ViewModel.MAIN_VIEW, cvm.GetType.Name, cvm)
                 Call ChangeContext(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
                 Call ChangeContext(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)

@@ -91,6 +91,9 @@ Public Class BaseViewModel2(Of T As {New})
     End Sub
 
 
+    ' ビューモデル初期化時のメインメソッド
+    ' 共有のモデル・ビューモデル・アプリケーション情報、プロジェクト情報をセットする
+    ' さらに各ビューモデルに対応するメインモデルもセットする
     Protected Overloads Sub Initializing(ByRef m As Model,
                                          ByRef vm As ViewModel,
                                          ByRef adm As AppDirectoryModel,
@@ -102,13 +105,17 @@ Public Class BaseViewModel2(Of T As {New})
         AppInfo = adm
         ProjectInfo = pim
 
+        ' ビューモデルに対応するメインモデルをセットする
         If Model.DataDictionary IsNot Nothing Then
             obj = Model.DataDictionary((New T).GetType.Name)
             Select Case obj.GetType
-                Case (New Object).GetType
-                    Me.MyModel = CType(obj, T)
+                'Case (New Object).GetType
+                '    Me.MyModel = CType(obj, T)
                 Case (New JObject).GetType
+                    ' Ｊｓｏｎからロードした場合は、JObject型になっている
                     Me.MyModel = obj.ToObject(Of T)
+                Case (New T).GetType
+                    Me.MyModel = obj
             End Select
         End If
     End Sub

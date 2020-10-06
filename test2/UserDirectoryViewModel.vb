@@ -4,6 +4,7 @@ Imports System.IO
 
 Public Class UserDirectoryViewModel
     Inherits BaseViewModel2(Of UserDirectoryViewModel)
+    'Inherits BaseViewModel2(Of UserDirectoryViewModel)
 
     Private Const _PROJECT_LOAD_FAILED As String = "プロジェクトのロードに失敗しました"
     Private Const _ISNOT_PROJECT_DIRECTORY As String = "このフォルダはプロジェクトディレクトリではありません"
@@ -147,7 +148,6 @@ Public Class UserDirectoryViewModel
     ' コマンド実行（Ｐｒｏｊｅｃｔを選択）
     Private Sub _SelectProjectCommandExecute(ByVal parameter As Object)
         Dim project As ProjectInfoModel
-
         project = Me.SelectedProject
 
         Call _CheckProject(project)
@@ -344,6 +344,9 @@ Public Class UserDirectoryViewModel
             Me.AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(elm, Me.CurrentProjects, 5)
             Me.AppInfo.ModelSave(AppDirectoryModel.ModelFileName, Me.AppInfo)
 
+            ' ProjectInfo更新
+            Me.ProjectInfo = elm
+
             ' Model更新
             Me.Model.ProjectKind = Me.ProjectKind
             Me.Model = Me.Model.InitializeData()
@@ -369,15 +372,25 @@ Public Class UserDirectoryViewModel
     ' プロジェクトをチェックし、正当な場合、プロジェクトをスタートします
     Private Sub _CheckProject(ByVal project As ProjectInfoModel)
         Dim msg As String : msg = vbNullString
+        Dim ml As ModelLoader(Of Nullable)
 
         Me.Message = vbNullString
 
         Select Case project.CheckProjectDirectory()
             Case 0
-                Me.Model = Me.Model.ModelLoad(Of Model)(project.ModelFileName)
+                '  0 : プロジェクトが構成されている
+                ' モデルを更新
+                ml = New ModelLoader(Of Nullable)
+                Me.Model = ml.ModelLoad(Of Model)(project.ModelFileName)
+
+                ' プロジェクト情報を更新
+                Me.ProjectInfo = project
+
                 If Me.Model Is Nothing Then
+                    ' モデルオブジェクトがない場合、エラー扱いにする
                     msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
                 Else
+                    ' モデルが持つプロジェクト種別を判断して、ビューモデルを初期化する
                     If Me.ProjectKindList.Contains(Me.Model.ProjectKind) Then
                         Me.ViewModel.ProjectKind = Me.Model.ProjectKind
                         Me.ViewModel = Me.ViewModel.InitializeContext(Me.Model, Me.ViewModel, Me.AppInfo, Me.ProjectInfo)
@@ -387,6 +400,7 @@ Public Class UserDirectoryViewModel
                     End If
                 End If
             Case Else
+                ' xx : プロジェクトが構成されていない
                 msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
         End Select
 
@@ -406,6 +420,7 @@ Public Class UserDirectoryViewModel
         Me.ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
     End Sub
 
+    ' Window初期化時に呼び出し
     Public Sub MyInitializing(ByRef m As Model,
                               ByRef vm As ViewModel,
                               ByRef adm As AppDirectoryModel,
