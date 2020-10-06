@@ -1,4 +1,6 @@
 ﻿Imports System.ComponentModel
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class BaseViewModel2(Of T As {New})
     Implements INotifyPropertyChanged
@@ -93,13 +95,21 @@ Public Class BaseViewModel2(Of T As {New})
                                          ByRef vm As ViewModel,
                                          ByRef adm As AppDirectoryModel,
                                          ByRef pim As ProjectInfoModel)
-        Dim mm As New T
+        Dim obj As Object
+
         Model = m
         ViewModel = vm
         AppInfo = adm
         ProjectInfo = pim
+
         If Model.DataDictionary IsNot Nothing Then
-            MyModel = Model.DataDictionary(mm.GetType.Name)
+            obj = Model.DataDictionary((New T).GetType.Name)
+            Select Case obj.GetType
+                Case (New Object).GetType
+                    Me.MyModel = CType(obj, T)
+                Case (New JObject).GetType
+                    Me.MyModel = obj.ToObject(Of T)
+            End Select
         End If
     End Sub
 

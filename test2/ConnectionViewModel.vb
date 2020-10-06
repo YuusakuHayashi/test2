@@ -1,4 +1,7 @@
-﻿Public Class ConnectionViewModel
+﻿Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+
+Public Class ConnectionViewModel
     Inherits BaseViewModel2(Of ConnectionModel)
 
     Private _ServerName As String
@@ -122,11 +125,8 @@
         Return Me._ConnectionCommandEnableFlag
     End Function
 
-    Protected Overrides Sub ViewInitializing()
-    End Sub
-
-    Public Sub MyInitializing(ByRef m As Model, 
-                              ByRef vm As ViewModel, 
+    Public Sub MyInitializing(ByRef m As Model,
+                              ByRef vm As ViewModel,
                               ByRef adm As AppDirectoryModel,
                               ByRef pim As ProjectInfoModel)
         Dim ip As InitializingProxy

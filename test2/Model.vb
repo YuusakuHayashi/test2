@@ -44,7 +44,7 @@ Public Class Model
         End If
     End Sub
 
-    Public Function InitializeData() As Object
+    Public Function InitializeData() As Model
         Dim cm As ConnectionModel
         Dim dbtm As DBTestModel
         Dim sm As ServerModel
