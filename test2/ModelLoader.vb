@@ -5,6 +5,11 @@ Imports Newtonsoft.Json.Linq
 Public Class ModelLoader(Of T)
     Private Const SHIFT_JIS As String = "Shift-JIS"
 
+    Public Delegate Function LoadProxy(ByVal f As String) As T
+    Public Delegate Function LoadProxy(Of T2)(ByVal f As String) As T2
+    Public Delegate Sub SaveProxy(ByVal f As String, ByVal m As T)
+    Public Delegate Sub SaveProxy(Of T2)(ByVal f As String, ByVal m As T2)
+
     ' この関数は呼び出したオブジェクトのモデルをロードします
     Public Overloads Function ModelLoad(ByVal f As String) As T
         Dim txt As String

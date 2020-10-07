@@ -36,11 +36,11 @@ Public Class ProjectInfoModel
     End Property
 
     ' プロジェクトのビューモデルファイルです
-    Public ReadOnly Property ViewModelFileName As String
-        Get
-            Return DirectoryName & "\ViewModel.json"
-        End Get
-    End Property
+    'Public ReadOnly Property ViewModelFileName As String
+    '    Get
+    '        Return DirectoryName & "\ViewModel.json"
+    '    End Get
+    'End Property
 
     ' プロジェクトのモデルファイルです
     Public ReadOnly Property ModelFileName As String
@@ -113,9 +113,9 @@ Public Class ProjectInfoModel
         Call CreateFile(Me.ModelFileName)
     End Sub
 
-    Private Sub CreateProjectViewModelFile()
-        Call CreateFile(Me.ViewModelFileName)
-    End Sub
+    'Private Sub CreateProjectViewModelFile()
+    '    Call CreateFile(Me.ViewModelFileName)
+    'End Sub
 
     Private Sub CreateProjectIniFile()
         Call CreateFile(Me.IniFileName)
@@ -137,13 +137,13 @@ Public Class ProjectInfoModel
 
     ' この関数はプロジェクトの作成を行い、その結果を返します
     Public Function ProjectLaunch() As Integer
-        Dim proxy(3) As ProjectLaunchProxy
+        Dim proxy(2) As ProjectLaunchProxy
         Dim proxy2 As ProjectLaunchProxy
 
         proxy(0) = AddressOf CreateProjectDirectory
         proxy(1) = AddressOf CreateProjectIniFile
         proxy(2) = AddressOf CreateProjectModelFile
-        proxy(3) = AddressOf CreateProjectViewModelFile
+        'proxy(3) = AddressOf CreateProjectViewModelFile
 
         Dim code As Integer : code = CheckProjectDirectory()
         Try

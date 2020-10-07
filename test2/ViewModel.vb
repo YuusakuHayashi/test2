@@ -6,16 +6,16 @@
     Public Const HISTORY_VIEW As String = "HistoryView"
 
 
-    Private _ProjectKind As String
-    Public Property ProjectKind As String
-        Get
-            Return Me._ProjectKind
-        End Get
-        Set(value As String)
-            Me._ProjectKind = value
-            RaisePropertyChanged("ProjectKind")
-        End Set
-    End Property
+    'Private _ProjectKind As String
+    'Public Property ProjectKind As String
+    '    Get
+    '        Return Me._ProjectKind
+    '    End Get
+    '    Set(value As String)
+    '        Me._ProjectKind = value
+    '        RaisePropertyChanged("ProjectKind")
+    '    End Set
+    'End Property
 
     Private _MainViewContext As Object
     Public Property MainViewContext As Object
@@ -180,19 +180,22 @@
         Call Me._SetContextObject(viewName, modelName)
     End Sub
 
+    Public Delegate Sub InitializeProxy(ByVal pk As String, ByVal m As Model, ByVal vm As ViewModel, ByVal adm As AppDirectoryModel, ByVal pim As ProjectInfoModel)
+
 
     ' 初回時に必要なビューモデルコンテキストを全てディクショナリにセットします
-    Public Function InitializeContext(ByRef m As Model,
-                                      ByRef vm As ViewModel,
-                                      ByRef adm As AppDirectoryModel,
-                                      ByRef pim As ProjectInfoModel)
+    Public Overloads Sub InitializeContext(ByVal pk As String,
+                                           ByVal m As Model,
+                                           ByVal vm As ViewModel,
+                                           ByVal adm As AppDirectoryModel,
+                                           ByVal pim As ProjectInfoModel)
         Dim cvm As ConnectionViewModel
         Dim dbtvm As DBTestViewModel
         Dim dbevm As DBExplorerViewModel
         Dim hvm As HistoryViewModel
 
         '-- you henkou --------------------------------'
-        Select Case Me.ProjectKind
+        Select Case pk
             Case AppDirectoryModel.DB_TEST
                 cvm = New ConnectionViewModel()
                 dbtvm = New DBTestViewModel()
@@ -213,7 +216,5 @@
             Case Else
         End Select
         '----------------------------------------------'
-
-        InitializeContext = Me
-    End Function
+    End Sub
 End Class

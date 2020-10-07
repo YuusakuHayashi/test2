@@ -3,17 +3,6 @@
 Public Class Model
     Inherits BaseModel(Of Model)
 
-    Private _ProjectKind As String
-    Public Property ProjectKind As String
-        Get
-            Return Me._ProjectKind
-        End Get
-        Set(value As String)
-            Me._ProjectKind = value
-            RaisePropertyChanged("ProjectKind")
-        End Set
-    End Property
-
     Private _DataDictionary As Dictionary(Of String, Object)
     Public Property DataDictionary As Dictionary(Of String, Object)
         Get
@@ -44,14 +33,16 @@ Public Class Model
         End If
     End Sub
 
-    Public Function InitializeData() As Model
+    Public Delegate Sub InitializeProxy(ByVal pk As String)
+
+    Public Overloads Sub InitializeData(ByVal pk As String)
         Dim cm As ConnectionModel
         Dim dbtm As DBTestModel
         Dim sm As ServerModel
         Dim hm As HistoryModel
 
         '-- you henkou --------------------------------'
-        Select Case Me.ProjectKind
+        Select Case pk
             Case AppDirectoryModel.DB_TEST
                 cm = New ConnectionModel
                 dbtm = New DBTestModel
@@ -64,9 +55,7 @@ Public Class Model
             Case Else
         End Select
         '----------------------------------------------'
-
-        InitializeData = Me
-    End Function
+    End Sub
 
     '' このモデルを生成したＪＳＯＮファイル
     'Private _SourceFile As String

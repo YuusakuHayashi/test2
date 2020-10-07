@@ -4,7 +4,6 @@ Imports System.IO
 
 Public Class UserDirectoryViewModel
     Inherits BaseViewModel2(Of UserDirectoryViewModel)
-    'Inherits BaseViewModel2(Of UserDirectoryViewModel)
 
     Private Const _PROJECT_LOAD_FAILED As String = "プロジェクトのロードに失敗しました"
     Private Const _ISNOT_PROJECT_DIRECTORY As String = "このフォルダはプロジェクトディレクトリではありません"
@@ -30,6 +29,7 @@ Public Class UserDirectoryViewModel
         End Get
         Set(value As String)
             _ProjectName = value
+            ProjectInfo.Name = value
             RaisePropertyChanged("ProjectName")
             Call _UpdateProjectDirectoryName()
             Call _CheckAddProjectCommandEnabled()
@@ -43,7 +43,21 @@ Public Class UserDirectoryViewModel
         End Get
         Set(value As String)
             _ProjectDirectoryName = value
+            ProjectInfo.DirectoryName = value
             RaisePropertyChanged("ProjectDirectoryName")
+        End Set
+    End Property
+
+    ' 
+    Private _CurrentProjects As ObservableCollection(Of ProjectInfoModel)
+    Public Property CurrentProjects As ObservableCollection(Of ProjectInfoModel)
+        Get
+            Return _CurrentProjects
+        End Get
+        Set(value As ObservableCollection(Of ProjectInfoModel))
+            _CurrentProjects = value
+            AppInfo.CurrentProjects = value
+            RaisePropertyChanged("CurrentProjects")
         End Set
     End Property
 
@@ -65,6 +79,7 @@ Public Class UserDirectoryViewModel
         End Get
         Set(value As String)
             _ProjectKind = value
+            ProjectInfo.Kind = value
             RaisePropertyChanged("ProjectKind")
         End Set
     End Property
@@ -94,18 +109,6 @@ Public Class UserDirectoryViewModel
     Private Sub _UpdateProjectDirectoryName()
         ProjectDirectoryName = UserDirectoryName & "\" & ProjectName
     End Sub
-
-    Private _CurrentProjects As ObservableCollection(Of ProjectInfoModel)
-    Public Property CurrentProjects As ObservableCollection(Of ProjectInfoModel)
-        Get
-            Return _CurrentProjects
-        End Get
-        Set(value As ObservableCollection(Of ProjectInfoModel))
-            _CurrentProjects = value
-            RaisePropertyChanged("CurrentProjects")
-        End Set
-    End Property
-
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを選択）
     Private _SelectProjectCommand As ICommand
@@ -335,31 +338,66 @@ Public Class UserDirectoryViewModel
 
     ' コマンド実行（Ｐｒｏｊｅｃｔ追加）
     Private Sub _AddProjectCommandExecute(ByVal parameter As Object)
+        ' プロジェクトディレクトリ作成結果判定
+        Dim res As Integer : res = -1
+
+        Dim viproxy As ViewModel.InitializeProxy
+        Dim pk As String : pk = vbNullString
+        Dim m As Model : m = Model
+        Dim vm As ViewModel : vm = ViewModel
+        Dim adm As AppDirectoryModel : adm = AppInfo
+        Dim pim As ProjectInfoModel : pim = ProjectInfo
+
+        Dim miproxy As Model.InitializeProxy
+
+        Dim appsv As AppDirectoryModel.SaveProxy
+        Dim modelsv As Model.SaveProxy
+
+        ' 新規プロジェクト情報
         Dim elm As New ProjectInfoModel With {
             .DirectoryName = Me.ProjectDirectoryName,
-            .Name = ProjectName
+            .Name = Me.ProjectName,
+            .Kind = Me.ProjectKind
         }
-        If elm.ProjectLaunch() = 0 Then
-            ' AppInfo更新
-            Me.AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(elm, Me.CurrentProjects, 5)
-            Me.AppInfo.ModelSave(AppDirectoryModel.ModelFileName, Me.AppInfo)
 
-            ' ProjectInfo更新
-            Me.ProjectInfo = elm
+        res = elm.ProjectLaunch()
 
-            ' Model更新
-            Me.Model.ProjectKind = Me.ProjectKind
-            Me.Model = Me.Model.InitializeData()
-            Call Me.Model.ModelSave(elm.ModelFileName, Me.Model)
+        Select Case res
+            Case 0   ' 正常完了
+                ' アプリケーション情報更新
+                adm.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(elm, adm.CurrentProjects, 5)
+                appsv = AdressOf adm.ModelSave
 
-            ' ViewModel更新
-            Me.ViewModel.ProjectKind = Me.ProjectKind
-            Me.ViewModel = Me.ViewModel.InitializeContext(Me.Model, Me.ViewModel, Me.AppInfo, Me.ProjectInfo)
+                'AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
+                pk = elm.Kind
 
-            ' ViewModelは循環参照するのでセーブ不可
-            'Call Me.ViewModel.ModelSave(elm.ViewModelFileName, Me.ViewModel)
+                ' プロジェクト情報更新
+                pim = elm
 
-            Me.CurrentProjects = Me.AppInfo.CurrentProjects
+                miproxy = AddressOf m.InitializeData
+
+                viproxy = AddressOf vm.InitializeContext
+
+                'Me.CurrentProjects = Me.AppInfo.CurrentProjects
+        End Select
+
+        If appsv IsNot Nothing Then
+            If appsv.GetInvocationList() IsNot Nothing Then
+                Call appsv(AppDirectoryModel.ModelFileName, adm)
+            End If
+        End If
+
+        If miproxy IsNot Nothing Then
+            If miproxy.GetInvocationList() IsNot Nothing Then
+                Call miproxy(pk)
+                Call m.ModelSave(pim.ModelFileName, m)
+            End If
+        End If
+
+        If viproxy IsNot Nothing Then
+            If viproxy.GetInvocationList() IsNot Nothing Then
+                Call viproxy(pk, m, vm, adm, pim)
+            End If
         End If
     End Sub
 
@@ -371,41 +409,41 @@ Public Class UserDirectoryViewModel
 
     ' プロジェクトをチェックし、正当な場合、プロジェクトをスタートします
     Private Sub _CheckProject(ByVal project As ProjectInfoModel)
-        Dim msg As String : msg = vbNullString
         Dim ml As ModelLoader(Of Nullable)
 
-        Me.Message = vbNullString
+        Dim msg As String : msg = vbNullString
+
+        Dim iproxy As ViewModel.InitializeProxy
+        Dim pk As String : pk = vbNullString
+        Dim m As Model : m = Model
+        Dim vm As ViewModel : vm = ViewModel
+        Dim adm As AppDirectoryModel : adm = AppInfo
+        Dim pim As ProjectInfoModel : pim = ProjectInfo
 
         Select Case project.CheckProjectDirectory()
-            Case 0
-                '  0 : プロジェクトが構成されている
-                ' モデルを更新
+            Case 0      ' 正常
                 ml = New ModelLoader(Of Nullable)
-                Me.Model = ml.ModelLoad(Of Model)(project.ModelFileName)
+                m = ml.ModelLoad(Of Model)(project.ModelFileName)
 
-                ' プロジェクト情報を更新
-                Me.ProjectInfo = project
-
-                If Me.Model Is Nothing Then
-                    ' モデルオブジェクトがない場合、エラー扱いにする
+                If m Is Nothing Then
                     msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
                 Else
-                    ' モデルが持つプロジェクト種別を判断して、ビューモデルを初期化する
-                    If Me.ProjectKindList.Contains(Me.Model.ProjectKind) Then
-                        Me.ViewModel.ProjectKind = Me.Model.ProjectKind
-                        Me.ViewModel = Me.ViewModel.InitializeContext(Me.Model, Me.ViewModel, Me.AppInfo, Me.ProjectInfo)
-                        msg = vbNullString
-                    Else
-                        msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
-                    End If
+                    iproxy = AddressOf ViewModel.InitializeContext
+                    pk = project.Kind
+                    m = m
+
+                    msg = vbNullString
                 End If
-            Case Else
-                ' xx : プロジェクトが構成されていない
+            Case Else   ' プロジェクトが不正
                 msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
         End Select
 
-        If Not String.IsNullOrEmpty(msg) Then
-            Me.Message = msg
+        Me.Message = msg
+
+        If iproxy IsNot Nothing Then
+            If iproxy.GetInvocationList() IsNot Nothing Then
+                Call iproxy(pk, m, vm, adm, pim)
+            End If
         End If
     End Sub
 

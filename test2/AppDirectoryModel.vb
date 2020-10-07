@@ -70,6 +70,10 @@ Public Class AppDirectoryModel : Inherits ModelLoader(Of AppDirectoryModel)
         CheckAppDirectory = code
     End Function
 
+    Public Sub AddProject(project As ProjectInfoModel)
+        Me.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(project, Me.CurrentProjects, 5)
+    End Sub
+
     ' この関数はアプリケーションの作成を行い、その結果を返します
     Public Function AppLaunch() As Integer
         Dim proxy(2) As AppLaunchProxy

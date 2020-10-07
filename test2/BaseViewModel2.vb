@@ -94,10 +94,10 @@ Public Class BaseViewModel2(Of T As {New})
     ' ビューモデル初期化時のメインメソッド
     ' 共有のモデル・ビューモデル・アプリケーション情報、プロジェクト情報をセットする
     ' さらに各ビューモデルに対応するメインモデルもセットする
-    Protected Overloads Sub Initializing(ByRef m As Model,
-                                         ByRef vm As ViewModel,
-                                         ByRef adm As AppDirectoryModel,
-                                         ByRef pim As ProjectInfoModel)
+    Protected Overloads Sub Initializing(ByVal m As Model,
+                                         ByVal vm As ViewModel,
+                                         ByVal adm As AppDirectoryModel,
+                                         ByVal pim As ProjectInfoModel)
         Dim obj As Object
 
         Model = m
@@ -120,10 +120,10 @@ Public Class BaseViewModel2(Of T As {New})
         End If
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model,
-                                         ByRef vm As ViewModel,
-                                         ByRef adm As AppDirectoryModel,
-                                         ByRef pim As ProjectInfoModel,
+    Protected Overloads Sub Initializing(ByVal m As Model,
+                                         ByVal vm As ViewModel,
+                                         ByVal adm As AppDirectoryModel,
+                                         ByVal pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy)
         Call Initializing(m, vm, adm, pim)
 
@@ -131,10 +131,10 @@ Public Class BaseViewModel2(Of T As {New})
         Call ip()
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model,
-                                         ByRef vm As ViewModel,
-                                         ByRef adm As AppDirectoryModel,
-                                         ByRef pim As ProjectInfoModel,
+    Protected Overloads Sub Initializing(ByVal m As Model,
+                                         ByVal vm As ViewModel,
+                                         ByVal adm As AppDirectoryModel,
+                                         ByVal pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy,
                                          ByRef ccep As CheckCommandEnabledProxy)
         Call Initializing(m, vm, adm, pim, ip)
@@ -143,10 +143,10 @@ Public Class BaseViewModel2(Of T As {New})
         Call ccep()
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model,
-                                         ByRef vm As ViewModel,
-                                         ByRef adm As AppDirectoryModel,
-                                         ByRef pim As ProjectInfoModel,
+    Protected Overloads Sub Initializing(ByVal m As Model,
+                                         ByVal vm As ViewModel,
+                                         ByVal adm As AppDirectoryModel,
+                                         ByVal pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy,
                                          ByRef ahp As AddHandlerProxy)
         Call Initializing(m, vm, adm, pim, ip)
@@ -155,10 +155,10 @@ Public Class BaseViewModel2(Of T As {New})
         Call ahp()
     End Sub
 
-    Protected Overloads Sub Initializing(ByRef m As Model,
-                                         ByRef vm As ViewModel,
-                                         ByRef adm As AppDirectoryModel,
-                                         ByRef pim As ProjectInfoModel,
+    Protected Overloads Sub Initializing(ByVal m As Model,
+                                         ByVal vm As ViewModel,
+                                         ByVal adm As AppDirectoryModel,
+                                         ByVal pim As ProjectInfoModel,
                                          ByRef ip As InitializingProxy,
                                          ByRef ccep As CheckCommandEnabledProxy,
                                          ByRef ahp As AddHandlerProxy)

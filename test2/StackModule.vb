@@ -1,6 +1,6 @@
 ﻿Module StackModule
     Public Function Push(Of ColT As {IList, New}, T)(ByVal elm As T, 
-                                                     ByRef [old] As ColT, 
+                                                     ByVal [old] As ColT, 
                                                      ByVal max As Integer)
         Dim [new] As New ColT
 
