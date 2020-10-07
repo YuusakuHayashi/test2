@@ -341,17 +341,15 @@ Public Class UserDirectoryViewModel
         ' プロジェクトディレクトリ作成結果判定
         Dim res As Integer : res = -1
 
-        Dim viproxy As ViewModel.InitializeProxy
         Dim pk As String : pk = vbNullString
+
+        Dim vminit As ViewModel.InitializeProxy
         Dim m As Model : m = Model
         Dim vm As ViewModel : vm = ViewModel
         Dim adm As AppDirectoryModel : adm = AppInfo
         Dim pim As ProjectInfoModel : pim = ProjectInfo
 
-        Dim miproxy As Model.InitializeProxy
-
-        Dim appsv As AppDirectoryModel.SaveProxy
-        Dim modelsv As Model.SaveProxy
+        Dim minit As Model.InitializeProxy
 
         ' 新規プロジェクト情報
         Dim elm As New ProjectInfoModel With {
@@ -364,41 +362,36 @@ Public Class UserDirectoryViewModel
 
         Select Case res
             Case 0   ' 正常完了
-                ' アプリケーション情報更新
-                adm.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(elm, adm.CurrentProjects, 5)
-                appsv = AdressOf adm.ModelSave
-
-                'AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
                 pk = elm.Kind
-
-                ' プロジェクト情報更新
+                minit = AddressOf m.InitializeData
+                vminit = AddressOf vm.InitializeContext
+                adm.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(elm, adm.CurrentProjects, 5)
                 pim = elm
-
-                miproxy = AddressOf m.InitializeData
-
-                viproxy = AddressOf vm.InitializeContext
-
-                'Me.CurrentProjects = Me.AppInfo.CurrentProjects
         End Select
 
-        If appsv IsNot Nothing Then
-            If appsv.GetInvocationList() IsNot Nothing Then
-                Call appsv(AppDirectoryModel.ModelFileName, adm)
-            End If
+        If minit IsNot Nothing Then
+            Call minit(pk)
         End If
 
-        If miproxy IsNot Nothing Then
-            If miproxy.GetInvocationList() IsNot Nothing Then
-                Call miproxy(pk)
-                Call m.ModelSave(pim.ModelFileName, m)
-            End If
+        If vminit IsNot Nothing Then
+            Call vminit(pk, m, vm, adm, pim)
         End If
 
-        If viproxy IsNot Nothing Then
-            If viproxy.GetInvocationList() IsNot Nothing Then
-                Call viproxy(pk, m, vm, adm, pim)
-            End If
+        ProjectInfo = pim
+
+        If Not AppInfo.Equals(adm) Then
+            AppInfo = adm
+            Call AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
         End If
+
+        ViewModel = vm
+
+        If Not Model.Equals(m) Then
+            Model = m
+            Call Model.ModelSave(pim.ModelFileName, Model)
+        End If
+
+        Me.CurrentProjects = AppInfo.CurrentProjects
     End Sub
 
 
@@ -409,18 +402,22 @@ Public Class UserDirectoryViewModel
 
     ' プロジェクトをチェックし、正当な場合、プロジェクトをスタートします
     Private Sub _CheckProject(ByVal project As ProjectInfoModel)
+        Dim res As Integer : res = -1
+
         Dim ml As ModelLoader(Of Nullable)
 
         Dim msg As String : msg = vbNullString
 
-        Dim iproxy As ViewModel.InitializeProxy
+        Dim vminit As ViewModel.InitializeProxy
         Dim pk As String : pk = vbNullString
         Dim m As Model : m = Model
         Dim vm As ViewModel : vm = ViewModel
         Dim adm As AppDirectoryModel : adm = AppInfo
         Dim pim As ProjectInfoModel : pim = ProjectInfo
 
-        Select Case project.CheckProjectDirectory()
+        res = project.CheckProjectDirectory()
+
+        Select Case res
             Case 0      ' 正常
                 ml = New ModelLoader(Of Nullable)
                 m = ml.ModelLoad(Of Model)(project.ModelFileName)
@@ -428,9 +425,11 @@ Public Class UserDirectoryViewModel
                 If m Is Nothing Then
                     msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
                 Else
-                    iproxy = AddressOf ViewModel.InitializeContext
                     pk = project.Kind
-                    m = m
+                    ' m = m
+                    vminit = AddressOf ViewModel.InitializeContext
+                    ' adm = adm
+                    ' pim = pim
 
                     msg = vbNullString
                 End If
@@ -438,27 +437,25 @@ Public Class UserDirectoryViewModel
                 msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
         End Select
 
-        Me.Message = msg
-
-        If iproxy IsNot Nothing Then
-            If iproxy.GetInvocationList() IsNot Nothing Then
-                Call iproxy(pk, m, vm, adm, pim)
-            End If
+        If vminit IsNot Nothing Then
+            Call vminit(pk, m, vm, adm, pim)
         End If
+
+        Me.Message = msg
     End Sub
 
     Protected Overrides Sub ViewInitializing()
-        Me.UserDirectoryName = Me.ProjectInfo.DirectoryName
-        Me.ProjectName = Me.ProjectInfo.Name
+        Me.UserDirectoryName = ProjectInfo.DirectoryName
+        Me.ProjectName = ProjectInfo.Name
         Me.ProjectKindList = AppDirectoryModel.ProjectKindList
-        Me.CurrentProjects = Me.AppInfo.CurrentProjects
+        Me.CurrentProjects = AppInfo.CurrentProjects
         If Me.CurrentProjects Is Nothing Then
             Me.CurrentProjects = New ObservableCollection(Of ProjectInfoModel)
         End If
         Me.ViewModel.SetContext(ViewModel.MAIN_VIEW, Me.GetType.Name, Me)
     End Sub
 
-    ' Window初期化時に呼び出し
+
     Public Sub MyInitializing(ByRef m As Model,
                               ByRef vm As ViewModel,
                               ByRef adm As AppDirectoryModel,

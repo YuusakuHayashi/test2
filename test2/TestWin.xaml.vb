@@ -25,9 +25,9 @@ Public Class TestWin
         Dim adm As AppDirectoryModel
 
         ' ProjectInfoModel, Model, ViewModelは各プログラムでロード（更新）
-        Dim pim As New ProjectInfoModel
         Dim m As New Model
         Dim vm As New ViewModel
+        Dim pim As New ProjectInfoModel
 
         adm = ml.ModelLoad(Of AppDirectoryModel)(AppDirectoryModel.ModelFileName)
         If adm Is Nothing Then
@@ -35,7 +35,6 @@ Public Class TestWin
         End If
         adm.ModelSave(AppDirectoryModel.ModelFileName, adm)
 
-        'Dim udvm As New UserDirectoryViewModel(m, vm, adm, pim)
         Dim udvm As New UserDirectoryViewModel
         Call udvm.MyInitializing(m, vm, adm, pim)
 
