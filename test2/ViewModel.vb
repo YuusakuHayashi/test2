@@ -182,13 +182,20 @@
 
     Public Delegate Sub InitializeProxy(ByVal pk As String, ByVal m As Model, ByVal vm As ViewModel, ByVal adm As AppDirectoryModel, ByVal pim As ProjectInfoModel)
 
+    Public Sub NoInitialize(ByVal pk As String,
+                            ByVal m As Model,
+                            ByVal vm As ViewModel,
+                            ByVal adm As AppDirectoryModel,
+                            ByVal pim As ProjectInfoModel)
+        ' Nothing To Do
+    End Sub
 
     ' 初回時に必要なビューモデルコンテキストを全てディクショナリにセットします
-    Public Overloads Sub InitializeContext(ByVal pk As String,
-                                           ByVal m As Model,
-                                           ByVal vm As ViewModel,
-                                           ByVal adm As AppDirectoryModel,
-                                           ByVal pim As ProjectInfoModel)
+    Public Overloads Sub InitializeViewModelsOfProject(ByVal pk As String,
+                                                       ByVal m As Model,
+                                                       ByVal vm As ViewModel,
+                                                       ByVal adm As AppDirectoryModel,
+                                                       ByVal pim As ProjectInfoModel)
         Dim cvm As ConnectionViewModel
         Dim dbtvm As DBTestViewModel
         Dim dbevm As DBExplorerViewModel

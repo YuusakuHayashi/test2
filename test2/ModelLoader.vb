@@ -55,6 +55,9 @@ Public Class ModelLoader(Of T)
         End Try
     End Function
 
+    Public Sub NoSave(ByVal f As String, ByVal m As T)
+        ' Nothing To Do
+    End Sub
 
     Public Overloads Sub ModelSave(ByVal f As String,
                                    ByVal m As T)

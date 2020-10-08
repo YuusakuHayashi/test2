@@ -35,7 +35,7 @@ Public Class Model
 
     Public Delegate Sub InitializeProxy(ByVal pk As String)
 
-    Public Overloads Sub InitializeData(ByVal pk As String)
+    Public Overloads Sub InitializeModels(ByVal pk As String)
         Dim cm As ConnectionModel
         Dim dbtm As DBTestModel
         Dim sm As ServerModel

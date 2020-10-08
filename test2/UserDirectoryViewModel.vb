@@ -203,7 +203,10 @@ Public Class UserDirectoryViewModel
 
     ' コマンド実行（Ｐｒｏｊｅｃｔを開く）
     Private Sub _OpenProjectCommandExecute(ByVal parameter As Object)
+        Dim p As ProjectInfoModel
         Dim project As ProjectInfoModel
+        Dim ml As ModelLoader(Of Nullable)
+
         Dim fbd As New FolderBrowserDialog With {
              .Description = "プロジェクトを開く",
              .RootFolder = Environment.SpecialFolder.Desktop,
@@ -212,9 +215,11 @@ Public Class UserDirectoryViewModel
         }
 
         If fbd.ShowDialog() = DialogResult.OK Then
-            project = New ProjectInfoModel With {
+            p = New ProjectInfoModel With {
                 .DirectoryName = fbd.SelectedPath
             }
+            project = p.LoadProject(p.ProjectInfoFileName)
+
             Call _CheckProject(project)
         End If
     End Sub
@@ -338,57 +343,32 @@ Public Class UserDirectoryViewModel
 
     ' コマンド実行（Ｐｒｏｊｅｃｔ追加）
     Private Sub _AddProjectCommandExecute(ByVal parameter As Object)
-        ' プロジェクトディレクトリ作成結果判定
         Dim res As Integer : res = -1
-
-        Dim pk As String : pk = vbNullString
-
-        Dim vminit As ViewModel.InitializeProxy
-        Dim m As Model : m = Model
-        Dim vm As ViewModel : vm = ViewModel
-        Dim adm As AppDirectoryModel : adm = AppInfo
-        Dim pim As ProjectInfoModel : pim = ProjectInfo
-
-        Dim minit As Model.InitializeProxy
+        Dim rtn As Action(Of ProjectInfoModel)
 
         ' 新規プロジェクト情報
-        Dim elm As New ProjectInfoModel With {
+        Dim project As New ProjectInfoModel With {
             .DirectoryName = Me.ProjectDirectoryName,
             .Name = Me.ProjectName,
             .Kind = Me.ProjectKind
         }
 
-        res = elm.ProjectLaunch()
-
+        res = project.ProjectLaunch()
         Select Case res
             Case 0   ' 正常完了
-                pk = elm.Kind
-                minit = AddressOf m.InitializeData
-                vminit = AddressOf vm.InitializeContext
-                adm.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(elm, adm.CurrentProjects, 5)
-                pim = elm
+                rtn = Sub(p)
+                          AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(p, AppInfo.CurrentProjects, 5)
+                          Call AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
+                          ProjectInfo = p
+                          Call ProjectInfo.ModelSave(p.ProjectInfoFileName, ProjectInfo)
+                          Call Model.InitializeModels(p.Kind)
+                          Call Model.ModelSave(p.ModelFileName, Model)
+                          Call ViewModel.InitializeViewModelsOfProject(p.Kind, Model, ViewModel, AppInfo, ProjectInfo)
+                      End Sub
         End Select
 
-        If minit IsNot Nothing Then
-            Call minit(pk)
-        End If
-
-        If vminit IsNot Nothing Then
-            Call vminit(pk, m, vm, adm, pim)
-        End If
-
-        ProjectInfo = pim
-
-        If Not AppInfo.Equals(adm) Then
-            AppInfo = adm
-            Call AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
-        End If
-
-        ViewModel = vm
-
-        If Not Model.Equals(m) Then
-            Model = m
-            Call Model.ModelSave(pim.ModelFileName, Model)
+        If rtn IsNot Nothing Then
+            Call rtn(project)
         End If
 
         Me.CurrentProjects = AppInfo.CurrentProjects
@@ -403,42 +383,31 @@ Public Class UserDirectoryViewModel
     ' プロジェクトをチェックし、正当な場合、プロジェクトをスタートします
     Private Sub _CheckProject(ByVal project As ProjectInfoModel)
         Dim res As Integer : res = -1
-
+        Dim m As Model
         Dim ml As ModelLoader(Of Nullable)
-
         Dim msg As String : msg = vbNullString
-
-        Dim vminit As ViewModel.InitializeProxy
-        Dim pk As String : pk = vbNullString
-        Dim m As Model : m = Model
-        Dim vm As ViewModel : vm = ViewModel
-        Dim adm As AppDirectoryModel : adm = AppInfo
-        Dim pim As ProjectInfoModel : pim = ProjectInfo
+        Dim vinit As ViewModel.InitializeProxy
+        Dim rtn As Action(Of ProjectInfoModel)
 
         res = project.CheckProjectDirectory()
-
         Select Case res
             Case 0      ' 正常
                 ml = New ModelLoader(Of Nullable)
                 m = ml.ModelLoad(Of Model)(project.ModelFileName)
-
                 If m Is Nothing Then
                     msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
                 Else
-                    pk = project.Kind
-                    ' m = m
-                    vminit = AddressOf ViewModel.InitializeContext
-                    ' adm = adm
-                    ' pim = pim
-
+                    rtn = Sub(p)
+                        Call ViewModel.InitializeViewModelsOfProject(p.Kind, Model, ViewModel, AppInfo, ProjectInfo)
+                    End Sub
                     msg = vbNullString
                 End If
             Case Else   ' プロジェクトが不正
                 msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
         End Select
 
-        If vminit IsNot Nothing Then
-            Call vminit(pk, m, vm, adm, pim)
+        If rtn IsNot Nothing Then
+            Call rtn(project)
         End If
 
         Me.Message = msg

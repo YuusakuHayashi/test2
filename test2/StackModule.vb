@@ -1,7 +1,8 @@
 ﻿Module StackModule
-    Public Function Push(Of ColT As {IList, New}, T)(ByVal elm As T, 
-                                                     ByVal [old] As ColT, 
-                                                     ByVal max As Integer)
+    Public Delegate Function PushProxy(Of ColT As {IList, New}, T)(ByVal elm As T, ByVal [old] As ColT, ByVal max As Integer) As ColT
+    Public Function Push(Of ColT As {IList, New}, T)(ByVal elm As T,
+                                                     ByVal [old] As ColT,
+                                                     ByVal max As Integer) As ColT
         Dim [new] As New ColT
 
         [new].Add(elm)

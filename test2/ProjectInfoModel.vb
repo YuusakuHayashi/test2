@@ -35,13 +35,6 @@ Public Class ProjectInfoModel
         End Set
     End Property
 
-    ' プロジェクトのビューモデルファイルです
-    'Public ReadOnly Property ViewModelFileName As String
-    '    Get
-    '        Return DirectoryName & "\ViewModel.json"
-    '    End Get
-    'End Property
-
     ' プロジェクトのモデルファイルです
     Public ReadOnly Property ModelFileName As String
         Get
@@ -53,6 +46,12 @@ Public Class ProjectInfoModel
     Public ReadOnly Property IniFileName As String
         Get
             Return DirectoryName & "\Project.ini"
+        End Get
+    End Property
+
+    Public ReadOnly Property ProjectInfoFileName As String
+        Get
+            Return DirectoryName & "\ProjectInfo.json"
         End Get
     End Property
 
@@ -113,22 +112,37 @@ Public Class ProjectInfoModel
         Call CreateFile(Me.ModelFileName)
     End Sub
 
-    'Private Sub CreateProjectViewModelFile()
-    '    Call CreateFile(Me.ViewModelFileName)
-    'End Sub
-
     Private Sub CreateProjectIniFile()
         Call CreateFile(Me.IniFileName)
     End Sub
 
+    Private Sub CreateProjectInfoFile()
+        Call CreateFile(Me.ProjectInfoFileName)
+    End Sub
+
+    Public Overloads Function LoadProject(ByVal p As ProjectInfoModel) As ProjectInfoModel
+        Dim project As ProjectInfoModel
+        project = p.ModelLoad(p.ProjectInfoFileName)
+        LoadProject = project
+    End Function
+
+    Public Overloads Function LoadProject(ByVal f As String) As ProjectInfoModel
+        Dim project As ProjectInfoModel
+        Dim ml As New ModelLoader(Of Nullable)
+        project = ml.ModelLoad(Of ProjectInfoModel)(f)
+        LoadProject = project
+    End Function
 
     ' この関数はプロジェクトディレクトリの存在チェックを行います
     Public Function CheckProjectDirectory() As Integer
         Dim code As Integer : code = 99
         If Directory.Exists(Me.DirectoryName) Then
             code = 10
-            If File.Exists(Me.IniFileName) Then
-                code = 0
+            If File.Exists(Me.ProjectInfoFileName) Then
+                code = 20
+                If File.Exists(Me.IniFileName) Then
+                    code = 0
+                End If
             End If
         End If
         CheckProjectDirectory = code
@@ -137,13 +151,13 @@ Public Class ProjectInfoModel
 
     ' この関数はプロジェクトの作成を行い、その結果を返します
     Public Function ProjectLaunch() As Integer
-        Dim proxy(2) As ProjectLaunchProxy
+        Dim proxy(3) As ProjectLaunchProxy
         Dim proxy2 As ProjectLaunchProxy
 
         proxy(0) = AddressOf CreateProjectDirectory
         proxy(1) = AddressOf CreateProjectIniFile
         proxy(2) = AddressOf CreateProjectModelFile
-        'proxy(3) = AddressOf CreateProjectViewModelFile
+        proxy(3) = AddressOf CreateProjectInfoFile
 
         Dim code As Integer : code = CheckProjectDirectory()
         Try
