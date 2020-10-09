@@ -111,6 +111,7 @@ Public Class UserDirectoryViewModel
     End Sub
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを選択）
+    '---------------------------------------------------------------------------------------------'
     Private _SelectProjectCommand As ICommand
     Public ReadOnly Property SelectProjectCommand As ICommand
         Get
@@ -126,15 +127,11 @@ Public Class UserDirectoryViewModel
         End Get
     End Property
 
-
-    'コマンド実行可否のチェック（Ｐｒｏｊｅｃｔを選択）
     Private Sub _CheckSelectProjectCommandEnabled()
         Dim b As Boolean : b = True
         Me._SelectProjectCommandEnableFlag = b
     End Sub
 
-
-    'コマンド実行可否のフラグ（Ｐｒｏｊｅｃｔを選択）
     Private __SelectProjectCommandEnableFlag As Boolean
     Public Property _SelectProjectCommandEnableFlag As Boolean
         Get
@@ -147,8 +144,6 @@ Public Class UserDirectoryViewModel
         End Set
     End Property
 
-
-    ' コマンド実行（Ｐｒｏｊｅｃｔを選択）
     Private Sub _SelectProjectCommandExecute(ByVal parameter As Object)
         Dim project As ProjectInfoModel
         project = Me.SelectedProject
@@ -156,14 +151,14 @@ Public Class UserDirectoryViewModel
         Call _CheckProject(project)
     End Sub
 
-
-    ' コマンド有効／無効（Ｐｒｏｊｅｃｔを選択）
     Private Function _SelectProjectCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._SelectProjectCommandEnableFlag
     End Function
+    '---------------------------------------------------------------------------------------------'
 
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを開く）
+    '---------------------------------------------------------------------------------------------'
     Private _OpenProjectCommand As ICommand
     Public ReadOnly Property OpenProjectCommand As ICommand
         Get
@@ -179,15 +174,11 @@ Public Class UserDirectoryViewModel
         End Get
     End Property
 
-
-    'コマンド実行可否のチェック（Ｐｒｏｊｅｃｔを開く）
     Private Sub _CheckOpenProjectCommandEnabled()
         Dim b As Boolean : b = True
         Me._OpenProjectCommandEnableFlag = b
     End Sub
 
-
-    'コマンド実行可否のフラグ（Ｐｒｏｊｅｃｔを開く）
     Private __OpenProjectCommandEnableFlag As Boolean
     Public Property _OpenProjectCommandEnableFlag As Boolean
         Get
@@ -200,12 +191,16 @@ Public Class UserDirectoryViewModel
         End Set
     End Property
 
-
-    ' コマンド実行（Ｐｒｏｊｅｃｔを開く）
     Private Sub _OpenProjectCommandExecute(ByVal parameter As Object)
         Dim p As ProjectInfoModel
         Dim project As ProjectInfoModel
         Dim ml As ModelLoader(Of Nullable)
+        Dim loadResult As Integer
+        Dim checker As CommonModule.CheckModelProxy(Of ProjectInfoModel)
+
+        Dim a As Integer : a = CommonModule.CheckLoadModel(Of ProjectInfoModel)("a")
+
+        checker = AddressOf CommonModule.CheckLoadModel(Of ProjectInfoModel)
 
         Dim fbd As New FolderBrowserDialog With {
              .Description = "プロジェクトを開く",
@@ -218,17 +213,18 @@ Public Class UserDirectoryViewModel
             p = New ProjectInfoModel With {
                 .DirectoryName = fbd.SelectedPath
             }
+            loadResult = checker(p.ProjectInfoFileName)
+
             project = p.LoadProject(p.ProjectInfoFileName)
 
             Call _CheckProject(project)
         End If
     End Sub
 
-
-    ' コマンド有効／無効（Ｐｒｏｊｅｃｔを開く）
     Private Function _OpenProjectCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._OpenProjectCommandEnableFlag
     End Function
+    '---------------------------------------------------------------------------------------------'
 
 
     ' コマンドプロパティ（ＩｎｐｕｔＢｏｘ）

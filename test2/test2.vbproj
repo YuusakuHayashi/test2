@@ -85,6 +85,7 @@
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
+    <Compile Include="CommonModule.vb" />
     <Compile Include="ConnectionModel.vb" />
     <Compile Include="ConnectionViewModel.vb" />
     <Compile Include="DBExplorerModel.vb" />
