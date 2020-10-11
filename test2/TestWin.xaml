@@ -555,7 +555,7 @@
                 </HierarchicalDataTemplate.ItemContainerStyle>-->
             </HierarchicalDataTemplate>
 
-            <DataTemplate
+            <!--<DataTemplate
                 DataType="{x:Type local:MenuModel}">
                 <StackPanel                    
                     Orientation="Horizontal"
@@ -569,7 +569,7 @@
                         Text="{Binding DisplayName}"
                         BorderThickness="0,0,0,0" />
                 </StackPanel>
-            </DataTemplate>
+            </DataTemplate>-->
 
             <HierarchicalDataTemplate
                 DataType="{x:Type local:ServerModel}"
@@ -601,10 +601,10 @@
                         VerticalContentAlignment="Center"
                         IsEnabled="{Binding IsEnabled}"
                         IsChecked="{Binding IsChecked}"/>
-                    <Image 
+                    <!--<Image 
                         Height="15"
                         Width="15"
-                        Source="{StaticResource DataBaseImage}" />
+                        Source="{StaticResource DataBaseImage}" />-->
                     <TextBlock 
                         Margin="5,3,3,3"
                         IsEnabled="{Binding IsEnabled}"
@@ -625,10 +625,10 @@
                         VerticalContentAlignment="Center"
                         IsEnabled="{Binding IsEnabled}"
                         IsChecked="{Binding IsChecked}"/>
-                    <Image 
+                    <!--<Image 
                         Height="15"
                         Width="15"
-                        Source="{StaticResource DataTableImage}" />
+                        Source="{StaticResource DataTableImage}" />-->
                     <TextBlock 
                         Margin="5,3,3,3"
                         IsEnabled="{Binding IsEnabled}"
@@ -714,7 +714,6 @@
                         Text="{Binding HistoryContents}" ScrollViewer.CanContentScroll="False" UseLayoutRounding="False" AllowDrop="True" Height="Auto"/>
                 </DockPanel>
             </DataTemplate>
-
         </Grid.Resources>
 
         <ContentControl                
@@ -730,11 +729,6 @@
             DockPanel.Dock="Left"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" />
-        <ContentControl
-            x:Name="MainFlame"
-            Grid.Row="0"
-            Grid.Column="2"
-            Content="{Binding MainViewContext}" />
         <GridSplitter
             Grid.Row="1"
             Grid.Column="2"

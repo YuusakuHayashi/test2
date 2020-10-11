@@ -19,26 +19,26 @@ Public Class TestWin
         '
 
         ' Of T型は何でも良い
-        Dim ml As New ModelLoader(Of Nullable)
+        'Dim ml As New JsonHandler(Of Nullable)
 
-        ' AppDirectoryModelはここでロード
-        Dim adm As AppDirectoryModel
+        '' AppDirectoryModelはここでロード
+        'Dim adm As AppDirectoryModel
 
-        ' ProjectInfoModel, Model, ViewModelは各プログラムでロード（更新）
-        Dim m As New Model
-        Dim vm As New ViewModel
-        Dim pim As New ProjectInfoModel
+        '' ProjectInfoModel, Model, ViewModelは各プログラムでロード（更新）
+        'Dim m As New Model
+        'Dim vm As New ViewModel
+        'Dim pim As New ProjectInfoModel
 
-        adm = ml.ModelLoad(Of AppDirectoryModel)(AppDirectoryModel.ModelFileName)
-        If adm Is Nothing Then
-            adm = New AppDirectoryModel
-        End If
-        adm.ModelSave(AppDirectoryModel.ModelFileName, adm)
+        'adm = ml.ModelLoad(Of AppDirectoryModel)(AppDirectoryModel.ModelFileName)
+        'If adm Is Nothing Then
+        '    adm = New AppDirectoryModel
+        'End If
+        'adm.ModelSave(AppDirectoryModel.ModelFileName, adm)
 
-        Dim udvm As New UserDirectoryViewModel
-        Call udvm.MyInitializing(m, vm, adm, pim)
+        'Dim udvm As New UserDirectoryViewModel
+        'Call udvm.MyInitializing(m, vm, adm, pim)
 
-        Me.MainFlame.DataContext = vm
+        'Me.MainFlame.DataContext = vm
 
 
         '' 可変ファイル名のロード

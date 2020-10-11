@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 
 Public Class ProjectInfoModel
-    Inherits ModelLoader(Of ProjectInfoModel)
+    Inherits JsonHandler(Of ProjectInfoModel)
 
     Private Const SHIFT_JIS As String = "Shift-JIS"
 
@@ -84,30 +84,6 @@ Public Class ProjectInfoModel
         End Try
     End Sub
 
-    'Private Sub CreateProjectModelFile()
-    '    Try
-    '        File.Create(Me.ModelFileName)
-    '    Catch ex As Exception
-    '        Throw New Exception
-    '    End Try
-    'End Sub
-
-    'Private Sub CreateProjectViewModelFile()
-    '    Try
-    '        File.Create(Me.ViewModelFileName)
-    '    Catch ex As Exception
-    '        Throw New Exception
-    '    End Try
-    'End Sub
-
-    'Private Sub CreateProjectIniFile()
-    '    Try
-    '        File.Create(Me.IniFileName)
-    '    Catch ex As Exception
-    '        Throw New Exception
-    '    End Try
-    'End Sub
-
     Private Sub CreateProjectModelFile()
         Call CreateFile(Me.ModelFileName)
     End Sub
@@ -128,55 +104,80 @@ Public Class ProjectInfoModel
 
     Public Overloads Function LoadProject(ByVal f As String) As ProjectInfoModel
         Dim project As ProjectInfoModel
-        Dim ml As New ModelLoader(Of Nullable)
+        Dim ml As New JsonHandler(Of Nullable)
         project = ml.ModelLoad(Of ProjectInfoModel)(f)
         LoadProject = project
     End Function
 
     ' この関数はプロジェクトディレクトリの存在チェックを行います
-    Public Function CheckProjectDirectory() As Integer
-        Dim code As Integer : code = 99
+    Public Function CheckStructure() As Integer
+        Dim code As Integer : code = -1
         If Directory.Exists(Me.DirectoryName) Then
-            code = 10
             If File.Exists(Me.ProjectInfoFileName) Then
-                code = 20
                 If File.Exists(Me.IniFileName) Then
                     code = 0
+                Else
+                    code = 10
                 End If
+            Else
+                code = 100
             End If
+        Else
+            code = 1000
         End If
-        CheckProjectDirectory = code
+        CheckStructure = code
     End Function
+
+    'Public Function CheckProjectDirectory() As Integer
+    '    Dim code As Integer : code = 99
+    '    If Directory.Exists(Me.DirectoryName) Then
+    '        code = 10
+    '        If File.Exists(Me.ProjectInfoFileName) Then
+    '            code = 20
+    '            If File.Exists(Me.IniFileName) Then
+    '                code = 0
+    '            End If
+    '        End If
+    '    End If
+    '    CheckProjectDirectory = code
+    'End Function
 
 
     ' この関数はプロジェクトの作成を行い、その結果を返します
-    Public Function ProjectLaunch() As Integer
-        Dim proxy(3) As ProjectLaunchProxy
-        Dim proxy2 As ProjectLaunchProxy
+    Public Sub Launch()
+        Call Me.CreateProjectDirectory()
+        Call Me.CreateProjectIniFile()
+        Call Me.CreateProjectInfoFile()
+        Call Me.CreateProjectModelFile()
+    End Sub
 
-        proxy(0) = AddressOf CreateProjectDirectory
-        proxy(1) = AddressOf CreateProjectIniFile
-        proxy(2) = AddressOf CreateProjectModelFile
-        proxy(3) = AddressOf CreateProjectInfoFile
+    'Public Function ProjectLaunch() As Integer
+    '    Dim proxy(3) As ProjectLaunchProxy
+    '    Dim proxy2 As ProjectLaunchProxy
 
-        Dim code As Integer : code = CheckProjectDirectory()
-        Try
-            Select Case code
-                Case 0
-                Case 10
-                Case 99
-                    proxy2 = [Delegate].Combine(proxy)
-                Case Else
-            End Select
-            If proxy2 IsNot Nothing Then
-                If proxy2.GetInvocationList IsNot Nothing Then
-                    Call proxy2()
-                    code = 0
-                End If
-            End If
-        Catch ex As Exception
-        Finally
-            ProjectLaunch = code
-        End Try
-    End Function
+    '    proxy(0) = AddressOf CreateProjectDirectory
+    '    proxy(1) = AddressOf CreateProjectIniFile
+    '    proxy(2) = AddressOf CreateProjectModelFile
+    '    proxy(3) = AddressOf CreateProjectInfoFile
+
+    '    Dim code As Integer : code = CheckProjectDirectory()
+    '    Try
+    '        Select Case code
+    '            Case 0
+    '            Case 10
+    '            Case 99
+    '                proxy2 = [Delegate].Combine(proxy)
+    '            Case Else
+    '        End Select
+    '        If proxy2 IsNot Nothing Then
+    '            If proxy2.GetInvocationList IsNot Nothing Then
+    '                Call proxy2()
+    '                code = 0
+    '            End If
+    '        End If
+    '    Catch ex As Exception
+    '    Finally
+    '        ProjectLaunch = code
+    '    End Try
+    'End Function
 End Class

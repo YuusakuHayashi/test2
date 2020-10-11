@@ -1,0 +1,123 @@
+﻿<Window x:Class="Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:test2"
+        mc:Ignorable="d"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        Title="Window" Height="450" Width="800">
+    <Grid>
+        <Grid.Resources>
+            <!-- タブで表示するタイプ -->
+            <DataTemplate
+                DataType="{x:Type local:TabViewModel}">
+                <TabControl ItemsSource="{Binding Tabs}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding Content}" />
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </DataTemplate>
+
+            <!-- 通常タイプ -->
+            <DataTemplate DataType="{x:Type local:NormalViewModel}">
+                <ContentControl Content="{Binding Content}" />
+            </DataTemplate>
+
+            <DataTemplate
+                DataType="{x:Type local:UserDirectoryViewModel}">
+                <DockPanel>
+                    <StackPanel
+                        DockPanel.Dock="Left">
+                        <TextBlock Text="プロジェクト" />
+                        <ListBox
+                            DockPanel.Dock="Top"
+                            SelectedItem="{Binding SelectedProject}"
+                            BorderThickness="0,0,0,0"                            
+                            ItemsSource="{Binding CurrentProjects}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock 
+                                            Text="{Binding Name}">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <behaviors:Interaction.Triggers>
+                                <behaviors:EventTrigger 
+                                    EventName="MouseDoubleClick">
+                                    <behaviors:InvokeCommandAction Command="{Binding SelectProjectCommand}" />
+                                </behaviors:EventTrigger>
+                            </behaviors:Interaction.Triggers>
+                        </ListBox>
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                        <TextBlock 
+                            Text="プロジェクトの種類" />
+                        <ComboBox
+                            SelectedIndex="0"
+                            SelectedValue="{Binding ProjectKind}"
+                            ItemsSource="{Binding ProjectKindList}" />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                        <TextBlock 
+                            Text="ディレクトリ名" />
+                        <TextBox 
+                            Width="250"
+                            Text="{Binding UserDirectoryName}" />
+                        <Button 
+                            Content="..."
+                            Command="{Binding InputBoxCommand}"/>
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                        <TextBlock Text="プロジェクト名" />
+                        <TextBox 
+                            Width="250"
+                            Text="{Binding ProjectName}" />
+                    </StackPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <TextBlock Text="{Binding ProjectDirectoryName}" />
+                    </StackPanel>
+                    <StackPanel
+                        HorizontalAlignment="Stretch"
+                        DockPanel.Dock="Top">
+                        <StackPanel
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                            <Button
+                                x:Name="OpenProjectButton"
+                                Content="開く"
+                                Command="{Binding OpenProjectCommand}"/>
+                            <Button
+                                Content="作成"
+                                Command="{Binding AddProjectCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <TextBlock
+                            Text="{Binding Message}"/>
+                    </StackPanel>
+                </DockPanel>
+            </DataTemplate>
+            
+        </Grid.Resources>
+        <ContentControl
+            Content="{Binding MainViewContent}"/>
+    </Grid>
+</Window>

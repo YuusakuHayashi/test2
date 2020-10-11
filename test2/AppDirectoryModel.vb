@@ -1,7 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.IO
 
-Public Class AppDirectoryModel : Inherits ModelLoader(Of AppDirectoryModel)
+Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
 
     ' この静的メンバはアプリケーションディレクトリを表します
     Public Shared AppDirectoryName _
@@ -69,7 +69,6 @@ Public Class AppDirectoryModel : Inherits ModelLoader(Of AppDirectoryModel)
         End If
         CheckAppDirectory = code
     End Function
-
 
     ' この関数はアプリケーションの作成を行い、その結果を返します
     Public Function AppLaunch() As Integer

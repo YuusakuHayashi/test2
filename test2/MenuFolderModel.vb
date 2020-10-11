@@ -51,7 +51,7 @@ Public Class MenuFolderModel
     ' コレクションのセット
     Private Sub _MenusUpdate()
         Dim flg As Boolean
-        For Each vdic In _PrivateViewModel.ContextDictionary
+        For Each vdic In _PrivateViewModel.ContentDictionary
             For Each c In vdic.Value
                 flg = True
                 For Each m In Me.Menus
@@ -94,7 +94,7 @@ Public Class MenuFolderModel
 
     ' 変更要求受理
     Private Sub _MenuChangeRequestAccept(ByVal mm As MenuModel)
-        Me._PrivateViewModel.ChangeContext(mm.ViewName, mm.Name, mm)
+        Me._PrivateViewModel.ChangeContent(mm.ViewName, mm.Name, mm)
     End Sub
 
 

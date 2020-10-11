@@ -2,13 +2,38 @@
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
-Public Class ModelLoader(Of T)
+Public Class JsonHandler(Of T)
     Private Const SHIFT_JIS As String = "Shift-JIS"
 
     Public Delegate Function LoadProxy(ByVal f As String) As T
     Public Delegate Function LoadProxy(Of T2)(ByVal f As String) As T2
     Public Delegate Sub SaveProxy(ByVal f As String, ByVal m As T)
     Public Delegate Sub SaveProxy(Of T2)(ByVal f As String, ByVal m As T2)
+
+    'Public Function CheckLoadModel(Of T)(ByVal f As String) As Integer
+    '    Dim returnCode As Integer : returnCode = -1
+    '    Dim m As T
+    '    Try
+    '        m = Me.ModelLoad(Of T)(f)
+    '        returnCode = 0
+    '    Catch ex As Exception
+    '        returnCode = 99
+    '    End Try
+
+    '    CheckLoadModel = returnCode
+    'End Function
+
+    Public Overloads Function CheckModel(Of T2)(ByVal f As String) As Boolean
+        Dim b As Boolean : b = False
+        Dim m As T2
+        Try
+            m = Me.ModelLoad(Of T2)(f)
+            b = True
+        Catch ex As Exception
+            b = False
+        End Try
+        CheckModel = b
+    End Function
 
     ' この関数は呼び出したオブジェクトのモデルをロードします
     Public Overloads Function ModelLoad(ByVal f As String) As T

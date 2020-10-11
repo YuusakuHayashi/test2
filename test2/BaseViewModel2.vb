@@ -36,16 +36,6 @@ Public Class BaseViewModel2(Of T As {New})
         End Set
     End Property
 
-    'Private _Model As Object
-    'Public Property Model As Object
-    '    Get
-    '        Return _Model
-    '    End Get
-    '    Set(value As Object)
-    '        _Model = value
-    '    End Set
-    'End Property
-
     Private _ViewModel As ViewModel
     Public Property ViewModel As ViewModel
         Get
@@ -109,8 +99,8 @@ Public Class BaseViewModel2(Of T As {New})
         If Model.DataDictionary IsNot Nothing Then
             obj = Model.DataDictionary((New T).GetType.Name)
             Select Case obj.GetType
-                'Case (New Object).GetType
-                '    Me.MyModel = CType(obj, T)
+                Case (New Object).GetType
+                    Me.MyModel = CType(obj, T)
                 Case (New JObject).GetType
                     ' Ｊｓｏｎからロードした場合は、JObject型になっている
                     Me.MyModel = obj.ToObject(Of T)

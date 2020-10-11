@@ -85,7 +85,15 @@
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
-    <Compile Include="CommonModule.vb" />
+    <Compile Include="CollectionModule.vb" />
+    <Compile Include="DelegateAction.vb" />
+    <Compile Include="NormalViewModel.vb" />
+    <Compile Include="TabItemModel.vb" />
+    <Compile Include="TabViewModel.vb" />
+    <Compile Include="Window.xaml.vb">
+      <DependentUpon>Window.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="_CommonModule.vb" />
     <Compile Include="ConnectionModel.vb" />
     <Compile Include="ConnectionViewModel.vb" />
     <Compile Include="DBExplorerModel.vb" />
@@ -97,7 +105,7 @@
     <Compile Include="HistoryModel.vb" />
     <Compile Include="MigraterViewModelCommands.vb" />
     <Compile Include="Model2.vb" />
-    <Compile Include="ModelLoader.vb" />
+    <Compile Include="JsonHandler.vb" />
     <Compile Include="MyDelegater.vb" />
     <Compile Include="ConditionChangedEventListener.vb" />
     <Compile Include="ConditionModel.vb" />
@@ -221,6 +229,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TestWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Window.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

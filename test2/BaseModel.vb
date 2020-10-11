@@ -1,7 +1,7 @@
 ﻿Imports System.ComponentModel
 
 Public MustInherit Class BaseModel(Of T)
-    Inherits ModelLoader(Of T)
+    Inherits JsonHandler(Of T)
     Implements INotifyPropertyChanged
 
     'Public ReadOnly Property ClassName As String

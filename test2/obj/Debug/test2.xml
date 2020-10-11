@@ -64,6 +64,16 @@ BatchMenuView
 InitializeComponent
 </summary>
 </member>
+<member name="T:test2.Window">
+<summary>
+Window
+</summary>
+</member>
+<member name="M:test2.Window.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
 <member name="T:test2.MainWin">
 <summary>
 MainWin
