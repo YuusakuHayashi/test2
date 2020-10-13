@@ -14,6 +14,7 @@ Public Class BaseViewModel2(Of T As {New})
         )
     End Sub
     '--------------------------------------------------------------------------------------------------'
+
     Private _Model As Model
     Public Property Model As Model
         Get
@@ -24,17 +25,15 @@ Public Class BaseViewModel2(Of T As {New})
         End Set
     End Property
 
-    '---------------------------------'
-    'Private _MyModel As T
-    'Public Property MyModel As T
-    '    Get
-    '        Return _MyModel
-    '    End Get
-    '    Set(value As T)
-    '        _MyModel = value
-    '    End Set
-    'End Property
-    '---------------------------------'
+    Private _Data As T
+    Public Property Data As T
+        Get
+            Return _Data
+        End Get
+        Set(value As T)
+            _Data = value
+        End Set
+    End Property
 
     Private _ViewModel As ViewModel
     Public Property ViewModel As ViewModel
@@ -66,11 +65,12 @@ Public Class BaseViewModel2(Of T As {New})
         End Set
     End Property
 
-    Protected Delegate Sub InitializingProxy()
-    Protected Delegate Sub ContextModelCheckProxy()
-    Protected Delegate Sub ViewModelInitializingProxy()
+    Protected Property InitializeHandler As Action
+    Protected Property CheckCommandEnabledHandler As Action
+    Protected Property [AddHandler] As Action
+
+    Protected Delegate Sub InitializeProxy()
     Protected Delegate Sub CheckCommandEnabledProxy()
-    Protected Delegate Sub AddHandlerProxy()
 
     Protected Overridable Sub ViewInitializing()
         'Nothing To Do
@@ -87,71 +87,87 @@ Public Class BaseViewModel2(Of T As {New})
                                          ByVal vm As ViewModel,
                                          ByVal adm As AppDirectoryModel,
                                          ByVal pim As ProjectInfoModel)
-        Model = m
-        ViewModel = vm
-        AppInfo = adm
-        ProjectInfo = pim
+        Dim obj As Object
+        Dim ih = Me.InitializeHandler
+        Dim cceh = Me.CheckCommandEnabledHandler
+        Dim ah = Me.[AddHandler]
 
-        '' ビューモデルに対応するメインモデルをセットする
-        'If Model.DataDictionary IsNot Nothing Then
-        '    obj = Model.DataDictionary((New T).GetType.Name)
-        '    Select Case obj.GetType
-        '        Case (New Object).GetType
-        '            Me.MyModel = CType(obj, T)
-        '        Case (New JObject).GetType
-        '            ' Ｊｓｏｎからロードした場合は、JObject型になっている
-        '            Me.MyModel = obj.ToObject(Of T)
-        '        Case (New T).GetType
-        '            Me.MyModel = obj
-        '    End Select
-        'End If
+        Me.Model = m
+        Me.ViewModel = vm
+        Me.AppInfo = adm
+        Me.ProjectInfo = pim
+
+        If Me.Model.Data <> Nothing Then
+            obj = Me.Model.Data
+            Select Case obj.GetType
+                Case (New Object).GetType
+                    Me.Data = CType(obj, T)
+                Case (New JObject).GetType
+                    ' Ｊｓｏｎからロードした場合は、JObject型になっている
+                    Me.Data = obj.ToObject(Of T)
+                Case (New T).GetType
+                    Me.Data = obj
+            End Select
+        Else
+            Me.Data = New T
+        End If
+
+        If ih <> Nothing Then
+            Call ih()
+        End If
+        If cceh <> Nothing Then
+            Call cceh()
+        End If
+        If ah <> Nothing Then
+            Call ah()
+        End If
     End Sub
 
-    Protected Overloads Sub Initializing(ByVal m As Model,
-                                         ByVal vm As ViewModel,
-                                         ByVal adm As AppDirectoryModel,
-                                         ByVal pim As ProjectInfoModel,
-                                         ByRef ip As InitializingProxy)
-        Call Initializing(m, vm, adm, pim)
+    'Protected Overloads Sub Initializing(ByVal m As Model,
+    '                                     ByVal vm As ViewModel,
+    '                                     ByVal adm As AppDirectoryModel,
+    '                                     ByVal pim As ProjectInfoModel,
+    '                                     ByRef ip As InitializeProxy)
+    '    Call Initializing(m, vm, adm, pim)
 
-        ' 自身(ビューモデル）の初期化設定を行います
-        Call ip()
-    End Sub
+    '    ' 自身(ビューモデル）の初期化設定を行います
+    '    Call ip()
+    'End Sub
 
-    Protected Overloads Sub Initializing(ByVal m As Model,
-                                         ByVal vm As ViewModel,
-                                         ByVal adm As AppDirectoryModel,
-                                         ByVal pim As ProjectInfoModel,
-                                         ByRef ip As InitializingProxy,
-                                         ByRef ccep As CheckCommandEnabledProxy)
-        Call Initializing(m, vm, adm, pim, ip)
+    'Protected Overloads Sub Initializing(ByVal m As Model,
+    '                                     ByVal vm As ViewModel,
+    '                                     ByVal adm As AppDirectoryModel,
+    '                                     ByVal pim As ProjectInfoModel,
+    '                                     ByRef ip As InitializeProxy,
+    '                                     ByRef ccep As CheckCommandEnabledProxy)
+    '    Call Initializing(m, vm, adm, pim, ip)
 
-        ' コマンド実行可否の設定
-        Call ccep()
-    End Sub
+    '    ' コマンド実行可否の設定
+    '    Call ccep()
+    'End Sub
 
-    Protected Overloads Sub Initializing(ByVal m As Model,
-                                         ByVal vm As ViewModel,
-                                         ByVal adm As AppDirectoryModel,
-                                         ByVal pim As ProjectInfoModel,
-                                         ByRef ip As InitializingProxy,
-                                         ByRef ahp As AddHandlerProxy)
-        Call Initializing(m, vm, adm, pim, ip)
+    'Protected Overloads Sub Initializing(ByVal m As Model,
+    '                                     ByVal vm As ViewModel,
+    '                                     ByVal adm As AppDirectoryModel,
+    '                                     ByVal pim As ProjectInfoModel,
+    '                                     ByRef ip As InitializeProxy,
+    '                                     ByRef ahp As AddHandlerProxy)
+    '    Call Initializing(m, vm, adm, pim, ip)
 
-        ' イベントハンドラの登録
-        Call ahp()
-    End Sub
+    '    ' イベントハンドラの登録
+    '    Call ahp()
+    'End Sub
 
-    Protected Overloads Sub Initializing(ByVal m As Model,
-                                         ByVal vm As ViewModel,
-                                         ByVal adm As AppDirectoryModel,
-                                         ByVal pim As ProjectInfoModel,
-                                         ByRef ip As InitializingProxy,
-                                         ByRef ccep As CheckCommandEnabledProxy,
-                                         ByRef ahp As AddHandlerProxy)
-        Call Initializing(m, vm, adm, pim, ip, ccep)
+    'Protected Overloads Sub Initializing(ByVal m As Model,
+    '                                     ByVal vm As ViewModel,
+    '                                     ByVal adm As AppDirectoryModel,
+    '                                     ByVal pim As ProjectInfoModel,
+    '                                     ByRef ip As InitializeProxy,
+    '                                     ByRef ccep As CheckCommandEnabledProxy,
+    '                                     ByRef ahp As AddHandlerProxy)
+    '    Call Initializing(m, vm, adm, pim, ip, ccep)
 
-        ' イベントハンドラの登録
-        Call ahp()
-    End Sub
+    '    ' イベントハンドラの登録
+    '    Call ahp()
+    'End Sub
 End Class

@@ -1,6 +1,6 @@
 ﻿Imports System.ComponentModel
 
-Public MustInherit Class BaseModel(Of T)
+Public MustInherit Class BaseModel(Of T As New)
     Inherits JsonHandler(Of T)
     Implements INotifyPropertyChanged
 

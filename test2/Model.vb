@@ -48,28 +48,19 @@ Public Class Model
 
     Public Delegate Sub InitializeProxy(ByVal pk As String)
 
-    Public Overloads Sub InitializeModels(ByVal project As ProjectInfoModel)
+    Public Overloads Sub Setup(ByVal project As ProjectInfoModel)
         Dim jh As New JsonHandler(Of Object)
-
-
-        Dim cm As ConnectionModel
         Dim dbtm As DBTestModel
-        Dim sm As ServerModel
-        Dim hm As HistoryModel
 
         ModelFileName = project.ModelFileName
 
         '-- you henkou --------------------------------'
         Select Case project.Kind
             Case AppDirectoryModel.DB_TEST
-                With jh
-                    .LoadHandler = AddressOf ModelLoad(Of DBTestModel)
-                    .LoadHandlerIfFailed = AddressOf NewLoad(Of DBTestModel)
-                    .LoadHandlerIfNull = AddressOf NewLoad(Of DBTestModel)
-                End With
-
                 dbtm = jh.ModelLoad(Of DBTestModel)()
-                dbtm = New DBTestModel
+                If dbtm Is Nothing Then
+                    dbtm = New DBTestModel 
+                End If
                 Me.Data = dbtm
             Case Else
         End Select

@@ -149,7 +149,7 @@ Public Class ConnectionViewModel
             .ConnectionString = Me.ConnectionString
         }
         b = sh.AccessTest()
-        Me.MyModel.ConnectionResult = b
+        Data.ConnectionResult = b
         If b Then
             Me.Message = _SUCCESS_MESSAGE
             'Call Me.Model.SetData(Me.MyModel.GetType.Name, Me.MyModel)
@@ -167,15 +167,12 @@ Public Class ConnectionViewModel
                               ByRef vm As ViewModel,
                               ByRef adm As AppDirectoryModel,
                               ByRef pim As ProjectInfoModel)
-        Dim ip As InitializingProxy
-        ip = AddressOf ViewInitializing
 
-        Dim ccep(0) As CheckCommandEnabledProxy
-        Dim ccep2 As CheckCommandEnabledProxy
-        ccep(0) = AddressOf Me._CheckConnectionCommandEnabled
-        ccep2 = [Delegate].Combine(ccep)
+        CheckCommandEnabledHandler = [Delegate].Combine(
+            New Action(AddressOf _CheckConnectionCommandEnabled)
+        )
 
-        Call Initializing(m, vm, adm, pim, ip, ccep2)
+        Call Initializing(m, vm, adm, pim)
     End Sub
 
     Sub New()

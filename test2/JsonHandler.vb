@@ -29,11 +29,6 @@ Public Class JsonHandler(Of T As New)
         CheckModel = b
     End Function
 
-    ' この関数はイニシャライズしたモデルオブジェクトを返します
-    Public Overloads Function NewLoad(ByVal f As String) As T
-        Return New T
-    End Function
-
     ' この関数は呼び出したオブジェクトのモデルをロードします
     Public Overloads Function ModelLoad(ByVal f As String) As T
         Dim txt As String
@@ -47,25 +42,13 @@ Public Class JsonHandler(Of T As New)
             txt = sr.ReadToEnd()
 
             ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
-            If ModelLoad Is Nothing Then
-                If LoadHandlerIfNull <> Nothing Then
-                    ModelLoad = LoadHandlerIfNull(f)
-                End If
-            End If
         Catch ex As Exception
-            If LoadHandlerIfFailed <> Nothing Then
-                ModelLoad = LoadHandlerIfFailed(f)
-            End If
         Finally
             If sr IsNot Nothing Then
                 sr.Close()
                 sr.Dispose()
             End If
         End Try
-    End Function
-
-    Public Overloads Function NewLoad(Of T2 As New)(ByVal f As String) As T2
-        Return New T2
     End Function
 
     ' この関数は指定したジェネリックモデルをロードします
@@ -85,15 +68,7 @@ Public Class JsonHandler(Of T As New)
             txt = sr.ReadToEnd()
 
             ModelLoad = JsonConvert.DeserializeObject(Of T2)(txt)
-            If ModelLoad Is Nothing Then
-                If LoadHandlerIfNull <> Nothing Then
-                    ModelLoad = LoadHandlerIfNull(Of T2)(f)
-                End If
-            End If
         Catch ex As Exception
-            If LoadHandlerIfFailed <> Nothing Then
-                ModelLoad = LoadHandlerIfFailed(Of T2)(f)
-            End If
         Finally
             If sr IsNot Nothing Then
                 sr.Close()

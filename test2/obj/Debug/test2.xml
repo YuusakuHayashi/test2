@@ -74,16 +74,6 @@ Window
 InitializeComponent
 </summary>
 </member>
-<member name="T:test2.MainWin">
-<summary>
-MainWin
-</summary>
-</member>
-<member name="M:test2.MainWin.InitializeComponent">
-<summary>
-InitializeComponent
-</summary>
-</member>
 <member name="T:test2.TestWin">
 <summary>
 TestWin
@@ -155,6 +145,16 @@ InitView
 </summary>
 </member>
 <member name="M:test2.InitView.InitializeComponent">
+<summary>
+InitializeComponent
+</summary>
+</member>
+<member name="T:test2.MainWin">
+<summary>
+MainWin
+</summary>
+</member>
+<member name="M:test2.MainWin.InitializeComponent">
 <summary>
 InitializeComponent
 </summary>

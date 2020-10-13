@@ -344,29 +344,13 @@ Public Class UserDirectoryViewModel
 
         i = launcher.ExecuteIfCan(project)
         If i = 0 Then
-            AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(project, AppInfo.CurrentProjects, 5)
-            Call AppInfo.ModelSave(
-                AppDirectoryModel.ModelFileName,
-                AppInfo
-            )
+            Me.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(project, Me.CurrentProjects, 5)
+            Call AppInfo.AppSave()
             ProjectInfo = project
-            Call ProjectInfo.ModelSave(
-                project.ProjectInfoFileName,
-                ProjectInfo
-            )
-            Call Model.InitializeModels(project.Kind)
-            Call Model.ModelSave(
-                project.ModelFileName,
-                Model
-            )
-            Call ViewModel.InitializeViewModelsOfProject(
-                project.Kind,
-                Model,
-                ViewModel,
-                AppInfo,
-                ProjectInfo
-            )
-            Me.CurrentProjects = AppInfo.CurrentProjects
+            Call ProjectInfo.ProjectSave()
+            Call Model.Setup(project)
+            Call Model.ModelSave(project.ModelFileName, Model)
+            Call ViewModel.Setup(project.Kind, Model, ViewModel, AppInfo, ProjectInfo)
         End If
     End Sub
 
@@ -401,20 +385,14 @@ Public Class UserDirectoryViewModel
         If i = 0 Then
             i2 = modelLoader.ExecuteIfCan(project)
             If i2 = 0 Then
-                Call ViewModel.InitializeViewModelsOfProject(
-                    ProjectInfo.Kind,
-                    Model,
-                    ViewModel,
-                    AppInfo,
-                    ProjectInfo
-                )
+                Call ViewModel.Setup(ProjectInfo.Kind, Model, ViewModel, AppInfo, ProjectInfo)
                 msg = vbNullString
             Else
                 msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
             End If
         Else
             Call _DeleteProject(project)
-            Call AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
+            Call AppInfo.AppSave()
             msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
         End If
 
@@ -450,12 +428,12 @@ Public Class UserDirectoryViewModel
     End Function
 
     Private Function _CheckProjectInfo(ByVal project As ProjectInfoModel) As Boolean
-        Dim jh As New JsonHandler(Of Nullable)
+        Dim jh As New JsonHandler(Of Object)
         Return (jh.CheckModel(Of ProjectInfoModel)(project.ProjectInfoFileName))
     End Function
 
     Private Function _CheckModel(ByVal project As ProjectInfoModel) As Boolean
-        Dim jh As New JsonHandler(Of Nullable)
+        Dim jh As New JsonHandler(Of Object)
         Return (jh.CheckModel(Of Model)(project.ModelFileName))
     End Function
 
@@ -463,12 +441,12 @@ Public Class UserDirectoryViewModel
     End Sub
 
     Private Sub _LoadProjectInfo(ByVal project As ProjectInfoModel)
-        Dim jh As New JsonHandler(Of Nullable)
+        Dim jh As New JsonHandler(Of Object)
         Me.ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
     End Sub
 
     Private Sub _LoadModel(ByVal project As ProjectInfoModel)
-        Dim jh As New JsonHandler(Of Nullable)
+        Dim jh As New JsonHandler(Of Object)
         Me.Model = jh.ModelLoad(Of Model)(project.ModelFileName)
     End Sub
 
@@ -501,17 +479,17 @@ Public Class UserDirectoryViewModel
                               ByRef vm As ViewModel,
                               ByRef adm As AppDirectoryModel,
                               ByRef pim As ProjectInfoModel)
-        Dim ip As InitializingProxy
-        ip = AddressOf ViewInitializing
+        InitializeHandler _
+            = AddressOf ViewInitializing
+        CheckCommandEnabledHandler _
+            = [Delegate].Combine(
+                New Action(AddressOf _CheckAddProjectCommandEnabled),
+                New Action(AddressOf _CheckInputBoxCommandEnabled),
+                New Action(AddressOf _CheckOpenProjectCommandEnabled),
+                New Action(AddressOf _CheckSelectProjectCommandEnabled)
+            )
 
-        Dim ccep(2) As CheckCommandEnabledProxy
-        Dim ccep2 As CheckCommandEnabledProxy
-        ccep(0) = AddressOf Me._CheckInputBoxCommandEnabled
-        ccep(1) = AddressOf Me._CheckOpenProjectCommandEnabled
-        ccep(2) = AddressOf Me._CheckSelectProjectCommandEnabled
-        ccep2 = [Delegate].Combine(ccep)
-
-        Call Initializing(m, vm, adm, pim, ip, ccep2)
+        Call Initializing(m, vm, adm, pim)
     End Sub
 
     ' ビューモデルは必ず、Initializingメソッドを呼び出すこと

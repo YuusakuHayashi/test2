@@ -57,6 +57,10 @@ Public Class ProjectInfoModel
 
     Public Delegate Sub ProjectLaunchProxy()
 
+    Public Sub ProjectSave()
+        Me.ModelSave(Me.ProjectInfoFileName, Me)
+    End Sub
+
     Private Sub CreateProjectDirectory()
         Try
             Directory.CreateDirectory(Me.DirectoryName)
@@ -104,7 +108,7 @@ Public Class ProjectInfoModel
 
     Public Overloads Function LoadProject(ByVal f As String) As ProjectInfoModel
         Dim project As ProjectInfoModel
-        Dim ml As New JsonHandler(Of Nullable)
+        Dim ml As New JsonHandler(Of Object)
         project = ml.ModelLoad(Of ProjectInfoModel)(f)
         LoadProject = project
     End Function

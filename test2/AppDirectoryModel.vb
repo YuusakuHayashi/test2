@@ -15,6 +15,10 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     Public Shared AppIniFileName _
         = AppDirectoryModel.AppDirectoryName & "\App.ini"
 
+    Public Sub AppSave()
+        Call Me.ModelSave(AppDirectoryModel.ModelFileName, Me)
+    End Sub
+
     Public Const DB_TEST As String = "データベーステスト(.dbt)"
     Public Shared ProjectKindList As List(Of String) _
         = New List(Of String) From {

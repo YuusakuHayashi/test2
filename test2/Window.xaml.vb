@@ -7,7 +7,7 @@ Public Class Window
         InitializeComponent()
 
         ' InitializeComponent() 呼び出しの後で初期化を追加します。
-        Dim ml As New JsonHandler(Of Nullable)
+        Dim ml As New JsonHandler(Of Object)
 
         Dim app As AppDirectoryModel
         Dim m As New Model
