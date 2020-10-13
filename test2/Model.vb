@@ -3,55 +3,74 @@
 Public Class Model
     Inherits BaseModel(Of Model)
 
-    Private _DataDictionary As Dictionary(Of String, Object)
-    Public Property DataDictionary As Dictionary(Of String, Object)
+    Private _Data As Object
+    Public Property Data As Object
         Get
-            Return Me._DataDictionary
+            Return Me._Data
         End Get
-        Set(value As Dictionary(Of String, Object))
-            Me._DataDictionary = value
+        Set(value As Object)
+            Me._Data = value
         End Set
     End Property
 
-    ' そのモデルに対応するデータがない場合、
-    ' その格納用のメモリを確保します
-    Private Sub _DictionaryCheck(ByVal view As String, ByVal nm As String)
-        If Me.DataDictionary Is Nothing Then
-            Me.DataDictionary = New Dictionary(Of String, Object)
-        End If
-    End Sub
+    '-- ディクショナリでのモデル保持は現在廃止 ---------------------------------------------------'
+    '-- 使い道はありそうなので、残しておく -------------------------------------------------------'
+    'Private _DataDictionary As Dictionary(Of String, Object)
+    'Public Property DataDictionary As Dictionary(Of String, Object)
+    '    Get
+    '        Return Me._DataDictionary
+    '    End Get
+    '    Set(value As Dictionary(Of String, Object))
+    '        Me._DataDictionary = value
+    '    End Set
+    'End Property
 
-    ' モデルのディクショナリへの追加・更新を行います
-    Public Overloads Sub SetData(ByVal modelName As String, ByRef data As Object)
-        If Me.DataDictionary Is Nothing Then
-            Me.DataDictionary = New Dictionary(Of String, Object)
-        End If
-        If Not Me.DataDictionary.ContainsKey(modelName) Then
-            Me.DataDictionary.Add(modelName, data)
-        Else
-            Me.DataDictionary(modelName) = data
-        End If
-    End Sub
+    '' そのモデルに対応するデータがない場合、
+    '' その格納用のメモリを確保します
+    'Private Sub _DictionaryCheck(ByVal view As String, ByVal nm As String)
+    '    If Me.DataDictionary Is Nothing Then
+    '        Me.DataDictionary = New Dictionary(Of String, Object)
+    '    End If
+    'End Sub
+
+    '' モデルのディクショナリへの追加・更新を行います
+    'Public Overloads Sub SetData(ByVal modelName As String, ByRef data As Object)
+    '    If Me.DataDictionary Is Nothing Then
+    '        Me.DataDictionary = New Dictionary(Of String, Object)
+    '    End If
+    '    If Not Me.DataDictionary.ContainsKey(modelName) Then
+    '        Me.DataDictionary.Add(modelName, data)
+    '    Else
+    '        Me.DataDictionary(modelName) = data
+    '    End If
+    'End Sub
+    '---------------------------------------------------------------------------------------------'
 
     Public Delegate Sub InitializeProxy(ByVal pk As String)
 
-    Public Overloads Sub InitializeModels(ByVal pk As String)
+    Public Overloads Sub InitializeModels(ByVal project As ProjectInfoModel)
+        Dim jh As New JsonHandler(Of Object)
+
+
         Dim cm As ConnectionModel
         Dim dbtm As DBTestModel
         Dim sm As ServerModel
         Dim hm As HistoryModel
 
+        ModelFileName = project.ModelFileName
+
         '-- you henkou --------------------------------'
-        Select Case pk
+        Select Case project.Kind
             Case AppDirectoryModel.DB_TEST
-                cm = New ConnectionModel
+                With jh
+                    .LoadHandler = AddressOf ModelLoad(Of DBTestModel)
+                    .LoadHandlerIfFailed = AddressOf NewLoad(Of DBTestModel)
+                    .LoadHandlerIfNull = AddressOf NewLoad(Of DBTestModel)
+                End With
+
+                dbtm = jh.ModelLoad(Of DBTestModel)()
                 dbtm = New DBTestModel
-                sm = New ServerModel
-                hm = New HistoryModel
-                Call Me.SetData(cm.GetType.Name, cm)
-                Call Me.SetData(dbtm.GetType.Name, dbtm)
-                Call Me.SetData(sm.GetType.Name, sm)
-                Call Me.SetData(hm.GetType.Name, hm)
+                Me.Data = dbtm
             Case Else
         End Select
         '----------------------------------------------'

@@ -13,7 +13,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ServerName = value
-            Me.MyModel.ServerName = value
+            Model.Data.ServerName = value
             RaisePropertyChanged("ServerName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -27,7 +27,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._DataBaseName = value
-            Me.MyModel.DataBaseName = value
+            Model.Data.DataBaseName = value
             RaisePropertyChanged("DataBaseName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -51,7 +51,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ConnectionString = value
-            Me.MyModel.ConnectionString = value
+            Model.Data.ConnectionString = value
             RaisePropertyChanged("ConnectionString")
             Call _GetOtherProperty()
         End Set
@@ -146,14 +146,14 @@ Public Class ConnectionViewModel
         ' ビジネスロジックに該当しそうだが、こちらで実行する
         Dim b As Boolean
         Dim sh As New SqlHandler With {
-            .ConnectionString = Me.MyModel.ConnectionString
+            .ConnectionString = Me.ConnectionString
         }
         b = sh.AccessTest()
         Me.MyModel.ConnectionResult = b
         If b Then
             Me.Message = _SUCCESS_MESSAGE
-            Call Me.Model.SetData(Me.MyModel.GetType.Name, Me.MyModel)
-            Call Me.Model.ModelSave(ProjectInfo.ModelFileName, Model)
+            'Call Me.Model.SetData(Me.MyModel.GetType.Name, Me.MyModel)
+            'Call Me.Model.ModelSave(ProjectInfo.ModelFileName, Model)
         Else
             Me.Message = sh.ResultMessage
         End If

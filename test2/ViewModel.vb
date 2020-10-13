@@ -187,31 +187,34 @@ Public Class ViewModel
 
     ' --------------------------------------------------------------------------------------------'
     ' タブコレクション関連
-    ' コンテントディクショナリ
-    Private _TabsDictionary As Dictionary(Of String, ObservableCollection(Of TabItemModel))
-    Public Property TabsDictionary As Dictionary(Of String, ObservableCollection(Of TabItemModel))
+    ' タブディクショナリ
+    Private _TabsDictionary As Dictionary(Of String, TabViewModel)
+    Public Property TabsDictionary As Dictionary(Of String, TabViewModel)
         Get
             Return Me._TabsDictionary
         End Get
-        Set(value As Dictionary(Of String, ObservableCollection(Of TabItemModel)))
+        Set(value As Dictionary(Of String, TabViewModel))
             Me._TabsDictionary = value
         End Set
     End Property
 
-    ' コンテントディクショナリが存在しない場合、新規作成し
+    ' タブディクショナリが存在しない場合、新規作成し
     ' ビューディクショナリが存在しない場合、追加します
     Private Sub _RegisterTabViewToDictionary(ByVal view As String)
         If Me.TabsDictionary Is Nothing Then
-            Me.TabsDictionary = New Dictionary(Of String, ObservableCollection(Of TabItemModel))
+            Me.TabsDictionary = New Dictionary(Of String, TabViewModel)
         End If
         If Not Me.TabsDictionary.ContainsKey(view) Then
-            Me.TabsDictionary.Add(view, New ObservableCollection(Of TabItemModel))
+            Me.TabsDictionary.Add(view, New TabViewModel)
+        End If
+        If Me.TabsDictionary(view).Tabs Is Nothing Then
+            Me.TabsDictionary(view).Tabs = New ObservableCollection(Of TabItemModel)
         End If
     End Sub
 
     ' ビューのDataContentに実際にセットします
     Private Sub _SetTabsObject(ByVal view As String)
-        Dim o As ObservableCollection(Of TabItemModel)
+        Dim o As TabViewModel
         o = Me.TabsDictionary(view)
 
         Select Case view
@@ -229,15 +232,15 @@ Public Class ViewModel
     ' タブをコレクションにセットします
     Private Sub _AddTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
         Call Me._RegisterTabViewToDictionary(view)
-        If Not Me.TabsDictionary(view).Contains([tab]) Then
-            Me.TabsDictionary(view).Add([tab])
+        If Not Me.TabsDictionary(view).Tabs.Contains([tab]) Then
+            Me.TabsDictionary(view).Tabs.Add([tab])
         End If
     End Sub
 
     ' タブをコレクションにセット＆更新します
     Private Sub _UpdateTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
         Call Me._AddTabsToCollection(view, [tab])
-        Me.TabsDictionary(view)(Me.TabsDictionary(view).IndexOf([tab])) = [tab]
+        Me.TabsDictionary(view).Tabs(Me.TabsDictionary(view).Tabs.IndexOf([tab])) = [tab]
     End Sub
 
     ' タブをコレクションにセット＆ビューの切り替えを行います

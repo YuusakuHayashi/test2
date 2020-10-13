@@ -14,18 +14,6 @@ Public Class BaseViewModel2(Of T As {New})
         )
     End Sub
     '--------------------------------------------------------------------------------------------------'
-
-    Private _MyModel As T
-    Public Property MyModel As T
-        Get
-            Return _MyModel
-        End Get
-        Set(value As T)
-            _MyModel = value
-        End Set
-    End Property
-
-
     Private _Model As Model
     Public Property Model As Model
         Get
@@ -35,6 +23,18 @@ Public Class BaseViewModel2(Of T As {New})
             _Model = value
         End Set
     End Property
+
+    '---------------------------------'
+    'Private _MyModel As T
+    'Public Property MyModel As T
+    '    Get
+    '        Return _MyModel
+    '    End Get
+    '    Set(value As T)
+    '        _MyModel = value
+    '    End Set
+    'End Property
+    '---------------------------------'
 
     Private _ViewModel As ViewModel
     Public Property ViewModel As ViewModel
@@ -83,31 +83,28 @@ Public Class BaseViewModel2(Of T As {New})
 
     ' ビューモデル初期化時のメインメソッド
     ' 共有のモデル・ビューモデル・アプリケーション情報、プロジェクト情報をセットする
-    ' さらに各ビューモデルに対応するメインモデルもセットする
     Protected Overloads Sub Initializing(ByVal m As Model,
                                          ByVal vm As ViewModel,
                                          ByVal adm As AppDirectoryModel,
                                          ByVal pim As ProjectInfoModel)
-        Dim obj As Object
-
         Model = m
         ViewModel = vm
         AppInfo = adm
         ProjectInfo = pim
 
-        ' ビューモデルに対応するメインモデルをセットする
-        If Model.DataDictionary IsNot Nothing Then
-            obj = Model.DataDictionary((New T).GetType.Name)
-            Select Case obj.GetType
-                Case (New Object).GetType
-                    Me.MyModel = CType(obj, T)
-                Case (New JObject).GetType
-                    ' Ｊｓｏｎからロードした場合は、JObject型になっている
-                    Me.MyModel = obj.ToObject(Of T)
-                Case (New T).GetType
-                    Me.MyModel = obj
-            End Select
-        End If
+        '' ビューモデルに対応するメインモデルをセットする
+        'If Model.DataDictionary IsNot Nothing Then
+        '    obj = Model.DataDictionary((New T).GetType.Name)
+        '    Select Case obj.GetType
+        '        Case (New Object).GetType
+        '            Me.MyModel = CType(obj, T)
+        '        Case (New JObject).GetType
+        '            ' Ｊｓｏｎからロードした場合は、JObject型になっている
+        '            Me.MyModel = obj.ToObject(Of T)
+        '        Case (New T).GetType
+        '            Me.MyModel = obj
+        '    End Select
+        'End If
     End Sub
 
     Protected Overloads Sub Initializing(ByVal m As Model,

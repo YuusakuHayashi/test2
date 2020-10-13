@@ -115,7 +115,64 @@
                     </StackPanel>
                 </DockPanel>
             </DataTemplate>
-            
+
+            <DataTemplate
+                DataType="{x:Type local:ConnectionViewModel}">
+                <StackPanel>
+                    <StackPanel 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                        <TextBlock 
+                            Text="設定ファイルが見つかりません。初期設定を行います" 
+                            Width="500" />
+                        <StackPanel 
+                            Orientation="Horizontal" >
+                            <TextBlock 
+                                Text="サーバ名" 
+                                Width="100"/>
+                            <TextBox 
+                                Text="{Binding ServerName}"
+                                Width="300" />
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding ServerNameError}"/>
+                        <StackPanel 
+                            Orientation="Horizontal" >
+                            <TextBlock 
+                                Text="データベース名"
+                                Width="100"/>
+                            <TextBox
+                                Text="{Binding DataBaseName}"
+                                Width="300"/>
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding DataBaseNameError}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock 
+                                Text="接続文字列"
+                                Width="100"/>
+                            <TextBox
+                                Text="{Binding ConnectionString}"
+                                Width="300"/>
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding ConnectionStringError}"/>
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Right">
+                        <Button
+                            Command="{Binding ConnectionCommand}"
+                            Content="Connection"
+                            Width="100" />
+                        <Button
+                            Content="Close" 
+                            Width="100" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+
         </Grid.Resources>
         <ContentControl
             Content="{Binding MainViewContent}"/>
