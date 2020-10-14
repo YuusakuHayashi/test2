@@ -69,9 +69,6 @@ Public Class BaseViewModel2(Of T As {New})
     Protected Property CheckCommandEnabledHandler As Action
     Protected Property [AddHandler] As Action
 
-    Protected Delegate Sub InitializeProxy()
-    Protected Delegate Sub CheckCommandEnabledProxy()
-
     Protected Overridable Sub ViewInitializing()
         'Nothing To Do
     End Sub
@@ -97,7 +94,7 @@ Public Class BaseViewModel2(Of T As {New})
         Me.AppInfo = adm
         Me.ProjectInfo = pim
 
-        If Me.Model.Data <> Nothing Then
+        If Me.Model.Data IsNot Nothing Then
             obj = Me.Model.Data
             Select Case obj.GetType
                 Case (New Object).GetType
@@ -112,62 +109,17 @@ Public Class BaseViewModel2(Of T As {New})
             Me.Data = New T
         End If
 
+        ' 自身(ビューモデル）の初期化設定を行います
         If ih <> Nothing Then
             Call ih()
         End If
+        ' コマンド実行可否の設定
         If cceh <> Nothing Then
             Call cceh()
         End If
+        ' イベントハンドラの登録
         If ah <> Nothing Then
             Call ah()
         End If
     End Sub
-
-    'Protected Overloads Sub Initializing(ByVal m As Model,
-    '                                     ByVal vm As ViewModel,
-    '                                     ByVal adm As AppDirectoryModel,
-    '                                     ByVal pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializeProxy)
-    '    Call Initializing(m, vm, adm, pim)
-
-    '    ' 自身(ビューモデル）の初期化設定を行います
-    '    Call ip()
-    'End Sub
-
-    'Protected Overloads Sub Initializing(ByVal m As Model,
-    '                                     ByVal vm As ViewModel,
-    '                                     ByVal adm As AppDirectoryModel,
-    '                                     ByVal pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializeProxy,
-    '                                     ByRef ccep As CheckCommandEnabledProxy)
-    '    Call Initializing(m, vm, adm, pim, ip)
-
-    '    ' コマンド実行可否の設定
-    '    Call ccep()
-    'End Sub
-
-    'Protected Overloads Sub Initializing(ByVal m As Model,
-    '                                     ByVal vm As ViewModel,
-    '                                     ByVal adm As AppDirectoryModel,
-    '                                     ByVal pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializeProxy,
-    '                                     ByRef ahp As AddHandlerProxy)
-    '    Call Initializing(m, vm, adm, pim, ip)
-
-    '    ' イベントハンドラの登録
-    '    Call ahp()
-    'End Sub
-
-    'Protected Overloads Sub Initializing(ByVal m As Model,
-    '                                     ByVal vm As ViewModel,
-    '                                     ByVal adm As AppDirectoryModel,
-    '                                     ByVal pim As ProjectInfoModel,
-    '                                     ByRef ip As InitializeProxy,
-    '                                     ByRef ccep As CheckCommandEnabledProxy,
-    '                                     ByRef ahp As AddHandlerProxy)
-    '    Call Initializing(m, vm, adm, pim, ip, ccep)
-
-    '    ' イベントハンドラの登録
-    '    Call ahp()
-    'End Sub
 End Class
