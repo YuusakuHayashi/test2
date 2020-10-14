@@ -32,6 +32,7 @@ Public Class BaseViewModel2(Of T As {New})
         End Get
         Set(value As T)
             _Data = value
+            Model.Data = Data
         End Set
     End Property
 

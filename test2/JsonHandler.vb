@@ -11,11 +11,6 @@ Public Class JsonHandler(Of T As New)
     Public Delegate Sub SaveProxy(Of T2)(ByVal f As String, ByVal m As T2)
 
     Public Property ModelFileName As String
-    Public Property LoadHandlerIfNull As LoadProxy
-    Public Property LoadHandlerIfFailed As LoadProxy
-    Public Property SaveHandlerIfNull As SaveProxy
-    Public Property SaveHandlerIfFailed As SaveProxy
-
 
     Public Overloads Function CheckModel(Of T2 As New)(ByVal f As String) As Boolean
         Dim b As Boolean : b = False

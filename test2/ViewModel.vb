@@ -265,42 +265,43 @@ Public Class ViewModel
     End Sub
 
     ' 初回時に必要なビューモデルコンテントを全てディクショナリにセットします
-    Public Overloads Sub Setup(ByVal pk As String,
-                               ByVal m As Model,
+    Public Overloads Sub Setup(ByVal m As Model,
                                ByVal vm As ViewModel,
                                ByVal adm As AppDirectoryModel,
                                ByVal pim As ProjectInfoModel)
         Dim cvm As ConnectionViewModel
-        Dim t_cvm As TabItemModel
         Dim dbtvm As DBTestViewModel
-        Dim t_dbtvm As TabItemModel
         Dim dbevm As DBExplorerViewModel
         Dim hvm As HistoryViewModel
+        Dim t_cvm As TabItemModel
+        Dim t_dbtvm As TabItemModel
 
         '-- you henkou --------------------------------'
-        Select Case pk
+        Select Case pim.Kind
             Case AppDirectoryModel.DB_TEST
                 cvm = New ConnectionViewModel()
                 dbtvm = New DBTestViewModel()
                 dbevm = New DBExplorerViewModel()
                 hvm = New HistoryViewModel()
 
-                'Call _UpdateContentToDictionary(ViewModel.MAIN_VIEW, cvm.GetType.Name, cvm)
-                'Call _UpdateContentToDictionary(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
-                'Call _UpdateContentToDictionary(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
-                'Call _UpdateContentToDictionary(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
-                t_cvm = New TabItemModel With {.Name = cvm.GetType.Name, .Content = cvm}
-                t_dbtvm = New TabItemModel With {.Name = dbtvm.GetType.Name, .Content = dbtvm}
+                Call cvm.MyInitializing(m, vm, adm, pim)
+                t_cvm = New TabItemModel With {
+                    .Name = cvm.GetType.Name, 
+                    .Content = cvm
+                }
+                t_dbtvm = New TabItemModel With {
+                    .Name = dbtvm.GetType.Name, 
+                    .Content = dbtvm
+                }
                 Call _UpdateTabsToCollection(ViewModel.MAIN_VIEW, t_cvm)
                 Call _UpdateTabsToCollection(ViewModel.MAIN_VIEW, t_dbtvm)
+                Call ChangeTabs(ViewModel.MAIN_VIEW, t_cvm)
 
-                Call cvm.MyInitializing(m, vm, adm, pim)
 
                 'Call ChangeContent(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
                 'Call ChangeContent(ViewModel.MAIN_VIEW, cvm.GetType.Name, cvm)
                 'Call ChangeContent(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
                 'Call ChangeContent(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
-                Call ChangeTabs(ViewModel.MAIN_VIEW, t_cvm)
                 'Call ChangeTabs(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
                 'Call ChangeTabs(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
             Case Else

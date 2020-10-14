@@ -26,46 +26,24 @@ Public Class SqlHandler
     End Property
 
     ' クエリ結果
-    Private _Result As DataSet
-    Public Property Result As DataSet
+    Private _Result As Boolean
+    Public Property Result As Boolean
         Get
             Return Me._Result
         End Get
-        Set(value As DataSet)
+        Set(value As Boolean)
             Me._Result = value
         End Set
     End Property
 
-    ' 接続結果
-    Private _ResultFlag As Boolean
-    Public Property ResultFlag As Boolean
-        Get
-            Return Me._ResultFlag
-        End Get
-        Set(value As Boolean)
-            Me._ResultFlag = value
-        End Set
-    End Property
-
-    ' 実行結果
-    Private _QueryResult As Integer
-    Public Property QueryResult As Integer
-        Get
-            Return Me._QueryResult
-        End Get
-        Set(value As Integer)
-            Me._QueryResult = value
-        End Set
-    End Property
-
     ' 接続結果メッセージ
-    Private _ResultMessage As String
-    Public Property ResultMessage As String
+    Private _Message As String
+    Public Property Message As String
         Get
-            Return Me._ResultMessage
+            Return Me._Message
         End Get
         Set(value As String)
-            Me._ResultMessage = value
+            Me._Message = value
         End Set
     End Property
 
@@ -128,140 +106,43 @@ Public Class SqlHandler
     '----------------------------------------------------------------------------------------------
 
     '----------------------------------------------------------------------------------------------
-    Public Sub DeleteTable(ByVal tbl)
-        Dim query As String
-        query = $"  IF OBJECT_ID('{tbl}', 'U') IS NOT NULL"
-        query &= $"    BEGIN DROP TABLE {tbl}"
-        query &= $" END"
-        Call Execute(query)
-    End Sub
-    '----------------------------------------------------------------------------------------------
-
-    '----------------------------------------------------------------------------------------------
-    ' 汎用のＳＱＬ実行
-
-    ' 一連のＳＱＬ実行を行う（ＳＱＬ文はユーザ指定）
-    Public Overloads Sub Execute(ByVal query As String)
-        _Main(
-            AddressOf _ConnectionStart,
-            query,
-            AddressOf _ExecuteMyQuery,
-            AddressOf _ConnectionCommit,
-            AddressOf _ConnectionFailed,
-            AddressOf _ConnectionClose
-        )
-    End Sub
-
-    ' 一連のＳＱＬ実行を行う（実行内容はユーザ指定）
-    Public Overloads Sub Execute(ByRef proxy As ConnectionExecuteProxy)
-        _Main(
-            AddressOf _ConnectionStart,
-            proxy,
-            AddressOf _ConnectionCommit,
-            AddressOf _ConnectionFailed,
-            AddressOf _ConnectionClose
-        )
-    End Sub
-
-    ' 汎用のアクセステスト
-    'Public Overloads Sub AccessTest()
-    '    _Main(
-    '        AddressOf _ConnectionStart,
-    '        AddressOf _NoDataGet,
-    '        AddressOf _ConnectionCommit,
-    '        AddressOf _ConnectionFailed,
-    '        AddressOf _ConnectionClose
-    '    )
-    'End Sub
-
-    ' 汎用のアクセステスト
-    Public Overloads Function AccessTest() As Boolean
-        Call Me._Main(AddressOf _ConnectionStart,
-                      AddressOf _NoDataGet,
-                      AddressOf _ConnectionCommit,
-                      AddressOf _ConnectionFailed,
-                      AddressOf _ConnectionClose)
-        AccessTest = Me.ResultFlag
+    Public Function AccessTest() As Boolean
+        Me.Query = "SELECT GETDATE()"
+        Call Execute()
+        AccessTest = Me.Result
     End Function
-    '----------------------------------------------------------------------------------------------
 
+    Public Sub DeleteTable(ByVal tbl)
+        Me.Query = $"  IF OBJECT_ID('{tbl}', 'U') IS NOT NULL"
+        Me.Query &= $"    BEGIN DROP TABLE {tbl}"
+        Me.Query &= $" END"
+        Call Execute()
+    End Sub
+    '----------------------------------------------------------------------------------------------
 
     ' ExecuteAccessProxy ------------------------------------------------------------------------------
-    ' クエリ実行メソッド関連
+    Private Delegate Sub ExecuteProxy()
+    Public ExecuteHandler As Action
+    Public GetExecuteHandler As Func(Of DataSet, Object)
+    Public ExecuteIfFailedHandler As Action
+    Public ExecuteAfterRollbackIfFailedHandler As Action
 
-    Public Delegate Sub ConnectionExecuteProxy()
-    Public Delegate Sub ConnectionExecuteProxyWithQuery(ByVal query As String)
-
-    ' コマンドプロパティをセットします
-    Private Sub _SetCommand(ByVal txt As String, ByVal timeout As Integer)
+    Private Overloads Sub _ExecuteQuery()
         Try
-            Me._Command = New System.Data.SqlClient.SqlCommand
-            Me._Command = Me._Connection.CreateCommand()
-            Me._Command.CommandText = txt
-            Me._Command.CommandType = CommandType.Text
-            Me._Command.CommandTimeout = timeout
-            Me._Command.Transaction = Me._Transaction
+            Call Me._Command.ExecuteNonQuery()
         Catch ex As Exception
-            Call _GetSqlError(ex)
-            Me.ResultMessage = ex.Message
-            Throw New Exception(ex.Message, ex)
-        Finally
+            Throw New Exception(ex.Message)
         End Try
     End Sub
 
-
-    ' 基本的なクエリ実行メソッドです
-    Private Overloads Sub _ExecuteMyQuery()
-        Try
-            Call _SetCommand(Me.Query, 30)
-            Me.QueryResult = Me._Command.ExecuteNonQuery()
-            'Me._Transaction.Commit()
-        Catch ex As Exception
-            Call _GetSqlError(ex)
-            Me.ResultMessage = ex.Message
-            Throw New Exception(ex.Message, ex)
-        Finally
-        End Try
-    End Sub
-
-    ' _ExecuteMyQuery() を外部公開したものです
-    Public Overloads Sub ExecuteMyQuery()
-        _ExecuteMyQuery()
-    End Sub
-
-    ' _ExecuteMyQuery() のクエリを外部から指定可能にしたものです
-    Private Overloads Sub _ExecuteMyQuery(ByVal query As String)
-        Try
-            Call _SetCommand(query, 30)
-            Me.QueryResult = Me._Command.ExecuteNonQuery()
-        Catch ex As Exception
-            Call _GetSqlError(ex)
-            Me.ResultMessage = ex.Message
-            Throw New Exception(ex.Message, ex)
-        Finally
-        End Try
-    End Sub
-
-    ' _ExecuteMyQuery(query) を外部公開したものです
-    Public Overloads Sub ExecuteMyQuery(ByVal query As String)
-        _ExecuteMyQuery(query)
-    End Sub
-
-    ' データセットを取得するクエリ実行メソッドです
-    Private Overloads Sub _ExecuteMyGetQuery()
+    Private Overloads Function _GetDataSet() As DataSet
         Dim sda As System.Data.SqlClient.SqlDataAdapter
-        Dim ds As DataSet
+        Dim ds As DataSet : ds = Nothing
         Try
-            Call _SetCommand(Me.Query, 30)
-
             sda = New System.Data.SqlClient.SqlDataAdapter(Me._Command)
             ds = New System.Data.DataSet
             sda.Fill(ds)
-
-            Me.Result = ds
         Catch ex As Exception
-            Call _GetSqlError(ex)
-            Me.ResultMessage = ex.Message
             Throw New Exception(ex.Message)
         Finally
             If sda IsNot Nothing Then
@@ -270,202 +151,133 @@ Public Class SqlHandler
             If ds IsNot Nothing Then
                 ds.Dispose()
             End If
+            _GetDataSet = ds
         End Try
-    End Sub
-
-    ' _ExecuteMyGetQuery() を外部公開したものです
-    Public Overloads Sub ExecuteMyGetQuery()
-        _ExecuteMyGetQuery()
-    End Sub
-
-
-    ' _ExecuteMyGetQuery() のクエリを外部から指定可能にしたものです
-    Private Overloads Sub _ExecuteMyGetQuery(ByVal query As String)
-        Dim sda As System.Data.SqlClient.SqlDataAdapter
-        Dim ds As DataSet
-        Try
-            Call _SetCommand(Me.Query, 30)
-
-            sda = New System.Data.SqlClient.SqlDataAdapter(Me._Command)
-            ds = New System.Data.DataSet
-            sda.Fill(ds)
-
-            Me.Result = ds
-        Catch ex As Exception
-            Call _GetSqlError(ex)
-            Me.ResultMessage = ex.Message
-            Throw New Exception(ex.Message)
-        Finally
-            If sda IsNot Nothing Then
-                sda.Dispose()
-            End If
-            If ds IsNot Nothing Then
-                ds.Dispose()
-            End If
-        End Try
-    End Sub
-
-    ' _ExecuteMyGetQuery(query) を外部公開したものです
-    Public Overloads Sub ExecuteMyGetQuery(ByVal query As String)
-        _ExecuteMyGetQuery(query)
-    End Sub
-
+    End Function
 
     ' クエリ実行しないクエリ実行メソッドです
     Private Overloads Sub _NoDataGet()
         Try
-            Call _SetCommand(vbNullString, 30)
         Catch ex As Exception
             Call _GetSqlError(ex)
-            Me.ResultMessage = ex.Message
+            Me.Message = ex.Message
             Throw New Exception(ex.Message, ex)
         Finally
         End Try
     End Sub
-    '--------------------------------------------------------------------------------------------------
 
-    '-- ConnectionCommitProxy -------------------------------------------------------------------------
-    ' コミットメソッド関係
-    Public Delegate Sub ConnectionCommitProxy()
-
-    ' 実行結果をコミットするメソッドです
-    Private Sub _ConnectionCommit()
-        Try
-            Me._Transaction.Commit()
-        Catch ex As Exception
-            Me.ResultMessage = ex.Message
-            Throw New Exception(ex.Message)
-        Finally
-        End Try
-    End Sub
-
-    ' _ConnectionCommit() を外部公開したものです
-    Public Sub ConnectionCommit()
-        Call Me._ConnectionCommit()
-    End Sub
-    '--------------------------------------------------------------------------------------------------
-
-
-    '-- ConnectionStartProxy --------------------------------------------------------------------------
-    ' 接続開始メソッド関係
-    Public Delegate Sub ConnectionStartProxy()
-
-    ' 接続を開始するメソッドです
-    Private Sub _ConnectionStart()
+    Private Sub _BeforeExecute()
         Try
             Me._Connection = New SqlConnection(Me.ConnectionString)
             Me._Connection.Open()
             Me._Transaction = Me._Connection.BeginTransaction()
+
+            Me._Command = New System.Data.SqlClient.SqlCommand
+            Me._Command = Me._Connection.CreateCommand()
+            Me._Command.CommandText = Me.Query
+            Me._Command.CommandType = CommandType.Text
+            Me._Command.CommandTimeout = 30
+            Me._Command.Transaction = Me._Transaction
         Catch ex As Exception
-            Me.ResultMessage = ex.Message
+            Me.Message = ex.Message
             Throw New Exception(ex.Message)
         Finally
         End Try
     End Sub
 
-    Public Sub ConnectionStart()
-        Call Me._ConnectionStart()
-    End Sub
-    '--------------------------------------------------------------------------------------------------
-
-
-    '-- ConnectionFailedProxy -------------------------------------------------------------------------
-    Public Delegate Sub ConnectionFailedProxy()
-
-    Private Sub _ConnectionFailed()
+    Private Sub _AfterExecute()
         Try
+            If Me._Command IsNot Nothing Then
+                Me._Command.Dispose()
+            End If
             If Me._Transaction IsNot Nothing Then
-                Me._Transaction.Rollback()
+                Me._Transaction.Dispose()
+            End If
+            If Me._Connection IsNot Nothing Then
+                Me._Connection.Close()
+                Me._Connection.Dispose()
             End If
         Catch ex As Exception
-            Me.ResultMessage = ex.Message
+            Me.Message = ex.Message
             Throw New Exception(ex.Message)
         Finally
         End Try
     End Sub
 
-    Public Sub ConnectionFailed()
-        _ConnectionFailed()
-    End Sub
-    '--------------------------------------------------------------------------------------------------
+    Public Sub Execute()
+        Dim b = False
+        Dim msg = vbNullString
+        Dim a = Me.ExecuteIfFailedHandler
+        Dim a2 = Me.ExecuteAfterRollbackIfFailedHandler
 
-
-    '-- ConnectionCloseProxy --------------------------------------------------------------------------
-    Public Delegate Sub ConnectionCloseProxy()
-
-    Private Sub _ConnectionClose()
-        If Me._Command IsNot Nothing Then
-            Me._Command.Dispose()
-        End If
-        If Me._Transaction IsNot Nothing Then
-            Me._Transaction.Dispose()
-        End If
-        If Me._Connection IsNot Nothing Then
-            Me._Connection.Close()
-            Me._Connection.Dispose()
-        End If
-    End Sub
-
-    Public Sub ConnectionClose()
-        _ConnectionClose()
-    End Sub
-    '--------------------------------------------------------------------------------------------------
-
-
-    Private Overloads Sub _Main(ByRef startProxy As ConnectionStartProxy,
-                                ByRef executeProxy As ConnectionExecuteProxy,
-                                ByRef commitProxy As ConnectionCommitProxy,
-                                ByRef failedProxy As ConnectionFailedProxy,
-                                ByRef closeProxy As ConnectionCloseProxy)
-        Dim b As Boolean : b = False
         Try
-            ' アクセス開始
-            startProxy()
-
-            Me.ServerVersion = Me._Connection.ServerVersion
-
-            executeProxy()
-            commitProxy()
-
-            ' Success
+            Call _BeforeExecute()
+            Call Me._Command.ExecuteNonQuery()
+            Me._Transaction.Commit()
             b = True
         Catch ex As Exception
-            ' アクセス失敗
-            failedProxy()
+            msg = ex.Message
+            Try
+                If a <> Nothing Then
+                    Call a()
+                End If
+                Me._Transaction.Rollback()
+            Catch ex2 As Exception
+                msg = ex2.Message
+            End Try
+            If a2 <> Nothing Then
+                Call a2()
+            End If
         Finally
-            Me._ResultFlag = b
-            ' アクセス終了
-            closeProxy()
+            Call _AfterExecute()
+            Me.Result = b
         End Try
     End Sub
 
+    Public Overloads Function GetExecute() As Object
+        Dim obj As Object : obj = Nothing
+        Dim ds As DataSet : ds = Nothing
+        Dim b = False
+        Dim msg = vbNullString
+        Dim f = Me.GetExecuteHandler
+        Dim e2 = Me.ExecuteIfFailedHandler
+        Dim e3 = Me.ExecuteAfterRollbackIfFailedHandler
+        Dim sda As System.Data.SqlClient.SqlDataAdapter
 
-    Private Overloads Sub _Main(ByRef startProxy As ConnectionStartProxy,
-                                ByVal query As String,
-                                ByRef executeProxy As ConnectionExecuteProxyWithQuery,
-                                ByRef commitProxy As ConnectionCommitProxy,
-                                ByRef failedProxy As ConnectionFailedProxy,
-                                ByRef closeProxy As ConnectionCloseProxy)
-        Dim b As Boolean : b = False
         Try
-            ' アクセス開始
-            startProxy()
+            Call _BeforeExecute()
 
-            Me.ServerVersion = Me._Connection.ServerVersion
+            sda = New System.Data.SqlClient.SqlDataAdapter(Me._Command)
+            ds = New System.Data.DataSet
+            sda.Fill(ds)
 
-            executeProxy(query)
-            commitProxy()
-
-            ' Success
+            obj = IIf(f <> Nothing, f(ds), ds)
             b = True
         Catch ex As Exception
-            ' アクセス失敗
-            failedProxy()
+            msg = ex.Message
+            Try
+                If e2 <> Nothing Then
+                    Call e2()
+                End If
+                Me._Transaction.Rollback()
+            Catch ex2 As Exception
+                msg = ex2.Message
+            End Try
+            If e3 <> Nothing Then
+                Call e3()
+            End If
         Finally
-            Me._ResultFlag = b
-            ' アクセス終了
-            closeProxy()
-        End Try
-    End Sub
+            If sda IsNot Nothing Then
+                sda.Dispose()
+            End If
+            If ds IsNot Nothing Then
+                ds.Dispose()
+            End If
 
+            Call _AfterExecute()
+            Me.Message = msg
+            GetExecute = obj
+            Me.Result = b
+        End Try
+    End Function
 End Class

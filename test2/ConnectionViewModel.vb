@@ -2,7 +2,7 @@
 Imports Newtonsoft.Json.Linq
 
 Public Class ConnectionViewModel
-    Inherits BaseViewModel2(Of ConnectionModel)
+    Inherits BaseViewModel2(Of DBTestModel)
 
     Private Const _SUCCESS_MESSAGE As String = "接続に成功しました"
 
@@ -13,7 +13,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ServerName = value
-            Model.Data.ServerName = value
+            Data.ServerName = value
             RaisePropertyChanged("ServerName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -27,7 +27,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._DataBaseName = value
-            Model.Data.DataBaseName = value
+            Data.DataBaseName = value
             RaisePropertyChanged("DataBaseName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -51,7 +51,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ConnectionString = value
-            Model.Data.ConnectionString = value
+            Data.ConnectionString = value
             RaisePropertyChanged("ConnectionString")
             Call _GetOtherProperty()
         End Set
@@ -64,6 +64,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me.__OtherProperty = value
+            Data.OtherProperty = value
             Call _CheckConnectionCommandEnabled()
         End Set
     End Property
@@ -143,19 +144,13 @@ Public Class ConnectionViewModel
 
     ' コマンド実行（接続確認）
     Private Sub _ConnectionCommandExecute(ByVal parameter As Object)
-        ' ビジネスロジックに該当しそうだが、こちらで実行する
-        Dim b As Boolean
         Dim sh As New SqlHandler With {
             .ConnectionString = Me.ConnectionString
         }
-        b = sh.AccessTest()
-        Data.ConnectionResult = b
-        If b Then
+        If sh.AccessTest() Then
             Me.Message = _SUCCESS_MESSAGE
-            'Call Me.Model.SetData(Me.MyModel.GetType.Name, Me.MyModel)
-            'Call Me.Model.ModelSave(ProjectInfo.ModelFileName, Model)
         Else
-            Me.Message = sh.ResultMessage
+            Me.Message = sh.Message
         End If
     End Sub
 
@@ -173,8 +168,5 @@ Public Class ConnectionViewModel
         )
 
         Call Initializing(m, vm, adm, pim)
-    End Sub
-
-    Sub New()
     End Sub
 End Class

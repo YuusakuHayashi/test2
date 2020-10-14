@@ -350,7 +350,7 @@ Public Class UserDirectoryViewModel
             Call ProjectInfo.ProjectSave()
             Call Model.Setup(project)
             Call Model.ModelSave(project.ModelFileName, Model)
-            Call ViewModel.Setup(project.Kind, Model, ViewModel, AppInfo, ProjectInfo)
+            Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
         End If
     End Sub
 
@@ -385,7 +385,7 @@ Public Class UserDirectoryViewModel
         If i = 0 Then
             i2 = modelLoader.ExecuteIfCan(project)
             If i2 = 0 Then
-                Call ViewModel.Setup(ProjectInfo.Kind, Model, ViewModel, AppInfo, ProjectInfo)
+                Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
                 msg = vbNullString
             Else
                 msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
