@@ -1,17 +1,22 @@
-﻿Public Class MyEventListener
-    Private Shared _Instance As MyEventListener = New MyEventListener
+﻿Public Class DelegateEventListener
+    Private Shared _Instance As DelegateEventListener = New DelegateEventListener
 
-    Public Shared ReadOnly Property Instance As MyEventListener
+    Public Shared ReadOnly Property Instance As DelegateEventListener
         Get
-            Return MyEventListener._Instance
+            Return DelegateEventListener._Instance
         End Get
     End Property
 
+    Public Event TabCloseRequested As EventHandler
     Public Event DeleteRequested As EventHandler
     Public Event ChildrenUpdated As EventHandler
     Public Event MigrateConditionUpdated As EventHandler
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
+
+    Public Sub RaiseTabCloseRequested(ByVal child As TabItemModel)
+        RaiseEvent TabCloseRequested(child, EventArgs.Empty)
+    End Sub
 
     Public Sub RaiseDeleteRequested(ByVal child As ConditionModel)
         RaiseEvent DeleteRequested(child, EventArgs.Empty)

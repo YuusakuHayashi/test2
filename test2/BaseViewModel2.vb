@@ -81,10 +81,10 @@ Public Class BaseViewModel2(Of T As {New})
 
     ' ビューモデル初期化時のメインメソッド
     ' 共有のモデル・ビューモデル・アプリケーション情報、プロジェクト情報をセットする
-    Protected Overloads Sub Initializing(ByVal m As Model,
-                                         ByVal vm As ViewModel,
-                                         ByVal adm As AppDirectoryModel,
-                                         ByVal pim As ProjectInfoModel)
+    Protected Overloads Sub BaseInitialize(ByVal m As Model,
+                                           ByVal vm As ViewModel,
+                                           ByVal adm As AppDirectoryModel,
+                                           ByVal pim As ProjectInfoModel)
         Dim obj As Object
         Dim ih = Me.InitializeHandler
         Dim cceh = Me.CheckCommandEnabledHandler

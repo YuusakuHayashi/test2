@@ -8,6 +8,16 @@
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
         Title="Window" Height="450" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
         <Grid.Resources>
             <!-- タブで表示するタイプ -->
             <DataTemplate
@@ -15,7 +25,12 @@
                 <TabControl ItemsSource="{Binding Tabs}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" />
+                                <Button 
+                                    Content="X"
+                                    Command="{Binding TabCloseCommand}"/>
+                            </StackPanel>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>
@@ -123,7 +138,7 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center">
                         <TextBlock 
-                            Text="設定ファイルが見つかりません。初期設定を行います" 
+                            Text="{Binding InitializeMessage}" 
                             Width="500" />
                         <StackPanel 
                             Orientation="Horizontal" >
@@ -174,7 +189,35 @@
             </DataTemplate>
 
         </Grid.Resources>
+        <ContentControl                
+            x:Name="ExplorerFlame"
+            Grid.Row="0" Grid.RowSpan="3"
+            Grid.Column="0"
+            Content="{Binding ExplorerViewContext}" />
+        <GridSplitter
+            Grid.Row="0" Grid.RowSpan="3"
+            Grid.Column="1"            
+            ResizeDirection="Columns"
+            ResizeBehavior="PreviousAndNext"
+            DockPanel.Dock="Left"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch" />
         <ContentControl
+            x:Name="MainFlame"
+            Grid.Row="0"
+            Grid.Column="2"
             Content="{Binding MainViewContent}"/>
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="2"
+            ResizeDirection="Rows"                
+            ResizeBehavior="PreviousAndNext"                
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch" />
+        <ContentControl
+            x:Name="HistoryFlame"
+            Grid.Row="2"
+            Grid.Column="2"
+            Content="{Binding HistoryViewContext}" />
     </Grid>
 </Window>

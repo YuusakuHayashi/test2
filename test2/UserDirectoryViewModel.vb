@@ -475,10 +475,10 @@ Public Class UserDirectoryViewModel
     End Sub
 
 
-    Public Sub MyInitializing(ByRef m As Model,
-                              ByRef vm As ViewModel,
-                              ByRef adm As AppDirectoryModel,
-                              ByRef pim As ProjectInfoModel)
+    Public Sub Initialize(ByRef m As Model,
+                          ByRef vm As ViewModel,
+                          ByRef adm As AppDirectoryModel,
+                          ByRef pim As ProjectInfoModel)
         InitializeHandler _
             = AddressOf ViewInitializing
         CheckCommandEnabledHandler _
@@ -489,7 +489,7 @@ Public Class UserDirectoryViewModel
                 New Action(AddressOf _CheckSelectProjectCommandEnabled)
             )
 
-        Call Initializing(m, vm, adm, pim)
+        Call BaseInitialize(m, vm, adm, pim)
     End Sub
 
     ' ビューモデルは必ず、Initializingメソッドを呼び出すこと

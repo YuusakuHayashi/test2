@@ -221,7 +221,9 @@ Public Class SqlHandler
                 If a <> Nothing Then
                     Call a()
                 End If
-                Me._Transaction.Rollback()
+                If Me._Transaction IsNot Nothing Then
+                    Me._Transaction.Rollback()
+                End If
             Catch ex2 As Exception
                 msg = ex2.Message
             End Try

@@ -1,7 +1,7 @@
 ﻿Imports System.ComponentModel
 
 Public Class Model
-    Inherits BaseModel(Of Model)
+    Inherits JsonHandler(Of Model)
 
     Private _Data As Object
     Public Property Data As Object
@@ -12,6 +12,10 @@ Public Class Model
             Me._Data = value
         End Set
     End Property
+
+    Public Sub DataSave(ByVal project As ProjectInfoModel)
+        Call Me.ModelSave(project.ModelFileName, Me)
+    End Sub
 
     '-- ディクショナリでのモデル保持は現在廃止 ---------------------------------------------------'
     '-- 使い道はありそうなので、残しておく -------------------------------------------------------'

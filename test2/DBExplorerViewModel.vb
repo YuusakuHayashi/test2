@@ -2,7 +2,7 @@
 'Imports System.Collections.ObjectModel
 
 Public Class DBExplorerViewModel
-    Inherits BaseViewModel2(Of DBExplorerModel)
+    Inherits BaseViewModel2(Of DBTestModel)
     '    Inherits ProjectBaseViewModel(Of DBExplorerViewModel)
 
     '    ' モデル

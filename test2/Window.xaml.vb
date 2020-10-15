@@ -21,8 +21,8 @@ Public Class Window
         app.ModelSave(AppDirectoryModel.ModelFileName, app)
 
         Dim udvm As New UserDirectoryViewModel
-        Call udvm.MyInitializing(m, vm, app, project)
+        Call udvm.Initialize(m, vm, app, project)
 
-        Me.DataContext = vm
+        Me.MainFlame.DataContext = vm
     End Sub
 End Class

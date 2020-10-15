@@ -22,7 +22,7 @@
         Set(value As Boolean)
             Me._IsChecked = value
             RaisePropertyChanged("IsChecked")
-            MyEventListener.Instance.RaiseDataTableCheckChanged()
+            DelegateEventListener.Instance.RaiseDataTableCheckChanged()
         End Set
     End Property
 

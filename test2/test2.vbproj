@@ -117,7 +117,7 @@
     </Compile>
     <Compile Include="MigraterViewModel.vb" />
     <Compile Include="Model.vb" />
-    <Compile Include="MyEventListener.vb" />
+    <Compile Include="DelegateEventListener.vb" />
     <Compile Include="MyProjectModel.vb" />
     <Compile Include="MySql.vb" />
     <Compile Include="ProjectInterface.vb" />

@@ -20,7 +20,7 @@ Public Class ConditionModel : Inherits BaseModel(Of ConnectionModel)
         Set(value As String)
             Me._FieldName = value
             Call Me._CheckAddCommandEnableFlag()
-            MyEventListener.Instance.RaiseChildrenUpdated(Me)
+            DelegateEventListener.Instance.RaiseChildrenUpdated(Me)
         End Set
     End Property
 
@@ -32,7 +32,7 @@ Public Class ConditionModel : Inherits BaseModel(Of ConnectionModel)
         Set(value As Object)
             Me._FieldValue = value
             Call Me._CheckAddCommandEnableFlag()
-            MyEventListener.Instance.RaiseChildrenUpdated(Me)
+            DelegateEventListener.Instance.RaiseChildrenUpdated(Me)
         End Set
     End Property
 
@@ -174,7 +174,7 @@ Public Class ConditionModel : Inherits BaseModel(Of ConnectionModel)
     ' コマンド実行(ＤＥＬＥＴＥ)
     Private Sub _DeleteCommandExecute(ByVal parameter As Object)
         Me.DeleteRequest = True
-        MyEventListener.Instance.RaiseDeleteRequested(Me)
+        DelegateEventListener.Instance.RaiseDeleteRequested(Me)
     End Sub
 
     ' コマンド有効／無効化(ＡＤＤ)
@@ -203,10 +203,10 @@ Public Class ConditionModel : Inherits BaseModel(Of ConnectionModel)
 
     Sub New()
         RemoveHandler _
-            MyEventListener.Instance.ChildrenUpdated,
+            DelegateEventListener.Instance.ChildrenUpdated,
             AddressOf Me._ChildrenUpdatedReview
         AddHandler _
-            MyEventListener.Instance.ChildrenUpdated,
+            DelegateEventListener.Instance.ChildrenUpdated,
             AddressOf Me._ChildrenUpdatedReview
     End Sub
 End Class

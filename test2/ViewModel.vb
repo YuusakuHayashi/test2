@@ -201,11 +201,14 @@ Public Class ViewModel
     ' タブディクショナリが存在しない場合、新規作成し
     ' ビューディクショナリが存在しない場合、追加します
     Private Sub _RegisterTabViewToDictionary(ByVal view As String)
+        Dim tvm As TabViewModel
         If Me.TabsDictionary Is Nothing Then
             Me.TabsDictionary = New Dictionary(Of String, TabViewModel)
         End If
         If Not Me.TabsDictionary.ContainsKey(view) Then
-            Me.TabsDictionary.Add(view, New TabViewModel)
+            tvm = New TabViewModel
+            tvm.Initialize()
+            Me.TabsDictionary.Add(view, tvm)
         End If
         If Me.TabsDictionary(view).Tabs Is Nothing Then
             Me.TabsDictionary(view).Tabs = New ObservableCollection(Of TabItemModel)
@@ -233,6 +236,7 @@ Public Class ViewModel
     Private Sub _AddTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
         Call Me._RegisterTabViewToDictionary(view)
         If Not Me.TabsDictionary(view).Tabs.Contains([tab]) Then
+            Call [tab].Initialize()
             Me.TabsDictionary(view).Tabs.Add([tab])
         End If
     End Sub
@@ -275,6 +279,7 @@ Public Class ViewModel
         Dim hvm As HistoryViewModel
         Dim t_cvm As TabItemModel
         Dim t_dbtvm As TabItemModel
+        Dim t_dbevm As TabItemModel
 
         '-- you henkou --------------------------------'
         Select Case pim.Kind
@@ -284,7 +289,7 @@ Public Class ViewModel
                 dbevm = New DBExplorerViewModel()
                 hvm = New HistoryViewModel()
 
-                Call cvm.MyInitializing(m, vm, adm, pim)
+                Call cvm.Initialize(m, vm, adm, pim)
                 t_cvm = New TabItemModel With {
                     .Name = cvm.GetType.Name, 
                     .Content = cvm
@@ -293,9 +298,15 @@ Public Class ViewModel
                     .Name = dbtvm.GetType.Name, 
                     .Content = dbtvm
                 }
+                t_dbevm = New TabItemModel With {
+                    .Name = dbevm.GetType.Name, 
+                    .Content = dbevm
+                }
                 Call _UpdateTabsToCollection(ViewModel.MAIN_VIEW, t_cvm)
                 Call _UpdateTabsToCollection(ViewModel.MAIN_VIEW, t_dbtvm)
+                Call _UpdateTabsToCollection(ViewModel.EXPLORER_VIEW, t_dbevm)
                 Call ChangeTabs(ViewModel.MAIN_VIEW, t_cvm)
+                Call ChangeTabs(ViewModel.EXPLORER_VIEW, t_dbevm)
 
 
                 'Call ChangeContent(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)

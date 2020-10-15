@@ -4,7 +4,8 @@ Imports Newtonsoft.Json.Linq
 Public Class ConnectionViewModel
     Inherits BaseViewModel2(Of DBTestModel)
 
-    Private Const _SUCCESS_MESSAGE As String = "接続に成功しました"
+    Private Const _SUCCESS_MESSAGE As String = "接続に成功しました。"
+    Private Const _NOCONNECTION As String = "まだ接続が成功していません。接続を定義してください"
 
     Private _ServerName As String
     Public Property ServerName As String
@@ -64,18 +65,28 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me.__OtherProperty = value
-            Data.OtherProperty = value
             Call _CheckConnectionCommandEnabled()
         End Set
     End Property
 
-    Private _Message As String
-    Private Property Message As String
+    Private _InitializeMessage As String
+    Public Property InitializeMessage As String
         Get
-            Return Me._Message
+            Return Me._InitializeMessage
         End Get
         Set(value As String)
-            Me._Message = value
+            Me._InitializeMessage = value
+            RaisePropertyChanged("InitializeMessage")
+        End Set
+    End Property
+
+    Private _ConnectionMessage As String
+    Private Property ConnectionMessage As String
+        Get
+            Return Me._ConnectionMessage
+        End Get
+        Set(value As String)
+            Me._ConnectionMessage = value
         End Set
     End Property
 
@@ -144,29 +155,70 @@ Public Class ConnectionViewModel
 
     ' コマンド実行（接続確認）
     Private Sub _ConnectionCommandExecute(ByVal parameter As Object)
+        Dim i As Integer : i = -1
+        Dim a = Sub()
+                    Call Model.DataSave(ProjectInfo)
+                End Sub
         Dim sh As New SqlHandler With {
             .ConnectionString = Me.ConnectionString
         }
-        If sh.AccessTest() Then
-            Me.Message = _SUCCESS_MESSAGE
-        Else
-            Me.Message = sh.Message
-        End If
+        Dim da As New DelegateAction With {
+            .CanExecuteHandler = AddressOf sh.AccessTest,
+            .ExecuteHandler = a
+        }
+        Select Case da.ExecuteIfCan(Nothing)
+            Case 0
+                Me.ConnectionMessage = _SUCCESS_MESSAGE
+                Me.InitializeMessage = vbNullString
+            Case 1000
+                Me.ConnectionMessage = sh.Message
+            Case Else
+        End Select
     End Sub
 
     Private Function _ConnectionCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._ConnectionCommandEnableFlag
     End Function
 
-    Public Sub MyInitializing(ByRef m As Model,
-                              ByRef vm As ViewModel,
-                              ByRef adm As AppDirectoryModel,
-                              ByRef pim As ProjectInfoModel)
+    Private Sub _ViewInitialize()
+        Dim i = 0
+        Dim b = False
+        Dim sh As SqlHandler
+        If Data.ConnectionString <> Nothing Then
+            Me.ConnectionString = Data.ConnectionString
+            i += 1
+        End If
+        If Data.ServerName <> Nothing Then
+            Me.ServerName = Data.ServerName
+            i += 1
+        End If
+        If Data.DataBaseName <> Nothing Then
+            Me.DataBaseName = Data.DataBaseName
+            i += 1
+        End If
+        If i >= 3 Then
+            sh = New SqlHandler With {
+                .ConnectionString = Me.ConnectionString
+            }
+            b = sh.AccessTest()
+        End If
+        If b Then
+            Me.InitializeMessage = vbNullString
+        Else
+            Me.InitializeMessage = _NOCONNECTION
+        End If
+    End Sub
 
+    Public Sub Initialize(ByRef m As Model,
+                          ByRef vm As ViewModel,
+                          ByRef adm As AppDirectoryModel,
+                          ByRef pim As ProjectInfoModel)
+
+        InitializeHandler = AddressOf _ViewInitialize
         CheckCommandEnabledHandler = [Delegate].Combine(
             New Action(AddressOf _CheckConnectionCommandEnabled)
         )
 
-        Call Initializing(m, vm, adm, pim)
+        Call BaseInitialize(m, vm, adm, pim)
     End Sub
 End Class
