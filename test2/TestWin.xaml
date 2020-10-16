@@ -193,7 +193,6 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.Resources>
-            
             <DataTemplate
                 DataType="{x:Type local:UserDirectoryViewModel}">
                 <DockPanel>
@@ -278,8 +277,7 @@
                     </StackPanel>
                 </DockPanel>
             </DataTemplate>
-                
-            
+
             <!-- InitView Bgn -->
             <DataTemplate
                 DataType="{x:Type local:ConnectionViewModel}">
