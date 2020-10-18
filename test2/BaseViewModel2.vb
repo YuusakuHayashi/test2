@@ -2,8 +2,10 @@
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
-Public Class BaseViewModel2(Of T As {New})
-    Implements INotifyPropertyChanged
+'Public Class BaseViewModel2(Of T As {New})
+Public MustInherit Class BaseViewModel2
+    Implements INotifyPropertyChanged, BaseViewModelInterface
+
     '--- INortify -------------------------------------------------------------------------------------'
     Public Event PropertyChanged As PropertyChangedEventHandler _
         Implements INotifyPropertyChanged.PropertyChanged
@@ -14,7 +16,6 @@ Public Class BaseViewModel2(Of T As {New})
         )
     End Sub
     '--------------------------------------------------------------------------------------------------'
-
     Private _Model As Model
     Public Property Model As Model
         Get
@@ -25,16 +26,16 @@ Public Class BaseViewModel2(Of T As {New})
         End Set
     End Property
 
-    Private _Data As T
-    Public Property Data As T
-        Get
-            Return _Data
-        End Get
-        Set(value As T)
-            _Data = value
-            Model.Data = Data
-        End Set
-    End Property
+    'Private _Data As T
+    'Public Property Data As T
+    '    Get
+    '        Return _Data
+    '    End Get
+    '    Set(value As T)
+    '        _Data = value
+    '        Model.Data = Data
+    '    End Set
+    'End Property
 
     Private _ViewModel As ViewModel
     Public Property ViewModel As ViewModel
@@ -70,6 +71,8 @@ Public Class BaseViewModel2(Of T As {New})
     Protected Property CheckCommandEnabledHandler As Action
     Protected Property [AddHandler] As Action
 
+    Public MustOverride ReadOnly Property ViewType As String Implements BaseViewModelInterface.ViewType
+
     Protected Overridable Sub ViewInitializing()
         'Nothing To Do
     End Sub
@@ -79,12 +82,11 @@ Public Class BaseViewModel2(Of T As {New})
     End Sub
 
 
-    ' ビューモデル初期化時のメインメソッド
-    ' 共有のモデル・ビューモデル・アプリケーション情報、プロジェクト情報をセットする
-    Protected Overloads Sub BaseInitialize(ByVal m As Model,
-                                           ByVal vm As ViewModel,
-                                           ByVal adm As AppDirectoryModel,
-                                           ByVal pim As ProjectInfoModel)
+    ' Model型のDataObjectはJsonからデシリアライズされたものはJObject型になっている
+    Protected Sub BaseInitialize(ByVal m As Model,
+                                 ByVal vm As ViewModel,
+                                 ByVal adm As AppDirectoryModel,
+                                 ByVal pim As ProjectInfoModel)
         Dim obj As Object
         Dim ih = Me.InitializeHandler
         Dim cceh = Me.CheckCommandEnabledHandler
@@ -95,20 +97,20 @@ Public Class BaseViewModel2(Of T As {New})
         Me.AppInfo = adm
         Me.ProjectInfo = pim
 
-        If Me.Model.Data IsNot Nothing Then
-            obj = Me.Model.Data
-            Select Case obj.GetType
-                Case (New Object).GetType
-                    Me.Data = CType(obj, T)
-                Case (New JObject).GetType
-                    ' Ｊｓｏｎからロードした場合は、JObject型になっている
-                    Me.Data = obj.ToObject(Of T)
-                Case (New T).GetType
-                    Me.Data = obj
-            End Select
-        Else
-            Me.Data = New T
-        End If
+        'If Me.Model.Data IsNot Nothing Then
+        '    obj = Me.Model.Data
+        '    Select Case obj.GetType
+        '        Case (New Object).GetType
+        '            Me.Model.Data = CType(obj, T)
+        '        Case (New JObject).GetType
+        '            ' Ｊｓｏｎからロードした場合は、JObject型になっている
+        '            Me.Model.Data = obj.ToObject(Of T)
+        '        Case (New T).GetType
+        '            Me.Model.Data = obj
+        '    End Select
+        'Else
+        '    Me.Model.Data = New T
+        'End If
 
         ' 自身(ビューモデル）の初期化設定を行います
         If ih <> Nothing Then

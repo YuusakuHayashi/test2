@@ -2,7 +2,6 @@
 
 Public Class Window
     Sub New()
-
         ' この呼び出しはデザイナーで必要です。
         InitializeComponent()
 
@@ -24,5 +23,8 @@ Public Class Window
         Call udvm.Initialize(m, vm, app, project)
 
         Me.MainFlame.DataContext = vm
+        Me.ExplorerFlame.DataContext = vm
+        Me.HistoryFlame.DataContext = vm
+        Me.MenuFrame.DataContext = vm
     End Sub
 End Class

@@ -1,4 +1,6 @@
 ﻿Imports System.ComponentModel
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class Model
     Inherits JsonHandler(Of Model)
@@ -50,25 +52,60 @@ Public Class Model
     'End Sub
     '---------------------------------------------------------------------------------------------'
 
-    Public Delegate Sub InitializeProxy(ByVal pk As String)
-
-    Public Overloads Sub Setup(ByVal project As ProjectInfoModel)
-        Dim jh As New JsonHandler(Of Object)
-        Dim dbtm As DBTestModel
-
-        ModelFileName = project.ModelFileName
-
+    ' AddProject時、Projectに必要なモデルをインスタンス化する
+    Public Sub Setup(ByVal project As ProjectInfoModel)
         '-- you henkou --------------------------------'
         Select Case project.Kind
             Case AppDirectoryModel.DB_TEST
-                dbtm = jh.ModelLoad(Of DBTestModel)()
-                If dbtm Is Nothing Then
-                    dbtm = New DBTestModel 
-                End If
-                Me.Data = dbtm
+                Me.Data = New DBTestModel
             Case Else
         End Select
         '----------------------------------------------'
+    End Sub
+
+    Private Sub _DataInitialize(Of T As {New})()
+        Dim obj As Object
+        If Me.Data IsNot Nothing Then
+            obj = Me.Data
+            Select Case obj.GetType
+                Case (New Object).GetType
+                    Me.Data = CType(obj, T)
+                Case (New JObject).GetType
+                    ' Ｊｓｏｎからロードした場合は、JObject型になっている
+                    Me.Data = obj.ToObject(Of T)
+                Case (New T).GetType
+                    Me.Data = obj
+            End Select
+        Else
+            Me.Data = New T
+        End If
+    End Sub
+
+    ' OpenProject、Selectプロジェクト時など、
+    ' 新たに追加されたオブジェクトメンバなどのインスタンス化を行う
+    Public Sub Initialize(ByVal project As ProjectInfoModel)
+        '-- you henkou --------------------------------'
+        Select Case project.Kind
+            Case AppDirectoryModel.DB_TEST
+                Call Me._DataInitialize(Of DBTestModel)()
+                Call Me._DBTestModelInitialize()
+            Case Else
+        End Select
+        '----------------------------------------------'
+    End Sub
+
+    ' DBTestModel のオブジェクトの初期化
+    Private Sub _DBTestModelInitialize()
+        If Me.Data Is Nothing Then
+            Me.Data = New DBTestModel
+        End If
+        If Me.Data.Server Is Nothing Then
+            Me.Data.Server = New ServerModel
+        End If
+        If Me.Data.History Is Nothing Then
+            Me.Data.History = New HistoryModel
+            Call Me.Data.History.NewLine("Historyは初期化されました")
+        End If
     End Sub
 
     '' このモデルを生成したＪＳＯＮファイル

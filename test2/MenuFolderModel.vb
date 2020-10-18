@@ -16,12 +16,12 @@ Public Class MenuFolderModel
     End Property
 
 
-    Private _Menus As ObservableCollection(Of MenuModel)
-    Public Property Menus As ObservableCollection(Of MenuModel)
+    Private _Menus As ObservableCollection(Of _MenuModel)
+    Public Property Menus As ObservableCollection(Of _MenuModel)
         Get
             Return Me._Menus
         End Get
-        Set(value As ObservableCollection(Of MenuModel))
+        Set(value As ObservableCollection(Of _MenuModel))
             Me._Menus = value
             RaisePropertyChanged("Menus")
         End Set
@@ -43,7 +43,7 @@ Public Class MenuFolderModel
     ' コレクションの存在チェック
     Private Sub _MenusCheck()
         If Me.Menus Is Nothing Then
-            Menus = New ObservableCollection(Of MenuModel)
+            Menus = New ObservableCollection(Of _MenuModel)
         End If
     End Sub
 
@@ -62,7 +62,7 @@ Public Class MenuFolderModel
 
                 If flg Then
                     Me.Menus.Add(
-                        New MenuModel With {
+                        New _MenuModel With {
                             .ViewName = vdic.Key,
                             .Name = c.Key,
                             .DisplayName = c.Key
@@ -84,7 +84,7 @@ Public Class MenuFolderModel
 
 
     ' 変更要求チェック
-    Private Sub _MenuChangeRequestedReview(ByVal mm As MenuModel, ByVal e As System.EventArgs)
+    Private Sub _MenuChangeRequestedReview(ByVal mm As _MenuModel, ByVal e As System.EventArgs)
         Dim b As Boolean : b = True
         If b Then
             Me._MenuChangeRequestAccept(mm)
@@ -93,7 +93,7 @@ Public Class MenuFolderModel
 
 
     ' 変更要求受理
-    Private Sub _MenuChangeRequestAccept(ByVal mm As MenuModel)
+    Private Sub _MenuChangeRequestAccept(ByVal mm As _MenuModel)
         Me._PrivateViewModel.ChangeContent(mm.ViewName, mm.Name, mm)
     End Sub
 

@@ -690,7 +690,7 @@
                 </StackPanel>
             </ControlTemplate>
 
-            <DataTemplate
+            <!--<DataTemplate
                 DataType="{x:Type local:HistoryViewModel}">
                 <DockPanel
                     LastChildFill="True">
@@ -711,7 +711,7 @@
                         HorizontalAlignment="Stretch"
                         Text="{Binding HistoryContents}" ScrollViewer.CanContentScroll="False" UseLayoutRounding="False" AllowDrop="True" Height="Auto"/>
                 </DockPanel>
-            </DataTemplate>
+            </DataTemplate>-->
         </Grid.Resources>
 
         <ContentControl                

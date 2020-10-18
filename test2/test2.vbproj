@@ -81,15 +81,21 @@
     <Compile Include="BaseModelWithViewModel.vb" />
     <Compile Include="BaseViewModel.vb" />
     <Compile Include="BaseViewModel2.vb" />
+    <Compile Include="BaseViewModelInterface.vb" />
     <Compile Include="BatchMenuView.xaml.vb">
       <DependentUpon>BatchMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="BatchMenuViewModel.vb" />
     <Compile Include="CollectionModule.vb" />
+    <Compile Include="CommonModule.vb" />
     <Compile Include="DelegateAction.vb" />
+    <Compile Include="MenuItemModel.vb" />
+    <Compile Include="MenuViewModel.vb" />
     <Compile Include="NormalViewModel.vb" />
     <Compile Include="TabItemModel.vb" />
     <Compile Include="TabViewModel.vb" />
+    <Compile Include="ViewExplorerViewModel.vb" />
+    <Compile Include="ViewItemModel.vb" />
     <Compile Include="Window.xaml.vb">
       <DependentUpon>Window.xaml</DependentUpon>
     </Compile>
@@ -150,11 +156,11 @@
       <DependentUpon>MainWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProjectBaseModel.vb" />
-    <Compile Include="MenuModel.vb" />
+    <Compile Include="_MenuModel.vb" />
     <Compile Include="MenuView.xaml.vb">
       <DependentUpon>MenuView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MenuViewModel.vb" />
+    <Compile Include="_MenuViewModel.vb" />
     <Compile Include="MyModule.vb" />
     <Compile Include="MyCommand.vb" />
     <Compile Include="ProjectModel.vb" />

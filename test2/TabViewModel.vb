@@ -1,6 +1,36 @@
 ﻿Imports System.Collections.ObjectModel
 
 Public Class TabViewModel : Inherits BaseViewModel
+    Private Property _SelectedIndex As Integer
+    Public Property SelectedIndex As Integer
+        Get
+            Return Me._SelectedIndex
+        End Get
+        Set(value As Integer)
+            Me._SelectedIndex = value
+            'If value = -1 Then
+            '    Me.SelectedIndex = 0
+            '    RaisePropertyChanged("SelectedIndex")
+            'End If
+        End Set
+    End Property
+
+    Private Property _SelectedItem As TabItemModel
+    Public Property SelectedItem As TabItemModel
+        Get
+            Return Me._SelectedItem
+        End Get
+        Set(value As TabItemModel)
+            Me._SelectedItem = value
+            'If value Is Nothing Then
+            '    If Tabs(0) IsNot Nothing Then
+            '        Me.SelectedItem = Tabs(0)
+            '    End If
+            'End If
+            'RaisePropertyChanged("SelectedItem")
+        End Set
+    End Property
+
     Private _Tabs As ObservableCollection(Of TabItemModel)
     Public Property Tabs As ObservableCollection(Of TabItemModel)
         Get

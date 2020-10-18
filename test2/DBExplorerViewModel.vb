@@ -2,7 +2,9 @@
 'Imports System.Collections.ObjectModel
 
 Public Class DBExplorerViewModel
-    Inherits BaseViewModel2(Of DBTestModel)
+    Inherits BaseViewModel2
+
+    'Inherits BaseViewModel2(Of DBTestModel)
     '    Inherits ProjectBaseViewModel(Of DBExplorerViewModel)
 
     '    ' モデル
@@ -162,4 +164,10 @@ Public Class DBExplorerViewModel
     '    End Sub
     Sub New()
     End Sub
+
+    Public Overrides ReadOnly Property ViewType As String
+        Get
+            Return ViewModel.EXPLORER_VIEW
+        End Get
+    End Property
 End Class

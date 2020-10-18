@@ -101,4 +101,32 @@
 
         EvaluateIfCan = obj
     End Function
+
+    Public Function CheckCanExecute(ByVal parameter As Object) As Integer
+        Dim i = -1
+        Dim lce As New List(Of Func(Of Object, Boolean))
+
+        lce.Add(Me.CanExecuteHandler)
+        lce.Add(Me.CanExecuteHandler2)
+        lce.Add(Me.CanExecuteHandler3)
+        lce.Add(Me.CanExecuteHandler4)
+        lce.Add(Me.CanExecuteHandler5)
+        lce.Add(Me.CanExecuteHandler6)
+        lce.Add(Me.CanExecuteHandler7)
+        lce.Add(Me.CanExecuteHandler8)
+        lce.Add(Me.CanExecuteHandler9)
+        lce.Add(Me.CanExecuteHandler10)
+
+        For Each ce In lce
+            i = 0
+            If ce <> Nothing Then
+                If Not ce(parameter) Then
+                    i += 1
+                    Exit For
+                End If
+            End If
+        Next
+
+        CheckCanExecute = i
+    End Function
 End Class

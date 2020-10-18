@@ -171,21 +171,24 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="10"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="300" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <Grid.Resources>
             <!-- タブで表示するタイプ -->
             <DataTemplate
                 DataType="{x:Type local:TabViewModel}">
-                <TabControl ItemsSource="{Binding Tabs}">
+                <TabControl
+                    SelectedIndex="{Binding SelectedIndex}"
+                    ItemsSource="{Binding Tabs}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -425,12 +428,12 @@
                     <StackPanel 
                         DockPanel.Dock="Top"
                         Orientation="Horizontal">
-                        <Button
+                        <!--<Button
                             Template="{StaticResource DBReLoadButton}"
                             Command="{Binding DBLoadCommand}" />
                         <Button
                             Template="{StaticResource SaveButton}"
-                            Command="{Binding SaveCommand}" />
+                            Command="{Binding SaveCommand}" />-->
                     </StackPanel>
 
                     <TreeView
@@ -464,37 +467,165 @@
                     </TreeView>
                 </DockPanel>
             </DataTemplate>
+            
+            <DataTemplate                
+                DataType="{x:Type local:ViewExplorerViewModel}">
+                <DockPanel
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    LastChildFill="True">
+                    <StackPanel 
+                        DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                        <!--<Button
+                            Template="{StaticResource DBReLoadButton}"
+                            Command="{Binding DBLoadCommand}" />
+                        <Button
+                            Template="{StaticResource SaveButton}"
+                            Command="{Binding SaveCommand}" />-->
+                    </StackPanel>
+
+                    <TreeView
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.HorizontalScrollBarVisibility="Visible"                        
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        BorderThickness="0,0,0,0">
+                        <TreeViewItem
+                            FontSize="11"
+                            Header="Views"
+                            ItemsSource="{Binding Views}">
+                            <TreeViewItem.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                                </Style>
+                            </TreeViewItem.ItemContainerStyle>
+                        </TreeViewItem>
+                    </TreeView>
+                </DockPanel>
+            </DataTemplate>
+
+            <ContextMenu x:Key="ViewItemContextMenu">
+                <MenuItem 
+                    Header="名前の変更"
+                    Command="{Binding ChangeAliasCommand}"/>
+            </ContextMenu>
+
+            <DataTemplate                
+                DataType="{x:Type local:ViewItemModel}">
+                <DockPanel 
+                    Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}}"
+                    LastChildFill="True">
+                    <TextBlock            
+                        Visibility="{Binding BlockVisibility}"
+                        ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                        Text="{Binding Alias}" />
+                    <TextBox            
+                        Visibility="{Binding BoxVisibility}"
+                        ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                        Text="{Binding Alias}" />
+                </DockPanel>
+            </DataTemplate>
+
+            <DataTemplate
+                DataType="{x:Type local:HistoryViewModel}">
+                <DockPanel
+                    LastChildFill="True">
+                    <StackPanel                        
+                        Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                    </StackPanel>
+                    <TextBox
+                        x:Name="HistoryBox"
+                        DockPanel.Dock="Top"         
+                        Text="{Binding History.DisplayContents, Mode=OneWay}" 
+                        IsReadOnly="True"                        
+                        VerticalScrollBarVisibility="Visible"
+                        HorizontalScrollBarVisibility="Visible"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"                        
+                        ScrollViewer.CanContentScroll="False" 
+                        UseLayoutRounding="False" 
+                        AllowDrop="True" 
+                        Height="Auto"/>
+                </DockPanel>
+            </DataTemplate>
+
+            <DataTemplate
+                DataType="{x:Type local:MenuViewModel}">
+                <StackPanel 
+                    Grid.Row="0" 
+                    Grid.Column="0" Grid.ColumnSpan="3"
+                    Orientation="Horizontal">
+                    <Menu>
+                        <MenuItem
+                            Header="ファイル(F)"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Margin="0,0,5,0">
+                            <MenuItem 
+                                Header="開く"
+                                Command="{Binding OpenProjectCommand}"/>
+                            <MenuItem 
+                                Header="保存" />
+                        </MenuItem>
+                        <MenuItem
+                            Header="編集(F)"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Margin="0,0,5,0" />
+                        <MenuItem
+                            Header="表示(V)"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Margin="0,0,5,0" />
+                        <MenuItem
+                            Header="プロジェクト(P)"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            Margin="0,0,5,0" />
+                    </Menu>
+                </StackPanel>
+            </DataTemplate>
 
         </Grid.Resources>
-        <ContentControl                
+
+        <ContentControl
+            x:Name="MenuFrame"
+            Grid.Row="0"
+            Grid.Column="0" Grid.ColumnSpan="3"
+            Content="{Binding MenuViewContent}" />
+        <ContentControl
             x:Name="ExplorerFlame"
-            Grid.Row="0" Grid.RowSpan="3"
+            Grid.Row="1" Grid.RowSpan="3"
             Grid.Column="0"
-            Content="{Binding ExplorerViewContext}" />
-        <GridSplitter
-            Grid.Row="0" Grid.RowSpan="3"
-            Grid.Column="1"            
+            Content="{Binding ExplorerViewContent}" />
+        <GridSplitter            
+            Grid.Row="1" Grid.RowSpan="3"
+            Grid.Column="1"
+            Width="10"
             ResizeDirection="Columns"
             ResizeBehavior="PreviousAndNext"
-            DockPanel.Dock="Left"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" />
         <ContentControl
-            x:Name="MainFlame"
-            Grid.Row="0"
+            Grid.Row="1"            
             Grid.Column="2"
-            Content="{Binding MainViewContent}"/>
+            x:Name="MainFlame"                
+            Content="{Binding MainViewContent}" />
         <GridSplitter
-            Grid.Row="1"
-            Grid.Column="2"
-            ResizeDirection="Rows"                
-            ResizeBehavior="PreviousAndNext"                
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Stretch" />
-        <ContentControl
-            x:Name="HistoryFlame"
             Grid.Row="2"
             Grid.Column="2"
-            Content="{Binding HistoryViewContext}" />
+            Height="10"
+            ResizeDirection="Rows"                
+            ResizeBehavior="PreviousAndNext" 
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch" />
+        <ContentControl
+            Grid.Row="3"
+            Grid.Column="2"
+            x:Name="HistoryFlame"                
+            Content="{Binding HistoryViewContent}" />
     </Grid>
 </Window>

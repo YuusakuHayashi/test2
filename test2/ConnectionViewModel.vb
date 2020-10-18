@@ -2,10 +2,17 @@
 Imports Newtonsoft.Json.Linq
 
 Public Class ConnectionViewModel
-    Inherits BaseViewModel2(Of DBTestModel)
+    'Inherits BaseViewModel2(Of DBTestModel)
+    Inherits BaseViewModel2
 
     Private Const _SUCCESS_MESSAGE As String = "接続に成功しました。"
     Private Const _NOCONNECTION As String = "まだ接続が成功していません。接続を定義してください"
+
+    Public Overrides ReadOnly Property ViewType As String
+        Get
+            Return ViewModel.MAIN_VIEW
+        End Get
+    End Property
 
     Private _ServerName As String
     Public Property ServerName As String
@@ -14,7 +21,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ServerName = value
-            Data.ServerName = value
+            Model.Data.ServerName = value
             RaisePropertyChanged("ServerName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -28,7 +35,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._DataBaseName = value
-            Data.DataBaseName = value
+            Model.Data.DataBaseName = value
             RaisePropertyChanged("DataBaseName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -52,7 +59,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ConnectionString = value
-            Data.ConnectionString = value
+            Model.Data.ConnectionString = value
             RaisePropertyChanged("ConnectionString")
             Call _GetOtherProperty()
         End Set
@@ -184,16 +191,16 @@ Public Class ConnectionViewModel
         Dim i = 0
         Dim b = False
         Dim sh As SqlHandler
-        If Data.ConnectionString <> Nothing Then
-            Me.ConnectionString = Data.ConnectionString
+        If Model.Data.ConnectionString <> Nothing Then
+            Me.ConnectionString = Model.Data.ConnectionString
             i += 1
         End If
-        If Data.ServerName <> Nothing Then
-            Me.ServerName = Data.ServerName
+        If Model.Data.ServerName <> Nothing Then
+            Me.ServerName = Model.Data.ServerName
             i += 1
         End If
-        If Data.DataBaseName <> Nothing Then
-            Me.DataBaseName = Data.DataBaseName
+        If Model.Data.DataBaseName <> Nothing Then
+            Me.DataBaseName = Model.Data.DataBaseName
             i += 1
         End If
         If i >= 3 Then

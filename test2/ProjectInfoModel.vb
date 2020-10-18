@@ -132,20 +132,61 @@ Public Class ProjectInfoModel
         CheckStructure = code
     End Function
 
-    'Public Function CheckProjectDirectory() As Integer
-    '    Dim code As Integer : code = 99
-    '    If Directory.Exists(Me.DirectoryName) Then
-    '        code = 10
-    '        If File.Exists(Me.ProjectInfoFileName) Then
-    '            code = 20
-    '            If File.Exists(Me.IniFileName) Then
-    '                code = 0
-    '            End If
-    '        End If
-    '    End If
-    '    CheckProjectDirectory = code
-    'End Function
+    ' CheckStructureを真偽値で評価します
+    Private Function _CheckProjectExist() As Boolean
+        Dim i = -1
+        Dim b = False
 
+        i = Me.CheckStructure()
+        If i = 0 Then
+            b = True
+        End If
+
+        _CheckProjectExist = b
+    End Function
+
+    Private Function _CheckProjectNotExist() As Boolean
+        Return (Not _CheckProjectExist())
+    End Function
+    Public Function CheckProjectNotExist() As Boolean
+        Return _CheckProjectNotExist()
+    End Function
+
+
+    ' ロード可能かのチェック
+    Private Function _CheckProjectInfo() As Boolean
+        Dim jh As New JsonHandler(Of Object)
+        Return (jh.CheckModel(Of ProjectInfoModel)(Me.ProjectInfoFileName))
+    End Function
+    Public Function CheckProjectInfo() As Boolean
+        Return CheckProjectInfo()
+    End Function
+
+    ' ロード可能かのチェック
+    Private Function _CheckModel() As Boolean
+        Dim jh As New JsonHandler(Of Object)
+        Return (jh.CheckModel(Of Model)(Me.ModelFileName))
+    End Function
+    Public Function CheckModel() As Boolean
+        Return CheckModel()
+    End Function
+
+    ' プロジェクト状態レベル
+    Public Function CheckProject() As Integer
+        ' 0 ... チェック全てＯＫ
+        ' 1 ... ディレクトリが不正
+        ' 2 ... プロジェクト情報が不正
+        ' 3 ... モデルが不正
+        Dim i As Integer : i = -1
+        Dim da As New DelegateAction With {
+            .CanExecuteHandler = AddressOf _CheckProjectExist,
+            .CanExecuteHandler2 = AddressOf _CheckProjectInfo,
+            .CanExecuteHandler3 = AddressOf _CheckModel
+        }
+
+        i = da.CheckCanExecute(Me)
+        CheckProject = i
+    End Function
 
     ' この関数はプロジェクトの作成を行い、その結果を返します
     Public Sub Launch()
@@ -154,34 +195,4 @@ Public Class ProjectInfoModel
         Call Me.CreateProjectInfoFile()
         Call Me.CreateProjectModelFile()
     End Sub
-
-    'Public Function ProjectLaunch() As Integer
-    '    Dim proxy(3) As ProjectLaunchProxy
-    '    Dim proxy2 As ProjectLaunchProxy
-
-    '    proxy(0) = AddressOf CreateProjectDirectory
-    '    proxy(1) = AddressOf CreateProjectIniFile
-    '    proxy(2) = AddressOf CreateProjectModelFile
-    '    proxy(3) = AddressOf CreateProjectInfoFile
-
-    '    Dim code As Integer : code = CheckProjectDirectory()
-    '    Try
-    '        Select Case code
-    '            Case 0
-    '            Case 10
-    '            Case 99
-    '                proxy2 = [Delegate].Combine(proxy)
-    '            Case Else
-    '        End Select
-    '        If proxy2 IsNot Nothing Then
-    '            If proxy2.GetInvocationList IsNot Nothing Then
-    '                Call proxy2()
-    '                code = 0
-    '            End If
-    '        End If
-    '    Catch ex As Exception
-    '    Finally
-    '        ProjectLaunch = code
-    '    End Try
-    'End Function
 End Class

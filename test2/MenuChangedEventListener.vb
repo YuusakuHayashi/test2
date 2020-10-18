@@ -9,7 +9,7 @@
 
     Public Event ChangeRequested As EventHandler
 
-    Public Sub RaiseChangeRequested(ByVal child As MenuModel)
+    Public Sub RaiseChangeRequested(ByVal child As _MenuModel)
         RaiseEvent ChangeRequested(child, EventArgs.Empty)
     End Sub
 End Class

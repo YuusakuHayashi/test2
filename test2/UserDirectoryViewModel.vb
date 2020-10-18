@@ -3,11 +3,19 @@ Imports System.Collections.ObjectModel
 Imports System.IO
 
 Public Class UserDirectoryViewModel
-    Inherits BaseViewModel2(Of Object)
+    Inherits BaseViewModel2
+
+    'Inherits BaseViewModel2(Of Object)
 
     Private Const _PROJECT_LOAD_FAILED As String = "プロジェクトのロードに失敗しました"
     Private Const _ISNOT_PROJECT_DIRECTORY As String = "このフォルダはプロジェクトディレクトリではありません"
     Private Const _DIRECTORY_ALREADY_EXIST As String = "このフォルダは既に存在しています"
+
+    Public Overrides ReadOnly Property ViewType As String
+        Get
+            Return Nothing
+        End Get
+    End Property
 
     Private _UserDirectoryName As String
     Public Property UserDirectoryName As String
@@ -146,8 +154,9 @@ Public Class UserDirectoryViewModel
 
     Private Sub _SelectProjectCommandExecute(ByVal parameter As Object)
         Dim project As ProjectInfoModel
+        Dim i = -1
         project = Me.SelectedProject
-        Call _CheckProject(project)
+        Call Me._CheckProject(project)
     End Sub
 
     Private Function _SelectProjectCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -338,11 +347,11 @@ Public Class UserDirectoryViewModel
         }
 
         Dim launcher As New DelegateAction With {
-            .CanExecuteHandler = AddressOf _CheckProjectNotExist,
-            .ExecuteHandler = AddressOf _LaunchProject
+            .CanExecuteHandler = AddressOf project.CheckProjectNotExist,
+            .ExecuteHandler = AddressOf project.Launch
         }
 
-        i = launcher.ExecuteIfCan(project)
+        i = launcher.ExecuteIfCan(Nothing)
         If i = 0 Then
             Me.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(project, Me.CurrentProjects, 5)
             Call AppInfo.AppSave()
@@ -361,94 +370,94 @@ Public Class UserDirectoryViewModel
     End Function
 
 
+
+
     ' プロジェクトをチェックし、正当な場合、プロジェクトをスタートします
+    ' Model.Setup() 不要、Model.Initializeする
     Private Sub _CheckProject(ByVal project As ProjectInfoModel)
         Dim msg As String : msg = vbNullString
-        Dim i As Integer : i = -1
-        Dim i2 As Integer : i = -1
-        Dim projectInfoLoader As New DelegateAction With {
-            .CanExecuteHandler = AddressOf _CheckProjectExist,
-            .CanExecuteHandler2 = AddressOf _CheckProjectInfo,
-            .ExecuteHandler = AddressOf _LoadProjectInfo
-        }
+        Dim jh As New JsonHandler(Of Object)
 
-        Dim modelLoader As New DelegateAction With {
-            .CanExecuteHandler = AddressOf _CheckModel,
-            .ExecuteHandler = AddressOf _LoadModel
-        }
-
-        Dim projectDeleter As New DelegateAction With {
-            .ExecuteHandler = AddressOf _DeleteProject
-        }
-
-        i = projectInfoLoader.ExecuteIfCan(project)
-        If i = 0 Then
-            i2 = modelLoader.ExecuteIfCan(project)
-            If i2 = 0 Then
+        Dim i = project.CheckProject()
+        ' 0 ... チェック全てＯＫ
+        ' 1 ... ディレクトリが不正
+        ' 2 ... プロジェクト情報が不正
+        ' 3 ... モデルが不正
+        Select Case i
+            Case 0
+                ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
+                Model = jh.ModelLoad(Of Model)(project.ModelFileName)
+                Call Model.Initialize(ProjectInfo)
                 Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
                 msg = vbNullString
-            Else
+            Case 1
+                Call _DeleteProject(project)
+                Call AppInfo.AppSave()
+                msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
+            Case 2
                 msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
-            End If
-        Else
-            Call _DeleteProject(project)
-            Call AppInfo.AppSave()
-            msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
-        End If
+            Case 3
+                msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
+        End Select
 
         Me.Message = msg
     End Sub
 
-    Private Sub _LaunchProject(ByVal project As ProjectInfoModel)
-        Call project.Launch()
-    End Sub
+    'Private Sub _CheckProject(ByVal project As ProjectInfoModel)
+    '    Dim msg As String : msg = vbNullString
+    '    Dim i As Integer : i = -1
+    '    Dim i2 As Integer : i = -1
+    '    Dim projectInfoLoader As New DelegateAction With {
+    '        .CanExecuteHandler = AddressOf _CheckProjectExist,
+    '        .CanExecuteHandler2 = AddressOf _CheckProjectInfo,
+    '        .ExecuteHandler = AddressOf _LoadProjectInfo
+    '    }
 
-    Private Overloads Function _CheckProjectExist(ByVal project As ProjectInfoModel) As Boolean
-        Dim i = -1
-        Dim b = False
+    '    Dim modelLoader As New DelegateAction With {
+    '        .CanExecuteHandler = AddressOf _CheckModel,
+    '        .ExecuteHandler = AddressOf _LoadModel
+    '    }
 
-        i = project.CheckStructure()
-        If i = 0 Then
-            b = True
-        End If
+    '    i = projectInfoLoader.ExecuteIfCan(project)
+    '    If i = 0 Then
+    '        i2 = modelLoader.ExecuteIfCan(project)
+    '        If i2 = 0 Then
+    '            Call Model.Initialize(ProjectInfo)
+    '            Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
+    '            msg = vbNullString
+    '        Else
+    '            msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
+    '        End If
+    '    Else
+    '        Call _DeleteProject(project)
+    '        Call AppInfo.AppSave()
+    '        msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
+    '    End If
 
-        _CheckProjectExist = b
-    End Function
+    '    Me.Message = msg
+    'End Sub
 
-    Private Overloads Function _CheckProjectNotExist(ByVal project As ProjectInfoModel) As Boolean
-        Dim i = -1
-        Dim b = False
+    'Private Overloads Function _CheckProjectNotExist(ByVal project As ProjectInfoModel) As Boolean
+    '    Dim i = -1
+    '    Dim b = False
 
-        i = project.CheckStructure()
-        If i = 1000 Then
-            b = True
-        End If
+    '    i = project.CheckStructure()
+    '    If i = 1000 Then
+    '        b = True
+    '    End If
 
-        _CheckProjectNotExist = b
-    End Function
+    '    _CheckProjectNotExist = b
+    'End Function
 
-    Private Function _CheckProjectInfo(ByVal project As ProjectInfoModel) As Boolean
-        Dim jh As New JsonHandler(Of Object)
-        Return (jh.CheckModel(Of ProjectInfoModel)(project.ProjectInfoFileName))
-    End Function
+    'Private Sub _LoadProjectInfo(ByVal project As ProjectInfoModel)
+    '    Dim jh As New JsonHandler(Of Object)
+    '    Me.ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
+    'End Sub
 
-    Private Function _CheckModel(ByVal project As ProjectInfoModel) As Boolean
-        Dim jh As New JsonHandler(Of Object)
-        Return (jh.CheckModel(Of Model)(project.ModelFileName))
-    End Function
-
-    Private Sub _SaveAppInfo(ByVal app As AppDirectoryModel)
-    End Sub
-
-    Private Sub _LoadProjectInfo(ByVal project As ProjectInfoModel)
-        Dim jh As New JsonHandler(Of Object)
-        Me.ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
-    End Sub
-
-    Private Sub _LoadModel(ByVal project As ProjectInfoModel)
-        Dim jh As New JsonHandler(Of Object)
-        Me.Model = jh.ModelLoad(Of Model)(project.ModelFileName)
-    End Sub
+    'Private Sub _LoadModel(ByVal project As ProjectInfoModel)
+    '    Dim jh As New JsonHandler(Of Object)
+    '    Me.Model = jh.ModelLoad(Of Model)(project.ModelFileName)
+    'End Sub
 
     Private Sub _DeleteProject(ByVal project As ProjectInfoModel)
         Dim pim As ProjectInfoModel

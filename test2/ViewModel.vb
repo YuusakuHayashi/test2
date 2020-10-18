@@ -6,6 +6,7 @@ Public Class ViewModel
     Public Const MAIN_VIEW As String = "MainView"
     Public Const EXPLORER_VIEW As String = "ExplorerView"
     Public Const HISTORY_VIEW As String = "HistoryView"
+    Public Const MENU_VIEW As String = "MenuView"
 
     Private _MainViewContent As Object
     Public Property MainViewContent As Object
@@ -40,83 +41,17 @@ Public Class ViewModel
         End Set
     End Property
 
-    'Private _MainTabViewContents As ObservableCollection(Of TabItemModel)
-    'Public Property MainTabViewContents As ObservableCollection(Of TabItemModel)
-    '    Get
-    '        Return Me._MainTabViewContents
-    '    End Get
-    '    Set(value As ObservableCollection(Of TabItemModel))
-    '        Me._MainTabViewContents = value
-    '        RaisePropertyChanged("MainTabViewContents")
-    '    End Set
-    'End Property
+    Private _MenuViewContent As Object
+    Public Property MenuViewContent As Object
+        Get
+            Return Me._MenuViewContent
+        End Get
+        Set(value As Object)
+            Me._MenuViewContent = value
+            RaisePropertyChanged("MenuViewContent")
+        End Set
+    End Property
 
-    'Private _MainViewHeight As Integer
-    'Public Property MainViewHeight As Integer
-    '    Get
-    '        Return Me._MainViewHeight
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._MainViewHeight = value
-    '        RaisePropertyChanged("MainViewHeight")
-    '    End Set
-    'End Property
-
-    'Private _MainViewWidth As Integer
-    'Public Property MainViewWidth As Integer
-    '    Get
-    '        Return Me._MainViewWidth
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._MainViewWidth = value
-    '        RaisePropertyChanged("MainViewWidth")
-    '    End Set
-    'End Property
-
-
-    'Private _ExplorerViewHeight As Integer
-    'Public Property ExplorerViewHeight As Integer
-    '    Get
-    '        Return Me._ExplorerViewHeight
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._ExplorerViewHeight = value
-    '        RaisePropertyChanged("ExplorerViewHeight")
-    '    End Set
-    'End Property
-
-    'Private _ExplorerViewWidth As Integer
-    'Public Property ExplorerViewWidth As Integer
-    '    Get
-    '        Return Me._ExplorerViewWidth
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._ExplorerViewWidth = value
-    '        RaisePropertyChanged("ExplorerViewWidth")
-    '    End Set
-    'End Property
-
-    'Private _HistoryViewHeight As Integer
-    'Public Property HistoryViewHeight As Integer
-    '    Get
-    '        Return Me._HistoryViewHeight
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._HistoryViewHeight = value
-    '        RaisePropertyChanged("HistoryViewHeight")
-    '    End Set
-    'End Property
-
-    'Private _HistoryViewWidth As Integer
-    'Public Property HistoryViewWidth As Integer
-    '    Get
-    '        Return Me._HistoryViewWidth
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._HistoryViewWidth = value
-    '        RaisePropertyChanged("HistoryViewWidth")
-    '    End Set
-    'End Property
 
     ' コンテントディクショナリ関連 ---------------------------------------------------------------'
     ' コンテントディクショナリ
@@ -153,6 +88,8 @@ Public Class ViewModel
                 Me.ExplorerViewContent = o
             Case HISTORY_VIEW
                 Me.HistoryViewContent = o
+            Case MENU_VIEW
+                Me.MenuViewContent = o
             Case Else
                 ' Nothing To Do
         End Select
@@ -198,8 +135,8 @@ Public Class ViewModel
         End Set
     End Property
 
-    ' タブディクショナリが存在しない場合、新規作成し
-    ' ビューディクショナリが存在しない場合、追加します
+    ' タブコレクションディクショナリが存在しない場合、新規作成し
+    ' タブコレクションが存在しない場合、追加します
     Private Sub _RegisterTabViewToDictionary(ByVal view As String)
         Dim tvm As TabViewModel
         If Me.TabsDictionary Is Nothing Then
@@ -233,28 +170,47 @@ Public Class ViewModel
     End Sub
 
     ' タブをコレクションにセットします
-    Private Sub _AddTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
-        Call Me._RegisterTabViewToDictionary(view)
-        If Not Me.TabsDictionary(view).Tabs.Contains([tab]) Then
-            Call [tab].Initialize()
-            Me.TabsDictionary(view).Tabs.Add([tab])
-        End If
-    End Sub
+    'Private Sub _AddTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
+    '    Call Me._RegisterTabViewToDictionary(view)
+    '    If Not Me.TabsDictionary(view).Tabs.Contains([tab]) Then
+    '        Call [tab].Initialize()
+    '        Me.TabsDictionary(view).Tabs.Add([tab])
+    '    End If
+    'End Sub
 
     ' タブをコレクションにセット＆更新します
     Private Sub _UpdateTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
-        Call Me._AddTabsToCollection(view, [tab])
-        Me.TabsDictionary(view).Tabs(Me.TabsDictionary(view).Tabs.IndexOf([tab])) = [tab]
+        Dim idx = -1
+        Call Me._RegisterTabViewToDictionary(view)
+        For Each t In Me.TabsDictionary(view).Tabs
+            If [tab].Name = t.Name Then
+                idx = Me.TabsDictionary(view).Tabs.IndexOf(t)
+            End If
+        Next
+        If idx = -1 Then
+            Call [tab].Initialize()
+            Me.TabsDictionary(view).Tabs.Add([tab])
+        Else
+            Call [tab].Initialize()
+            Me.TabsDictionary(view).Tabs(idx) = [tab]
+        End If
+        'Call Me._AddTabsToCollection(view, [tab])
+        'Me.TabsDictionary(view).Tabs(Me.TabsDictionary(view).Tabs.IndexOf([tab])) = [tab]
     End Sub
 
     ' タブをコレクションにセット＆ビューの切り替えを行います
-    Public Sub ChangeTabs(ByVal view As String, ByVal [tab] As TabItemModel)
-        Call Me._AddTabsToCollection(view, [tab])
-        Call Me._SetTabsObject(view)
-    End Sub
+    'Public Sub ChangeTabs(ByVal view As String, ByVal [tab] As TabItemModel)
+    '    Call Me._AddTabsToCollection(view, [tab])
+    '    Call Me._SetTabsObject(view)
+    'End Sub
 
     ' タブをコレクションにセット＆更新＆ビューの切り替えを行います
-    Public Sub SetTabs(ByVal view As String, ByVal [tab] As TabItemModel)
+    'Public Sub SetTabs(ByVal view As String, ByVal [tab] As TabItemModel)
+    '    Call Me._UpdateTabsToCollection(view, [tab])
+    '    Call Me._SetTabsObject(view)
+    'End Sub
+    Public Sub SetTabs(ByVal [tab] As TabItemModel)
+        Dim view = [tab].Content.ViewType
         Call Me._UpdateTabsToCollection(view, [tab])
         Call Me._SetTabsObject(view)
     End Sub
@@ -273,50 +229,91 @@ Public Class ViewModel
                                ByVal vm As ViewModel,
                                ByVal adm As AppDirectoryModel,
                                ByVal pim As ProjectInfoModel)
-        Dim cvm As ConnectionViewModel
-        Dim dbtvm As DBTestViewModel
-        Dim dbevm As DBExplorerViewModel
-        Dim hvm As HistoryViewModel
+        'Dim cvm As ConnectionViewModel
+        'Dim dbtvm As DBTestViewModel
+        'Dim dbevm As DBExplorerViewModel
+        'Dim vevm As ViewExplorerViewModel
+        'Dim hvm As HistoryViewModel
+        'Dim mvm As MenuViewModel
+        Dim cvm As Object
+        Dim dbtvm As Object
+        Dim dbevm As Object
+        Dim vevm As Object
+        Dim hvm As Object
+        Dim mvm As Object
         Dim t_cvm As TabItemModel
         Dim t_dbtvm As TabItemModel
         Dim t_dbevm As TabItemModel
+        Dim t_vevm As TabItemModel
+        Dim t_hvm As TabItemModel
 
         '-- you henkou --------------------------------'
         Select Case pim.Kind
             Case AppDirectoryModel.DB_TEST
-                cvm = New ConnectionViewModel()
-                dbtvm = New DBTestViewModel()
-                dbevm = New DBExplorerViewModel()
-                hvm = New HistoryViewModel()
+                cvm = New ConnectionViewModel
+                dbtvm = New DBTestViewModel
+                dbevm = New DBExplorerViewModel
+                vevm = New ViewExplorerViewModel
+                hvm = New HistoryViewModel
+                mvm = New MenuViewModel
 
                 Call cvm.Initialize(m, vm, adm, pim)
+                Call hvm.Initialize(m, vm, adm, pim)
+                Call mvm.Initialize(m, vm, adm, pim)
+                Call vevm.Initialize(m, vm, adm, pim)
+
                 t_cvm = New TabItemModel With {
-                    .Name = cvm.GetType.Name, 
+                    .Name = cvm.GetType.Name,
                     .Content = cvm
                 }
                 t_dbtvm = New TabItemModel With {
-                    .Name = dbtvm.GetType.Name, 
+                    .Name = dbtvm.GetType.Name,
                     .Content = dbtvm
                 }
                 t_dbevm = New TabItemModel With {
-                    .Name = dbevm.GetType.Name, 
+                    .Name = dbevm.GetType.Name,
                     .Content = dbevm
                 }
-                Call _UpdateTabsToCollection(ViewModel.MAIN_VIEW, t_cvm)
-                Call _UpdateTabsToCollection(ViewModel.MAIN_VIEW, t_dbtvm)
-                Call _UpdateTabsToCollection(ViewModel.EXPLORER_VIEW, t_dbevm)
-                Call ChangeTabs(ViewModel.MAIN_VIEW, t_cvm)
-                Call ChangeTabs(ViewModel.EXPLORER_VIEW, t_dbevm)
+                t_hvm = New TabItemModel With {
+                    .Name = hvm.GetType.Name,
+                    .Content = hvm
+                }
+                t_vevm = New TabItemModel With {
+                    .Name = vevm.GetType.Name,
+                    .Content = vevm
+                }
 
+                Call vevm.RegisterViews(t_cvm, t_dbtvm, t_dbevm, t_hvm, t_vevm)
 
-                'Call ChangeContent(ViewModel.MAIN_VIEW, dbtvm.GetType.Name, dbtvm)
-                'Call ChangeContent(ViewModel.MAIN_VIEW, cvm.GetType.Name, cvm)
-                'Call ChangeContent(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
-                'Call ChangeContent(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
-                'Call ChangeTabs(ViewModel.EXPLORER_VIEW, dbevm.GetType.Name, dbevm)
-                'Call ChangeTabs(ViewModel.HISTORY_VIEW, hvm.GetType.Name, hvm)
+                Call SetTabs(t_cvm)
+                Call SetTabs(t_dbtvm)
+                Call SetTabs(t_dbevm)
+                Call SetTabs(t_vevm)
+                Call SetTabs(t_hvm)
+                Call ChangeContent(ViewModel.MENU_VIEW, mvm.GetType.Name, mvm)
             Case Else
         End Select
         '----------------------------------------------'
     End Sub
+
+    Public Function GetViewOfName(ByVal [name] As String) As Object
+        Dim obj As Object
+        Select Case [name]
+            Case (New ConnectionViewModel).GetType.Name
+                obj = New ConnectionViewModel
+            Case (New DBTestViewModel).GetType.Name
+                obj = New DBTestViewModel
+            Case (New DBExplorerViewModel).GetType.Name
+                obj = New DBExplorerViewModel
+            Case (New ViewExplorerViewModel).GetType.Name
+                obj = New ViewExplorerViewModel
+            Case (New HistoryViewModel).GetType.Name
+                obj = New HistoryViewModel
+            Case (New MenuViewModel).GetType.Name
+                obj = New MenuViewModel
+            Case Else
+                obj = Nothing
+        End Select
+        GetViewOfName = obj
+    End Function
 End Class

@@ -1,0 +1,31 @@
+﻿Public Class ViewItemModel
+    Private _Name As String
+    Public Property Name As String
+        Get
+            Return Me._Name
+        End Get
+        Set(value As String)
+            Me._Name = value
+        End Set
+    End Property
+
+    Private _IsExpand As Boolean
+    Public Property IsExpand As Boolean
+        Get
+            Return Me._IsExpand
+        End Get
+        Set(value As Boolean)
+            Me._IsExpand = value
+        End Set
+    End Property
+
+    Private _IsExpand As Boolean
+    Public Property IsExpand As Boolean
+        Get
+            Return Me._IsExpand
+        End Get
+        Set(value As Boolean)
+            Me._IsExpand = value
+        End Set
+    End Property
+End Class

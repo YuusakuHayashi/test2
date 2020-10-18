@@ -9,11 +9,24 @@
         End Set
     End Property
 
+    Private Property _Alias As String
+    Public Property [Alias] As String
+        Get
+            If String.IsNullOrEmpty(Me._Alias) Then
+                Me._Alias = Me.Name
+            End If
+            Return Me._Alias
+        End Get
+        Set(value As String)
+            Me._Alias = value
+        End Set
+    End Property
+
     Private Property _Content As Object
     Public Property Content As Object
         Get
             Return Me._Content
-       End Get
+        End Get
         Set(value As Object)
             Me._Content = value
         End Set

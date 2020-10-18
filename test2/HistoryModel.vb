@@ -1,47 +1,42 @@
-﻿Public Class HistoryModel : Inherits BaseModel(Of HistoryModel)
-
-    Private Const DELETE_OVER_LINES As String = "DeleteOverLines"
+﻿Public Class HistoryModel : Inherits BaseModel(Of Object)
+    Private Const DELETE_OVERLINES As String = "DeleteOverLines"
     Private Const RESET_HISTORIES As String = "ResetHistories"
 
-    Private _Contents As String
-    Public Property Contents As String
+    Public ExecuteWhenMaxLineMethod As String
+    Private _ExecuteWhenMaxLine As Action
+
+    Public ReadOnly Property DisplayContents
         Get
             Return Me._Contents
         End Get
-        Set(value As String)
-            Me._Contents = value
-            RaisePropertyChanged("Contents")
-        End Set
     End Property
 
-    Private _BehavierWhenMaxLine As String
-    Public Property BehavierWhenMaxLine As String
+    Private __Contents As String
+    Public Property _Contents As String
         Get
-            Return Me._BehavierWhenMaxLine
+            Return Me.__Contents
         End Get
         Set(value As String)
-            Me._BehavierWhenMaxLine = value
+            Me.__Contents = value
+            RaisePropertyChanged("_Contents")
+            RaisePropertyChanged("DisplayContents")
         End Set
     End Property
 
     Public Sub NewLine(ByVal txt As String)
-        Me.Contents = txt
+        Me._Contents = txt & vbCrLf
         Me._LineCounts = 1
     End Sub
 
     Public Sub AddLine(ByVal txt As String)
-        If Me.Contents = vbNullString Then
-            Me.Contents = txt
-        Else
-            Me.Contents &= vbCrLf & txt
-        End If
+        Me._Contents &= txt & vbCrLf
         Me._LineCounts += 1
     End Sub
 
-    Public Sub ClearContents()
-        Me.Contents = ""
-        Me._LineCounts = 0
-    End Sub
+    'Public Sub Clear_Contents()
+    '    Me._Contents = ""
+    '    Me._LineCounts = 0
+    'End Sub
 
     Private _MaxLine As Integer
     Public Property MaxLine As Integer
@@ -59,52 +54,44 @@
             Return Me.__LineCounts
         End Get
         Set(value As Integer)
-            Dim dol As Action : dol = AddressOf _DeleteOverLines
-            Dim reset As Action : reset = AddressOf _ResetBecauseOfMaxLine
             Me.__LineCounts = value
             If Me.__LineCounts > Me.MaxLine Then
-                Select Case Me.BehavierWhenMaxLine
-                    Case DELETE_OVER_LINES
-                        dol()
-                    Case RESET_HISTORIES
-                        reset()
-                    Case Else
-                        reset()
-                End Select
+                Call Me._ExecuteWhenMaxLine()
             End If
         End Set
     End Property
 
-    Public Sub _ResetBecauseOfMaxLine()
-        Me.NewLine("履歴が最大行を超えたため、クリアしました")
-    End Sub
-
-    Public Sub CheckLineCounts()
-        Dim d As Double
-        d = (Me.Contents.Length - Me.Contents.Replace(vbCrLf, "").Length) / 2
+    Private Sub _GetLineCounts()
+        Dim d = (Me._Contents.Length - Me._Contents.Replace(vbCrLf, "").Length) / 2
         Me._LineCounts = Math.Truncate(d)
     End Sub
 
-    Private Sub _DeleteOverLines()
-        Dim idx As Long
-        idx = Me.Contents.IndexOf(vbCrLf)
-        Me.Contents = Me.Contents.Remove(0, Convert.ToInt32(idx) + 2)
-        Me._LineCounts -= 1
+    Private Sub _ResetHistories()
+        Call Me.NewLine("履歴が最終行を超え、クリアされました")
     End Sub
 
-    'Public Overrides Sub MemberCheck()
-    '    If Me.MaxLine = Nothing Or 0 Then
-    '        Me.MaxLine = 100
-    '    End If
-    '    If String.IsNullOrEmpty(Me.Contents) Then
-    '        Me.NewLine("Historyは初期化されました")
-    '    End If
-    '    If String.IsNullOrEmpty(Me.BehavierWhenMaxLine) Then
-    '        Me.BehavierWhenMaxLine = RESET_HISTORIES
-    '    End If
-    'End Sub
+    Private Sub _DeleteOverLines()
+        Dim idx = Me._Contents.IndexOf(vbCrLf)
+        Me._Contents = Me.__Contents.Remove(0, Convert.ToInt32(idx) + 2)
+        Call Me._GetLineCounts()
+    End Sub
 
-    'Sub New()
-    '    Call Me.MemberCheck()
-    'End Sub
+    Sub New()
+        If MaxLine = 0 Then
+            Me.MaxLine = 100
+        End If
+
+        If Not String.IsNullOrEmpty(Me._Contents) Then
+            Call Me._GetLineCounts()
+        End If
+
+        Select Case ExecuteWhenMaxLineMethod
+            Case DELETE_OVERLINES
+                Me._ExecuteWhenMaxLine = AddressOf Me._DeleteOverLines
+            Case RESET_HISTORIES
+                Me._ExecuteWhenMaxLine = AddressOf Me._ResetHistories
+            Case Else
+                Me._ExecuteWhenMaxLine = AddressOf Me._DeleteOverLines
+        End Select
+    End Sub
 End Class

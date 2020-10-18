@@ -1,9 +1,24 @@
 ﻿'Imports System.ComponentModel
 
 Public Class HistoryViewModel
-    Inherits BaseViewModel2(Of HistoryModel)
-    Sub New()
-    End Sub
+    Inherits BaseViewModel2
+
+    Private _History As HistoryModel
+    Public Property History As HistoryModel
+        Get
+            Return Me._History
+        End Get
+        Set(value As HistoryModel)
+            Me._History = value
+        End Set
+    End Property
+
+    Public Overrides ReadOnly Property ViewType As String
+        Get
+            Return ViewModel.HISTORY_VIEW
+        End Get
+    End Property
+    'Inherits BaseViewModel2(Of Object)
     '    Inherits ProjectBaseViewModel(Of HistoryViewModel)
 
     '    Private _HistoryContents As String
@@ -109,4 +124,17 @@ Public Class HistoryViewModel
     '        ' ビューモデルの設定
     '        Initializing(m, vm, ccep2, ahp2)
     '    End Sub
+    Private Sub _ViewInitialize()
+        Me.History = Model.Data.History
+    End Sub
+
+    Sub Initialize(ByRef m As Model,
+                   ByRef vm As ViewModel,
+                   ByRef adm As AppDirectoryModel,
+                   ByRef pim As ProjectInfoModel)
+
+        InitializeHandler = AddressOf _ViewInitialize
+
+        Call BaseInitialize(m, vm, adm, pim)
+    End Sub
 End Class

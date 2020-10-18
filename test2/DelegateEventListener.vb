@@ -7,12 +7,17 @@
         End Get
     End Property
 
+    Public Event OpenViewRequested As EventHandler
     Public Event TabCloseRequested As EventHandler
     Public Event DeleteRequested As EventHandler
     Public Event ChildrenUpdated As EventHandler
     Public Event MigrateConditionUpdated As EventHandler
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
+
+    Public Sub RaiseOpenViewRequested(ByVal child As ViewItemModel)
+        RaiseEvent OpenViewRequested(child, EventArgs.Empty)
+    End Sub
 
     Public Sub RaiseTabCloseRequested(ByVal child As TabItemModel)
         RaiseEvent TabCloseRequested(child, EventArgs.Empty)
