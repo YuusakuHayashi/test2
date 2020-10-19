@@ -125,6 +125,16 @@ Public Class ViewModel
     ' --------------------------------------------------------------------------------------------'
     ' タブコレクション関連
     ' タブディクショナリ
+    Private _OpenTabsDictionary As Dictionary(Of String, TabViewModel)
+    Public Property OpenTabsDictionary As Dictionary(Of String, TabViewModel)
+        Get
+            Return Me._OpenTabsDictionary
+        End Get
+        Set(value As Dictionary(Of String, TabViewModel))
+            Me._OpenTabsDictionary = value
+        End Set
+    End Property
+
     Private _TabsDictionary As Dictionary(Of String, TabViewModel)
     Public Property TabsDictionary As Dictionary(Of String, TabViewModel)
         Get
@@ -226,6 +236,17 @@ Public Class ViewModel
         ' Nothing To Do
     End Sub
 
+
+    Public Sub InitializeTabs(ParamArray views() As Object)
+        Dim t As TabItemModel
+        For Each v In views
+            t = New TabItemModel With {
+                .Name = v.GetType.Name,
+                .Content = v
+            }
+        Next
+    End Sub
+
     ' 初回時に必要なビューモデルコンテントを全てディクショナリにセットします
     Public Overloads Sub Setup(ByVal m As Model,
                                ByVal vm As ViewModel,
@@ -236,7 +257,6 @@ Public Class ViewModel
         'Dim dbevm As DBExplorerViewModel
         'Dim vevm As ViewExplorerViewModel
         'Dim hvm As HistoryViewModel
-        'Dim mvm As MenuViewModel
         Dim cvm As Object
         Dim dbtvm As Object
         Dim dbevm As Object
@@ -252,17 +272,24 @@ Public Class ViewModel
         '-- you henkou --------------------------------'
         Select Case pim.Kind
             Case AppDirectoryModel.DB_TEST
-                cvm = New ConnectionViewModel
-                dbtvm = New DBTestViewModel
-                dbevm = New DBExplorerViewModel
-                vevm = New ViewExplorerViewModel
-                hvm = New HistoryViewModel
-                mvm = New MenuViewModel
+                If OpenTabsDictionary Is Nothing Then
+                    cvm = New ConnectionViewModel
+                    dbtvm = New DBTestViewModel
+                    dbevm = New DBExplorerViewModel
+                    vevm = New ViewExplorerViewModel
+                    hvm = New HistoryViewModel
+                    mvm = New MenuViewModel
 
-                Call cvm.Initialize(m, vm, adm, pim)
-                Call hvm.Initialize(m, vm, adm, pim)
-                Call mvm.Initialize(m, vm, adm, pim)
-                Call vevm.Initialize(m, vm, adm, pim)
+                    Call cvm.Initialize(m, vm, adm, pim)
+                    Call hvm.Initialize(m, vm, adm, pim)
+                    Call mvm.Initialize(m, vm, adm, pim)
+                    Call vevm.Initialize(m, vm, adm, pim)
+
+                    Call InitializeTabs(cvm, dbtvm, dbevm, vevm, hvm)
+                Else
+                    Call LoadOpenTabs()
+                End If
+
 
                 t_cvm = New TabItemModel With {
                     .Name = cvm.GetType.Name,
