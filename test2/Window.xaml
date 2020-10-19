@@ -566,9 +566,10 @@
                             Margin="0,0,5,0">
                             <MenuItem 
                                 Header="開く"
-                                Command="{Binding OpenProjectCommand}"/>
+                                Command="{Binding OpenProjectCommand}" />
                             <MenuItem 
-                                Header="保存" />
+                                Header="保存"
+                                Command="{Binding SaveProjectCommand}" />
                         </MenuItem>
                         <MenuItem
                             Header="編集(F)"

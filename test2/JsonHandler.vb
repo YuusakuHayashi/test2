@@ -10,8 +10,9 @@ Public Class JsonHandler(Of T As New)
     Public Delegate Sub SaveProxy(ByVal f As String, ByVal m As T)
     Public Delegate Sub SaveProxy(Of T2)(ByVal f As String, ByVal m As T2)
 
-    Public Property ModelFileName As String
+    'Private Property ModelFileName As String
 
+    ' ロード可能かどうかのチェック
     Public Overloads Function CheckModel(Of T2 As New)(ByVal f As String) As Boolean
         Dim b As Boolean : b = False
         Dim m As T2
@@ -22,6 +23,10 @@ Public Class JsonHandler(Of T As New)
             b = False
         End Try
         CheckModel = b
+    End Function
+
+    Public Overloads Function CheckModel(ByVal f As String) As Boolean
+        Return (CheckModel(Of T)(f))
     End Function
 
     ' この関数は呼び出したオブジェクトのモデルをロードします
@@ -47,9 +52,9 @@ Public Class JsonHandler(Of T As New)
     End Function
 
     ' この関数は指定したジェネリックモデルをロードします
-    Public Overloads Function ModelLoad(Of T2 As New)() As T2
-        ModelLoad = ModelLoad(Of T2)(Me.ModelFileName)
-    End Function
+    'Public Overloads Function ModelLoad(Of T2 As New)() As T2
+    '    ModelLoad = ModelLoad(Of T2)(Me.ModelFileName)
+    'End Function
 
     ' この関数は指定したジェネリックモデルをロードします
     Public Overloads Function ModelLoad(Of T2 As New)(ByVal f As String) As T2
@@ -76,9 +81,9 @@ Public Class JsonHandler(Of T As New)
         ' Nothing To Do
     End Sub
 
-    Public Overloads Sub ModelSave(ByVal m As T)
-        Call ModelSave(Me.ModelFileName, m)
-    End Sub
+    'Public Overloads Sub ModelSave(ByVal m As T)
+    '    Call ModelSave(Me.ModelFileName, m)
+    'End Sub
 
     Public Overloads Sub ModelSave(ByVal f As String,
                                    ByVal m As T)
@@ -104,9 +109,9 @@ Public Class JsonHandler(Of T As New)
         End Try
     End Sub
 
-    Public Overloads Sub ModelSave(Of T2 As New)(ByVal m As T2)
-        Call ModelSave(Of T2)(Me.ModelFileName, m)
-    End Sub
+    'Public Overloads Sub ModelSave(Of T2 As New)(ByVal m As T2)
+    '    Call ModelSave(Of T2)(Me.ModelFileName, m)
+    'End Sub
 
     Public Overloads Sub ModelSave(Of T2 As New)(ByVal f As String,
                                           ByVal m As T2)

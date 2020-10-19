@@ -1,8 +1,9 @@
 ﻿Imports System.ComponentModel
 
 Public MustInherit Class BaseModel(Of T As New)
-    Inherits JsonHandler(Of T)
     Implements INotifyPropertyChanged
+    'Inherits JsonHandler(Of T)
+    'Implements INotifyPropertyChanged
 
     'Public ReadOnly Property ClassName As String
     '    Get

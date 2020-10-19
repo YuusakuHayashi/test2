@@ -187,13 +187,15 @@ Public Class ViewModel
                 idx = Me.TabsDictionary(view).Tabs.IndexOf(t)
             End If
         Next
+
+        Call [tab].Initialize()
         If idx = -1 Then
-            Call [tab].Initialize()
             Me.TabsDictionary(view).Tabs.Add([tab])
         Else
-            Call [tab].Initialize()
             Me.TabsDictionary(view).Tabs(idx) = [tab]
         End If
+        Me.TabsDictionary(view).SelectedIndex _
+            = Me.TabsDictionary(view).Tabs.IndexOf([tab])
         'Call Me._AddTabsToCollection(view, [tab])
         'Me.TabsDictionary(view).Tabs(Me.TabsDictionary(view).Tabs.IndexOf([tab])) = [tab]
     End Sub

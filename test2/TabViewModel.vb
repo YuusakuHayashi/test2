@@ -8,6 +8,7 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Get
         Set(value As Integer)
             Me._SelectedIndex = value
+            RaisePropertyChanged("SelectedIndex")
             'If value = -1 Then
             '    Me.SelectedIndex = 0
             '    RaisePropertyChanged("SelectedIndex")

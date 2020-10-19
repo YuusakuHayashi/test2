@@ -2,7 +2,7 @@
 Imports System.IO
 
 Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
-
+'Public Class AppDirectoryModel
     ' この静的メンバはアプリケーションディレクトリを表します
     Public Shared AppDirectoryName _
         = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\hys"
@@ -16,7 +16,9 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         = AppDirectoryModel.AppDirectoryName & "\App.ini"
 
     Public Sub AppSave()
-        Call Me.ModelSave(AppDirectoryModel.ModelFileName, Me)
+        Call Me.ModelSave(
+            AppDirectoryModel.ModelFileName, Me
+        )
     End Sub
 
     Public Const DB_TEST As String = "データベーステスト(.dbt)"

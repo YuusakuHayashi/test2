@@ -155,9 +155,11 @@ Public Class ProjectInfoModel
 
     ' ロード可能かのチェック
     Private Function _CheckProjectInfo() As Boolean
-        Dim jh As New JsonHandler(Of Object)
-        Return (jh.CheckModel(Of ProjectInfoModel)(Me.ProjectInfoFileName))
+        'Dim jh As New JsonHandler(Of Object)
+        'Return (jh.CheckModel(Of ProjectInfoModel)(Me.ProjectInfoFileName))
+        Return MyBase.CheckModel(Me.ProjectInfoFileName)
     End Function
+
     Public Function CheckProjectInfo() As Boolean
         Return CheckProjectInfo()
     End Function
@@ -167,9 +169,10 @@ Public Class ProjectInfoModel
         Dim jh As New JsonHandler(Of Object)
         Return (jh.CheckModel(Of Model)(Me.ModelFileName))
     End Function
-    Public Function CheckModel() As Boolean
-        Return CheckModel()
-    End Function
+    'Public Function CheckModel() As Boolean
+    '    Return _CheckModel()
+    'End Function
+
 
     ' プロジェクト状態レベル
     Public Function CheckProject() As Integer

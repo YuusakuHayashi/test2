@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.Windows.Forms
+Imports System.IO
 
 Public Class MenuViewModel
     Inherits BaseViewModel2
@@ -10,6 +11,74 @@ Public Class MenuViewModel
         End Get
     End Property
 
+    ' コマンドプロパティ（Ｐｒｏｊｅｃｔを保存）
+    '---------------------------------------------------------------------------------------------'
+    Private _SaveProjectCommand As ICommand
+    Public ReadOnly Property SaveProjectCommand As ICommand
+        Get
+            If Me._SaveProjectCommand Is Nothing Then
+                Me._SaveProjectCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _SaveProjectCommandExecute,
+                    .CanExecuteHandler = AddressOf _SaveProjectCommandCanExecute
+                }
+                Return Me._SaveProjectCommand
+            Else
+                Return Me._SaveProjectCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckSaveProjectCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._SaveProjectCommandEnableFlag = b
+    End Sub
+
+    Private __SaveProjectCommandEnableFlag As Boolean
+    Public Property _SaveProjectCommandEnableFlag As Boolean
+        Get
+            Return Me.__SaveProjectCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__SaveProjectCommandEnableFlag = value
+            RaisePropertyChanged("_SaveProjectCommandEnableFlag")
+            CType(SaveProjectCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _SaveProjectCommandExecute(ByVal parameter As Object)
+        Dim i = -1
+        Dim [dir] As String
+        Dim [root] As String
+        Dim jh As New JsonHandler(Of Object)
+        Dim project As ProjectInfoModel
+        Dim fbd As New FolderBrowserDialog With {
+             .Description = "プロジェクトを保存",
+             .RootFolder = Environment.SpecialFolder.Desktop,
+             .SelectedPath = Environment.SpecialFolder.Desktop,
+             .ShowNewFolderButton = True
+        }
+
+        If fbd.ShowDialog() = DialogResult.OK Then
+            [dir] = fbd.SelectedPath
+            [root] = [dir].Replace((Path.GetDirectoryName(dir) & "\"), vbNullString)
+            project = New ProjectInfoModel With {
+                .DirectoryName = [dir],
+                .Name = [root],
+                .Kind = ProjectInfo.Kind
+            }
+            Call project.Launch()
+            Call jh.ModelSave(Of ProjectInfoModel)(project.ProjectInfoFileName, project)
+            Call jh.ModelSave(Of Model)(project.ModelFileName, Model)
+            AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(project, AppInfo.CurrentProjects, 5)
+            Call AppInfo.AppSave()
+        End If
+    End Sub
+
+
+    Private Function _SaveProjectCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._SaveProjectCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを開く）
     '---------------------------------------------------------------------------------------------'
@@ -100,7 +169,8 @@ Public Class MenuViewModel
 
         'InitializeHandler = AddressOf _ViewInitialize
         CheckCommandEnabledHandler = [Delegate].Combine(
-            New Action(AddressOf _CheckOpenProjectCommandEnabled)
+            New Action(AddressOf _CheckOpenProjectCommandEnabled),
+            New Action(AddressOf _CheckSaveProjectCommandEnabled)
         )
 
         Call BaseInitialize(m, vm, adm, pim)
