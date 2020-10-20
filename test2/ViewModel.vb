@@ -1,7 +1,20 @@
-﻿Imports System.Collections.ObjectModel
+﻿Imports System.ComponentModel
+Imports System.Collections.ObjectModel
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class ViewModel
-    Inherits BaseModel(Of ViewModel)
+    Inherits JsonHandler(Of ViewModel)
+    Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler _
+        Implements INotifyPropertyChanged.PropertyChanged
+
+    Public Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
+        RaiseEvent PropertyChanged(
+            Me, New PropertyChangedEventArgs(PropertyName)
+        )
+    End Sub
 
     Public Const MAIN_VIEW As String = "MainView"
     Public Const EXPLORER_VIEW As String = "ExplorerView"
@@ -9,6 +22,7 @@ Public Class ViewModel
     Public Const MENU_VIEW As String = "MenuView"
 
     Private _MainViewContent As Object
+    <JsonIgnore>
     Public Property MainViewContent As Object
         Get
             Return Me._MainViewContent
@@ -19,7 +33,9 @@ Public Class ViewModel
         End Set
     End Property
 
+
     Private _ExplorerViewContent As Object
+    <JsonIgnore>
     Public Property ExplorerViewContent As Object
         Get
             Return Me._ExplorerViewContent
@@ -31,6 +47,7 @@ Public Class ViewModel
     End Property
 
     Private _HistoryViewContent As Object
+    <JsonIgnore>
     Public Property HistoryViewContent As Object
         Get
             Return Me._HistoryViewContent
@@ -42,6 +59,7 @@ Public Class ViewModel
     End Property
 
     Private _MenuViewContent As Object
+    <JsonIgnore>
     Public Property MenuViewContent As Object
         Get
             Return Me._MenuViewContent
@@ -56,9 +74,14 @@ Public Class ViewModel
     ' コンテントディクショナリ関連 ---------------------------------------------------------------'
     ' コンテントディクショナリ
     Private _ContentDictionary As Dictionary(Of String, Dictionary(Of String, Object))
+    <JsonIgnore>
     Public Property ContentDictionary As Dictionary(Of String, Dictionary(Of String, Object))
         Get
-            Return Me._ContentDictionary
+            If Me._ContentDictionary Is Nothing Then
+                Return New Dictionary(Of String, Dictionary(Of String, Object))
+            Else
+                Return Me._ContentDictionary
+            End If
         End Get
         Set(value As Dictionary(Of String, Dictionary(Of String, Object)))
             Me._ContentDictionary = value
@@ -125,20 +148,53 @@ Public Class ViewModel
     ' --------------------------------------------------------------------------------------------'
     ' タブコレクション関連
     ' タブディクショナリ
-    Private _OpenTabsDictionary As Dictionary(Of String, TabViewModel)
-    Public Property OpenTabsDictionary As Dictionary(Of String, TabViewModel)
+    'Private _OpenTabsDictionary As Dictionary(Of String, List(Of String))
+    'Public Property OpenTabsDictionary As Dictionary(Of String, List(Of String))
+    '    Get
+    '        Return Me._OpenTabsDictionary
+    '    End Get
+    '    Set(value As Dictionary(Of String, List(Of String)))
+    '        Me._OpenTabsDictionary = value
+    '    End Set
+    'End Property
+
+    Private _OpenTabs As List(Of String)
+    Public Property OpenTabs As List(Of String)
         Get
-            Return Me._OpenTabsDictionary
+            If Me._OpenTabs Is Nothing Then
+                Return New List(Of String)
+            Else
+                Return Me._OpenTabs
+            End If
         End Get
-        Set(value As Dictionary(Of String, TabViewModel))
-            Me._OpenTabsDictionary = value
+        Set(value As List(Of String))
+            Me._OpenTabs = value
         End Set
     End Property
 
+    ' タブコレクションディクショナリが存在しない場合、新規作成し
+    ' タブコレクションが存在しない場合、追加します
+    Public Sub AddOpenTabs(ByVal tab As TabItemModel)
+        If Not Me.OpenTabs.Contains(tab.Name) Then
+            Me.OpenTabs.Add(tab.Name)
+        End If
+    End Sub
+
+    Public Sub RemoveOpenTabs(ByVal tab As TabItemModel)
+        If Me.OpenTabs.Contains(tab.Name) Then
+            Me.OpenTabs.Remove(tab.Name)
+        End If
+    End Sub
+
     Private _TabsDictionary As Dictionary(Of String, TabViewModel)
+    <JsonIgnore>
     Public Property TabsDictionary As Dictionary(Of String, TabViewModel)
         Get
-            Return Me._TabsDictionary
+            If Me._TabsDictionary Is Nothing Then
+                Return New Dictionary(Of String, TabViewModel)
+            Else
+                Return Me._TabsDictionary
+            End If
         End Get
         Set(value As Dictionary(Of String, TabViewModel))
             Me._TabsDictionary = value
@@ -149,17 +205,18 @@ Public Class ViewModel
     ' タブコレクションが存在しない場合、追加します
     Private Sub _RegisterTabViewToDictionary(ByVal view As String)
         Dim tvm As TabViewModel
-        If Me.TabsDictionary Is Nothing Then
-            Me.TabsDictionary = New Dictionary(Of String, TabViewModel)
-        End If
+        'If Me.TabsDictionary Is Nothing Then
+        '    Me.TabsDictionary = New Dictionary(Of String, TabViewModel)
+        'End If
         If Not Me.TabsDictionary.ContainsKey(view) Then
             tvm = New TabViewModel
+            ' 閉じるハンドラーのセット
             tvm.Initialize()
             Me.TabsDictionary.Add(view, tvm)
         End If
-        If Me.TabsDictionary(view).Tabs Is Nothing Then
-            Me.TabsDictionary(view).Tabs = New ObservableCollection(Of TabItemModel)
-        End If
+        'If Me.TabsDictionary(view).Tabs Is Nothing Then
+        '    Me.TabsDictionary(view).Tabs = New ObservableCollection(Of TabItemModel)
+        'End If
     End Sub
 
     ' ビューのDataContentに実際にセットします
@@ -191,13 +248,13 @@ Public Class ViewModel
     ' タブをコレクションにセット＆更新します
     Private Sub _UpdateTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
         Dim idx = -1
-        Call Me._RegisterTabViewToDictionary(view)
         For Each t In Me.TabsDictionary(view).Tabs
             If [tab].Name = t.Name Then
                 idx = Me.TabsDictionary(view).Tabs.IndexOf(t)
             End If
         Next
 
+        ' 閉じるコマンドのセット
         Call [tab].Initialize()
         If idx = -1 Then
             Me.TabsDictionary(view).Tabs.Add([tab])
@@ -217,26 +274,23 @@ Public Class ViewModel
     'End Sub
 
     ' タブをコレクションにセット＆更新＆ビューの切り替えを行います
-    'Public Sub SetTabs(ByVal view As String, ByVal [tab] As TabItemModel)
+    'Public Sub ShowTabs(ByVal view As String, ByVal [tab] As TabItemModel)
     '    Call Me._UpdateTabsToCollection(view, [tab])
     '    Call Me._SetTabsObject(view)
     'End Sub
-    Public Sub SetTabs(ByVal [tab] As TabItemModel)
+
+    ' タブを表示する唯一の公開メソッドとすること
+    Public Sub ShowTabs(ByVal [tab] As TabItemModel)
         Dim view = [tab].Content.ViewType
+        Call Me._RegisterTabViewToDictionary(view)
         Call Me._UpdateTabsToCollection(view, [tab])
+        Call Me.AddOpenTabs([tab])
         Call Me._SetTabsObject(view)
     End Sub
     ' --------------------------------------------------------------------------------------------'
 
-    Public Sub NoInitialize(ByVal pk As String,
-                            ByVal m As Model,
-                            ByVal vm As ViewModel,
-                            ByVal adm As AppDirectoryModel,
-                            ByVal pim As ProjectInfoModel)
-        ' Nothing To Do
-    End Sub
 
-
+    ' 初回時に必要なビューモデルコンテントを全てディクショナリにセットします
     Public Sub InitializeTabs(ParamArray views() As Object)
         Dim t As TabItemModel
         For Each v In views
@@ -244,19 +298,14 @@ Public Class ViewModel
                 .Name = v.GetType.Name,
                 .Content = v
             }
+            Call ShowTabs(t)
         Next
     End Sub
 
-    ' 初回時に必要なビューモデルコンテントを全てディクショナリにセットします
     Public Overloads Sub Setup(ByVal m As Model,
                                ByVal vm As ViewModel,
                                ByVal adm As AppDirectoryModel,
                                ByVal pim As ProjectInfoModel)
-        'Dim cvm As ConnectionViewModel
-        'Dim dbtvm As DBTestViewModel
-        'Dim dbevm As DBExplorerViewModel
-        'Dim vevm As ViewExplorerViewModel
-        'Dim hvm As HistoryViewModel
         Dim cvm As Object
         Dim dbtvm As Object
         Dim dbevm As Object
@@ -272,7 +321,8 @@ Public Class ViewModel
         '-- you henkou --------------------------------'
         Select Case pim.Kind
             Case AppDirectoryModel.DB_TEST
-                If OpenTabsDictionary Is Nothing Then
+                If Me.OpenTabs Is Nothing Then
+                    ' ビューの登録
                     cvm = New ConnectionViewModel
                     dbtvm = New DBTestViewModel
                     dbevm = New DBExplorerViewModel
@@ -287,38 +337,37 @@ Public Class ViewModel
 
                     Call InitializeTabs(cvm, dbtvm, dbevm, vevm, hvm)
                 Else
-                    Call LoadOpenTabs()
+                    Call 
                 End If
 
-
-                t_cvm = New TabItemModel With {
-                    .Name = cvm.GetType.Name,
-                    .Content = cvm
-                }
-                t_dbtvm = New TabItemModel With {
-                    .Name = dbtvm.GetType.Name,
-                    .Content = dbtvm
-                }
-                t_dbevm = New TabItemModel With {
-                    .Name = dbevm.GetType.Name,
-                    .Content = dbevm
-                }
-                t_hvm = New TabItemModel With {
-                    .Name = hvm.GetType.Name,
-                    .Content = hvm
-                }
-                t_vevm = New TabItemModel With {
-                    .Name = vevm.GetType.Name,
-                    .Content = vevm
-                }
+                't_cvm = New TabItemModel With {
+                '    .Name = cvm.GetType.Name,
+                '    .Content = cvm
+                '}
+                't_dbtvm = New TabItemModel With {
+                '    .Name = dbtvm.GetType.Name,
+                '    .Content = dbtvm
+                '}
+                't_dbevm = New TabItemModel With {
+                '    .Name = dbevm.GetType.Name,
+                '    .Content = dbevm
+                '}
+                't_hvm = New TabItemModel With {
+                '    .Name = hvm.GetType.Name,
+                '    .Content = hvm
+                '}
+                't_vevm = New TabItemModel With {
+                '    .Name = vevm.GetType.Name,
+                '    .Content = vevm
+                '}
 
                 Call vevm.RegisterViews(t_cvm, t_dbtvm, t_dbevm, t_hvm, t_vevm)
 
-                Call SetTabs(t_cvm)
-                Call SetTabs(t_dbtvm)
-                Call SetTabs(t_dbevm)
-                Call SetTabs(t_vevm)
-                Call SetTabs(t_hvm)
+                Call ShowTabs(t_cvm)
+                Call ShowTabs(t_dbtvm)
+                Call ShowTabs(t_dbevm)
+                Call ShowTabs(t_vevm)
+                Call ShowTabs(t_hvm)
                 Call ChangeContent(ViewModel.MENU_VIEW, mvm.GetType.Name, mvm)
             Case Else
         End Select

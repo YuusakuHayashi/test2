@@ -35,7 +35,11 @@ Public Class TabViewModel : Inherits BaseViewModel
     Private _Tabs As ObservableCollection(Of TabItemModel)
     Public Property Tabs As ObservableCollection(Of TabItemModel)
         Get
-            Return Me._Tabs
+            If Me._Tabs Is Nothing Then
+                Return New ObservableCollection(Of TabItemModel)
+            Else
+                Return Me._Tabs
+            End If
         End Get
         Set(value As ObservableCollection(Of TabItemModel))
             Me._Tabs = value

@@ -338,6 +338,7 @@ Public Class UserDirectoryViewModel
     Private Sub _AddProjectCommandExecute(ByVal parameter As Object)
         Dim i = -1
         Dim rtn As Action(Of ProjectInfoModel)
+        Dim jh As New JsonHandler(Of Object)
 
         ' 新規プロジェクト情報
         Dim project As New ProjectInfoModel With {
@@ -360,6 +361,10 @@ Public Class UserDirectoryViewModel
             Call Model.Setup(project)
             Call Model.ModelSave(project.ModelFileName, Model)
             Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
+            Call ViewModel.ModelSave(project.ViewModelFileName, ViewModel)
+        Else
+            Msgbox("Error AddProjectCommandExecute")
+            Exit Sub
         End If
     End Sub
 
@@ -388,7 +393,8 @@ Public Class UserDirectoryViewModel
                 ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
                 Model = jh.ModelLoad(Of Model)(project.ModelFileName)
                 Call Model.Initialize(ProjectInfo)
-                Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
+                'ViewModel = jh.ModelLoad(Of ViewModel)(project.ViewModelFileName)
+                'Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
                 msg = vbNullString
             Case 1
                 Call _DeleteProject(project)

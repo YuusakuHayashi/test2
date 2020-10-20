@@ -55,6 +55,12 @@ Public Class ProjectInfoModel
         End Get
     End Property
 
+    Public ReadOnly Property ViewModelFileName As String
+        Get
+            Return DirectoryName & "\ViewModel.json"
+        End Get
+    End Property
+
     Public Delegate Sub ProjectLaunchProxy()
 
     Public Sub ProjectSave()
