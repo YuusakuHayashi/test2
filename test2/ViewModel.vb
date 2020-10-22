@@ -121,14 +121,6 @@ Public Class ViewModel
         End Select
     End Sub
 
-    ' コンテントをディクショナリにセットします
-    'Private Sub _AddContentToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-    '    'Call Me._RegisterViewToDictionary(viewName)
-    '    'If Not Me.ContentDictionary(viewName).ContainsKey(modelName) Then
-    '    '    Me.ContentDictionary(viewName).Add(modelName, context)
-    '    'End If
-    'End Sub
-
     Private Sub _AddItem(ByVal v As ViewItemModel)
         Dim obj = v.Content
         Dim frame = obj.FrameType
@@ -139,24 +131,6 @@ Public Class ViewModel
             Me.ContentDictionary(frame).Add([name], obj)
         End If
     End Sub
-
-    '' コンテントをディクショナリにセット＆更新します
-    'Private Sub _UpdateContentToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-    '    Call Me._AddContentToDictionary(viewName, modelName, context)
-    '    Me.ContentDictionary(viewName)(modelName) = context
-    'End Sub
-
-    '' コンテントをディクショナリにセット＆ビューの切り替えを行います
-    'Public Sub ChangeContent(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-    '    Call Me._AddContentToDictionary(viewName, modelName, context)
-    '    Call Me._SetContentObject(viewName, modelName)
-    'End Sub
-
-    '' コンテントをディクショナリにセット＆更新＆ビューの切り替えを行います
-    'Public Sub SetContent(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-    '    Call Me._UpdateContentToDictionary(viewName, modelName, context)
-    '    Call Me._SetContentObject(viewName, modelName)
-    'End Sub
     ' --------------------------------------------------------------------------------------------'
 
     ' --------------------------------------------------------------------------------------------'
@@ -172,21 +146,6 @@ Public Class ViewModel
             Me._Views = value
         End Set
     End Property
-
-    'Private Sub _OpenStateOff(ByVal [tab] As TabItemModel)
-    '    For Each v In Me.Views
-    '        If v.Name = [tab].Name Then
-    '            v.OpenState = False
-    '        End If
-    '    Next
-    'End Sub
-    'Private Sub _OpenStateOn(ByVal [tab] As TabItemModel)
-    '    For Each v In Me.Views
-    '        If v.Name = [tab].Name Then
-    '            v.OpenState = True
-    '        End If
-    '    Next
-    'End Sub
     ' --------------------------------------------------------------------------------------------'
 
 
@@ -297,47 +256,6 @@ Public Class ViewModel
         End Select
     End Sub
 
-    ' 初期時のみ実行 -----------------------------------------------------------------------------'
-    'Private Sub _InitialSetup(ParamArray objs() As Object)
-    '    ' タブへの変換
-    '    Dim t As TabItemModel
-
-    '    For Each obj In objs
-    '        t = New TabItemModel With {
-    '            .Name = obj.GetType.Name,
-    '            .Content = obj
-    '        }
-    '        Call _AddTabItem(t)
-    '        Call _AddViewItem(t)
-    '    Next
-    'End Sub
-
-    'Private Sub _AddViewItem(ParamArray tabs() As TabItemModel)
-    '    Dim v As ViewItemModel
-    '    For Each t In tabs
-    '        v = New ViewItemModel With {
-    '            .Name = t.Name,
-    '            .[Alias] = t.[Alias],
-    '            .ViewState = True
-    '        }
-    '        Me.Views.Add(v)
-    '    Next
-    'End Sub
-
-    'Private Sub _RegisterTabItem(obj As Object)
-    '    ' タブへの変換
-    '    Dim t As TabItemModel
-
-    '    For Each obj In objs
-    '        t = New TabItemModel With {
-    '            .Name = obj.GetType.Name,
-    '            .Content = obj
-    '        }
-    '        Call _AddTabItem(t)
-    '        Call _AddViewItem(t)
-    '    Next
-    'End Sub
-
     Public Function AddViewItem(ByVal obj As Object,
                                 ByVal frame As String,
                                 ByVal view As String) As ViewItemModel
@@ -356,16 +274,6 @@ Public Class ViewModel
         AddViewItem = v
     End Function
     '---------------------------------------------------------------------------------------------'
-
-    '---------------------------------------------------------------------------------------------'
-    ' タブを表示する唯一の公開メソッドとすること
-    'Public Sub ShowTabs(ByVal [tab] As TabItemModel)
-    '    Dim view = [tab].Content.ViewType
-    '    Call Me._AddTabItem([tab])
-    '    Call Me._ViewStateOn([tab])
-    '    Call Me._SetTabsObject(view)
-    'End Sub
-    ' --------------------------------------------------------------------------------------------'
 
     Private Sub _LoadSetup(ByVal m As Model,
                            ByVal vm As ViewModel,
@@ -414,7 +322,6 @@ Public Class ViewModel
                     Call AddView(v1)
                     Call AddView(v2)
                     Call AddView(v3)
-
                 Else
                     Call _LoadSetup(m, vm, adm, pim)
                 End If
@@ -480,6 +387,7 @@ Public Class ViewModel
             AddressOf Me._TabCloseRequestedReview
     End Sub
     '---------------------------------------------------------------------------------------------'
+
 
     '--- タブを開く関連 --------------------------------------------------------------------------'
     Private Sub _OpenViewAddHandler()
