@@ -94,6 +94,7 @@
     <Compile Include="NormalViewModel.vb" />
     <Compile Include="TabItemModel.vb" />
     <Compile Include="TabViewModel.vb" />
+    <Compile Include="ViewController.vb" />
     <Compile Include="ViewExplorerViewModel.vb" />
     <Compile Include="ViewItemModel.vb" />
     <Compile Include="Window.xaml.vb">

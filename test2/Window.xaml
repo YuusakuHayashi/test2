@@ -577,6 +577,9 @@
                                 Header="開く"
                                 Command="{Binding OpenProjectCommand}" />
                             <MenuItem 
+                                Header="上書き保存"
+                                Command="{Binding ResaveProjectCommand}" />
+                            <MenuItem 
                                 Header="保存"
                                 Command="{Binding SaveProjectCommand}" />
                         </MenuItem>

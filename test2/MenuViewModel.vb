@@ -11,6 +11,53 @@ Public Class MenuViewModel
         End Get
     End Property
 
+    ' コマンドプロパティ（Ｐｒｏｊｅｃｔを上書き）
+    '---------------------------------------------------------------------------------------------'
+    Private _ResaveProjectCommand As ICommand
+    Public ReadOnly Property ResaveProjectCommand As ICommand
+        Get
+            If Me._ResaveProjectCommand Is Nothing Then
+                Me._ResaveProjectCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _ResaveProjectCommandExecute,
+                    .CanExecuteHandler = AddressOf _ResaveProjectCommandCanExecute
+                }
+                Return Me._ResaveProjectCommand
+            Else
+                Return Me._ResaveProjectCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckResaveProjectCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._ResaveProjectCommandEnableFlag = b
+    End Sub
+
+    Private __ResaveProjectCommandEnableFlag As Boolean
+    Public Property _ResaveProjectCommandEnableFlag As Boolean
+        Get
+            Return Me.__ResaveProjectCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__ResaveProjectCommandEnableFlag = value
+            RaisePropertyChanged("_ResaveProjectCommandEnableFlag")
+            CType(ResaveProjectCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _ResaveProjectCommandExecute(ByVal parameter As Object)
+        Call Model.ModelSave(ProjectInfo.ModelFileName, Model)
+        Call ViewModel.ModelSave(ProjectInfo.ViewModelFileName, ViewModel)
+        Call ProjectInfo.ProjectSave()
+        AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(ProjectInfo, AppInfo.CurrentProjects, 5)
+        Call AppInfo.AppSave()
+    End Sub
+
+    Private Function _ResaveProjectCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._ResaveProjectCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを保存）
     '---------------------------------------------------------------------------------------------'
     Private _SaveProjectCommand As ICommand
@@ -153,7 +200,7 @@ Public Class MenuViewModel
                 ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
                 Model = jh.ModelLoad(Of Model)(project.ModelFileName)
                 Call Model.Initialize(ProjectInfo)
-                Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
+                Call Setup(Model, ViewModel, AppInfo, ProjectInfo)
             Case 1
                 'Call _DeleteProject(project)
                 Call AppInfo.AppSave()
@@ -164,10 +211,10 @@ Public Class MenuViewModel
 
 
     Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
-        'InitializeHandler = AddressOf _ViewInitialize
         CheckCommandEnabledHandler = [Delegate].Combine(
             New Action(AddressOf _CheckOpenProjectCommandEnabled),
-            New Action(AddressOf _CheckSaveProjectCommandEnabled)
+            New Action(AddressOf _CheckSaveProjectCommandEnabled),
+            New Action(AddressOf _CheckResaveProjectCommandEnabled)
         )
 
         Call BaseInitialize(m, vm, adm, pim)
