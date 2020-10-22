@@ -1,0 +1,33 @@
+?vm
+{test2.ViewModel}
+    ContentDictionary: Count = 1
+    ExplorerViewContent: Nothing
+    HistoryViewContent: Nothing
+    MainViewContent: {test2.UserDirectoryViewModel}
+    MenuViewContent: Nothing
+    TabsDictionary: Count = 3
+    Views: Count = 0
+    _ContentDictionary: Count = 1
+    _ExplorerViewContent: Nothing
+    _HistoryViewContent: Nothing
+    _MainViewContent: {test2.UserDirectoryViewModel}
+    _MenuViewContent: Nothing
+    _TabsDictionary: Count = 3
+    _Views: Count = 0
+
+
+{test2.ViewModel}
+    ContentDictionary: Count = 0
+    ExplorerViewContent: Nothing
+    HistoryViewContent: Nothing
+    MainViewContent: Nothing
+    MenuViewContent: Nothing
+    TabsDictionary: Count = 3
+    Views: Count = 4
+    _ContentDictionary: Count = 0
+    _ExplorerViewContent: Nothing
+    _HistoryViewContent: Nothing
+    _MainViewContent: Nothing
+    _MenuViewContent: Nothing
+    _TabsDictionary: Count = 3
+    _Views: Count = 4

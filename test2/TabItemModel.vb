@@ -22,6 +22,16 @@
         End Set
     End Property
 
+    Private Property _FrameType As String
+    Public Property FrameType As String
+        Get
+            Return Me._FrameType
+        End Get
+        Set(value As String)
+            Me._FrameType = value
+        End Set
+    End Property
+
     Private Property _Content As Object
     Public Property Content As Object
         Get
@@ -32,7 +42,9 @@
         End Set
     End Property
 
+
     ' コマンドプロパティ（接続確認）
+    '---------------------------------------------------------------------------------------------'
     Private _TabCloseCommand As ICommand
     Public ReadOnly Property TabCloseCommand As ICommand
         Get
@@ -75,8 +87,13 @@
     Private Function _TabCloseCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._TabCloseCommandEnableFlag
     End Function
+    '---------------------------------------------------------------------------------------------'
 
     Public Sub Initialize()
         Call _CheckTabCloseCommandEnabled()
+    End Sub
+
+    Public Sub New()
+        Call Initialize()
     End Sub
 End Class

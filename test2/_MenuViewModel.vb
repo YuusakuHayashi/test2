@@ -1,11 +1,15 @@
 ﻿Public Class _MenuViewModel
     Inherits BaseViewModel2
 
-    Public Overrides ReadOnly Property ViewType As String
+    Public Overrides ReadOnly Property FrameType As String
         Get
-            Throw New NotImplementedException()
+            Return ViewModel.MENU_FRAME
         End Get
     End Property
+
+    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
+        'Throw New NotImplementedException()
+    End Sub
 
     '    Private Const _MENUVIEW_FILE As String = "MenuView.txt"
     '    Private Const _BATCHMENU As String = "BatchMenu"

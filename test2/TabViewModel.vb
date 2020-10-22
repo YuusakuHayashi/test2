@@ -1,6 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 
 Public Class TabViewModel : Inherits BaseViewModel
+
     Private Property _SelectedIndex As Integer
     Public Property SelectedIndex As Integer
         Get
@@ -36,27 +37,29 @@ Public Class TabViewModel : Inherits BaseViewModel
     Public Property Tabs As ObservableCollection(Of TabItemModel)
         Get
             If Me._Tabs Is Nothing Then
-                Return New ObservableCollection(Of TabItemModel)
-            Else
-                Return Me._Tabs
+                Me._Tabs = New ObservableCollection(Of TabItemModel)
             End If
+            Return Me._Tabs
         End Get
         Set(value As ObservableCollection(Of TabItemModel))
             Me._Tabs = value
         End Set
     End Property
 
-    Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
-        Call _TabCloseRequestAccept(t)
-    End Sub
+    'Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
+    '    Call _TabCloseRequestAccept(t)
+    'End Sub
 
-    Private Sub _TabCloseRequestAccept(ByVal t As TabItemModel)
-        Tabs.Remove(t)
-    End Sub
+    'Private Sub _TabCloseRequestAccept(ByVal t As TabItemModel)
+    '    Tabs.Remove(t)
+    'End Sub
 
-    Public Sub Initialize()
-        AddHandler _
-            DelegateEventListener.Instance.TabCloseRequested,
-            AddressOf Me._TabCloseRequestedReview
-    End Sub
+    'Private Sub _TabCloseAddHandler()
+    '    AddHandler _
+    '        DelegateEventListener.Instance.TabCloseRequested,
+    '        AddressOf Me._TabCloseRequestedReview
+    'End Sub
+    'Public Sub Initialize()
+    '    Call _TabCloseAddHandler()
+    'End Sub
 End Class

@@ -83,30 +83,40 @@ Public Class Model
 
     ' OpenProject、Selectプロジェクト時など、
     ' 新たに追加されたオブジェクトメンバなどのインスタンス化を行う
+    'Public Sub Initialize(ByVal project As ProjectInfoModel)
+    '    '-- you henkou --------------------------------'
+    '    Select Case project.Kind
+    '        Case AppDirectoryModel.DB_TEST
+    '            Call Me._DataInitialize(Of DBTestModel)()
+    '            Call Me._DBTestModelInitialize()
+    '        Case Else
+    '    End Select
+    '    '----------------------------------------------'
+    'End Sub
+
     Public Sub Initialize(ByVal project As ProjectInfoModel)
         '-- you henkou --------------------------------'
         Select Case project.Kind
             Case AppDirectoryModel.DB_TEST
                 Call Me._DataInitialize(Of DBTestModel)()
-                Call Me._DBTestModelInitialize()
             Case Else
         End Select
         '----------------------------------------------'
     End Sub
 
     ' DBTestModel のオブジェクトの初期化
-    Private Sub _DBTestModelInitialize()
-        If Me.Data Is Nothing Then
-            Me.Data = New DBTestModel
-        End If
-        If Me.Data.Server Is Nothing Then
-            Me.Data.Server = New ServerModel
-        End If
-        If Me.Data.History Is Nothing Then
-            Me.Data.History = New HistoryModel
-            Call Me.Data.History.NewLine("Historyは初期化されました")
-        End If
-    End Sub
+    'Private Sub _DBTestModelInitialize()
+    '    If Me.Data Is Nothing Then
+    '        Me.Data = New DBTestModel
+    '    End If
+    '    If Me.Data.Server Is Nothing Then
+    '        Me.Data.Server = New ServerModel
+    '    End If
+    '    If Me.Data.History Is Nothing Then
+    '        Me.Data.History = New HistoryModel
+    '        Call Me.Data.History.NewLine("Historyは初期化されました")
+    '    End If
+    'End Sub
 
     '' このモデルを生成したＪＳＯＮファイル
     'Private _SourceFile As String

@@ -5,9 +5,9 @@ Imports System.IO
 Public Class MenuViewModel
     Inherits BaseViewModel2
 
-    Public Overrides ReadOnly Property ViewType As String
+    Public Overrides ReadOnly Property FrameType As String
         Get
-            Return ViewModel.MENU_VIEW
+            Return ViewModel.MENU_FRAME
         End Get
     End Property
 
@@ -162,11 +162,8 @@ Public Class MenuViewModel
         End Select
     End Sub
 
-    Public Sub Initialize(ByRef m As Model,
-                          ByRef vm As ViewModel,
-                          ByRef adm As AppDirectoryModel,
-                          ByRef pim As ProjectInfoModel)
 
+    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
         'InitializeHandler = AddressOf _ViewInitialize
         CheckCommandEnabledHandler = [Delegate].Combine(
             New Action(AddressOf _CheckOpenProjectCommandEnabled),

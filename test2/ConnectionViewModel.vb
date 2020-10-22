@@ -8,9 +8,9 @@ Public Class ConnectionViewModel
     Private Const _SUCCESS_MESSAGE As String = "接続に成功しました。"
     Private Const _NOCONNECTION As String = "まだ接続が成功していません。接続を定義してください"
 
-    Public Overrides ReadOnly Property ViewType As String
+    Public Overrides ReadOnly Property FrameType As String
         Get
-            Return ViewModel.MAIN_VIEW
+            Return ViewModel.MAIN_FRAME
         End Get
     End Property
 
@@ -216,11 +216,7 @@ Public Class ConnectionViewModel
         End If
     End Sub
 
-    Public Sub Initialize(ByRef m As Model,
-                          ByRef vm As ViewModel,
-                          ByRef adm As AppDirectoryModel,
-                          ByRef pim As ProjectInfoModel)
-
+    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
         InitializeHandler = AddressOf _ViewInitialize
         CheckCommandEnabledHandler = [Delegate].Combine(
             New Action(AddressOf _CheckConnectionCommandEnabled)

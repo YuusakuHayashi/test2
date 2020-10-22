@@ -71,7 +71,7 @@ Public MustInherit Class BaseViewModel2
     Protected Property CheckCommandEnabledHandler As Action
     Protected Property [AddHandler] As Action
 
-    Public MustOverride ReadOnly Property ViewType As String Implements BaseViewModelInterface.ViewType
+    Public MustOverride ReadOnly Property FrameType As String Implements BaseViewModelInterface.FrameType
 
     Protected Overridable Sub ViewInitializing()
         'Nothing To Do
@@ -125,4 +125,6 @@ Public MustInherit Class BaseViewModel2
             Call ah()
         End If
     End Sub
+
+    Public MustOverride Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel) Implements BaseViewModelInterface.Initialize
 End Class

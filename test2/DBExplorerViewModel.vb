@@ -162,12 +162,14 @@ Public Class DBExplorerViewModel
 
     '        Initializing(m, vm, ccep2)
     '    End Sub
-    Sub New()
-    End Sub
-
-    Public Overrides ReadOnly Property ViewType As String
+    Public Overrides ReadOnly Property FrameType As String
         Get
-            Return ViewModel.EXPLORER_VIEW
+            Return ViewModel.EXPLORER_FRAME
         End Get
     End Property
+
+
+    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
+        'Throw New NotImplementedException()
+    End Sub
 End Class

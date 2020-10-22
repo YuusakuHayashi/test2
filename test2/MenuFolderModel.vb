@@ -76,26 +76,26 @@ Public Class MenuFolderModel
 
     ' 変更要求購読
     ' 購読をここで行うかは色々検討する点がある。
-    Public Sub MenuChangeRequestedAddHandler()
-        AddHandler _
-            MenuChangedEventListener.Instance.ChangeRequested,
-            AddressOf Me._MenuChangeRequestedReview
-    End Sub
+    'Public Sub MenuChangeRequestedAddHandler()
+    '    AddHandler _
+    '        MenuChangedEventListener.Instance.ChangeRequested,
+    '        AddressOf Me._MenuChangeRequestedReview
+    'End Sub
 
 
     ' 変更要求チェック
-    Private Sub _MenuChangeRequestedReview(ByVal mm As _MenuModel, ByVal e As System.EventArgs)
-        Dim b As Boolean : b = True
-        If b Then
-            Me._MenuChangeRequestAccept(mm)
-        End If
-    End Sub
+    'Private Sub _MenuChangeRequestedReview(ByVal mm As _MenuModel, ByVal e As System.EventArgs)
+    '    Dim b As Boolean : b = True
+    '    If b Then
+    '        Me._MenuChangeRequestAccept(mm)
+    '    End If
+    'End Sub
 
 
     ' 変更要求受理
-    Private Sub _MenuChangeRequestAccept(ByVal mm As _MenuModel)
-        Me._PrivateViewModel.ChangeContent(mm.ViewName, mm.Name, mm)
-    End Sub
+    'Private Sub _MenuChangeRequestAccept(ByVal mm As _MenuModel)
+    '    Me._PrivateViewModel.ChangeContent(mm.ViewName, mm.Name, mm)
+    'End Sub
 
 
     ' メンバーチェック

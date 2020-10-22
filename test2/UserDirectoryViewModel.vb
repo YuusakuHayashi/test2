@@ -11,9 +11,9 @@ Public Class UserDirectoryViewModel
     Private Const _ISNOT_PROJECT_DIRECTORY As String = "このフォルダはプロジェクトディレクトリではありません"
     Private Const _DIRECTORY_ALREADY_EXIST As String = "このフォルダは既に存在しています"
 
-    Public Overrides ReadOnly Property ViewType As String
+    Public Overrides ReadOnly Property FrameType As String
         Get
-            Return Nothing
+            Return ViewModel.MAIN_FRAME
         End Get
     End Property
 
@@ -360,6 +360,7 @@ Public Class UserDirectoryViewModel
             Call ProjectInfo.ProjectSave()
             Call Model.Setup(project)
             Call Model.ModelSave(project.ModelFileName, Model)
+            Call ViewModel.Initialize()
             Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
             Call ViewModel.ModelSave(project.ViewModelFileName, ViewModel)
         Else
@@ -376,12 +377,12 @@ Public Class UserDirectoryViewModel
 
 
 
-
     ' プロジェクトをチェックし、正当な場合、プロジェクトをスタートします
     ' Model.Setup() 不要、Model.Initializeする
     Private Sub _CheckProject(ByVal project As ProjectInfoModel)
         Dim msg As String : msg = vbNullString
         Dim jh As New JsonHandler(Of Object)
+        Dim vm As ViewModel
 
         Dim i = project.CheckProject()
         ' 0 ... チェック全てＯＫ
@@ -393,8 +394,9 @@ Public Class UserDirectoryViewModel
                 ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
                 Model = jh.ModelLoad(Of Model)(project.ModelFileName)
                 Call Model.Initialize(ProjectInfo)
-                'ViewModel = jh.ModelLoad(Of ViewModel)(project.ViewModelFileName)
-                'Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
+                vm = jh.ModelLoad(Of ViewModel)(project.ViewModelFileName)
+                Call ViewModel.Initialize(vm)
+                Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
                 msg = vbNullString
             Case 1
                 Call _DeleteProject(project)
@@ -409,61 +411,6 @@ Public Class UserDirectoryViewModel
         Me.Message = msg
     End Sub
 
-    'Private Sub _CheckProject(ByVal project As ProjectInfoModel)
-    '    Dim msg As String : msg = vbNullString
-    '    Dim i As Integer : i = -1
-    '    Dim i2 As Integer : i = -1
-    '    Dim projectInfoLoader As New DelegateAction With {
-    '        .CanExecuteHandler = AddressOf _CheckProjectExist,
-    '        .CanExecuteHandler2 = AddressOf _CheckProjectInfo,
-    '        .ExecuteHandler = AddressOf _LoadProjectInfo
-    '    }
-
-    '    Dim modelLoader As New DelegateAction With {
-    '        .CanExecuteHandler = AddressOf _CheckModel,
-    '        .ExecuteHandler = AddressOf _LoadModel
-    '    }
-
-    '    i = projectInfoLoader.ExecuteIfCan(project)
-    '    If i = 0 Then
-    '        i2 = modelLoader.ExecuteIfCan(project)
-    '        If i2 = 0 Then
-    '            Call Model.Initialize(ProjectInfo)
-    '            Call ViewModel.Setup(Model, ViewModel, AppInfo, ProjectInfo)
-    '            msg = vbNullString
-    '        Else
-    '            msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
-    '        End If
-    '    Else
-    '        Call _DeleteProject(project)
-    '        Call AppInfo.AppSave()
-    '        msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
-    '    End If
-
-    '    Me.Message = msg
-    'End Sub
-
-    'Private Overloads Function _CheckProjectNotExist(ByVal project As ProjectInfoModel) As Boolean
-    '    Dim i = -1
-    '    Dim b = False
-
-    '    i = project.CheckStructure()
-    '    If i = 1000 Then
-    '        b = True
-    '    End If
-
-    '    _CheckProjectNotExist = b
-    'End Function
-
-    'Private Sub _LoadProjectInfo(ByVal project As ProjectInfoModel)
-    '    Dim jh As New JsonHandler(Of Object)
-    '    Me.ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
-    'End Sub
-
-    'Private Sub _LoadModel(ByVal project As ProjectInfoModel)
-    '    Dim jh As New JsonHandler(Of Object)
-    '    Me.Model = jh.ModelLoad(Of Model)(project.ModelFileName)
-    'End Sub
 
     Private Sub _DeleteProject(ByVal project As ProjectInfoModel)
         Dim pim As ProjectInfoModel
@@ -479,6 +426,7 @@ Public Class UserDirectoryViewModel
     End Sub
 
     Protected Overrides Sub ViewInitializing()
+        Dim v As ViewItemModel
         Me.UserDirectoryName = ProjectInfo.DirectoryName
         Me.ProjectName = ProjectInfo.Name
         Me.ProjectKindList = AppDirectoryModel.ProjectKindList
@@ -486,14 +434,22 @@ Public Class UserDirectoryViewModel
         If Me.CurrentProjects Is Nothing Then
             Me.CurrentProjects = New ObservableCollection(Of ProjectInfoModel)
         End If
-        Me.ViewModel.SetContent(ViewModel.MAIN_VIEW, Me.GetType.Name, New NormalViewModel With {.Content = Me})
+
+        ' ViewModel.AddViewItem() から取得すると、
+        ' ViewModel.Viewsに登録されてしまい、
+        ' ロード対象になってしまう
+        v = New ViewItemModel With {
+            .Name = Me.GetType.Name,
+            .FrameType = Me.FrameType,
+            .ViewType = ViewModel.NORMAL_VIEW,
+            .OpenState = True,
+            .Content = Me
+        }
+        Call ViewModel.AddView(v)
     End Sub
 
 
-    Public Sub Initialize(ByRef m As Model,
-                          ByRef vm As ViewModel,
-                          ByRef adm As AppDirectoryModel,
-                          ByRef pim As ProjectInfoModel)
+    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
         InitializeHandler _
             = AddressOf ViewInitializing
         CheckCommandEnabledHandler _
@@ -505,9 +461,5 @@ Public Class UserDirectoryViewModel
             )
 
         Call BaseInitialize(m, vm, adm, pim)
-    End Sub
-
-    ' ビューモデルは必ず、Initializingメソッドを呼び出すこと
-    Sub New()
     End Sub
 End Class

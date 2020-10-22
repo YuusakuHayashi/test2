@@ -16,10 +16,13 @@ Public Class ViewModel
         )
     End Sub
 
-    Public Const MAIN_VIEW As String = "MainView"
-    Public Const EXPLORER_VIEW As String = "ExplorerView"
-    Public Const HISTORY_VIEW As String = "HistoryView"
-    Public Const MENU_VIEW As String = "MenuView"
+    Public Const MAIN_FRAME As String = "MainView"
+    Public Const EXPLORER_FRAME As String = "ExplorerView"
+    Public Const HISTORY_FRAME As String = "HistoryView"
+    Public Const MENU_FRAME As String = "MenuView"
+
+    Public Const NORMAL_VIEW As String = "Normal"
+    Public Const TAB_VIEW As String = "Tab"
 
     Private _MainViewContent As Object
     <JsonIgnore>
@@ -78,10 +81,9 @@ Public Class ViewModel
     Public Property ContentDictionary As Dictionary(Of String, Dictionary(Of String, Object))
         Get
             If Me._ContentDictionary Is Nothing Then
-                Return New Dictionary(Of String, Dictionary(Of String, Object))
-            Else
-                Return Me._ContentDictionary
+                Me._ContentDictionary = New Dictionary(Of String, Dictionary(Of String, Object))
             End If
+            Return Me._ContentDictionary
         End Get
         Set(value As Dictionary(Of String, Dictionary(Of String, Object)))
             Me._ContentDictionary = value
@@ -90,28 +92,29 @@ Public Class ViewModel
 
     ' コンテントディクショナリが存在しない場合、新規作成し
     ' ビューディクショナリが存在しない場合、追加します
-    Private Sub _RegisterViewToDictionary(ByVal view As String)
+    Private Sub _RegisterViewToDictionary(ByVal v As ViewItemModel)
+        Dim frame = v.FrameType
         If Me.ContentDictionary Is Nothing Then
             Me.ContentDictionary = New Dictionary(Of String, Dictionary(Of String, Object))
         End If
-        If Not Me.ContentDictionary.ContainsKey(view) Then
-            Me.ContentDictionary.Add(view, New Dictionary(Of String, Object))
+        If Not Me.ContentDictionary.ContainsKey(frame) Then
+            Me.ContentDictionary.Add(frame, New Dictionary(Of String, Object))
         End If
     End Sub
 
     ' ビューのDataContentに実際にセットします
-    Private Sub _SetContentObject(ByVal view As String, ByVal nm As String)
+    Private Sub _SetItemToContent(ByVal v As ViewItemModel)
         Dim o As Object
-        o = Me.ContentDictionary(view)(nm)
+        o = Me.ContentDictionary(v.FrameType)(v.Name)
 
-        Select Case view
-            Case MAIN_VIEW
+        Select Case v.FrameType
+            Case MAIN_FRAME
                 Me.MainViewContent = o
-            Case EXPLORER_VIEW
+            Case EXPLORER_FRAME
                 Me.ExplorerViewContent = o
-            Case HISTORY_VIEW
+            Case HISTORY_FRAME
                 Me.HistoryViewContent = o
-            Case MENU_VIEW
+            Case MENU_FRAME
                 Me.MenuViewContent = o
             Case Else
                 ' Nothing To Do
@@ -119,82 +122,85 @@ Public Class ViewModel
     End Sub
 
     ' コンテントをディクショナリにセットします
-    Private Sub _AddContentToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-        Call Me._RegisterViewToDictionary(viewName)
-        If Not Me.ContentDictionary(viewName).ContainsKey(modelName) Then
-            Me.ContentDictionary(viewName).Add(modelName, context)
+    'Private Sub _AddContentToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+    '    'Call Me._RegisterViewToDictionary(viewName)
+    '    'If Not Me.ContentDictionary(viewName).ContainsKey(modelName) Then
+    '    '    Me.ContentDictionary(viewName).Add(modelName, context)
+    '    'End If
+    'End Sub
+
+    Private Sub _AddItem(ByVal v As ViewItemModel)
+        Dim obj = v.Content
+        Dim frame = obj.FrameType
+        Dim [name] = obj.GetType.Name
+        If Me.ContentDictionary(frame).ContainsKey([name]) Then
+            Me.ContentDictionary(frame)([name]) = obj
+        Else
+            Me.ContentDictionary(frame).Add([name], obj)
         End If
     End Sub
 
-    ' コンテントをディクショナリにセット＆更新します
-    Private Sub _UpdateContentToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-        Call Me._AddContentToDictionary(viewName, modelName, context)
-        Me.ContentDictionary(viewName)(modelName) = context
-    End Sub
+    '' コンテントをディクショナリにセット＆更新します
+    'Private Sub _UpdateContentToDictionary(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+    '    Call Me._AddContentToDictionary(viewName, modelName, context)
+    '    Me.ContentDictionary(viewName)(modelName) = context
+    'End Sub
 
-    ' コンテントをディクショナリにセット＆ビューの切り替えを行います
-    Public Sub ChangeContent(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-        Call Me._AddContentToDictionary(viewName, modelName, context)
-        Call Me._SetContentObject(viewName, modelName)
-    End Sub
+    '' コンテントをディクショナリにセット＆ビューの切り替えを行います
+    'Public Sub ChangeContent(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+    '    Call Me._AddContentToDictionary(viewName, modelName, context)
+    '    Call Me._SetContentObject(viewName, modelName)
+    'End Sub
 
-    ' コンテントをディクショナリにセット＆更新＆ビューの切り替えを行います
-    Public Sub SetContent(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
-        Call Me._UpdateContentToDictionary(viewName, modelName, context)
-        Call Me._SetContentObject(viewName, modelName)
-    End Sub
+    '' コンテントをディクショナリにセット＆更新＆ビューの切り替えを行います
+    'Public Sub SetContent(ByVal viewName As String, ByVal modelName As String, ByRef context As Object)
+    '    Call Me._UpdateContentToDictionary(viewName, modelName, context)
+    '    Call Me._SetContentObject(viewName, modelName)
+    'End Sub
     ' --------------------------------------------------------------------------------------------'
 
     ' --------------------------------------------------------------------------------------------'
-    ' タブコレクション関連
-    ' タブディクショナリ
-    'Private _OpenTabsDictionary As Dictionary(Of String, List(Of String))
-    'Public Property OpenTabsDictionary As Dictionary(Of String, List(Of String))
-    '    Get
-    '        Return Me._OpenTabsDictionary
-    '    End Get
-    '    Set(value As Dictionary(Of String, List(Of String)))
-    '        Me._OpenTabsDictionary = value
-    '    End Set
-    'End Property
-
-    Private _OpenTabs As List(Of String)
-    Public Property OpenTabs As List(Of String)
+    Private _Views As ObservableCollection(Of ViewItemModel)
+    Public Property Views As ObservableCollection(Of ViewItemModel)
         Get
-            If Me._OpenTabs Is Nothing Then
-                Return New List(Of String)
-            Else
-                Return Me._OpenTabs
+            If Me._Views Is Nothing Then
+                Me._Views = New ObservableCollection(Of ViewItemModel)
             End If
+            Return Me._Views
         End Get
-        Set(value As List(Of String))
-            Me._OpenTabs = value
+        Set(value As ObservableCollection(Of ViewItemModel))
+            Me._Views = value
         End Set
     End Property
 
-    ' タブコレクションディクショナリが存在しない場合、新規作成し
-    ' タブコレクションが存在しない場合、追加します
-    Public Sub AddOpenTabs(ByVal tab As TabItemModel)
-        If Not Me.OpenTabs.Contains(tab.Name) Then
-            Me.OpenTabs.Add(tab.Name)
-        End If
-    End Sub
+    'Private Sub _OpenStateOff(ByVal [tab] As TabItemModel)
+    '    For Each v In Me.Views
+    '        If v.Name = [tab].Name Then
+    '            v.OpenState = False
+    '        End If
+    '    Next
+    'End Sub
+    'Private Sub _OpenStateOn(ByVal [tab] As TabItemModel)
+    '    For Each v In Me.Views
+    '        If v.Name = [tab].Name Then
+    '            v.OpenState = True
+    '        End If
+    '    Next
+    'End Sub
+    ' --------------------------------------------------------------------------------------------'
 
-    Public Sub RemoveOpenTabs(ByVal tab As TabItemModel)
-        If Me.OpenTabs.Contains(tab.Name) Then
-            Me.OpenTabs.Remove(tab.Name)
-        End If
-    End Sub
 
+    ' タブコレクション関連
+    ' タブディクショナリ
+    ' --------------------------------------------------------------------------------------------'
     Private _TabsDictionary As Dictionary(Of String, TabViewModel)
     <JsonIgnore>
     Public Property TabsDictionary As Dictionary(Of String, TabViewModel)
         Get
             If Me._TabsDictionary Is Nothing Then
-                Return New Dictionary(Of String, TabViewModel)
-            Else
-                Return Me._TabsDictionary
+                Me._TabsDictionary = New Dictionary(Of String, TabViewModel)
             End If
+            Return Me._TabsDictionary
         End Get
         Set(value As Dictionary(Of String, TabViewModel))
             Me._TabsDictionary = value
@@ -203,102 +209,178 @@ Public Class ViewModel
 
     ' タブコレクションディクショナリが存在しない場合、新規作成し
     ' タブコレクションが存在しない場合、追加します
-    Private Sub _RegisterTabViewToDictionary(ByVal view As String)
+    Private Sub _RegisterTabViewToDictionary(ByVal v As ViewItemModel)
+        Dim frame = v.FrameType
         Dim tvm As TabViewModel
-        'If Me.TabsDictionary Is Nothing Then
-        '    Me.TabsDictionary = New Dictionary(Of String, TabViewModel)
-        'End If
-        If Not Me.TabsDictionary.ContainsKey(view) Then
+        If Not Me.TabsDictionary.ContainsKey(frame) Then
             tvm = New TabViewModel
-            ' 閉じるハンドラーのセット
-            tvm.Initialize()
-            Me.TabsDictionary.Add(view, tvm)
+            Me.TabsDictionary.Add(frame, tvm)
         End If
-        'If Me.TabsDictionary(view).Tabs Is Nothing Then
-        '    Me.TabsDictionary(view).Tabs = New ObservableCollection(Of TabItemModel)
-        'End If
     End Sub
 
     ' ビューのDataContentに実際にセットします
-    Private Sub _SetTabsObject(ByVal view As String)
+    Private Sub _SetTabItemToContent(ByVal v As ViewItemModel)
         Dim o As TabViewModel
-        o = Me.TabsDictionary(view)
+        o = Me.TabsDictionary(v.FrameType)
 
-        Select Case view
-            Case MAIN_VIEW
+        Select Case v.FrameType
+            Case MAIN_FRAME
                 Me.MainViewContent = o
-            Case EXPLORER_VIEW
+            Case EXPLORER_FRAME
                 Me.ExplorerViewContent = o
-            Case HISTORY_VIEW
+            Case HISTORY_FRAME
                 Me.HistoryViewContent = o
             Case Else
                 ' Nothing To Do
         End Select
     End Sub
 
-    ' タブをコレクションにセットします
-    'Private Sub _AddTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
-    '    Call Me._RegisterTabViewToDictionary(view)
-    '    If Not Me.TabsDictionary(view).Tabs.Contains([tab]) Then
-    '        Call [tab].Initialize()
-    '        Me.TabsDictionary(view).Tabs.Add([tab])
-    '    End If
-    'End Sub
-
-    ' タブをコレクションにセット＆更新します
-    Private Sub _UpdateTabsToCollection(ByVal view As String, ByVal [tab] As TabItemModel)
-        Dim idx = -1
-        For Each t In Me.TabsDictionary(view).Tabs
-            If [tab].Name = t.Name Then
-                idx = Me.TabsDictionary(view).Tabs.IndexOf(t)
+    Public Overloads Sub RemoveTabItem(ByVal [tab] As TabItemModel)
+        For Each p In Me.TabsDictionary
+            If p.Value.Tabs.Contains([tab]) Then
+                p.Value.Tabs.Remove([tab])
             End If
         Next
 
-        ' 閉じるコマンドのセット
-        Call [tab].Initialize()
+        ' ビューからの開閉状態記録
+        For Each v In Me.Views
+            If v.Name = [tab].Name Then
+                v.OpenState = False
+            End If
+        Next
+    End Sub
+
+    ' コレクションにタブがなければ追加、あれば更新
+    Private Overloads Sub _AddTabItem(ByVal [tab] As TabItemModel)
+        Dim idx = -1
+        Dim frame = [tab].FrameType
+        For Each t In Me.TabsDictionary(frame).Tabs
+            If [tab].Name = t.Name Then
+                idx = Me.TabsDictionary(frame).Tabs.IndexOf(t)
+            End If
+        Next
         If idx = -1 Then
-            Me.TabsDictionary(view).Tabs.Add([tab])
+            ' 閉じるコマンドのセット
+            Me.TabsDictionary(frame).Tabs.Add([tab])
+            idx = Me.TabsDictionary(frame).Tabs.IndexOf([tab])
         Else
-            Me.TabsDictionary(view).Tabs(idx) = [tab]
+            Me.TabsDictionary(frame).Tabs(idx).Content = [tab].Content
+            'idx = idx
         End If
-        Me.TabsDictionary(view).SelectedIndex _
-            = Me.TabsDictionary(view).Tabs.IndexOf([tab])
-        'Call Me._AddTabsToCollection(view, [tab])
-        'Me.TabsDictionary(view).Tabs(Me.TabsDictionary(view).Tabs.IndexOf([tab])) = [tab]
+        Me.TabsDictionary(frame).SelectedIndex = idx
     End Sub
 
-    ' タブをコレクションにセット＆ビューの切り替えを行います
-    'Public Sub ChangeTabs(ByVal view As String, ByVal [tab] As TabItemModel)
-    '    Call Me._AddTabsToCollection(view, [tab])
-    '    Call Me._SetTabsObject(view)
+    ' コレクションにタブがなければ追加、あれば更新
+    Private Overloads Sub _AddTabItem(ByVal v As ViewItemModel)
+        Dim t = New TabItemModel With {
+            .Name = v.Name,
+            .FrameType = v.FrameType,
+            .Content = v.Content
+        }
+        Call _AddTabItem(t)
+    End Sub
+
+    Public Sub AddView(ByVal v As ViewItemModel)
+        ' ビュータイプから、セットする辞書を判別する
+        Select Case v.ViewType
+            Case ViewModel.NORMAL_VIEW
+                Call _RegisterViewToDictionary(v)
+                Call _AddItem(v)
+                Call _SetItemToContent(v)
+            Case ViewModel.TAB_VIEW
+                Call _RegisterTabViewToDictionary(v)
+                Call _AddTabItem(v)
+                Call _SetTabItemToContent(v)
+            Case Else
+                MsgBox("ViewModel.AddView")
+                Exit Sub
+        End Select
+    End Sub
+
+    ' 初期時のみ実行 -----------------------------------------------------------------------------'
+    'Private Sub _InitialSetup(ParamArray objs() As Object)
+    '    ' タブへの変換
+    '    Dim t As TabItemModel
+
+    '    For Each obj In objs
+    '        t = New TabItemModel With {
+    '            .Name = obj.GetType.Name,
+    '            .Content = obj
+    '        }
+    '        Call _AddTabItem(t)
+    '        Call _AddViewItem(t)
+    '    Next
     'End Sub
 
-    ' タブをコレクションにセット＆更新＆ビューの切り替えを行います
-    'Public Sub ShowTabs(ByVal view As String, ByVal [tab] As TabItemModel)
-    '    Call Me._UpdateTabsToCollection(view, [tab])
-    '    Call Me._SetTabsObject(view)
+    'Private Sub _AddViewItem(ParamArray tabs() As TabItemModel)
+    '    Dim v As ViewItemModel
+    '    For Each t In tabs
+    '        v = New ViewItemModel With {
+    '            .Name = t.Name,
+    '            .[Alias] = t.[Alias],
+    '            .ViewState = True
+    '        }
+    '        Me.Views.Add(v)
+    '    Next
     'End Sub
 
+    'Private Sub _RegisterTabItem(obj As Object)
+    '    ' タブへの変換
+    '    Dim t As TabItemModel
+
+    '    For Each obj In objs
+    '        t = New TabItemModel With {
+    '            .Name = obj.GetType.Name,
+    '            .Content = obj
+    '        }
+    '        Call _AddTabItem(t)
+    '        Call _AddViewItem(t)
+    '    Next
+    'End Sub
+
+    Public Function AddViewItem(ByVal obj As Object,
+                                ByVal frame As String,
+                                ByVal view As String) As ViewItemModel
+        Dim v As New ViewItemModel With {
+            .Name = obj.GetType.Name,
+            .FrameType = frame,
+            .ViewType = view,
+            .OpenState = True,
+            .Content = obj
+        }
+
+        ' 自身の表示はしない
+        If Not obj.Equals(Me) Then
+            Me.Views.Add(v)
+        End If
+        AddViewItem = v
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
     ' タブを表示する唯一の公開メソッドとすること
-    Public Sub ShowTabs(ByVal [tab] As TabItemModel)
-        Dim view = [tab].Content.ViewType
-        Call Me._RegisterTabViewToDictionary(view)
-        Call Me._UpdateTabsToCollection(view, [tab])
-        Call Me.AddOpenTabs([tab])
-        Call Me._SetTabsObject(view)
-    End Sub
+    'Public Sub ShowTabs(ByVal [tab] As TabItemModel)
+    '    Dim view = [tab].Content.ViewType
+    '    Call Me._AddTabItem([tab])
+    '    Call Me._ViewStateOn([tab])
+    '    Call Me._SetTabsObject(view)
+    'End Sub
     ' --------------------------------------------------------------------------------------------'
 
-
-    ' 初回時に必要なビューモデルコンテントを全てディクショナリにセットします
-    Public Sub InitializeTabs(ParamArray views() As Object)
+    Private Sub _LoadSetup(ByVal m As Model,
+                           ByVal vm As ViewModel,
+                           ByVal adm As AppDirectoryModel,
+                           ByVal pim As ProjectInfoModel)
+        Dim obj As Object
         Dim t As TabItemModel
-        For Each v In views
-            t = New TabItemModel With {
-                .Name = v.GetType.Name,
-                .Content = v
-            }
-            Call ShowTabs(t)
+
+        For Each v In Views
+            If v.OpenState Then
+                obj = GetViewOfName(v.Name)
+                obj.Initialize(m, vm, adm, pim)
+                v.Content = obj
+                Call AddView(v)
+            End If
         Next
     End Sub
 
@@ -306,23 +388,13 @@ Public Class ViewModel
                                ByVal vm As ViewModel,
                                ByVal adm As AppDirectoryModel,
                                ByVal pim As ProjectInfoModel)
-        Dim cvm As Object
-        Dim dbtvm As Object
-        Dim dbevm As Object
-        Dim vevm As Object
-        Dim hvm As Object
-        Dim mvm As Object
-        Dim t_cvm As TabItemModel
-        Dim t_dbtvm As TabItemModel
-        Dim t_dbevm As TabItemModel
-        Dim t_vevm As TabItemModel
-        Dim t_hvm As TabItemModel
+        Dim cvm, dbtvm, dbevm, vevm, hvm, mvm
+        Dim v0, v1, v2, v3, v4, v5, v6, v7, v8, v9
 
-        '-- you henkou --------------------------------'
         Select Case pim.Kind
+            '-- you henkou --------------------------------'
             Case AppDirectoryModel.DB_TEST
-                If Me.OpenTabs Is Nothing Then
-                    ' ビューの登録
+                If Me.Views.Count < 1 Then
                     cvm = New ConnectionViewModel
                     dbtvm = New DBTestViewModel
                     dbevm = New DBExplorerViewModel
@@ -333,45 +405,26 @@ Public Class ViewModel
                     Call cvm.Initialize(m, vm, adm, pim)
                     Call hvm.Initialize(m, vm, adm, pim)
                     Call mvm.Initialize(m, vm, adm, pim)
-                    Call vevm.Initialize(m, vm, adm, pim)
 
-                    Call InitializeTabs(cvm, dbtvm, dbevm, vevm, hvm)
+                    ' ビューへの追加
+                    v1 = AddViewItem(cvm, MAIN_FRAME, TAB_VIEW)
+                    v2 = AddViewItem(hvm, HISTORY_FRAME, TAB_VIEW)
+                    v3 = AddViewItem(mvm, MENU_FRAME, NORMAL_VIEW)
+
+                    Call AddView(v1)
+                    Call AddView(v2)
+                    Call AddView(v3)
+
                 Else
-                    Call 
+                    Call _LoadSetup(m, vm, adm, pim)
                 End If
-
-                't_cvm = New TabItemModel With {
-                '    .Name = cvm.GetType.Name,
-                '    .Content = cvm
-                '}
-                't_dbtvm = New TabItemModel With {
-                '    .Name = dbtvm.GetType.Name,
-                '    .Content = dbtvm
-                '}
-                't_dbevm = New TabItemModel With {
-                '    .Name = dbevm.GetType.Name,
-                '    .Content = dbevm
-                '}
-                't_hvm = New TabItemModel With {
-                '    .Name = hvm.GetType.Name,
-                '    .Content = hvm
-                '}
-                't_vevm = New TabItemModel With {
-                '    .Name = vevm.GetType.Name,
-                '    .Content = vevm
-                '}
-
-                Call vevm.RegisterViews(t_cvm, t_dbtvm, t_dbevm, t_hvm, t_vevm)
-
-                Call ShowTabs(t_cvm)
-                Call ShowTabs(t_dbtvm)
-                Call ShowTabs(t_dbevm)
-                Call ShowTabs(t_vevm)
-                Call ShowTabs(t_hvm)
-                Call ChangeContent(ViewModel.MENU_VIEW, mvm.GetType.Name, mvm)
+                ' 特殊なビューのセット(ViewModel)
+                v0 = AddViewItem(Me, EXPLORER_FRAME, TAB_VIEW)
+                Call AddView(v0)
+                'Case Else
             Case Else
+                '----------------------------------------------'
         End Select
-        '----------------------------------------------'
     End Sub
 
     Public Function GetViewOfName(ByVal [name] As String) As Object
@@ -394,4 +447,55 @@ Public Class ViewModel
         End Select
         GetViewOfName = obj
     End Function
+
+    '---------------------------------------------------------------------------------------------'
+    ' このオブジェクト自体を上書きしてしまうと、ＭＶＶＭが適用されなくなる
+    ' (Ｖｉｅｗへの反映がされない)ため、ロードが必要なメンバをここで別個にセットする
+    Public Overloads Sub Initialize(ByVal vm As ViewModel)
+        '--- you henkou ----------------------------------'
+        Me.Views = vm.Views
+        '-------------------------------------------------'
+        Call Me.Initialize()
+    End Sub
+
+    Public Overloads Sub Initialize()
+        Call _TabCloseAddHandler()
+        Call _OpenViewAddHandler()
+    End Sub
+    '---------------------------------------------------------------------------------------------'
+
+
+    '--- タブを閉じる関連 ------------------------------------------------------------------------'
+    Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
+        Call _TabCloseRequestAccept(t)
+    End Sub
+
+    Private Sub _TabCloseRequestAccept(ByVal [tab] As TabItemModel)
+        Call RemoveTabItem([tab])
+    End Sub
+
+    Private Sub _TabCloseAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.TabCloseRequested,
+            AddressOf Me._TabCloseRequestedReview
+    End Sub
+    '---------------------------------------------------------------------------------------------'
+
+    '--- タブを開く関連 --------------------------------------------------------------------------'
+    Private Sub _OpenViewAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.OpenViewRequested,
+            AddressOf Me._OpenViewRequestedReview
+    End Sub
+
+    Private Sub _OpenViewRequestedReview(ByVal v As ViewItemModel, ByVal e As System.EventArgs)
+        Call _OpenViewRequestAccept(v)
+    End Sub
+
+    Private Sub _OpenViewRequestAccept(ByVal v As ViewItemModel)
+        Dim idx = Me.Views.IndexOf(v)
+        Me.Views(idx).OpenState = True
+        Call Me.AddView(Me.Views(idx))
+    End Sub
+    '---------------------------------------------------------------------------------------------'
 End Class

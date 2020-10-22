@@ -1,7 +1,11 @@
-﻿Public Class ViewItemModel
+﻿Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+
+Public Class ViewItemModel
     Inherits BaseViewModel
 
     Private _BoxVisibility As Visibility
+    <JsonIgnore>
     Public Property BoxVisibility As Visibility
         Get
             Return Me._BoxVisibility
@@ -16,6 +20,7 @@
     End Property
 
     Private _BlockVisibility As Visibility
+    <JsonIgnore>
     Public Property BlockVisibility As Visibility
         Get
             Return Me._BlockVisibility
@@ -66,6 +71,37 @@
         End Set
     End Property
 
+    Private _FrameType As String
+    Public Property FrameType As String
+        Get
+            Return Me._FrameType
+        End Get
+        Set(value As String)
+            Me._FrameType = value
+        End Set
+    End Property
+
+    Private _OpenState As Boolean
+    Public Property OpenState As Boolean
+        Get
+            Return Me._OpenState
+        End Get
+        Set(value As Boolean)
+            Me._OpenState = value
+        End Set
+    End Property
+
+    Private _Content As Object
+    <JsonIgnore>
+    Public Property Content As Object
+        Get
+            Return Me._Content
+        End Get
+        Set(value As Object)
+            Me._Content = value
+        End Set
+    End Property
+
     'Private _IsExpand As Boolean
     'Public Property IsExpand As Boolean
     '    Get
@@ -77,6 +113,7 @@
     'End Property
 
     Private _IsSelected As Boolean
+    <JsonIgnore>
     Public Property IsSelected As Boolean
         Get
             Return Me._IsSelected
@@ -102,6 +139,7 @@
 
     ' コマンドプロパティ（接続確認）
     Private _ChangeAliasCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property ChangeAliasCommand As ICommand
         Get
             If Me._ChangeAliasCommand Is Nothing Then
@@ -124,6 +162,7 @@
 
     ' コマンド実行可否のフラグ（接続確認）
     Private __ChangeAliasCommandEnableFlag As Boolean
+    <JsonIgnore>
     Public Property _ChangeAliasCommandEnableFlag As Boolean
         Get
             Return Me.__ChangeAliasCommandEnableFlag
@@ -146,5 +185,10 @@
 
     Public Sub Initialize()
         Call _CheckChangeAliasCommandEnabled()
+        Me.BlockVisibility = Visibility.Visible
+    End Sub
+
+    Public Sub New()
+        Call Initialize()
     End Sub
 End Class

@@ -186,22 +186,31 @@
             <!-- タブで表示するタイプ -->
             <DataTemplate
                 DataType="{x:Type local:TabViewModel}">
-                <TabControl
+                <TabControl                    
                     SelectedIndex="{Binding SelectedIndex}"
                     ItemsSource="{Binding Tabs}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Name}" />
+                            <StackPanel 
+                                Orientation="Horizontal">
+                                <TextBlock                                     
+                                    Width="75"                                    
+                                    Text="{Binding Name}" 
+                                    TextTrimming="CharacterEllipsis"  />
                                 <Button 
-                                    Content="X"
+                                    FontSize="4"
+                                    Background="PaleVioletRed"
+                                    Foreground="White"
+                                    Height="8" Width="8"
+                                    Content="X"                                    
                                     Command="{Binding TabCloseCommand}"/>
                             </StackPanel>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>
                         <DataTemplate>
-                            <ContentControl Content="{Binding Content}" />
+                            <ContentControl 
+                                Content="{Binding Content}"  />
                         </DataTemplate>
                     </TabControl.ContentTemplate>
                 </TabControl>
@@ -467,9 +476,9 @@
                     </TreeView>
                 </DockPanel>
             </DataTemplate>
-            
+
             <DataTemplate                
-                DataType="{x:Type local:ViewExplorerViewModel}">
+                DataType="{x:Type local:ViewModel}">
                 <DockPanel
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch"
@@ -590,43 +599,46 @@
                 </StackPanel>
             </DataTemplate>
 
+            <DataTemplate DataType="MainFrameModel">
+                <Grid>
+                </Grid>
+            </DataTemplate>
         </Grid.Resources>
-
-        <ContentControl
-            x:Name="MenuFrame"
-            Grid.Row="0"
-            Grid.Column="0" Grid.ColumnSpan="3"
-            Content="{Binding MenuViewContent}" />
-        <ContentControl
-            x:Name="ExplorerFlame"
-            Grid.Row="1" Grid.RowSpan="3"
-            Grid.Column="0"
-            Content="{Binding ExplorerViewContent}" />
-        <GridSplitter            
-            Grid.Row="1" Grid.RowSpan="3"
-            Grid.Column="1"
-            Width="10"
-            ResizeDirection="Columns"
-            ResizeBehavior="PreviousAndNext"
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Stretch" />
-        <ContentControl
-            Grid.Row="1"            
-            Grid.Column="2"
-            x:Name="MainFlame"                
-            Content="{Binding MainViewContent}" />
-        <GridSplitter
-            Grid.Row="2"
-            Grid.Column="2"
-            Height="10"
-            ResizeDirection="Rows"                
-            ResizeBehavior="PreviousAndNext" 
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Stretch" />
-        <ContentControl
-            Grid.Row="3"
-            Grid.Column="2"
-            x:Name="HistoryFlame"                
-            Content="{Binding HistoryViewContent}" />
+                    <ContentControl
+                        x:Name="MenuFrame"
+                        Grid.Row="0"
+                        Grid.Column="0" Grid.ColumnSpan="3"
+                        Content="{Binding MenuViewContent}" />
+                    <ContentControl
+                        x:Name="ExplorerFlame"
+                        Grid.Row="1" Grid.RowSpan="3"
+                        Grid.Column="0"
+                        Content="{Binding ExplorerViewContent}" />
+                    <GridSplitter            
+                        Grid.Row="1" Grid.RowSpan="3"
+                        Grid.Column="1"
+                        Width="10"
+                        ResizeDirection="Columns"
+                        ResizeBehavior="PreviousAndNext"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <ContentControl
+                        Grid.Row="1"            
+                        Grid.Column="2"
+                        x:Name="MainFlame"                
+                        Content="{Binding MainViewContent}" />
+                    <GridSplitter
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Height="10"
+                        ResizeDirection="Rows"                
+                        ResizeBehavior="PreviousAndNext" 
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <ContentControl
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        x:Name="HistoryFlame"                
+                        Content="{Binding HistoryViewContent}" />
     </Grid>
 </Window>
