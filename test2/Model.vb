@@ -56,7 +56,7 @@ Public Class Model
     Public Sub Setup(ByVal project As ProjectInfoModel)
         '-- you henkou --------------------------------'
         Select Case project.Kind
-            Case AppDirectoryModel.DB_TEST
+            Case AppDirectoryModel.DBTEST
                 Me.Data = New DBTestModel
             Case Else
         End Select
@@ -97,7 +97,7 @@ Public Class Model
     Public Sub Initialize(ByVal project As ProjectInfoModel)
         '-- you henkou --------------------------------'
         Select Case project.Kind
-            Case AppDirectoryModel.DB_TEST
+            Case AppDirectoryModel.DBTEST
                 Call Me._DataInitialize(Of DBTestModel)()
             Case Else
         End Select

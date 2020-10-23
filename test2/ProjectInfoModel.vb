@@ -1,9 +1,42 @@
 ﻿Imports System.IO
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class ProjectInfoModel
     Inherits JsonHandler(Of ProjectInfoModel)
 
     Private Const SHIFT_JIS As String = "Shift-JIS"
+
+    Private _ImageFileName As String
+    Public Property ImageFileName As String
+        Get
+            Return _ImageFileName
+        End Get
+        Set(value As String)
+            _ImageFileName = value
+        End Set
+    End Property
+
+    Private _Image As BitmapImage
+    <JsonIgnore>
+    Public Property [Image] As BitmapImage
+        Get
+            Return _Image
+        End Get
+        Set(value As BitmapImage)
+            _Image = value
+        End Set
+    End Property
+
+    Private _Index As Integer
+    Public Property [Index] As String
+        Get
+            Return _Index
+        End Get
+        Set(value As String)
+            _Index = value
+        End Set
+    End Property
 
     Private _Name As String
     Public Property Name As String

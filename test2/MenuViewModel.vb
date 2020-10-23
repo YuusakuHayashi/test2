@@ -49,7 +49,7 @@ Public Class MenuViewModel
         Call Model.ModelSave(ProjectInfo.ModelFileName, Model)
         Call ViewModel.ModelSave(ProjectInfo.ViewModelFileName, ViewModel)
         Call ProjectInfo.ProjectSave()
-        AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(ProjectInfo, AppInfo.CurrentProjects, 5)
+        Call AppInfo.PushProject(ProjectInfo)
         Call AppInfo.AppSave()
     End Sub
 
@@ -197,8 +197,9 @@ Public Class MenuViewModel
         ' 3 ... モデルが不正
         Select Case i
             Case 0
-                ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
-                Model = jh.ModelLoad(Of Model)(project.ModelFileName)
+                ProjectInfo = project.ModelLoad(project.ProjectInfoFileName)
+                AppInfo.PushProject(ProjectInfo)
+                Model = jh.ModelLoad(Of Model)(ProjectInfo.ModelFileName)
                 Call Model.Initialize(ProjectInfo)
                 Call Setup(Model, ViewModel, AppInfo, ProjectInfo)
             Case 1

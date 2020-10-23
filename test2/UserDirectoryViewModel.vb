@@ -344,7 +344,8 @@ Public Class UserDirectoryViewModel
         Dim project As New ProjectInfoModel With {
             .DirectoryName = Me.ProjectDirectoryName,
             .Name = Me.ProjectName,
-            .Kind = Me.ProjectKind
+            .Kind = Me.ProjectKind,
+            .ImageFileName = AppInfo.AssignImageOfProject(Me.ProjectKind)
         }
 
         Dim launcher As New DelegateAction With {
@@ -354,7 +355,7 @@ Public Class UserDirectoryViewModel
 
         i = launcher.ExecuteIfCan(Nothing)
         If i = 0 Then
-            Me.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(project, Me.CurrentProjects, 5)
+            Call AppInfo.PushProject(project)
             Call AppInfo.AppSave()
             ProjectInfo = project
             Call ProjectInfo.ProjectSave()
@@ -365,7 +366,7 @@ Public Class UserDirectoryViewModel
             vc = New ViewController
             vc.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
         Else
-            Msgbox("Error AddProjectCommandExecute")
+            MsgBox("Error AddProjectCommandExecute")
             Exit Sub
         End If
     End Sub
@@ -429,85 +430,6 @@ Public Class UserDirectoryViewModel
         End If
     End Sub
 
-    'Private Sub _LoadSetup(ByVal m As Model,
-    '                       ByVal vm As ViewModel,
-    '                       ByVal adm As AppDirectoryModel,
-    '                       ByVal pim As ProjectInfoModel)
-    '    Dim obj As Object
-    '    Dim t As TabItemModel
-
-    '    For Each v In ViewModel.Views
-    '        If v.OpenState Then
-    '            obj = GetViewOfName(v.Name)
-    '            obj.Initialize(m, vm, adm, pim)
-    '            v.Content = obj
-    '            Call AddView(v)
-    '        End If
-    '    Next
-    'End Sub
-
-    'Public Overloads Sub Setup(ByVal m As Model,
-    '                           ByVal vm As ViewModel,
-    '                           ByVal adm As AppDirectoryModel,
-    '                           ByVal pim As ProjectInfoModel)
-    '    Dim cvm, dbtvm, dbevm, vevm, hvm, mvm
-    '    Dim v0, v1, v2, v3, v4, v5, v6, v7, v8, v9
-
-    '    Select Case pim.Kind
-    '        '-- you henkou --------------------------------'
-    '        Case AppDirectoryModel.DB_TEST
-    '            If ViewModel.Views.Count < 1 Then
-    '                cvm = New ConnectionViewModel
-    '                dbtvm = New DBTestViewModel
-    '                dbevm = New DBExplorerViewModel
-    '                vevm = New ViewExplorerViewModel
-    '                hvm = New HistoryViewModel
-    '                mvm = New MenuViewModel
-
-    '                Call cvm.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
-    '                Call hvm.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
-    '                Call mvm.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
-
-    '                ' ビューへの追加
-    '                v1 = AddViewItem(cvm, ViewModel.MAIN_FRAME, ViewModel.TAB_VIEW)
-    '                v2 = AddViewItem(hvm, ViewModel.HISTORY_FRAME, ViewModel.TAB_VIEW)
-    '                v3 = AddViewItem(mvm, ViewModel.MENU_FRAME, ViewModel.NORMAL_VIEW)
-
-    '                Call AddView(v1)
-    '                Call AddView(v2)
-    '                Call AddView(v3)
-    '            Else
-    '                Call _LoadSetup(m, vm, adm, pim)
-    '            End If
-    '            ' 特殊なビューのセット(ViewModel)
-    '            v0 = AddViewItem(ViewModel, ViewModel.EXPLORER_FRAME, ViewModel.TAB_VIEW)
-    '            Call AddView(v0)
-    '            'Case Else
-    '        Case Else
-    '            '----------------------------------------------'
-    '    End Select
-    'End Sub
-
-    'Public Function GetViewOfName(ByVal [name] As String) As Object
-    '    Dim obj As Object
-    '    Select Case [name]
-    '        Case (New ConnectionViewModel).GetType.Name
-    '            obj = New ConnectionViewModel
-    '        Case (New DBTestViewModel).GetType.Name
-    '            obj = New DBTestViewModel
-    '        Case (New DBExplorerViewModel).GetType.Name
-    '            obj = New DBExplorerViewModel
-    '        Case (New ViewExplorerViewModel).GetType.Name
-    '            obj = New ViewExplorerViewModel
-    '        Case (New HistoryViewModel).GetType.Name
-    '            obj = New HistoryViewModel
-    '        Case (New MenuViewModel).GetType.Name
-    '            obj = New MenuViewModel
-    '        Case Else
-    '            obj = Nothing
-    '    End Select
-    '    GetViewOfName = obj
-    'End Function
 
     Private Sub _ViewInitializing()
         Dim v As ViewItemModel

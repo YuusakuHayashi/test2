@@ -18,6 +18,7 @@ Public Class Window
             app = New AppDirectoryModel
         End If
         app.ModelSave(AppDirectoryModel.ModelFileName, app)
+        app.Initialize()
 
         Dim udvm As New UserDirectoryViewModel
         Call udvm.Initialize(m, vm, app, project)

@@ -14,15 +14,6 @@
         Call BaseInitialize(m, vm, adm, pim)
     End Sub
 
-    '---------------------------------------------------------------------------------------------'
-    ' このオブジェクト自体を上書きしてしまうと、ＭＶＶＭが適用されなくなる
-    ' (Ｖｉｅｗへの反映がされない)ため、ロードが必要なメンバをここで別個にセットする
-    'Public Overloads Sub Initialize(ByVal vm As ViewModel)
-    '    '--- you henkou ----------------------------------'
-    '    ViewModel.Views = vm.Views
-    '    '-------------------------------------------------'
-    'End Sub
-
     '--- タブを閉じる関連 ------------------------------------------------------------------------'
     Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
         Call _TabCloseRequestAccept(t)
@@ -55,11 +46,9 @@
         Dim obj As Object
         Dim idx = ViewModel.Views.IndexOf(v)
         ViewModel.Views(idx).OpenState = True
-        If ViewModel.Views(idx).Content Is Nothing Then
-            obj = GetViewOfName(ViewModel.Views(idx).Name)
-            Call obj.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
-            ViewModel.Views(idx).Content = obj
-        End If
+        obj = GetViewOfName(ViewModel.Views(idx).Name)
+        Call obj.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
+        ViewModel.Views(idx).Content = obj
         Call Me.AddView(ViewModel.Views(idx))
     End Sub
     '---------------------------------------------------------------------------------------------'

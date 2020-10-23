@@ -234,10 +234,27 @@
                             ItemsSource="{Binding CurrentProjects}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel>
-                                        <TextBlock 
-                                            Text="{Binding Name}">
-                                        </TextBlock>
+                                    <StackPanel                                        
+                                        Orientation="Horizontal"
+                                        Width="200">
+                                        <Image
+                                            Height="30" Width="30"
+                                            Source="{Binding Image}"
+                                            Stretch="UniformToFill" />
+                                        <StackPanel
+                                            Orientation="Vertical">
+                                            <TextBlock 
+                                                Margin="10,0,0,0"
+                                                FontSize="14"
+                                                FontWeight="Bold"
+                                                Text="{Binding Name}" />
+                                            <TextBlock
+                                                Margin="10,0,0,0"
+                                                FontSize="10"
+                                                Foreground="Gray"
+                                                TextWrapping="WrapWithOverflow"
+                                                Text="{Binding DirectoryName}" />
+                                        </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

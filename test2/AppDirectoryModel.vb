@@ -21,13 +21,23 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         )
     End Sub
 
-    Public Const DB_TEST As String = "データベーステスト(.dbt)"
+    Public Const DBTEST As String = "データベーステスト(.dbt)"
+    Public Const DBTEST_IMAGE_URL As String = "\\Coral\個人情報-林祐\project\wpf\test2\test2\rpa.ico"
+
     Public Shared ProjectKindList As List(Of String) _
         = New List(Of String) From {
-            DB_TEST
+            DBTEST
         }
 
-    Public Delegate Sub AppLaunchProxy()
+    Private Sub _AssignProjectIndex(ByRef project As ProjectInfoModel)
+        Dim idx = 1
+        For Each p In Me.CurrentProjects
+            If p.[Index] = idx Then
+                idx += 1
+            End If
+        Next
+        project.[Index] = idx
+    End Sub
 
     Private Sub CreateAppDirectory()
         Try
@@ -64,6 +74,17 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         End Set
     End Property
 
+    Public Function AssignImageOfProject(ByVal kind As String)
+        Dim url = vbNullString
+        Select Case kind
+            Case DBTEST
+                url = DBTEST_IMAGE_URL
+            Case Else
+                url = DBTEST_IMAGE_URL
+        End Select
+        AssignImageOfProject = url
+    End Function
+
     ' この関数はアプリケーションディレクトリの存在チェックを行います
     Public Function CheckAppDirectory() As Integer
         Dim code As Integer : code = 99
@@ -78,12 +99,7 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
 
     ' この関数はアプリケーションの作成を行い、その結果を返します
     Public Function AppLaunch() As Integer
-        Dim proxy(2) As AppLaunchProxy
-        Dim proxy2 As AppLaunchProxy
-
-        proxy(0) = AddressOf CreateAppDirectory
-        proxy(1) = AddressOf CreateAppIniFile
-        proxy(2) = AddressOf CreateAppModelFile
+        Dim proxy As Action
 
         Dim code As Integer : code = CheckAppDirectory()
         Try
@@ -92,14 +108,16 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
                 Case 10
                     ' 失敗用のロジックが必要
                 Case 99
-                    proxy2 = [Delegate].Combine(proxy)
+                    proxy = [Delegate].Combine(
+                        New Action(AddressOf CreateAppDirectory),
+                        New Action(AddressOf CreateAppIniFile),
+                        New Action(AddressOf CreateAppModelFile)
+                    )
                 Case Else
             End Select
-            If proxy2 IsNot Nothing Then
-                If proxy2.GetInvocationList IsNot Nothing Then
-                    Call proxy2()
-                    code = 0
-                End If
+            If proxy IsNot Nothing Then
+                Call proxy()
+                code = 0
             End If
         Catch ex As Exception
         Finally
@@ -107,24 +125,55 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         End Try
     End Function
 
-    Sub New()
-        Dim proxy(0) As AppLaunchProxy
-        Dim proxy2 As AppLaunchProxy
-        proxy(0) = AddressOf Me.AppLaunch
+    Public Sub PushProject(ByVal project As ProjectInfoModel)
+        Dim [new] As New ObservableCollection(Of ProjectInfoModel)
 
+        [new].Add(project)
+        If project.[Index] = 0 Then
+            Call _AssignProjectIndex(project)
+        End If
+
+        For Each p In Me.CurrentProjects
+            If project.[Index] <> p.[Index] Then
+                [new].Add(p)
+            End If
+            If [new].Count >= 5 Then
+                Exit For
+            End If
+        Next
+
+        Me.CurrentProjects = [new]
+    End Sub
+
+    Sub New()
+        Dim proxy As Action
         Dim code As Integer : code = Me.CheckAppDirectory()
 
         Select Case code
             Case 0
             Case 10
             Case 99
-                proxy2 = [Delegate].Combine(proxy)
+                proxy = [Delegate].Combine(
+                    New Action(AddressOf AppLaunch)
+                )
         End Select
 
-        If proxy2 IsNot Nothing Then
-            If proxy2.GetInvocationList IsNot Nothing Then
-                Call proxy2()
-            End If
+        If proxy IsNot Nothing Then
+            Call proxy()
         End If
+    End Sub
+
+    Public Sub Initialize()
+        Dim bi As BitmapImage
+        For Each p In Me.CurrentProjects
+            If String.IsNullOrEmpty(p.ImageFileName) Then
+                p.ImageFileName = DBTEST_IMAGE_URL
+            End If
+            bi = New BitmapImage
+            bi.BeginInit()
+            bi.UriSource = New Uri((p.ImageFileName), UriKind.Absolute)
+            bi.EndInit()
+            p.Image = bi
+        Next
     End Sub
 End Class

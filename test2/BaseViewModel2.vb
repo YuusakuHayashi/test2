@@ -219,7 +219,6 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Public Sub AddView(ByVal v As ViewItemModel)
-        ' ビュータイプから、セットする辞書を判別する
         Select Case v.ViewType
             Case ViewModel.NORMAL_VIEW
                 Call _RegisterViewToDictionary(v)
@@ -279,7 +278,7 @@ Public MustInherit Class BaseViewModel2
 
         Select Case pim.Kind
             '-- you henkou --------------------------------'
-            Case AppDirectoryModel.DB_TEST
+            Case AppDirectoryModel.DBTEST
                 If ViewModel.Views.Count < 1 Then
                     cvm = New ConnectionViewModel
                     dbtvm = New DBTestViewModel
