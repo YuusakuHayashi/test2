@@ -15,14 +15,19 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     Public Shared AppIniFileName _
         = AppDirectoryModel.AppDirectoryName & "\App.ini"
 
+    Private Shared _AppImageDirectory _
+        = AppDirectoryModel.AppDirectoryName & "\Image"
+
     Public Sub AppSave()
         Call Me.ModelSave(
             AppDirectoryModel.ModelFileName, Me
         )
     End Sub
 
+    Private Shared _DBTEST_IMAGE As String _
+        = _AppImageDirectory & "\rpa.ico"
+
     Public Const DBTEST As String = "データベーステスト(.dbt)"
-    Public Const DBTEST_IMAGE_URL As String = "\\Coral\個人情報-林祐\project\wpf\test2\test2\rpa.ico"
 
     Public Shared ProjectKindList As List(Of String) _
         = New List(Of String) From {
@@ -78,51 +83,74 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         Dim url = vbNullString
         Select Case kind
             Case DBTEST
-                url = DBTEST_IMAGE_URL
+                url = _DBTEST_IMAGE
             Case Else
-                url = DBTEST_IMAGE_URL
+                url = _DBTEST_IMAGE
         End Select
         AssignImageOfProject = url
     End Function
 
+    Private Sub _Make(ByVal fds As List(Of Object))
+        Dim fi As FileInfo
+        Dim di As DirectoryInfo
+        For Each fd In fds
+            fd.Create()
+            'If TryCast(fd, FileInfo) IsNot Nothing Then
+            '    fi = CType(fd, FileInfo)
+            '    fi.Create()
+            '    Continue For
+            'End If
+            'If TryCast(fd, DirectoryInfo) IsNot Nothing Then
+            '    di = CType(fd, DirectoryInfo)
+            '    di.Create()
+            '    Continue For
+            'End If
+        Next
+    End Sub
+
     ' この関数はアプリケーションディレクトリの存在チェックを行います
     Public Function CheckAppDirectory() As Integer
-        Dim code As Integer : code = 99
+        Dim code = 999
         If Directory.Exists(AppDirectoryModel.AppDirectoryName) Then
-            code = 10
+            code = 998
             If File.Exists(AppDirectoryModel.AppIniFileName) Then
-                code = 0
+                code = 997
+                If File.Exists(AppDirectoryModel.ModelFileName) Then
+                    code = 996
+                    If Directory.Exists(AppDirectoryModel._AppImageDirectory) Then
+                        code = 0
+                    End If
+                End If
             End If
         End If
         CheckAppDirectory = code
     End Function
 
+
     ' この関数はアプリケーションの作成を行い、その結果を返します
     Public Function AppLaunch() As Integer
-        Dim proxy As Action
+        Dim fds As New List(Of Object)
 
-        Dim code As Integer : code = CheckAppDirectory()
-        Try
-            Select Case code
-                Case 0
-                Case 10
-                    ' 失敗用のロジックが必要
-                Case 99
-                    proxy = [Delegate].Combine(
-                        New Action(AddressOf CreateAppDirectory),
-                        New Action(AddressOf CreateAppIniFile),
-                        New Action(AddressOf CreateAppModelFile)
-                    )
-                Case Else
-            End Select
-            If proxy IsNot Nothing Then
-                Call proxy()
-                code = 0
-            End If
-        Catch ex As Exception
-        Finally
-            AppLaunch = code
-        End Try
+        Dim code = CheckAppDirectory()
+        If code = 998 Then
+            MsgBox("Error AppLaunch = 998")
+        End If
+        If code >= 996 Then
+            fds.Add(New DirectoryInfo(AppDirectoryModel._AppImageDirectory))
+        End If
+        If code >= 997 Then
+            fds.Add(New FileInfo(AppDirectoryModel.ModelFileName))
+        End If
+        If code >= 999 Then
+            fds.Add(New FileInfo(AppDirectoryModel.AppIniFileName))
+            fds.Add(New DirectoryInfo(AppDirectoryModel.AppDirectoryName))
+        End If
+
+        If fds.Count > 0 Then
+            Call _Make(fds)
+        End If
+
+        AppLaunch = code
     End Function
 
     Public Sub PushProject(ByVal project As ProjectInfoModel)
@@ -146,28 +174,14 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     End Sub
 
     Sub New()
-        Dim proxy As Action
-        Dim code As Integer : code = Me.CheckAppDirectory()
-
-        Select Case code
-            Case 0
-            Case 10
-            Case 99
-                proxy = [Delegate].Combine(
-                    New Action(AddressOf AppLaunch)
-                )
-        End Select
-
-        If proxy IsNot Nothing Then
-            Call proxy()
-        End If
+        Call AppLaunch()
     End Sub
 
     Public Sub Initialize()
         Dim bi As BitmapImage
         For Each p In Me.CurrentProjects
             If String.IsNullOrEmpty(p.ImageFileName) Then
-                p.ImageFileName = DBTEST_IMAGE_URL
+                p.ImageFileName = _DBTEST_IMAGE
             End If
             bi = New BitmapImage
             bi.BeginInit()

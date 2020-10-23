@@ -623,6 +623,10 @@
                 <Grid>
                 </Grid>
             </DataTemplate>
+            <DataTemplate DataType="MainFrameModel">
+                <Grid>
+                </Grid>
+            </DataTemplate>
         </Grid.Resources>
                     <ContentControl
                         x:Name="MenuFrame"
