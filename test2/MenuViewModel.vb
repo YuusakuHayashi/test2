@@ -5,11 +5,61 @@ Imports System.IO
 Public Class MenuViewModel
     Inherits BaseViewModel2
 
-    Public Overrides ReadOnly Property FrameType As String
+    'Public Overrides ReadOnly Property FrameType As String
+    '    Get
+    '        Return ViewModel.MENU_FRAME
+    '    End Get
+    'End Property
+
+    ' コマンドプロパティ（Ｐｒｏｊｅｃｔ設定画面表示）
+    '---------------------------------------------------------------------------------------------'
+    Private _ShowProjectSettingCommand As ICommand
+    Public ReadOnly Property ShowProjectSettingCommand As ICommand
         Get
-            Return ViewModel.MENU_FRAME
+            If Me._ShowProjectSettingCommand Is Nothing Then
+                Me._ShowProjectSettingCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _ShowProjectSettingCommandExecute,
+                    .CanExecuteHandler = AddressOf _ShowProjectSettingCommandCanExecute
+                }
+                Return Me._ShowProjectSettingCommand
+            Else
+                Return Me._ShowProjectSettingCommand
+            End If
         End Get
     End Property
+
+    Private Sub _CheckShowProjectSettingCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._ShowProjectSettingCommandEnableFlag = b
+    End Sub
+
+    Private __ShowProjectSettingCommandEnableFlag As Boolean
+    Public Property _ShowProjectSettingCommandEnableFlag As Boolean
+        Get
+            Return Me.__ShowProjectSettingCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__ShowProjectSettingCommandEnableFlag = value
+            RaisePropertyChanged("_ShowProjectSettingCommandEnableFlag")
+            CType(ShowProjectSettingCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _ShowProjectSettingCommandExecute(ByVal parameter As Object)
+        Dim v As ViewItemModel
+        v = AddViewItem(
+            AppInfo.ProjectInfo,
+            ViewModel.MULTI_VIEW,
+            MultiViewModel.MAIN_FRAME,
+            MultiViewModel.TAB_VIEW
+        )
+        Call AddView(v)
+    End Sub
+
+    Private Function _ShowProjectSettingCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._ShowProjectSettingCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを上書き）
     '---------------------------------------------------------------------------------------------'
@@ -46,11 +96,11 @@ Public Class MenuViewModel
     End Property
 
     Private Sub _ResaveProjectCommandExecute(ByVal parameter As Object)
-        Call Model.ModelSave(ProjectInfo.ModelFileName, Model)
-        Call ViewModel.ModelSave(ProjectInfo.ViewModelFileName, ViewModel)
-        Call ProjectInfo.ProjectSave()
-        Call AppInfo.PushProject(ProjectInfo)
-        Call AppInfo.AppSave()
+        Call ProjectModelSave()
+        Call ProjectViewModelSave()
+        Call ProjectSave()
+        Call PushProject(AppInfo.ProjectInfo)
+        Call AppSave()
     End Sub
 
     Private Function _ResaveProjectCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -111,13 +161,14 @@ Public Class MenuViewModel
             project = New ProjectInfoModel With {
                 .DirectoryName = [dir],
                 .Name = [root],
-                .Kind = ProjectInfo.Kind
+                .Kind = AppInfo.ProjectInfo.Kind
             }
             Call project.Launch()
-            Call jh.ModelSave(Of ProjectInfoModel)(project.ProjectInfoFileName, project)
-            Call jh.ModelSave(Of Model)(project.ModelFileName, Model)
-            AppInfo.CurrentProjects = StackModule.Push(Of ObservableCollection(Of ProjectInfoModel), ProjectInfoModel)(project, AppInfo.CurrentProjects, 5)
-            Call AppInfo.AppSave()
+            Call ProjectModelSave(project)
+            Call ProjectViewModelSave(project)
+            Call ProjectSave(project)
+            Call PushProject(project)
+            Call AppSave()
         End If
     End Sub
 
@@ -197,27 +248,28 @@ Public Class MenuViewModel
         ' 3 ... モデルが不正
         Select Case i
             Case 0
-                ProjectInfo = project.ModelLoad(project.ProjectInfoFileName)
-                AppInfo.PushProject(ProjectInfo)
-                Model = jh.ModelLoad(Of Model)(ProjectInfo.ModelFileName)
-                Call Model.Initialize(ProjectInfo)
-                Call Setup(Model, ViewModel, AppInfo, ProjectInfo)
+                Call ProjectLoad(project)
+                Call PushProject(project)
+                Call ProjectModelLoad()
+                Call ModelSetup()
+                Call ViewModelSetup()
             Case 1
-                'Call _DeleteProject(project)
-                Call AppInfo.AppSave()
+                Call AppSave()
             Case 2
             Case 3
         End Select
     End Sub
 
 
-    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
+    Public Overrides Sub Initialize(ByRef app As AppDirectoryModel,
+                                    ByRef vm As ViewModel)
         CheckCommandEnabledHandler = [Delegate].Combine(
             New Action(AddressOf _CheckOpenProjectCommandEnabled),
             New Action(AddressOf _CheckSaveProjectCommandEnabled),
-            New Action(AddressOf _CheckResaveProjectCommandEnabled)
+            New Action(AddressOf _CheckResaveProjectCommandEnabled),
+            New Action(AddressOf _CheckShowProjectSettingCommandEnabled)
         )
 
-        Call BaseInitialize(m, vm, adm, pim)
+        Call BaseInitialize(app, vm)
     End Sub
 End Class

@@ -91,7 +91,9 @@
     <Compile Include="DelegateAction.vb" />
     <Compile Include="MenuItemModel.vb" />
     <Compile Include="MenuViewModel.vb" />
+    <Compile Include="MultiViewModel.vb" />
     <Compile Include="NormalViewModel.vb" />
+    <Compile Include="SingleViewModel.vb" />
     <Compile Include="TabItemModel.vb" />
     <Compile Include="TabViewModel.vb" />
     <Compile Include="ViewController.vb" />

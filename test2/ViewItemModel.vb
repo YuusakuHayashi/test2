@@ -81,6 +81,16 @@ Public Class ViewItemModel
         End Set
     End Property
 
+    Private _LayoutType As String
+    Public Property LayoutType As String
+        Get
+            Return Me._LayoutType
+        End Get
+        Set(value As String)
+            Me._LayoutType = value
+        End Set
+    End Property
+
     Private _OpenState As Boolean
     Public Property OpenState As Boolean
         Get

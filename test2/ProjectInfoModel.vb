@@ -1,40 +1,77 @@
 ﻿Imports System.IO
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
+Imports System.ComponentModel
 
 Public Class ProjectInfoModel
     Inherits JsonHandler(Of ProjectInfoModel)
+    Implements INotifyPropertyChanged
+
+    '--- INortify -------------------------------------------------------------------------------------'
+    Public Event PropertyChanged As PropertyChangedEventHandler _
+        Implements INotifyPropertyChanged.PropertyChanged
+
+    Protected Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
+        RaiseEvent PropertyChanged(
+            Me, New PropertyChangedEventArgs(PropertyName)
+        )
+    End Sub
+    '--------------------------------------------------------------------------------------------------'
 
     Private Const SHIFT_JIS As String = "Shift-JIS"
 
-    Private _ImageFileName As String
-    Public Property ImageFileName As String
+    Private _Model As Model
+    <JsonIgnore>
+    Public Property Model As Model
         Get
-            Return _ImageFileName
+            If Me._Model Is Nothing Then
+                Me._Model = New Model
+            End If
+            Return _Model
         End Get
-        Set(value As String)
-            _ImageFileName = value
+        Set(value As Model)
+            _Model = value
         End Set
     End Property
 
-    Private _Image As BitmapImage
-    <JsonIgnore>
-    Public Property [Image] As BitmapImage
+    Private _IconFileName As String
+    Public Property IconFileName As String
         Get
-            Return _Image
+            Return _IconFileName
+        End Get
+        Set(value As String)
+            _IconFileName = value
+        End Set
+    End Property
+
+    Private _Icon As BitmapImage
+    <JsonIgnore>
+    Public Property [Icon] As BitmapImage
+        Get
+            Return _Icon
         End Get
         Set(value As BitmapImage)
-            _Image = value
+            _Icon = value
         End Set
     End Property
 
     Private _Index As Integer
-    Public Property [Index] As String
+    Public Property [Index] As Integer
         Get
             Return _Index
         End Get
-        Set(value As String)
+        Set(value As Integer)
             _Index = value
+        End Set
+    End Property
+
+    Private _FixedIndex As Integer
+    Public Property [FixedIndex] As Integer
+        Get
+            Return _FixedIndex
+        End Get
+        Set(value As Integer)
+            _FixedIndex = value
         End Set
     End Property
 
@@ -58,6 +95,16 @@ Public Class ProjectInfoModel
         End Set
     End Property
 
+    Private _LastUpdate As String
+    Public Property LastUpdate As String
+        Get
+            Return _LastUpdate
+        End Get
+        Set(value As String)
+            _LastUpdate = value
+        End Set
+    End Property
+
     Private _DirectoryName As String
     Public Property DirectoryName As String
         Get
@@ -68,11 +115,38 @@ Public Class ProjectInfoModel
         End Set
     End Property
 
-    ' プロジェクトのモデルファイルです
-    Public ReadOnly Property ModelFileName As String
+    Private _IsSelected As Boolean
+    Public Property IsSelected As Boolean
         Get
-            Return DirectoryName & "\Model.json"
+            Return _IsSelected
         End Get
+        Set(value As Boolean)
+            _IsSelected = value
+        End Set
+    End Property
+
+    Private _IsExpand As Boolean
+    Public Property IsExpand As Boolean
+        Get
+            Return _IsExpand
+        End Get
+        Set(value As Boolean)
+            _IsExpand = value
+        End Set
+    End Property
+
+    ' プロジェクトのモデルファイルです
+    Private _ModelFileName As String
+    Public Property ModelFileName As String
+        Get
+            If String.IsNullOrEmpty(Me._ModelFileName) Then
+                Me._ModelFileName = Me.DirectoryName & "\Model.json"
+            End If
+            Return Me._ModelFileName
+        End Get
+        Set(value As String)
+            Me._ModelFileName = value
+        End Set
     End Property
 
     ' プロジェクトがアプリケーションにより作成されたことを表すファイルです
@@ -82,23 +156,35 @@ Public Class ProjectInfoModel
         End Get
     End Property
 
-    Public ReadOnly Property ProjectInfoFileName As String
+    Private _ProjectInfoFileName As String
+    Public Property ProjectInfoFileName As String
         Get
-            Return DirectoryName & "\ProjectInfo.json"
+            If String.IsNullOrEmpty(Me._ProjectInfoFileName) Then
+                Me._ProjectInfoFileName = Me.DirectoryName & "\ProjectInfo.json"
+            End If
+            Return Me._ProjectInfoFileName
         End Get
+        Set(value As String)
+            Me._ProjectInfoFileName = value
+        End Set
     End Property
 
-    Public ReadOnly Property ViewModelFileName As String
+    Private _ViewModelFileName As String
+    Public Property ViewModelFileName As String
         Get
-            Return DirectoryName & "\ViewModel.json"
+            If String.IsNullOrEmpty(Me._ViewModelFileName) Then
+                Me._ViewModelFileName = Me.DirectoryName & "\ViewModel.json"
+            End If
+            Return Me._ViewModelFileName
         End Get
+        Set(value As String)
+            Me._ViewModelFileName = value
+        End Set
     End Property
 
-    Public Delegate Sub ProjectLaunchProxy()
-
-    Public Sub ProjectSave()
-        Me.ModelSave(Me.ProjectInfoFileName, Me)
-    End Sub
+    'Public Sub ProjectSave()
+    '    Me.ModelSave(Me.ProjectInfoFileName, Me)
+    'End Sub
 
     Private Sub CreateProjectDirectory()
         Try
@@ -236,5 +322,98 @@ Public Class ProjectInfoModel
         Call Me.CreateProjectIniFile()
         Call Me.CreateProjectInfoFile()
         Call Me.CreateProjectModelFile()
+    End Sub
+
+    ' コマンドプロパティ（Ｐｒｏｊｅｃｔをピン止め）
+    '---------------------------------------------------------------------------------------------'
+    Private _FixProjectCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property FixProjectCommand As ICommand
+        Get
+            If Me._FixProjectCommand Is Nothing Then
+                Me._FixProjectCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _FixProjectCommandExecute,
+                    .CanExecuteHandler = AddressOf _FixProjectCommandCanExecute
+                }
+                Return Me._FixProjectCommand
+            Else
+                Return Me._FixProjectCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckFixProjectCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._FixProjectCommandEnableFlag = b
+    End Sub
+
+    Private __FixProjectCommandEnableFlag As Boolean
+    Public Property _FixProjectCommandEnableFlag As Boolean
+        Get
+            Return Me.__FixProjectCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__FixProjectCommandEnableFlag = value
+            RaisePropertyChanged("_FixProjectCommandEnableFlag")
+            CType(FixProjectCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _FixProjectCommandExecute(ByVal parameter As Object)
+        Call DelegateEventListener.Instance.RaiseFixProjectRequested(Me)
+    End Sub
+
+    Private Function _FixProjectCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._FixProjectCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    ' コマンドプロパティ（Ｐｒｏｊｅｃｔのピン解除）
+    '---------------------------------------------------------------------------------------------'
+    Private _RemoveFixedProjectCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property RemoveFixedProjectCommand As ICommand
+        Get
+            If Me._RemoveFixedProjectCommand Is Nothing Then
+                Me._RemoveFixedProjectCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _RemoveFixedProjectCommandExecute,
+                    .CanExecuteHandler = AddressOf _RemoveFixedProjectCommandCanExecute
+                }
+                Return Me._RemoveFixedProjectCommand
+            Else
+                Return Me._RemoveFixedProjectCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckRemoveFixedProjectCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._RemoveFixedProjectCommandEnableFlag = b
+    End Sub
+
+    Private __RemoveFixedProjectCommandEnableFlag As Boolean
+    Public Property _RemoveFixedProjectCommandEnableFlag As Boolean
+        Get
+            Return Me.__RemoveFixedProjectCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__RemoveFixedProjectCommandEnableFlag = value
+            RaisePropertyChanged("_RemoveFixedProjectCommandEnableFlag")
+            CType(RemoveFixedProjectCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _RemoveFixedProjectCommandExecute(ByVal parameter As Object)
+        Call DelegateEventListener.Instance.RaiseRemoveFixedProjectRequested(Me)
+    End Sub
+
+    Private Function _RemoveFixedProjectCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._RemoveFixedProjectCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    Sub New()
+        Call _CheckFixProjectCommandEnabled()
+        Call _CheckRemoveFixedProjectCommandEnabled()
     End Sub
 End Class

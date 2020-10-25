@@ -15,94 +15,48 @@ Public Class Model
         End Set
     End Property
 
-    Public Sub DataSave(ByVal project As ProjectInfoModel)
-        Call Me.ModelSave(project.ModelFileName, Me)
-    End Sub
-
-    '-- ディクショナリでのモデル保持は現在廃止 ---------------------------------------------------'
-    '-- 使い道はありそうなので、残しておく -------------------------------------------------------'
-    'Private _DataDictionary As Dictionary(Of String, Object)
-    'Public Property DataDictionary As Dictionary(Of String, Object)
-    '    Get
-    '        Return Me._DataDictionary
-    '    End Get
-    '    Set(value As Dictionary(Of String, Object))
-    '        Me._DataDictionary = value
-    '    End Set
-    'End Property
-
-    '' そのモデルに対応するデータがない場合、
-    '' その格納用のメモリを確保します
-    'Private Sub _DictionaryCheck(ByVal view As String, ByVal nm As String)
-    '    If Me.DataDictionary Is Nothing Then
-    '        Me.DataDictionary = New Dictionary(Of String, Object)
-    '    End If
+    'Public Sub DataSave(ByVal project As ProjectInfoModel)
+    '    Call Me.ModelSave(project.ModelFileName, Me)
     'End Sub
 
-    '' モデルのディクショナリへの追加・更新を行います
-    'Public Overloads Sub SetData(ByVal modelName As String, ByRef data As Object)
-    '    If Me.DataDictionary Is Nothing Then
-    '        Me.DataDictionary = New Dictionary(Of String, Object)
-    '    End If
-    '    If Not Me.DataDictionary.ContainsKey(modelName) Then
-    '        Me.DataDictionary.Add(modelName, data)
-    '    Else
-    '        Me.DataDictionary(modelName) = data
-    '    End If
-    'End Sub
-    '---------------------------------------------------------------------------------------------'
-
-    ' AddProject時、Projectに必要なモデルをインスタンス化する
-    Public Sub Setup(ByVal project As ProjectInfoModel)
-        '-- you henkou --------------------------------'
-        Select Case project.Kind
-            Case AppDirectoryModel.DBTEST
-                Me.Data = New DBTestModel
-            Case Else
-        End Select
-        '----------------------------------------------'
-    End Sub
-
-    Private Sub _DataInitialize(Of T As {New})()
-        Dim obj As Object
-        If Me.Data IsNot Nothing Then
-            obj = Me.Data
-            Select Case obj.GetType
-                Case (New Object).GetType
-                    Me.Data = CType(obj, T)
-                Case (New JObject).GetType
-                    ' Ｊｓｏｎからロードした場合は、JObject型になっている
-                    Me.Data = obj.ToObject(Of T)
-                Case (New T).GetType
-                    Me.Data = obj
-            End Select
-        Else
-            Me.Data = New T
-        End If
-    End Sub
-
-    ' OpenProject、Selectプロジェクト時など、
-    ' 新たに追加されたオブジェクトメンバなどのインスタンス化を行う
-    'Public Sub Initialize(ByVal project As ProjectInfoModel)
+    '' AddProject時、Projectに必要なモデルをインスタンス化する
+    'Public Sub Setup(ByVal project As ProjectInfoModel)
     '    '-- you henkou --------------------------------'
     '    Select Case project.Kind
-    '        Case AppDirectoryModel.DB_TEST
-    '            Call Me._DataInitialize(Of DBTestModel)()
-    '            Call Me._DBTestModelInitialize()
+    '        Case AppDirectoryModel.DBTEST
+    '            Me.Data = New DBTestModel
     '        Case Else
     '    End Select
     '    '----------------------------------------------'
     'End Sub
 
-    Public Sub Initialize(ByVal project As ProjectInfoModel)
-        '-- you henkou --------------------------------'
-        Select Case project.Kind
-            Case AppDirectoryModel.DBTEST
-                Call Me._DataInitialize(Of DBTestModel)()
-            Case Else
-        End Select
-        '----------------------------------------------'
-    End Sub
+    'Private Sub _DataInitialize(Of T As {New})()
+    '    Dim obj As Object
+    '    If Me.Data IsNot Nothing Then
+    '        obj = Me.Data
+    '        Select Case obj.GetType
+    '            Case (New Object).GetType
+    '                Me.Data = CType(obj, T)
+    '            Case (New JObject).GetType
+    '                ' Ｊｓｏｎからロードした場合は、JObject型になっている
+    '                Me.Data = obj.ToObject(Of T)
+    '            Case (New T).GetType
+    '                Me.Data = obj
+    '        End Select
+    '    Else
+    '        Me.Data = New T
+    '    End If
+    'End Sub
+
+    'Public Sub Initialize(ByVal project As ProjectInfoModel)
+    '    '-- you henkou --------------------------------'
+    '    Select Case project.Kind
+    '        Case AppDirectoryModel.DBTEST
+    '            Call Me._DataInitialize(Of DBTestModel)()
+    '        Case Else
+    '    End Select
+    '    '----------------------------------------------'
+    'End Sub
 
     ' DBTestModel のオブジェクトの初期化
     'Private Sub _DBTestModelInitialize()

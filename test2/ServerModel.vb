@@ -1,98 +1,98 @@
 ﻿Imports System.Collections.ObjectModel
 
 Public Class ServerModel
-    Inherits BaseModel(Of ServerModel)
-    Implements TreeViewInterface
+    'Inherits BaseModel(Of ServerModel)
+    'Implements TreeViewInterface
 
-    ' ロード時の挙動の対応
-    ' 本来モデルに書きたくなかったが、妥協。改善案検討
-    Private _LoadState As Integer
+    '' ロード時の挙動の対応
+    '' 本来モデルに書きたくなかったが、妥協。改善案検討
+    'Private _LoadState As Integer
 
-    Private _Name As String
-    Public Property Name As String
-        Get
-            Return Me._Name
-        End Get
-        Set(value As String)
-            Me._Name = value
-            'RaisePropertyChanged("Name")
-        End Set
-    End Property
+    'Private _Name As String
+    'Public Property Name As String
+    '    Get
+    '        Return Me._Name
+    '    End Get
+    '    Set(value As String)
+    '        Me._Name = value
+    '        'RaisePropertyChanged("Name")
+    '    End Set
+    'End Property
 
-    Private _DataBases As ObservableCollection(Of DataBaseModel)
-    Public Property DataBases As ObservableCollection(Of DataBaseModel)
-        Get
-            Return Me._DataBases
-        End Get
-        Set(value As ObservableCollection(Of DataBaseModel))
-            Me._DataBases = value
-            RaisePropertyChanged("DataBases")
-        End Set
-    End Property
+    'Private _DataBases As ObservableCollection(Of DataBaseModel)
+    'Public Property DataBases As ObservableCollection(Of DataBaseModel)
+    '    Get
+    '        Return Me._DataBases
+    '    End Get
+    '    Set(value As ObservableCollection(Of DataBaseModel))
+    '        Me._DataBases = value
+    '        RaisePropertyChanged("DataBases")
+    '    End Set
+    'End Property
 
-    Private _IsChecked As Boolean
-    Public Property IsChecked As Boolean Implements TreeViewInterface.IsChecked
-        Get
-            Return Me._IsChecked
-        End Get
-        Set(value As Boolean)
-            ' ロードした場合には子要素を更新させない
-            If Me._LoadState > 0 Then
-                Call CheckingChildren(Of DataBaseModel)(DataBases, value)
-            End If
-            Me._LoadState += 1
-            Me._IsChecked = value
-            RaisePropertyChanged("IsChecked")
-        End Set
-    End Property
-
-
-    Private _IsExpanded As Boolean
-    Public Property IsExpanded As Boolean
-        Get
-            Return Me._IsExpanded
-        End Get
-        Set(value As Boolean)
-            Me._IsExpanded = value
-            RaisePropertyChanged("IsExpanded")
-        End Set
-    End Property
+    'Private _IsChecked As Boolean
+    'Public Property IsChecked As Boolean Implements TreeViewInterface.IsChecked
+    '    Get
+    '        Return Me._IsChecked
+    '    End Get
+    '    Set(value As Boolean)
+    '        ' ロードした場合には子要素を更新させない
+    '        If Me._LoadState > 0 Then
+    '            Call CheckingChildren(Of DataBaseModel)(DataBases, value)
+    '        End If
+    '        Me._LoadState += 1
+    '        Me._IsChecked = value
+    '        RaisePropertyChanged("IsChecked")
+    '    End Set
+    'End Property
 
 
-    Private _IsEnabled As Boolean
-    Public Property IsEnabled As Boolean Implements TreeViewInterface.IsEnabled
-        Get
-            Return Me._IsEnabled
-        End Get
-        Set(value As Boolean)
-            Me._IsEnabled = value
-        End Set
-    End Property
+    'Private _IsExpanded As Boolean
+    'Public Property IsExpanded As Boolean
+    '    Get
+    '        Return Me._IsExpanded
+    '    End Get
+    '    Set(value As Boolean)
+    '        Me._IsExpanded = value
+    '        RaisePropertyChanged("IsExpanded")
+    '    End Set
+    'End Property
 
-    'Sub MemberCheck()
-    '    '
-    '    If String.IsNullOrEmpty(Me.Name) Then
-    '        Me.Name = vbNullString
-    '    End If
 
-    '    '
-    '    If Me.DataBases Is Nothing Then
-    '        Me.DataBases = New ObservableCollection(Of DataBaseModel)
-    '    End If
+    'Private _IsEnabled As Boolean
+    'Public Property IsEnabled As Boolean Implements TreeViewInterface.IsEnabled
+    '    Get
+    '        Return Me._IsEnabled
+    '    End Get
+    '    Set(value As Boolean)
+    '        Me._IsEnabled = value
+    '    End Set
+    'End Property
 
-    '    '
-    '    If Me.IsChecked = Nothing Then
-    '        Me.IsChecked = False
-    '    End If
+    ''Sub MemberCheck()
+    ''    '
+    ''    If String.IsNullOrEmpty(Me.Name) Then
+    ''        Me.Name = vbNullString
+    ''    End If
 
-    '    '
-    '    If Me.IsEnabled = Nothing Then
-    '        Me.IsEnabled = False
-    '    End If
-    'End Sub
+    ''    '
+    ''    If Me.DataBases Is Nothing Then
+    ''        Me.DataBases = New ObservableCollection(Of DataBaseModel)
+    ''    End If
 
-    'Sub New()
-    '    Me.IsChecked = vbNull
-    'End Sub
+    ''    '
+    ''    If Me.IsChecked = Nothing Then
+    ''        Me.IsChecked = False
+    ''    End If
+
+    ''    '
+    ''    If Me.IsEnabled = Nothing Then
+    ''        Me.IsEnabled = False
+    ''    End If
+    ''End Sub
+
+    ''Sub New()
+    ''    Me.IsChecked = vbNull
+    ''End Sub
 End Class
 

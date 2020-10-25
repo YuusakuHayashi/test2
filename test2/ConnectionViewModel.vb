@@ -8,11 +8,11 @@ Public Class ConnectionViewModel
     Private Const _SUCCESS_MESSAGE As String = "接続に成功しました。"
     Private Const _NOCONNECTION As String = "まだ接続が成功していません。接続を定義してください"
 
-    Public Overrides ReadOnly Property FrameType As String
-        Get
-            Return ViewModel.MAIN_FRAME
-        End Get
-    End Property
+    'Public Overrides ReadOnly Property FrameType As String
+    '    Get
+    '        Return ViewModel.MAIN_FRAME
+    '    End Get
+    'End Property
 
     Private _ServerName As String
     Public Property ServerName As String
@@ -21,7 +21,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ServerName = value
-            Model.Data.ServerName = value
+            AppInfo.ProjectInfo.Model.Data.ServerName = value
             RaisePropertyChanged("ServerName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -35,7 +35,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._DataBaseName = value
-            Model.Data.DataBaseName = value
+            AppInfo.ProjectInfo.Model.Data.DataBaseName = value
             RaisePropertyChanged("DataBaseName")
             Call _GetConnectionString()
             Call _CheckConnectionCommandEnabled()
@@ -59,7 +59,7 @@ Public Class ConnectionViewModel
         End Get
         Set(value As String)
             Me._ConnectionString = value
-            Model.Data.ConnectionString = value
+            AppInfo.ProjectInfo.Model.Data.ConnectionString = value
             RaisePropertyChanged("ConnectionString")
             Call _GetOtherProperty()
         End Set
@@ -162,25 +162,22 @@ Public Class ConnectionViewModel
 
     ' コマンド実行（接続確認）
     Private Sub _ConnectionCommandExecute(ByVal parameter As Object)
-        Dim i As Integer : i = -1
-        Dim a = Sub()
-                    Call Model.DataSave(ProjectInfo)
-                End Sub
-        Dim sh As New SqlHandler With {
-            .ConnectionString = Me.ConnectionString
-        }
-        Dim da As New DelegateAction With {
-            .CanExecuteHandler = AddressOf sh.AccessTest,
-            .ExecuteHandler = a
-        }
-        Select Case da.ExecuteIfCan(Nothing)
-            Case 0
-                Me.ConnectionMessage = _SUCCESS_MESSAGE
-                Me.InitializeMessage = vbNullString
-            Case 1000
-                Me.ConnectionMessage = sh.Message
-            Case Else
-        End Select
+        'Dim i As Integer : i = -1
+        'Dim sh As New SqlHandler With {
+        '    .ConnectionString = Me.ConnectionString
+        '}
+        'Dim da As New DelegateAction With {
+        '    .CanExecuteHandler = AddressOf sh.AccessTest,
+        '    .ExecuteHandler =
+        '}
+        'Select Case da.ExecuteIfCan(Nothing)
+        '    Case 0
+        '        Me.ConnectionMessage = _SUCCESS_MESSAGE
+        '        Me.InitializeMessage = vbNullString
+        '    Case 1000
+        '        Me.ConnectionMessage = sh.Message
+        '    Case Else
+        'End Select
     End Sub
 
     Private Function _ConnectionCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -191,16 +188,16 @@ Public Class ConnectionViewModel
         Dim i = 0
         Dim b = False
         Dim sh As SqlHandler
-        If Model.Data.ConnectionString <> Nothing Then
-            Me.ConnectionString = Model.Data.ConnectionString
+        If AppInfo.ProjectInfo.Model.Data.ConnectionString <> Nothing Then
+            Me.ConnectionString = AppInfo.ProjectInfo.Model.Data.ConnectionString
             i += 1
         End If
-        If Model.Data.ServerName <> Nothing Then
-            Me.ServerName = Model.Data.ServerName
+        If AppInfo.ProjectInfo.Model.Data.ServerName <> Nothing Then
+            Me.ServerName = AppInfo.ProjectInfo.Model.Data.ServerName
             i += 1
         End If
-        If Model.Data.DataBaseName <> Nothing Then
-            Me.DataBaseName = Model.Data.DataBaseName
+        If AppInfo.ProjectInfo.Model.Data.DataBaseName <> Nothing Then
+            Me.DataBaseName = AppInfo.ProjectInfo.Model.Data.DataBaseName
             i += 1
         End If
         If i >= 3 Then
@@ -216,12 +213,13 @@ Public Class ConnectionViewModel
         End If
     End Sub
 
-    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
+    Public Overrides Sub Initialize(ByRef app As AppDirectoryModel,
+                                    ByRef vm As ViewModel)
         InitializeHandler = AddressOf _ViewInitialize
         CheckCommandEnabledHandler = [Delegate].Combine(
             New Action(AddressOf _CheckConnectionCommandEnabled)
         )
 
-        Call BaseInitialize(m, vm, adm, pim)
+        Call BaseInitialize(app, vm)
     End Sub
 End Class

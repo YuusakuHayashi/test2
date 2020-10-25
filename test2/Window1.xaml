@@ -7,12 +7,27 @@
         mc:Ignorable="d"
         Title="Window1" Height="500" Width="800">
     <Grid>
-        <StackPanel 
-            Orientation="Horizontal">
-            <TextBox
-                Margin="5,3,3,3"                        
-                Text="AAAAAAAAAAA"
-                BorderThickness="0,0,0,0" />
-        </StackPanel>
+        <!--<Grid.Resources>
+            <DataTemplate DataType="{x:Type local:ViewContents}">
+                <TextBlock Text="{Binding ModelName}" />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:ViewModelA}">
+                <StackPanel 
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    Background="Beige">
+                    <ContentControl Content="{Binding Content}" />
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:ViewModelB}">
+                <StackPanel 
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    Background="LightCyan">
+                    <ContentControl Content="{Binding Content}" />
+                </StackPanel>
+            </DataTemplate>
+        </Grid.Resources>
+        <ContentControl Content="{Binding Content}" />-->
     </Grid>
 </Window>

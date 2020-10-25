@@ -1,18 +1,14 @@
 ﻿Public Class ViewController : Inherits BaseViewModel2
 
-    Public Overrides ReadOnly Property FrameType As String
-        Get
-            Return Nothing
-        End Get
-    End Property
-
-    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
+    Public Overrides Sub Initialize(ByRef adm As AppDirectoryModel,
+                                    ByRef vm As ViewModel)
         Me.[AddHandler] = [Delegate].Combine(
             New Action(AddressOf _TabCloseAddHandler),
             New Action(AddressOf _OpenViewAddHandler)
         )
-        Call BaseInitialize(m, vm, adm, pim)
+        Call BaseInitialize(adm, vm)
     End Sub
+
 
     '--- タブを閉じる関連 ------------------------------------------------------------------------'
     Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
@@ -47,7 +43,7 @@
         Dim idx = ViewModel.Views.IndexOf(v)
         ViewModel.Views(idx).OpenState = True
         obj = GetViewOfName(ViewModel.Views(idx).Name)
-        Call obj.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
+        Call obj.Initialize(AppInfo, ViewModel)
         ViewModel.Views(idx).Content = obj
         Call Me.AddView(ViewModel.Views(idx))
     End Sub

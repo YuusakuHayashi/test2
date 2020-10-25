@@ -13,11 +13,11 @@ Public Class HistoryViewModel
         End Set
     End Property
 
-    Public Overrides ReadOnly Property FrameType As String
-        Get
-            Return ViewModel.HISTORY_FRAME
-        End Get
-    End Property
+    'Public Overrides ReadOnly Property FrameType As String
+    '    Get
+    '        Return ViewModel.HISTORY_FRAME
+    '    End Get
+    'End Property
     'Inherits BaseViewModel2(Of Object)
     '    Inherits ProjectBaseViewModel(Of HistoryViewModel)
 
@@ -125,12 +125,13 @@ Public Class HistoryViewModel
     '        Initializing(m, vm, ccep2, ahp2)
     '    End Sub
     Private Sub _ViewInitialize()
-        Me.History = Model.Data.History
+        Me.History = AppInfo.ProjectInfo.Model.Data.History
     End Sub
 
-    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
+    Public Overrides Sub Initialize(ByRef app As AppDirectoryModel,
+                                    ByRef vm As ViewModel)
         InitializeHandler = AddressOf _ViewInitialize
 
-        Call BaseInitialize(m, vm, adm, pim)
+        Call BaseInitialize(app, vm)
     End Sub
 End Class

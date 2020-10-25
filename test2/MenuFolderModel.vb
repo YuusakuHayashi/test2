@@ -49,29 +49,29 @@ Public Class MenuFolderModel
 
 
     ' コレクションのセット
-    Private Sub _MenusUpdate()
-        Dim flg As Boolean
-        For Each vdic In _PrivateViewModel.ContentDictionary
-            For Each c In vdic.Value
-                flg = True
-                For Each m In Me.Menus
-                    If m.Name = c.Key Then
-                        flg = False
-                    End If
-                Next
+    'Private Sub _MenusUpdate()
+    '    Dim flg As Boolean
+    '    For Each vdic In _PrivateViewModel.ContentDictionary
+    '        For Each c In vdic.Value
+    '            flg = True
+    '            For Each m In Me.Menus
+    '                If m.Name = c.Key Then
+    '                    flg = False
+    '                End If
+    '            Next
 
-                If flg Then
-                    Me.Menus.Add(
-                        New _MenuModel With {
-                            .ViewName = vdic.Key,
-                            .Name = c.Key,
-                            .DisplayName = c.Key
-                        }
-                    )
-                End If
-            Next
-        Next
-    End Sub
+    '            If flg Then
+    '                Me.Menus.Add(
+    '                    New _MenuModel With {
+    '                        .ViewName = vdic.Key,
+    '                        .Name = c.Key,
+    '                        .DisplayName = c.Key
+    '                    }
+    '                )
+    '            End If
+    '        Next
+    '    Next
+    'End Sub
 
 
     ' 変更要求購読
@@ -105,11 +105,11 @@ Public Class MenuFolderModel
 
 
     ' メンバーチェック
-    Public Overloads Sub MemberCheck(ByRef vm As ViewModel)
-        Me._MenusCheck()
-        Me._PrivateViewModel = vm
-        Me._MenusUpdate()
-    End Sub
+    'Public Overloads Sub MemberCheck(ByRef vm As ViewModel)
+    '    Me._MenusCheck()
+    '    Me._PrivateViewModel = vm
+    '    Me._MenusUpdate()
+    'End Sub
 
     Sub New()
     End Sub

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:test2"
         mc:Ignorable="d"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-        Title="Window" Height="450" Width="800">
+        Title="Window" Height="500" Width="1000">
     <Window.Resources>
         <Style TargetType="TreeViewItem">
             <Setter Property="Template">
@@ -171,17 +171,6 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="25" />
-            <RowDefinition Height="300" />
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
         <Grid.Resources>
             <!-- タブで表示するタイプ -->
             <DataTemplate
@@ -195,7 +184,7 @@
                                 Orientation="Horizontal">
                                 <TextBlock                                     
                                     Width="75"                                    
-                                    Text="{Binding Name}" 
+                                    Text="{Binding Alias}" 
                                     TextTrimming="CharacterEllipsis"  />
                                 <Button 
                                     FontSize="4"
@@ -225,35 +214,133 @@
                 DataType="{x:Type local:UserDirectoryViewModel}">
                 <DockPanel>
                     <StackPanel
+                        Margin="10,0,0,0"
                         DockPanel.Dock="Left">
-                        <TextBlock Text="プロジェクト" />
+                        <TextBlock 
+                            Margin="0,10,0,0"
+                            FontSize="14"
+                            Text="Open Project" />
+                        <TextBlock
+                            FontSize="10"
+                            Margin="10,10,0,0"
+                            FontWeight="Bold"
+                            Text="固定されたプロジェクト" />
                         <ListBox
+                            Width="350"
+                            DockPanel.Dock="Top"
+                            SelectedItem="{Binding SelectedProject}"
+                            BorderThickness="0,0,0,0"                            
+                            ItemsSource="{Binding FixedProjects}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel
+                                        Margin="10,0,0,0"
+                                        Orientation="Horizontal">
+                                        <Image
+                                            Height="30" Width="30"
+                                            Source="{Binding Icon}"
+                                            Stretch="UniformToFill" />
+                                        <StackPanel
+                                            Margin="10,0,0,0"
+                                            Orientation="Vertical">
+                                            <DockPanel VerticalAlignment="Stretch">
+                                                <TextBlock 
+                                                    DockPanel.Dock="Left"
+                                                    FontSize="14"
+                                                    FontWeight="Bold"
+                                                    Text="{Binding Name}" />
+                                                <Button 
+                                                    Command="{Binding RemoveFixedProjectCommand}"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Right"
+                                                    Content="&lt;"                                                    
+                                                    FontSize="8"
+                                                    Width="10"
+                                                    Height="10" 
+                                                    BorderThickness="0" 
+                                                    Padding="0" />
+                                            </DockPanel>
+                                            <StackPanel
+                                                Orientation="Horizontal">
+                                                <TextBlock
+                                                    Width="200"
+                                                    FontSize="10"
+                                                    Foreground="Gray"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    Text="{Binding DirectoryName}" />
+                                                <TextBlock
+                                                    Margin="20,0,0,0"
+                                                    Width="50"                                                                                                         
+                                                    FontSize="10"
+                                                    Foreground="Gray"
+                                                    Text="{Binding LastUpdate}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <behaviors:Interaction.Triggers>
+                                <behaviors:EventTrigger 
+                                    EventName="MouseDoubleClick">
+                                    <behaviors:InvokeCommandAction Command="{Binding SelectProjectCommand}" />
+                                </behaviors:EventTrigger>
+                            </behaviors:Interaction.Triggers>
+                        </ListBox>
+                        <TextBlock
+                            FontSize="10"
+                            Margin="10,10,0,0"
+                            FontWeight="Bold"
+                            Text="最近開いたプロジェクト" />
+                        <ListBox
+                            Width="350"
                             DockPanel.Dock="Top"
                             SelectedItem="{Binding SelectedProject}"
                             BorderThickness="0,0,0,0"                            
                             ItemsSource="{Binding CurrentProjects}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel                                        
-                                        Orientation="Horizontal"
-                                        Width="200">
+                                    <StackPanel
+                                        Margin="10,0,0,0"
+                                        Orientation="Horizontal">
                                         <Image
                                             Height="30" Width="30"
-                                            Source="{Binding Image}"
+                                            Source="{Binding Icon}"
                                             Stretch="UniformToFill" />
                                         <StackPanel
+                                            Margin="10,0,0,0"
                                             Orientation="Vertical">
-                                            <TextBlock 
-                                                Margin="10,0,0,0"
-                                                FontSize="14"
-                                                FontWeight="Bold"
-                                                Text="{Binding Name}" />
-                                            <TextBlock
-                                                Margin="10,0,0,0"
-                                                FontSize="10"
-                                                Foreground="Gray"
-                                                TextWrapping="WrapWithOverflow"
-                                                Text="{Binding DirectoryName}" />
+                                            <DockPanel VerticalAlignment="Stretch">
+                                                <TextBlock 
+                                                    DockPanel.Dock="Left"
+                                                    FontSize="14"
+                                                    FontWeight="Bold"
+                                                    Text="{Binding Name}" />
+                                                <Button 
+                                                    Command="{Binding FixProjectCommand}"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Right"
+                                                    Content=">"                                                    
+                                                    FontSize="8"
+                                                    Width="10"
+                                                    Height="10" 
+                                                    BorderThickness="0" 
+                                                    Padding="0" />
+                                            </DockPanel>
+                                            <StackPanel
+                                                Orientation="Horizontal">
+                                                <TextBlock
+                                                    Width="200"
+                                                    FontSize="10"
+                                                    Foreground="Gray"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    Text="{Binding DirectoryName}" />
+                                                <TextBlock
+                                                    Margin="20,0,0,0"
+                                                    Width="50"                                                                                                         
+                                                    FontSize="10"
+                                                    Foreground="Gray"
+                                                    Text="{Binding LastUpdate}" />
+                                            </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
@@ -267,63 +354,173 @@
                         </ListBox>
                     </StackPanel>
                     <StackPanel
-                        Orientation="Horizontal"
-                        DockPanel.Dock="Top">
+                        Margin="30,0,0,0"
+                        Orientation="Vertical">
                         <TextBlock 
-                            Text="プロジェクトの種類" />
-                        <ComboBox
-                            SelectedIndex="0"
-                            SelectedValue="{Binding ProjectKind}"
-                            ItemsSource="{Binding ProjectKindList}" />
-                    </StackPanel>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        DockPanel.Dock="Top">
-                        <TextBlock 
-                            Text="ディレクトリ名" />
-                        <TextBox 
-                            Width="250"
-                            Text="{Binding UserDirectoryName}" />
-                        <Button 
-                            Content="..."
-                            Command="{Binding InputBoxCommand}"/>
-                    </StackPanel>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        DockPanel.Dock="Top">
-                        <TextBlock Text="プロジェクト名" />
-                        <TextBox 
-                            Width="250"
-                            Text="{Binding ProjectName}" />
-                    </StackPanel>
-                    <StackPanel
-                        DockPanel.Dock="Top">
-                        <TextBlock Text="{Binding ProjectDirectoryName}" />
-                    </StackPanel>
-                    <StackPanel
-                        HorizontalAlignment="Stretch"
-                        DockPanel.Dock="Top">
+                            Margin="0,10,0,0"
+                            FontSize="14"
+                            Text="New Project" />
                         <StackPanel
+                            Margin="0,10,0,0"
                             Orientation="Horizontal"
-                            HorizontalAlignment="Right">
-                            <Button
-                                x:Name="OpenProjectButton"
-                                Content="開く"
-                                Command="{Binding OpenProjectCommand}"/>
-                            <Button
-                                Content="作成"
-                                Command="{Binding AddProjectCommand}"/>
+                            DockPanel.Dock="Top">
+                            <TextBlock 
+                                Width="100"
+                                Text="プロジェクトの種類" />
+                            <ComboBox
+                                Width="250"
+                                SelectedIndex="0"
+                                SelectedValue="{Binding ProjectKind}"
+                                ItemsSource="{Binding ProjectKindList}" />
                         </StackPanel>
-                    </StackPanel>
-                    <StackPanel
-                        DockPanel.Dock="Top">
-                        <TextBlock
-                            Text="{Binding Message}"/>
+                        <StackPanel
+                            Margin="0,5,0,0"
+                            Orientation="Horizontal"
+                            DockPanel.Dock="Top">
+                            <TextBlock 
+                                Width="100"
+                                Text="ディレクトリ名" />
+                            <TextBox 
+                                Width="250"
+                                Text="{Binding UserDirectoryName}" />
+                            <Button 
+                                Width="20"
+                                Content=". . ."
+                                Command="{Binding InputBoxCommand}"/>
+                        </StackPanel>
+                        <StackPanel
+                            Margin="0,5,0,0"
+                            Orientation="Horizontal"
+                            DockPanel.Dock="Top">
+                            <TextBlock 
+                                Width="100"
+                                Text="プロジェクト名" />
+                            <TextBox 
+                                Width="250"
+                                Text="{Binding ProjectName}" />
+                        </StackPanel>
+                        <StackPanel
+                            DockPanel.Dock="Top">
+                            <TextBlock 
+                                Margin="100,0,0,0"
+                                Text="{Binding ProjectDirectoryName}" />
+                        </StackPanel>
+                        <StackPanel
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Stretch"
+                            DockPanel.Dock="Top">
+                            <StackPanel
+                                Margin="250,0,0,0"
+                                Orientation="Horizontal">
+                                <Button
+                                    Width="50"
+                                    Height="25"
+                                    Content="開く"
+                                    Command="{Binding OpenProjectCommand}"/>
+                                <Button
+                                    Width="50"
+                                    Height="25"
+                                    Content="作成"
+                                    Command="{Binding AddProjectCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel
+                            DockPanel.Dock="Top">
+                            <TextBlock
+                                Text="{Binding Message}"/>
+                        </StackPanel>
                     </StackPanel>
                 </DockPanel>
             </DataTemplate>
 
             <DataTemplate
+                DataType="{x:Type local:ProjectInfoModel}">
+                <StackPanel Margin="10,0,0,0">
+                    <Label 
+                        HorizontalAlignment="Right"
+                        Background="Gray"
+                        Foreground="White"
+                        FontWeight="bold"
+                        Content="{Binding Name}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock 
+                            Width="150"
+                            Text="プロジェクト名" />
+                        <TextBox
+                            Margin="10,0,0,0"
+                            Width="400"
+                            Text="{Binding Name}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Margin="0,10,0,0">
+                        <TextBlock 
+                            Width="150"
+                            Text="プロジェクトディレクトリ" />
+                        <TextBox
+                            Margin="10,0,0,0"
+                            Width="400"
+                            Text="{Binding DirectoryName}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Margin="0,10,0,0">
+                        <TextBlock 
+                            Width="150"
+                            Text="プロジェクト種類" />
+                        <TextBlock
+                            Margin="10,0,0,0"
+                            Width="400"
+                            Text="{Binding Kind}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Margin="0,10,0,0">
+                        <TextBlock 
+                            Width="150"
+                            Text="プロジェクトアイコン" />
+                        <TextBox
+                            Margin="10,0,0,0"
+                            Width="400"
+                            Text="{Binding IconFileName}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Margin="0,10,0,0">
+                        <TextBlock 
+                            Width="150"
+                            Text="Project Information File" />
+                        <TextBox
+                            Margin="10,0,0,0"
+                            Width="400"
+                            Text="{Binding ProjectInfoFileName}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Margin="0,10,0,0">
+                        <TextBlock 
+                            Width="150"
+                            Text="Model File" />
+                        <TextBox
+                            Margin="10,0,0,0"
+                            Width="400"
+                            Text="{Binding ModelFileName}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Margin="0,10,0,0">
+                        <TextBlock 
+                            Width="150"
+                            Text="ViewModel File" />
+                        <TextBox
+                            Margin="10,0,0,0"
+                            Width="400"
+                            Text="{Binding ViewModelFileName}" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+
+            <!--<DataTemplate
                 DataType="{x:Type local:ConnectionViewModel}">
                 <StackPanel>
                     <StackPanel 
@@ -378,7 +575,7 @@
                             Width="100" />
                     </StackPanel>
                 </StackPanel>
-            </DataTemplate>
+            </DataTemplate>-->
 
             <HierarchicalDataTemplate
                 DataType="{x:Type local:ServerModel}"
@@ -532,6 +729,49 @@
                 </DockPanel>
             </DataTemplate>
 
+            <DataTemplate                
+                DataType="{x:Type local:AppDirectoryModel}">
+                <DockPanel
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    LastChildFill="True">
+                    <StackPanel 
+                        DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                        <!--<Button
+                            Template="{StaticResource DBReLoadButton}"
+                            Command="{Binding DBLoadCommand}" />
+                        <Button
+                            Template="{StaticResource SaveButton}"
+                            Command="{Binding SaveCommand}" />-->
+                    </StackPanel>
+
+                    <TreeView
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.HorizontalScrollBarVisibility="Visible"                        
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        BorderThickness="0,0,0,0">
+                        <TreeViewItem
+                            FontSize="11"
+                            Header="Projects"
+                            ItemsSource="{Binding CurrentProjects}">
+                            <TreeViewItem.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                                </Style>
+                            </TreeViewItem.ItemContainerStyle>
+                            <TreeViewItem.ItemTemplate>
+                                <HierarchicalDataTemplate DataType="{x:Type local:ProjectInfoModel}">
+                                    <TextBlock Text="{Binding Name}" />
+                                </HierarchicalDataTemplate>
+                            </TreeViewItem.ItemTemplate>
+                        </TreeViewItem>
+                    </TreeView>
+                </DockPanel>
+            </DataTemplate>
+
             <ContextMenu x:Key="ViewItemContextMenu">
                 <MenuItem 
                     Header="名前の変更"
@@ -579,6 +819,63 @@
             </DataTemplate>
 
             <DataTemplate
+                DataType="{x:Type local:ConnectionViewModel}">
+                <StackPanel>
+                    <StackPanel 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                        <TextBlock 
+                            Text="{Binding InitializeMessage}" 
+                            Width="500" />
+                        <StackPanel 
+                            Orientation="Horizontal" >
+                            <TextBlock 
+                                Text="サーバ名" 
+                                Width="100"/>
+                            <TextBox 
+                                Text="{Binding ServerName}"
+                                Width="300" />
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding ServerNameError}"/>
+                        <StackPanel 
+                            Orientation="Horizontal" >
+                            <TextBlock 
+                                Text="データベース名"
+                                Width="100"/>
+                            <TextBox
+                                Text="{Binding DataBaseName}"
+                                Width="300"/>
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding DataBaseNameError}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock 
+                                Text="接続文字列"
+                                Width="100"/>
+                            <TextBox
+                                Text="{Binding ConnectionString}"
+                                Width="300"/>
+                        </StackPanel>
+                        <TextBlock 
+                            Text="{Binding ConnectionStringError}"/>
+                    </StackPanel>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Right">
+                        <Button
+                            Command="{Binding ConnectionCommand}"
+                            Content="Connection"
+                            Width="100" />
+                        <Button
+                            Content="Close" 
+                            Width="100" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate
                 DataType="{x:Type local:MenuViewModel}">
                 <StackPanel 
                     Grid.Row="0" 
@@ -614,27 +911,42 @@
                             Header="プロジェクト(P)"
                             Background="Transparent"
                             BorderBrush="Transparent"
-                            Margin="0,0,5,0" />
+                            Margin="0,0,5,0">
+                            <MenuItem 
+                                Header="プロジェクトの設定"
+                                Command="{Binding ShowProjectSettingCommand}" />
+                        </MenuItem>
                     </Menu>
                 </StackPanel>
             </DataTemplate>
 
-            <DataTemplate DataType="MainFrameModel">
+            <DataTemplate DataType="{x:Type local:SingleViewModel}">
                 <Grid>
-                </Grid>
-            </DataTemplate>
-            <DataTemplate DataType="MainFrameModel">
-                <Grid>
-                </Grid>
-            </DataTemplate>
-        </Grid.Resources>
                     <ContentControl
-                        x:Name="MenuFrame"
+                        Content="{Binding Content}" />
+                </Grid>
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type local:MultiViewModel}">
+                <Grid>
+                    <Grid.Resources>
+                    </Grid.Resources>                   
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="300" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ContentControl
                         Grid.Row="0"
                         Grid.Column="0" Grid.ColumnSpan="3"
                         Content="{Binding MenuViewContent}" />
                     <ContentControl
-                        x:Name="ExplorerFlame"
                         Grid.Row="1" Grid.RowSpan="3"
                         Grid.Column="0"
                         Content="{Binding ExplorerViewContent}" />
@@ -648,8 +960,7 @@
                         HorizontalAlignment="Stretch" />
                     <ContentControl
                         Grid.Row="1"            
-                        Grid.Column="2"
-                        x:Name="MainFlame"                
+                        Grid.Column="2"              
                         Content="{Binding MainViewContent}" />
                     <GridSplitter
                         Grid.Row="2"
@@ -661,8 +972,11 @@
                         HorizontalAlignment="Stretch" />
                     <ContentControl
                         Grid.Row="3"
-                        Grid.Column="2"
-                        x:Name="HistoryFlame"                
+                        Grid.Column="2"           
                         Content="{Binding HistoryViewContent}" />
+                </Grid>
+            </DataTemplate>
+        </Grid.Resources>
+        <ContentControl Content="{Binding Content}" />
     </Grid>
 </Window>

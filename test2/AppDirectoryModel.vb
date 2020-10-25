@@ -1,8 +1,8 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.IO
+Imports Newtonsoft.Json
 
 Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
-'Public Class AppDirectoryModel
     ' この静的メンバはアプリケーションディレクトリを表します
     Public Shared AppDirectoryName _
         = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\hys"
@@ -18,12 +18,6 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     Private Shared _AppImageDirectory _
         = AppDirectoryModel.AppDirectoryName & "\Image"
 
-    Public Sub AppSave()
-        Call Me.ModelSave(
-            AppDirectoryModel.ModelFileName, Me
-        )
-    End Sub
-
     Private Shared _DBTEST_IMAGE As String _
         = _AppImageDirectory & "\rpa.ico"
 
@@ -34,15 +28,19 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
             DBTEST
         }
 
-    Private Sub _AssignProjectIndex(ByRef project As ProjectInfoModel)
-        Dim idx = 1
-        For Each p In Me.CurrentProjects
-            If p.[Index] = idx Then
-                idx += 1
+    Private _ProjectInfo As ProjectInfoModel
+    <JsonIgnore>
+    Public Property ProjectInfo As ProjectInfoModel
+        Get
+            If Me._ProjectInfo Is Nothing Then
+                Me._ProjectInfo = New ProjectInfoModel
             End If
-        Next
-        project.[Index] = idx
-    End Sub
+            Return _ProjectInfo
+        End Get
+        Set(value As ProjectInfoModel)
+            _ProjectInfo = value
+        End Set
+    End Property
 
     Private Sub CreateAppDirectory()
         Try
@@ -72,6 +70,9 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     Private _CurrentProjects As ObservableCollection(Of ProjectInfoModel)
     Public Property CurrentProjects As ObservableCollection(Of ProjectInfoModel)
         Get
+            If Me._CurrentProjects Is Nothing Then
+                Me._CurrentProjects = New ObservableCollection(Of ProjectInfoModel)
+            End If
             Return _CurrentProjects
         End Get
         Set(value As ObservableCollection(Of ProjectInfoModel))
@@ -79,7 +80,20 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         End Set
     End Property
 
-    Public Function AssignImageOfProject(ByVal kind As String)
+    Private _FixedProjects As ObservableCollection(Of ProjectInfoModel)
+    Public Property FixedProjects As ObservableCollection(Of ProjectInfoModel)
+        Get
+            If Me._FixedProjects Is Nothing Then
+                Me._FixedProjects = New ObservableCollection(Of ProjectInfoModel)
+            End If
+            Return _FixedProjects
+        End Get
+        Set(value As ObservableCollection(Of ProjectInfoModel))
+            _FixedProjects = value
+        End Set
+    End Property
+
+    Public Function AssignIconOfProject(ByVal kind As String)
         Dim url = vbNullString
         Select Case kind
             Case DBTEST
@@ -87,7 +101,7 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
             Case Else
                 url = _DBTEST_IMAGE
         End Select
-        AssignImageOfProject = url
+        AssignIconOfProject = url
     End Function
 
     Private Sub _Make(ByVal fds As List(Of Object))
@@ -95,16 +109,6 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         Dim di As DirectoryInfo
         For Each fd In fds
             fd.Create()
-            'If TryCast(fd, FileInfo) IsNot Nothing Then
-            '    fi = CType(fd, FileInfo)
-            '    fi.Create()
-            '    Continue For
-            'End If
-            'If TryCast(fd, DirectoryInfo) IsNot Nothing Then
-            '    di = CType(fd, DirectoryInfo)
-            '    di.Create()
-            '    Continue For
-            'End If
         Next
     End Sub
 
@@ -153,41 +157,31 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         AppLaunch = code
     End Function
 
-    Public Sub PushProject(ByVal project As ProjectInfoModel)
-        Dim [new] As New ObservableCollection(Of ProjectInfoModel)
-
-        [new].Add(project)
-        If project.[Index] = 0 Then
-            Call _AssignProjectIndex(project)
-        End If
-
+    Public Sub Initialize()
+        Dim bi As BitmapImage
         For Each p In Me.CurrentProjects
-            If project.[Index] <> p.[Index] Then
-                [new].Add(p)
+            If String.IsNullOrEmpty(p.IconFileName) Then
+                p.IconFileName = _DBTEST_IMAGE
             End If
-            If [new].Count >= 5 Then
-                Exit For
-            End If
+            bi = New BitmapImage
+            bi.BeginInit()
+            bi.UriSource = New Uri((p.IconFileName), UriKind.Absolute)
+            bi.EndInit()
+            p.Icon = bi
         Next
-
-        Me.CurrentProjects = [new]
+        For Each p In Me.FixedProjects
+            If String.IsNullOrEmpty(p.IconFileName) Then
+                p.IconFileName = _DBTEST_IMAGE
+            End If
+            bi = New BitmapImage
+            bi.BeginInit()
+            bi.UriSource = New Uri((p.IconFileName), UriKind.Absolute)
+            bi.EndInit()
+            p.Icon = bi
+        Next
     End Sub
 
     Sub New()
         Call AppLaunch()
-    End Sub
-
-    Public Sub Initialize()
-        Dim bi As BitmapImage
-        For Each p In Me.CurrentProjects
-            If String.IsNullOrEmpty(p.ImageFileName) Then
-                p.ImageFileName = _DBTEST_IMAGE
-            End If
-            bi = New BitmapImage
-            bi.BeginInit()
-            bi.UriSource = New Uri((p.ImageFileName), UriKind.Absolute)
-            bi.EndInit()
-            p.Image = bi
-        Next
     End Sub
 End Class

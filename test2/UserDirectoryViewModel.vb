@@ -4,18 +4,11 @@ Imports System.IO
 
 Public Class UserDirectoryViewModel
     Inherits BaseViewModel2
-
     'Inherits BaseViewModel2(Of Object)
 
     Private Const _PROJECT_LOAD_FAILED As String = "プロジェクトのロードに失敗しました"
     Private Const _ISNOT_PROJECT_DIRECTORY As String = "このフォルダはプロジェクトディレクトリではありません"
     Private Const _DIRECTORY_ALREADY_EXIST As String = "このフォルダは既に存在しています"
-
-    Public Overrides ReadOnly Property FrameType As String
-        Get
-            Return ViewModel.MAIN_FRAME
-        End Get
-    End Property
 
     Private _UserDirectoryName As String
     Public Property UserDirectoryName As String
@@ -37,7 +30,7 @@ Public Class UserDirectoryViewModel
         End Get
         Set(value As String)
             _ProjectName = value
-            ProjectInfo.Name = value
+            AppInfo.ProjectInfo.Name = value
             RaisePropertyChanged("ProjectName")
             Call _UpdateProjectDirectoryName()
             Call _CheckAddProjectCommandEnabled()
@@ -51,7 +44,7 @@ Public Class UserDirectoryViewModel
         End Get
         Set(value As String)
             _ProjectDirectoryName = value
-            ProjectInfo.DirectoryName = value
+            AppInfo.ProjectInfo.DirectoryName = value
             RaisePropertyChanged("ProjectDirectoryName")
         End Set
     End Property
@@ -60,12 +53,29 @@ Public Class UserDirectoryViewModel
     Private _CurrentProjects As ObservableCollection(Of ProjectInfoModel)
     Public Property CurrentProjects As ObservableCollection(Of ProjectInfoModel)
         Get
+            If _CurrentProjects Is Nothing Then
+                _CurrentProjects = New ObservableCollection(Of ProjectInfoModel)
+            End If
             Return _CurrentProjects
         End Get
         Set(value As ObservableCollection(Of ProjectInfoModel))
             _CurrentProjects = value
             AppInfo.CurrentProjects = value
             RaisePropertyChanged("CurrentProjects")
+        End Set
+    End Property
+
+    'このメンバーはViewControllerによって、AppInfo側から更新される。
+    'AppInfo側の更新を購読して反映させる
+    Private _FixedProjects As ObservableCollection(Of ProjectInfoModel)
+    Public Property FixedProjects As ObservableCollection(Of ProjectInfoModel)
+        Get
+            Return _FixedProjects
+        End Get
+        Set(value As ObservableCollection(Of ProjectInfoModel))
+            _FixedProjects = value
+            AppInfo.FixedProjects = value
+            RaisePropertyChanged("FixedProjects")
         End Set
     End Property
 
@@ -87,7 +97,7 @@ Public Class UserDirectoryViewModel
         End Get
         Set(value As String)
             _ProjectKind = value
-            ProjectInfo.Kind = value
+            AppInfo.ProjectInfo.Kind = value
             RaisePropertyChanged("ProjectKind")
         End Set
     End Property
@@ -117,6 +127,11 @@ Public Class UserDirectoryViewModel
     Private Sub _UpdateProjectDirectoryName()
         ProjectDirectoryName = UserDirectoryName & "\" & ProjectName
     End Sub
+
+    'Private Sub _FixedProjectsUpdate(ByVal sender As Object, ByVal e As EventArgs)
+    '    Me.FixedProjects = sender
+    'End Sub
+
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを選択）
     '---------------------------------------------------------------------------------------------'
@@ -338,14 +353,13 @@ Public Class UserDirectoryViewModel
     Private Sub _AddProjectCommandExecute(ByVal parameter As Object)
         Dim i = -1
         Dim jh As New JsonHandler(Of Object)
-        Dim vc As ViewController
 
         ' 新規プロジェクト情報
         Dim project As New ProjectInfoModel With {
             .DirectoryName = Me.ProjectDirectoryName,
             .Name = Me.ProjectName,
             .Kind = Me.ProjectKind,
-            .ImageFileName = AppInfo.AssignImageOfProject(Me.ProjectKind)
+            .IconFileName = AppInfo.AssignIconOfProject(Me.ProjectKind)
         }
 
         Dim launcher As New DelegateAction With {
@@ -355,16 +369,14 @@ Public Class UserDirectoryViewModel
 
         i = launcher.ExecuteIfCan(Nothing)
         If i = 0 Then
-            Call AppInfo.PushProject(project)
-            Call AppInfo.AppSave()
-            ProjectInfo = project
-            Call ProjectInfo.ProjectSave()
-            Call Model.Setup(project)
-            Call Model.ModelSave(project.ModelFileName, Model)
-            Call Setup(Model, ViewModel, AppInfo, ProjectInfo)
-            Call ViewModel.ModelSave(project.ViewModelFileName, ViewModel)
-            vc = New ViewController
-            vc.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
+            'Call PushProject(project)
+            AppInfo.ProjectInfo = project
+            Call ProjectSave()
+            Call AppSave()
+            Call ModelSetup()
+            Call ProjectModelSave(project)
+            Call ViewModelSetup()
+            Call ProjectViewModelSave(project)
         Else
             MsgBox("Error AddProjectCommandExecute")
             Exit Sub
@@ -385,7 +397,6 @@ Public Class UserDirectoryViewModel
         Dim msg As String : msg = vbNullString
         Dim jh As New JsonHandler(Of Object)
         Dim vm As ViewModel
-        Dim vc As ViewController
 
         Dim i = project.CheckProject()
         ' 0 ... チェック全てＯＫ
@@ -394,18 +405,15 @@ Public Class UserDirectoryViewModel
         ' 3 ... モデルが不正
         Select Case i
             Case 0
-                ProjectInfo = jh.ModelLoad(Of ProjectInfoModel)(project.ProjectInfoFileName)
-                Model = jh.ModelLoad(Of Model)(project.ModelFileName)
-                Call Model.Initialize(ProjectInfo)
-                vm = jh.ModelLoad(Of ViewModel)(project.ViewModelFileName)
-                ViewModel.Views = vm.Views
-                Call Setup(Model, ViewModel, AppInfo, ProjectInfo)
-                vc = New ViewController
-                vc.Initialize(Model, ViewModel, AppInfo, ProjectInfo)
+                Call ProjectLoad(project)
+                Call ProjectModelLoad()
+                Call ModelSetup()
+                Call ProjectViewModelLoad()
+                Call ViewModelSetup()
                 msg = vbNullString
             Case 1
                 Call _DeleteProject(project)
-                Call AppInfo.AppSave()
+                Call _RemoveFixedProject(project)
                 msg = _ISNOT_PROJECT_DIRECTORY & " " & project.DirectoryName
             Case 2
                 msg = _PROJECT_LOAD_FAILED & " " & project.DirectoryName
@@ -418,44 +426,159 @@ Public Class UserDirectoryViewModel
 
 
     Private Sub _DeleteProject(ByVal project As ProjectInfoModel)
-        Dim pim As ProjectInfoModel
+
         For Each p In Me.CurrentProjects
             If p.DirectoryName = project.DirectoryName Then
-                pim = p
+                Me.CurrentProjects.Remove(p)
                 Exit For
             End If
         Next
-        If pim IsNot Nothing Then
-            Me.CurrentProjects.Remove(pim)
-        End If
+
+        'If Me.CurrentProjects.Contains(project) Then
+        '    Me.CurrentProjects.Remove(project)
+        'End If
+
+        Call AppSave()
+        'Dim pim As ProjectInfoModel
+        'For Each p In Me.CurrentProjects
+        '    If p.DirectoryName = project.DirectoryName Then
+        '        pim = p
+        '        Exit For
+        '    End If
+        'Next
+        'If pim IsNot Nothing Then
+        '    Me.CurrentProjects.Remove(pim)
+        'End If
     End Sub
 
 
     Private Sub _ViewInitializing()
         Dim v As ViewItemModel
-        Me.UserDirectoryName = ProjectInfo.DirectoryName
-        Me.ProjectName = ProjectInfo.Name
+        Me.UserDirectoryName = AppInfo.ProjectInfo.DirectoryName
+        Me.ProjectName = AppInfo.ProjectInfo.Name
         Me.ProjectKindList = AppDirectoryModel.ProjectKindList
         Me.CurrentProjects = AppInfo.CurrentProjects
-        If Me.CurrentProjects Is Nothing Then
-            Me.CurrentProjects = New ObservableCollection(Of ProjectInfoModel)
-        End If
+        Me.FixedProjects = AppInfo.FixedProjects
 
         ' ViewModel.AddViewItem() から取得すると、
         ' ViewModel.Viewsに登録されてしまい、
         ' ロード対象になってしまう
         v = New ViewItemModel With {
             .Name = Me.GetType.Name,
-            .FrameType = ViewModel.MAIN_FRAME,
-            .ViewType = ViewModel.NORMAL_VIEW,
+            .LayoutType = ViewModel.SINGLE_VIEW,
+            .FrameType = ViewModel.MultiView.MAIN_FRAME,
+            .ViewType = ViewModel.MultiView.NORMAL_VIEW,
             .OpenState = True,
             .Content = Me
         }
         Call AddView(v)
     End Sub
 
+    'Private Sub _FixedProjectUpdatedAddHandler()
+    '    AddHandler _
+    '        AppInfo.FixedProjects.CollectionChanged,
+    '        AddressOf _FixedProjectsUpdate
+    'End Sub
 
-    Public Overrides Sub Initialize(ByRef m As Model, ByRef vm As ViewModel, ByRef adm As AppDirectoryModel, ByRef pim As ProjectInfoModel)
+    Private Sub _RemoveFixedProject(ByVal project As ProjectInfoModel)
+        For Each p In Me.FixedProjects
+            If p.DirectoryName = project.DirectoryName Then
+                Me.FixedProjects.Remove(p)
+                Exit For
+            End If
+        Next
+
+        'If Me.FixedProjects.Contains(project) Then
+        '    Me.FixedProjects.Remove(project)
+        'End If
+
+        Call AppSave()
+    End Sub
+
+    Private Sub _PushFixedProject(ByVal project As ProjectInfoModel)
+        Dim [old] As ProjectInfoModel()
+        ReDim old(Me.FixedProjects.Count - 1)
+
+        Me.FixedProjects.CopyTo([old], 0)
+        Do Until True = False
+            For Each p In Me.FixedProjects
+                Me.FixedProjects.Remove(p)
+                Exit For
+            Next
+            If Me.FixedProjects.Count = 0 Then
+                Exit Do
+            End If
+        Loop
+        Me.FixedProjects.Add(project)
+        If project.[FixedIndex] = 0 Then
+            Call _AssignFixedProjectIndex(project)
+        End If
+
+        For Each p In [old]
+            If project.[FixedIndex] <> p.[FixedIndex] Then
+                Me.FixedProjects.Add(p)
+            End If
+            If Me.FixedProjects.Count >= 5 Then
+                Exit For
+            End If
+        Next
+        Call AppSave()
+    End Sub
+
+    Private Sub _AssignFixedProjectIndex(ByRef project As ProjectInfoModel)
+        Dim idx = 1
+        Dim b = False
+
+        Do Until True = False
+            b = False
+            For Each p In Me.FixedProjects
+                If p.[Index] = idx Then
+                    idx += 1
+                    b = True
+                    Exit For
+                End If
+            Next
+            If Not b Then
+                Exit Do
+            End If
+        Loop
+        project.[FixedIndex] = idx
+    End Sub
+
+    '--- プロジェクトのピン解除 ------------------------------------------------------------------'
+    Private Sub _RemoveFixedProjectRequestedReview(ByVal p As ProjectInfoModel, ByVal e As System.EventArgs)
+        Call _RemoveFixedProjectRequestAccept(p)
+    End Sub
+
+    Private Sub _RemoveFixedProjectRequestAccept(ByVal p As ProjectInfoModel)
+        Call _RemoveFixedProject(p)
+    End Sub
+
+    Private Sub _RemoveFixedProjectAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.RemoveFixedProjectRequested,
+            AddressOf Me._RemoveFixedProjectRequestedReview
+    End Sub
+    '---------------------------------------------------------------------------------------------'
+
+    '--- プロジェクトのピン止め ------------------------------------------------------------------'
+    Private Sub _FixProjectRequestedReview(ByVal p As ProjectInfoModel, ByVal e As System.EventArgs)
+        Call _FixProjectRequestAccept(p)
+    End Sub
+
+    Private Sub _FixProjectRequestAccept(ByVal p As ProjectInfoModel)
+        Call _PushFixedProject(p)
+    End Sub
+
+    Private Sub _FixProjectAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.FixProjectRequested,
+            AddressOf Me._FixProjectRequestedReview
+    End Sub
+    '---------------------------------------------------------------------------------------------'
+
+    Public Overrides Sub Initialize(ByRef app As AppDirectoryModel,
+                                    ByRef vm As ViewModel)
         InitializeHandler _
             = AddressOf _ViewInitializing
         CheckCommandEnabledHandler _
@@ -466,6 +589,11 @@ Public Class UserDirectoryViewModel
                 New Action(AddressOf _CheckSelectProjectCommandEnabled)
             )
 
-        Call BaseInitialize(m, vm, adm, pim)
+        [AddHandler] = [Delegate].Combine(
+            New Action(AddressOf _FixProjectAddHandler),
+            New Action(AddressOf _RemoveFixedProjectAddHandler)
+        )
+
+        Call BaseInitialize(app, vm)
     End Sub
 End Class

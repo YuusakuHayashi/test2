@@ -7,12 +7,9 @@ Public Class Window
 
         ' InitializeComponent() 呼び出しの後で初期化を追加します。
         Dim ml As New JsonHandler(Of Object)
-
-        Dim app As AppDirectoryModel
-        Dim m As New Model
         Dim vm As New ViewModel
-        Dim project As New ProjectInfoModel
 
+        Dim app As New AppDirectoryModel
         app = ml.ModelLoad(Of AppDirectoryModel)(AppDirectoryModel.ModelFileName)
         If app Is Nothing Then
             app = New AppDirectoryModel
@@ -20,12 +17,12 @@ Public Class Window
         app.ModelSave(AppDirectoryModel.ModelFileName, app)
         app.Initialize()
 
-        Dim udvm As New UserDirectoryViewModel
-        Call udvm.Initialize(m, vm, app, project)
+        Dim vc As New ViewController
+        Call vc.Initialize(app, vm)
 
-        Me.MainFlame.DataContext = vm
-        Me.ExplorerFlame.DataContext = vm
-        Me.HistoryFlame.DataContext = vm
-        Me.MenuFrame.DataContext = vm
+        Dim udvm As New UserDirectoryViewModel
+        Call udvm.Initialize(app, vm)
+
+        Me.DataContext = vm
     End Sub
 End Class

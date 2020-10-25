@@ -7,6 +7,8 @@
         End Get
     End Property
 
+    Public Event RemoveFixedProjectRequested As EventHandler
+    Public Event FixProjectRequested As EventHandler
     Public Event OpenViewRequested As EventHandler
     Public Event TabCloseRequested As EventHandler
     Public Event DeleteRequested As EventHandler
@@ -18,6 +20,14 @@
     'Public Sub RaiseOpenViewRequested(ByVal child As ViewItemModel)
     '    RaiseEvent OpenViewRequested(child, EventArgs.Empty)
     'End Sub
+    Public Sub RaiseRemoveFixedProjectRequested(ByVal p As ProjectInfoModel)
+        RaiseEvent RemoveFixedProjectRequested(p, EventArgs.Empty)
+    End Sub
+
+    Public Sub RaiseFixProjectRequested(ByVal p As ProjectInfoModel)
+        RaiseEvent FixProjectRequested(p, EventArgs.Empty)
+    End Sub
+
     Public Sub RaiseOpenViewRequested(ByVal v As ViewItemModel)
         RaiseEvent OpenViewRequested(v, EventArgs.Empty)
     End Sub
