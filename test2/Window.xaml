@@ -175,18 +175,20 @@
             <!-- タブで表示するタイプ -->
             <DataTemplate
                 DataType="{x:Type local:TabViewModel}">
-                <TabControl                    
+                <TabControl    
                     SelectedIndex="{Binding SelectedIndex}"
+                    SelectedItem="{Binding SelectedItem}"
                     ItemsSource="{Binding Tabs}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel 
+                            <StackPanel                                 
                                 Orientation="Horizontal">
                                 <TextBlock                                     
                                     Width="75"                                    
                                     Text="{Binding Alias}" 
                                     TextTrimming="CharacterEllipsis"  />
                                 <Button 
+                                    Visibility="{Binding TabCloseButtonVisibility}"
                                     FontSize="4"
                                     Background="PaleVioletRed"
                                     Foreground="White"

@@ -24,6 +24,9 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Get
         Set(value As TabItemModel)
             Me._SelectedItem = value
+            RaisePropertyChanged("SelectedItem")
+            Call _ChangeTabCloseButtonVisibilities(value)
+            Call _ChangeTabColors(value)
             'If value Is Nothing Then
             '    If Tabs(0) IsNot Nothing Then
             '        Me.SelectedItem = Tabs(0)
@@ -45,6 +48,26 @@ Public Class TabViewModel : Inherits BaseViewModel
             Me._Tabs = value
         End Set
     End Property
+
+    Private Sub _ChangeTabCloseButtonVisibilities(ByVal [tab] As TabItemModel)
+        For Each t In Me.Tabs
+            If t.Equals([tab]) Then
+                t.TabCloseButtonVisibility = Visibility.Visible
+            Else
+                t.TabCloseButtonVisibility = Visibility.Collapsed
+            End If
+        Next
+    End Sub
+
+    Private Sub _ChangeTabColors(ByVal [tab] As TabItemModel)
+        For Each t In Me.Tabs
+            If t.Equals([tab]) Then
+                t.Color = Colors.Goldenrod
+            Else
+                t.Color = Colors.White
+            End If
+        Next
+    End Sub
 
     'Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
     '    Call _TabCloseRequestAccept(t)

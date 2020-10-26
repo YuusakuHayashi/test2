@@ -1,4 +1,7 @@
-﻿Public Class TabItemModel : Inherits BaseModel(Of Object)
+﻿Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+
+Public Class TabItemModel : Inherits BaseModel(Of Object)
     Private Property _Name As String
     Public Property Name As String
         Get
@@ -41,6 +44,31 @@
             Me._Content = value
         End Set
     End Property
+
+    Private _TabCloseButtonVisibility As Visibility
+    <JsonIgnore>
+    Public Property TabCloseButtonVisibility As Visibility
+        Get
+            Return Me._TabCloseButtonVisibility
+        End Get
+        Set(value As Visibility)
+            Me._TabCloseButtonVisibility = value
+            RaisePropertyChanged("TabCloseButtonVisibility")
+        End Set
+    End Property
+
+    Private _Color As Color
+    <JsonIgnore>
+    Public Property [Color] As Color
+        Get
+            Return Me._Color
+        End Get
+        Set(value As Color)
+            Me._Color = value
+            RaisePropertyChanged("Color")
+        End Set
+    End Property
+
 
 
     ' コマンドプロパティ（接続確認）
@@ -90,6 +118,8 @@
     '---------------------------------------------------------------------------------------------'
 
     Public Sub Initialize()
+        Me._TabCloseButtonVisibility = Visibility.Collapsed
+        Me.Color = Colors.White
         Call _CheckTabCloseCommandEnabled()
     End Sub
 
