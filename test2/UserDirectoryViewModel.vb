@@ -18,6 +18,7 @@ Public Class UserDirectoryViewModel
         Set(value As String)
             _UserDirectoryName = value
             RaisePropertyChanged("UserDirectoryName")
+            AppInfo.ProjectInfo.RootDirectoryName = value
             Call _UpdateProjectDirectoryName()
             Call _CheckAddProjectCommandEnabled()
         End Set
