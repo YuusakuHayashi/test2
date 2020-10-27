@@ -66,8 +66,6 @@ Public Class UserDirectoryViewModel
         End Set
     End Property
 
-    'このメンバーはViewControllerによって、AppInfo側から更新される。
-    'AppInfo側の更新を購読して反映させる
     Private _FixedProjects As ObservableCollection(Of ProjectInfoModel)
     Public Property FixedProjects As ObservableCollection(Of ProjectInfoModel)
         Get

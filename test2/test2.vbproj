@@ -93,12 +93,18 @@
     <Compile Include="MenuViewModel.vb" />
     <Compile Include="MultiViewModel.vb" />
     <Compile Include="NormalViewModel.vb" />
+    <Compile Include="ProjectViewModel.vb" />
+    <Compile Include="RpaModel.vb" />
+    <Compile Include="RpaProjectModel.vb" />
+    <Compile Include="RpaProjectViewModel.vb" />
+    <Compile Include="RpaViewModel.vb" />
     <Compile Include="SingleViewModel.vb" />
     <Compile Include="TabItemModel.vb" />
     <Compile Include="TabViewModel.vb" />
     <Compile Include="ViewController.vb" />
     <Compile Include="ViewExplorerViewModel.vb" />
     <Compile Include="ViewItemModel.vb" />
+    <Compile Include="ViewSetupModule.vb" />
     <Compile Include="Window.xaml.vb">
       <DependentUpon>Window.xaml</DependentUpon>
     </Compile>

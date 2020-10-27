@@ -164,12 +164,15 @@ Public MustInherit Class BaseViewModel2
         AppInfo.ProjectInfo.Model.Data = [new]
     End Sub
 
-    'Public Sub Initialize(ByVal project As ProjectInfoModel)
+
+    ' << Add Case >>
     Public Sub ModelSetup()
         '-- you henkou --------------------------------'
         Select Case AppInfo.ProjectInfo.Kind
             Case AppDirectoryModel.DBTEST
                 Call Me._DataInitialize(Of DBTestModel)()
+            Case AppDirectoryModel.RpaProject
+                Call Me._DataInitialize(Of RpaProjectModel)()
             Case Else
         End Select
         '----------------------------------------------'
@@ -388,98 +391,78 @@ Public MustInherit Class BaseViewModel2
                 '
             Case obj.GetType.Name = (New ProjectInfoModel).GetType.Name
                 '
+            Case obj.GetType.Name = (New ProjectViewModel).GetType.Name
+                '
             Case Else
                 ViewModel.Views.Add(v)
         End Select
         AddViewItem = v
     End Function
 
-    Private Sub _ViewModelLoadSetup()
-        Dim obj As Object
+    Public Delegate Sub ViewSetupDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
+    '<< Add Case >>
+    <JsonIgnore>
+    Public ReadOnly Property ViewSetupHandler As ViewSetupDelegater
+        Get
+            Select Case AppInfo.ProjectInfo.Kind
+                Case AppDirectoryModel.DBTEST
+                    Return AddressOf ViewSetupModule.DBTESTViewSetupExecute
+                Case AppDirectoryModel.RpaProject
+                    Return AddressOf ViewSetupModule.RpaProjectViewSetupExecute
+                Case Else
+                    Throw New Exception("No ViewSetupHandler")
+            End Select
+        End Get
+    End Property
 
-        For Each v In ViewModel.Views
-            If v.OpenState Then
-                obj = GetViewOfName(v.Name)
-                obj.Initialize(AppInfo, ViewModel)
-                v.Content = obj
-                Call AddView(v)
-            End If
-        Next
-    End Sub
+    '<< Add Case >>
+    <JsonIgnore>
+    Public ReadOnly Property ViewDefineHandler As Func(Of String, Object)
+        Get
+            Select Case AppInfo.ProjectInfo.Kind
+                Case AppDirectoryModel.DBTEST
+                    Return AddressOf ViewSetupModule.DBTESTViewDefineExecute
+                Case AppDirectoryModel.RpaProject
+                    Return AddressOf ViewSetupModule.RpaProjectViewDefineExecute
+                Case Else
+                    Throw New Exception("No ViewDefineHandler")
+            End Select
+        End Get
+    End Property
 
     Public Overloads Sub ViewModelSetup()
-        Dim cvm, dbtvm, dbevm, vevm, hvm, mvm
-        Dim v0, v1, v2, v3, v4, v5, v6, v7, v8, v9
+        Dim v0, v1
+        Dim obj
+        Dim [setup] = ViewSetupHandler
+        Dim [define] = ViewDefineHandler
 
-        Select Case AppInfo.ProjectInfo.Kind
-            '-- you henkou --------------------------------'
-            Case AppDirectoryModel.DBTEST
-                If ViewModel.Views.Count < 1 Then
-                    cvm = New ConnectionViewModel
-                    dbtvm = New DBTestViewModel
-                    dbevm = New DBExplorerViewModel
-                    vevm = New ViewExplorerViewModel
-                    hvm = New HistoryViewModel
-                    mvm = New MenuViewModel
+        If ViewModel.Views.Count < 1 Then
+            If [setup] <> Nothing Then
+                Call [setup](AppInfo, ViewModel)
+            End If
+        Else
+            If [define] <> Nothing Then
+                For Each v In ViewModel.Views
+                    If v.OpenState Then
+                        obj = [define](v.Name)
+                        obj.Initialize(AppInfo, ViewModel)
+                        v.Content = obj
+                        Call AddView(v)
+                    End If
+                Next
+            End If
+        End If
 
-                    Call cvm.Initialize(AppInfo, ViewModel)
-                    Call hvm.Initialize(AppInfo, ViewModel)
-                    Call mvm.Initialize(AppInfo, ViewModel)
-
-                    ' ビューへの追加
-                    v2 = AddViewItem(cvm,
-                                     ViewModel.MULTI_VIEW,
-                                     MultiViewModel.MAIN_FRAME,
-                                     MultiViewModel.TAB_VIEW)
-                    v3 = AddViewItem(hvm,
-                                     ViewModel.MULTI_VIEW,
-                                     MultiViewModel.HISTORY_FRAME,
-                                     MultiViewModel.TAB_VIEW)
-                    v4 = AddViewItem(mvm,
-                                     ViewModel.MULTI_VIEW,
-                                     MultiViewModel.MENU_FRAME,
-                                     MultiViewModel.NORMAL_VIEW)
-
-                    Call AddView(v2)
-                    Call AddView(v3)
-                    Call AddView(v4)
-                Else
-                    Call _ViewModelLoadSetup()
-                End If
-                ' 特殊なビューのセット(ViewModel)
-                v0 = AddViewItem(ViewModel,
-                                 ViewModel.MULTI_VIEW,
-                                 MultiViewModel.EXPLORER_FRAME,
-                                 MultiViewModel.TAB_VIEW)
-                v1 = AddViewItem(AppInfo,
-                                 ViewModel.MULTI_VIEW,
-                                 MultiViewModel.EXPLORER_FRAME,
-                                 MultiViewModel.TAB_VIEW)
-                Call AddView(v0)
-                Call AddView(v1)
-            Case Else
-                '----------------------------------------------'
-        End Select
+        ' 特殊なビューのセット(ViewModel)
+        v0 = AddViewItem(ViewModel,
+                         ViewModel.MULTI_VIEW,
+                         MultiViewModel.EXPLORER_FRAME,
+                         MultiViewModel.TAB_VIEW)
+        v1 = AddViewItem(AppInfo,
+                         ViewModel.MULTI_VIEW,
+                         MultiViewModel.EXPLORER_FRAME,
+                         MultiViewModel.TAB_VIEW)
+        Call AddView(v0)
+        Call AddView(v1)
     End Sub
-
-    Public Function GetViewOfName(ByVal [name] As String) As Object
-        Dim obj As Object
-        Select Case [name]
-            Case (New ConnectionViewModel).GetType.Name
-                obj = New ConnectionViewModel
-            Case (New DBTestViewModel).GetType.Name
-                obj = New DBTestViewModel
-            Case (New DBExplorerViewModel).GetType.Name
-                obj = New DBExplorerViewModel
-            Case (New ViewExplorerViewModel).GetType.Name
-                obj = New ViewExplorerViewModel
-            Case (New HistoryViewModel).GetType.Name
-                obj = New HistoryViewModel
-            Case (New MenuViewModel).GetType.Name
-                obj = New MenuViewModel
-            Case Else
-                obj = Nothing
-        End Select
-        GetViewOfName = obj
-    End Function
 End Class

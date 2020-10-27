@@ -239,18 +239,18 @@ Public Class ProjectInfoModel
         Call CreateFile(Me.ProjectInfoFileName)
     End Sub
 
-    Public Overloads Function LoadProject(ByVal p As ProjectInfoModel) As ProjectInfoModel
-        Dim project As ProjectInfoModel
-        project = p.ModelLoad(p.ProjectInfoFileName)
-        LoadProject = project
-    End Function
+    'Public Overloads Function LoadProject(ByVal p As ProjectInfoModel) As ProjectInfoModel
+    '    Dim project As ProjectInfoModel
+    '    project = p.ModelLoad(p.ProjectInfoFileName)
+    '    LoadProject = project
+    'End Function
 
-    Public Overloads Function LoadProject(ByVal f As String) As ProjectInfoModel
-        Dim project As ProjectInfoModel
-        Dim ml As New JsonHandler(Of Object)
-        project = ml.ModelLoad(Of ProjectInfoModel)(f)
-        LoadProject = project
-    End Function
+    'Public Overloads Function LoadProject(ByVal f As String) As ProjectInfoModel
+    '    Dim project As ProjectInfoModel
+    '    Dim ml As New JsonHandler(Of Object)
+    '    project = ml.ModelLoad(Of ProjectInfoModel)(f)
+    '    LoadProject = project
+    'End Function
 
     ' この関数はプロジェクトディレクトリの存在チェックを行います
     Public Function CheckStructure() As Integer
@@ -426,184 +426,181 @@ Public Class ProjectInfoModel
     End Function
     '---------------------------------------------------------------------------------------------'
 
-    ' コマンドプロパティ（ファイル編集）
-    '---------------------------------------------------------------------------------------------'
-    Private _EditFileCommand As ICommand
-    <JsonIgnore>
-    Public ReadOnly Property EditFileCommand As ICommand
-        Get
-            If Me._EditFileCommand Is Nothing Then
-                Me._EditFileCommand = New DelegateCommand With {
-                    .ExecuteHandler = AddressOf _EditFileCommandExecute,
-                    .CanExecuteHandler = AddressOf _EditFileCommandCanExecute
-                }
-                Return Me._EditFileCommand
-            Else
-                Return Me._EditFileCommand
-            End If
-        End Get
-    End Property
+    '' コマンドプロパティ（ファイル編集）
+    ''---------------------------------------------------------------------------------------------'
+    'Private _EditFileCommand As ICommand
+    '<JsonIgnore>
+    'Public ReadOnly Property EditFileCommand As ICommand
+    '    Get
+    '        If Me._EditFileCommand Is Nothing Then
+    '            Me._EditFileCommand = New DelegateCommand With {
+    '                .ExecuteHandler = AddressOf _EditFileCommandExecute,
+    '                .CanExecuteHandler = AddressOf _EditFileCommandCanExecute
+    '            }
+    '            Return Me._EditFileCommand
+    '        Else
+    '            Return Me._EditFileCommand
+    '        End If
+    '    End Get
+    'End Property
 
-    Private Sub _CheckEditFileCommandEnabled()
-        Dim b As Boolean : b = True
-        Me._EditFileCommandEnableFlag = b
-    End Sub
+    'Private Sub _CheckEditFileCommandEnabled()
+    '    Dim b As Boolean : b = True
+    '    Me._EditFileCommandEnableFlag = b
+    'End Sub
 
-    Private __EditFileCommandEnableFlag As Boolean
-    Private Property _EditFileCommandEnableFlag As Boolean
-        Get
-            Return Me.__EditFileCommandEnableFlag
-        End Get
-        Set(value As Boolean)
-            Me.__EditFileCommandEnableFlag = value
-            RaisePropertyChanged("_EditFileCommandEnableFlag")
-            CType(EditFileCommand, DelegateCommand).RaiseCanExecuteChanged()
-        End Set
-    End Property
+    'Private __EditFileCommandEnableFlag As Boolean
+    'Private Property _EditFileCommandEnableFlag As Boolean
+    '    Get
+    '        Return Me.__EditFileCommandEnableFlag
+    '    End Get
+    '    Set(value As Boolean)
+    '        Me.__EditFileCommandEnableFlag = value
+    '        RaisePropertyChanged("_EditFileCommandEnableFlag")
+    '        CType(EditFileCommand, DelegateCommand).RaiseCanExecuteChanged()
+    '    End Set
+    'End Property
 
-    Private Sub _EditFileCommandExecute(ByVal parameter As Object)
-        Dim f = CType(parameter, String)
-        Dim psi As New System.Diagnostics.ProcessStartInfo With {
-            .FileName = "notepad.exe",
-            .Arguments = $"{f}"
-        }
-        Dim p = System.Diagnostics.Process.Start(psi)
-    End Sub
+    'Private Sub _EditFileCommandExecute(ByVal parameter As Object)
+    '    Dim f = CType(parameter, String)
+    '    Dim psi As New System.Diagnostics.ProcessStartInfo With {
+    '        .FileName = "notepad.exe",
+    '        .Arguments = $"{f}"
+    '    }
+    '    Dim p = System.Diagnostics.Process.Start(psi)
+    'End Sub
 
-    Private Function _EditFileCommandCanExecute(ByVal parameter As Object) As Boolean
-        Return Me._EditFileCommandEnableFlag
-    End Function
-    '---------------------------------------------------------------------------------------------'
+    'Private Function _EditFileCommandCanExecute(ByVal parameter As Object) As Boolean
+    '    Return Me._EditFileCommandEnableFlag
+    'End Function
+    ''---------------------------------------------------------------------------------------------'
 
-    ' コマンドプロパティ（ファイル選択）
-    '---------------------------------------------------------------------------------------------'
-    Private _InputFileDialogCommand As ICommand
-    <JsonIgnore>
-    Public ReadOnly Property InputFileDialogCommand As ICommand
-        Get
-            If Me._InputFileDialogCommand Is Nothing Then
-                Me._InputFileDialogCommand = New DelegateCommand With {
-                    .ExecuteHandler = AddressOf _InputFileDialogCommandExecute,
-                    .CanExecuteHandler = AddressOf _InputFileDialogCommandCanExecute
-                }
-                Return Me._InputFileDialogCommand
-            Else
-                Return Me._InputFileDialogCommand
-            End If
-        End Get
-    End Property
+    '' コマンドプロパティ（ファイル選択）
+    ''---------------------------------------------------------------------------------------------'
+    'Private _InputFileDialogCommand As ICommand
+    '<JsonIgnore>
+    'Public ReadOnly Property InputFileDialogCommand As ICommand
+    '    Get
+    '        If Me._InputFileDialogCommand Is Nothing Then
+    '            Me._InputFileDialogCommand = New DelegateCommand With {
+    '                .ExecuteHandler = AddressOf _InputFileDialogCommandExecute,
+    '                .CanExecuteHandler = AddressOf _InputFileDialogCommandCanExecute
+    '            }
+    '            Return Me._InputFileDialogCommand
+    '        Else
+    '            Return Me._InputFileDialogCommand
+    '        End If
+    '    End Get
+    'End Property
 
-    Private Sub _CheckInputFileDialogCommandEnabled()
-        Dim b As Boolean : b = True
-        Me._InputFileDialogCommandEnableFlag = b
-    End Sub
+    'Private Sub _CheckInputFileDialogCommandEnabled()
+    '    Dim b As Boolean : b = True
+    '    Me._InputFileDialogCommandEnableFlag = b
+    'End Sub
 
-    Private __InputFileDialogCommandEnableFlag As Boolean
-    Private Property _InputFileDialogCommandEnableFlag As Boolean
-        Get
-            Return Me.__InputFileDialogCommandEnableFlag
-        End Get
-        Set(value As Boolean)
-            Me.__InputFileDialogCommandEnableFlag = value
-            RaisePropertyChanged("_InputFileDialogCommandEnableFlag")
-            CType(InputFileDialogCommand, DelegateCommand).RaiseCanExecuteChanged()
-        End Set
-    End Property
+    'Private __InputFileDialogCommandEnableFlag As Boolean
+    'Private Property _InputFileDialogCommandEnableFlag As Boolean
+    '    Get
+    '        Return Me.__InputFileDialogCommandEnableFlag
+    '    End Get
+    '    Set(value As Boolean)
+    '        Me.__InputFileDialogCommandEnableFlag = value
+    '        RaisePropertyChanged("_InputFileDialogCommandEnableFlag")
+    '        CType(InputFileDialogCommand, DelegateCommand).RaiseCanExecuteChanged()
+    '    End Set
+    'End Property
 
-    Private Sub _InputFileDialogCommandExecute(ByVal parameter As Object)
-        Dim f As String
-        Dim t As String
-        Dim fil = "JSONファイル(*.json)|*.json"
-        Select Case parameter
-            Case Me.ModelFileName
-                f = "Model.json"
-                t = "Select Model File"
-            Case Me.ViewModelFileName
-                f = "ViewModel.json"
-                t = "Select ViewModel File"
-            Case Me.ProjectInfoFileName
-                f = "ProjectInfo.json"
-                t = "Select Project Information File"
-            Case Me.IconFileName
-                f = "Project.ico"
-                t = "プロジェクトアイコンの選択"
-                fil = "すべてのファイル(*.*)|*.*"
-        End Select
-        Dim ofd As New OpenFileDialog With {
-            .FileName = f,
-            .InitialDirectory = Me.DirectoryName,
-            .Filter = fil,
-            .FilterIndex = 1,
-            .Title = t
-        }
-        If ofd.ShowDialog() = DialogResult.OK Then
-            Me.ModelFileName = ofd.FileName
-        End If
-    End Sub
+    'Private Sub _InputFileDialogCommandExecute(ByVal parameter As Object)
+    '    Dim f As String
+    '    Dim t As String
+    '    Dim fil = "JSONファイル(*.json)|*.json"
+    '    Select Case parameter
+    '        Case Me.ModelFileName
+    '            f = "Model.json"
+    '            t = "Select Model File"
+    '        Case Me.ViewModelFileName
+    '            f = "ViewModel.json"
+    '            t = "Select ViewModel File"
+    '        Case Me.ProjectInfoFileName
+    '            f = "ProjectInfo.json"
+    '            t = "Select Project Information File"
+    '        Case Me.IconFileName
+    '            f = "Project.ico"
+    '            t = "プロジェクトアイコンの選択"
+    '            fil = "すべてのファイル(*.*)|*.*"
+    '    End Select
+    '    Dim ofd As New OpenFileDialog With {
+    '        .FileName = f,
+    '        .InitialDirectory = Me.DirectoryName,
+    '        .Filter = fil,
+    '        .FilterIndex = 1,
+    '        .Title = t
+    '    }
+    '    If ofd.ShowDialog() = DialogResult.OK Then
+    '        Me.ModelFileName = ofd.FileName
+    '    End If
+    'End Sub
 
-    Private Function _InputFileDialogCommandCanExecute(ByVal parameter As Object) As Boolean
-        Return Me._InputFileDialogCommandEnableFlag
-    End Function
-    '---------------------------------------------------------------------------------------------'
+    'Private Function _InputFileDialogCommandCanExecute(ByVal parameter As Object) As Boolean
+    '    Return Me._InputFileDialogCommandEnableFlag
+    'End Function
+    ''---------------------------------------------------------------------------------------------'
 
-    ' コマンドプロパティ（フォルダ選択）
-    '---------------------------------------------------------------------------------------------'
-    Private _FolderBrowserDialogCommand As ICommand
-    <JsonIgnore>
-    Public ReadOnly Property FolderBrowserDialogCommand As ICommand
-        Get
-            If Me._FolderBrowserDialogCommand Is Nothing Then
-                Me._FolderBrowserDialogCommand = New DelegateCommand With {
-                    .ExecuteHandler = AddressOf _FolderBrowserDialogCommandExecute,
-                    .CanExecuteHandler = AddressOf _FolderBrowserDialogCommandCanExecute
-                }
-                Return Me._FolderBrowserDialogCommand
-            Else
-                Return Me._FolderBrowserDialogCommand
-            End If
-        End Get
-    End Property
+    '' コマンドプロパティ（フォルダ選択）
+    ''---------------------------------------------------------------------------------------------'
+    'Private _FolderBrowserDialogCommand As ICommand
+    '<JsonIgnore>
+    'Public ReadOnly Property FolderBrowserDialogCommand As ICommand
+    '    Get
+    '        If Me._FolderBrowserDialogCommand Is Nothing Then
+    '            Me._FolderBrowserDialogCommand = New DelegateCommand With {
+    '                .ExecuteHandler = AddressOf _FolderBrowserDialogCommandExecute,
+    '                .CanExecuteHandler = AddressOf _FolderBrowserDialogCommandCanExecute
+    '            }
+    '            Return Me._FolderBrowserDialogCommand
+    '        Else
+    '            Return Me._FolderBrowserDialogCommand
+    '        End If
+    '    End Get
+    'End Property
 
-    Private Sub _CheckFolderBrowserDialogCommandEnabled()
-        Dim b As Boolean : b = True
-        Me._FolderBrowserDialogCommandEnableFlag = b
-    End Sub
+    'Private Sub _CheckFolderBrowserDialogCommandEnabled()
+    '    Dim b As Boolean : b = True
+    '    Me._FolderBrowserDialogCommandEnableFlag = b
+    'End Sub
 
-    Private __FolderBrowserDialogCommandEnableFlag As Boolean
-    Private Property _FolderBrowserDialogCommandEnableFlag As Boolean
-        Get
-            Return Me.__FolderBrowserDialogCommandEnableFlag
-        End Get
-        Set(value As Boolean)
-            Me.__FolderBrowserDialogCommandEnableFlag = value
-            RaisePropertyChanged("_FolderBrowserDialogCommandEnableFlag")
-            CType(FolderBrowserDialogCommand, DelegateCommand).RaiseCanExecuteChanged()
-        End Set
-    End Property
+    'Private __FolderBrowserDialogCommandEnableFlag As Boolean
+    'Private Property _FolderBrowserDialogCommandEnableFlag As Boolean
+    '    Get
+    '        Return Me.__FolderBrowserDialogCommandEnableFlag
+    '    End Get
+    '    Set(value As Boolean)
+    '        Me.__FolderBrowserDialogCommandEnableFlag = value
+    '        RaisePropertyChanged("_FolderBrowserDialogCommandEnableFlag")
+    '        CType(FolderBrowserDialogCommand, DelegateCommand).RaiseCanExecuteChanged()
+    '    End Set
+    'End Property
 
-    Private Sub _FolderBrowserDialogCommandExecute(ByVal parameter As Object)
-        Dim f = CType(parameter, String)
-        Dim fbd As New FolderBrowserDialog With {
-            .Description = "プロジェクトフォルダの指定",
-            .RootFolder = Me.RootDirectoryName,
-            .SelectedPath = Me.DirectoryName,
-            .ShowNewFolderButton = True
-        }
-        If fbd.ShowDialog() = DialogResult.OK Then
-            Me.DirectoryName = fbd.SelectedPath
-        End If
-    End Sub
+    'Private Sub _FolderBrowserDialogCommandExecute(ByVal parameter As Object)
+    '    Dim f = CType(parameter, String)
+    '    Dim fbd As New FolderBrowserDialog With {
+    '        .Description = "プロジェクトフォルダの指定",
+    '        .RootFolder = Me.RootDirectoryName,
+    '        .SelectedPath = Me.DirectoryName,
+    '        .ShowNewFolderButton = True
+    '    }
+    '    If fbd.ShowDialog() = DialogResult.OK Then
+    '        Me.DirectoryName = fbd.SelectedPath
+    '    End If
+    'End Sub
 
-    Private Function _FolderBrowserDialogCommandCanExecute(ByVal parameter As Object) As Boolean
-        Return Me._FolderBrowserDialogCommandEnableFlag
-    End Function
-    '---------------------------------------------------------------------------------------------'
+    'Private Function _FolderBrowserDialogCommandCanExecute(ByVal parameter As Object) As Boolean
+    '    Return Me._FolderBrowserDialogCommandEnableFlag
+    'End Function
+    ''---------------------------------------------------------------------------------------------'
 
     Sub New()
         Call _CheckFixProjectCommandEnabled()
         Call _CheckRemoveFixedProjectCommandEnabled()
-        Call _CheckEditFileCommandEnabled()
-        Call _CheckInputFileDialogCommandEnabled()
-        Call _CheckFolderBrowserDialogCommandEnabled()
     End Sub
 End Class

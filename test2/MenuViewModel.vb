@@ -5,12 +5,6 @@ Imports System.IO
 Public Class MenuViewModel
     Inherits BaseViewModel2
 
-    'Public Overrides ReadOnly Property FrameType As String
-    '    Get
-    '        Return ViewModel.MENU_FRAME
-    '    End Get
-    'End Property
-
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔ設定画面表示）
     '---------------------------------------------------------------------------------------------'
     Private _ShowProjectSettingCommand As ICommand
@@ -47,8 +41,10 @@ Public Class MenuViewModel
 
     Private Sub _ShowProjectSettingCommandExecute(ByVal parameter As Object)
         Dim v As ViewItemModel
+        Dim pvm = New ProjectViewModel
+        pvm.Initialize(AppInfo, ViewModel)
         v = AddViewItem(
-            AppInfo.ProjectInfo,
+            pvm,
             ViewModel.MULTI_VIEW,
             MultiViewModel.MAIN_FRAME,
             MultiViewModel.TAB_VIEW
@@ -249,17 +245,17 @@ Public Class MenuViewModel
         Select Case i
             Case 0
                 Call ProjectLoad(project)
-                Call PushProject(project)
+                Call PushProject(AppInfo.ProjectInfo)
                 Call ProjectModelLoad()
                 Call ModelSetup()
                 Call ViewModelSetup()
+                Call AppSave()
             Case 1
                 Call AppSave()
             Case 2
             Case 3
         End Select
     End Sub
-
 
     Public Overrides Sub Initialize(ByRef app As AppDirectoryModel,
                                     ByRef vm As ViewModel)

@@ -181,21 +181,24 @@
                     ItemsSource="{Binding Tabs}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel                                 
-                                Orientation="Horizontal">
-                                <TextBlock                                     
-                                    Width="75"                                    
-                                    Text="{Binding Alias}" 
-                                    TextTrimming="CharacterEllipsis"  />
-                                <Button 
-                                    Visibility="{Binding TabCloseButtonVisibility}"
-                                    FontSize="4"
-                                    Background="PaleVioletRed"
-                                    Foreground="White"
-                                    Height="8" Width="8"
-                                    Content="X"                                    
-                                    Command="{Binding TabCloseCommand}"/>
-                            </StackPanel>
+                            <Border BorderBrush="{Binding Color}">
+                                <StackPanel                                 
+                                    Orientation="Horizontal">
+                                    <TextBlock                                     
+                                        Width="75"                                    
+                                        Text="{Binding Alias}" 
+                                        TextTrimming="CharacterEllipsis"  />
+                                    <Button 
+                                        Visibility="{Binding TabCloseButtonVisibility}"
+                                        FontSize="4"
+                                        Background="Black"
+                                        Foreground="White"
+                                        Height="8" Width="8"
+                                        Content="X"                                    
+                                        BorderThickness="0"
+                                        Command="{Binding TabCloseCommand}"/>
+                                </StackPanel>
+                            </Border>
                         </DataTemplate>
                     </TabControl.ItemTemplate>
                     <TabControl.ContentTemplate>
@@ -436,7 +439,7 @@
             </DataTemplate>
 
             <DataTemplate
-                DataType="{x:Type local:ProjectInfoModel}">
+                DataType="{x:Type local:ProjectViewModel}">
                 <StackPanel Margin="10,0,0,0">
                     <Label 
                         HorizontalAlignment="Right"
@@ -826,6 +829,36 @@
                         ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
                         Text="{Binding Alias}" />
                 </DockPanel>
+            </DataTemplate>
+
+            <DataTemplate                
+                DataType="{x:Type local:RpaProjectViewModel}">
+                <StackPanel Margin="10,0,0,0">
+                    <StackPanel 
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock 
+                            Width="150"
+                            Text="ルートディレクトリ名" />
+                        <TextBox
+                            Width="400"
+                            Text="{Binding RootDirectoryName}" />
+                        <Button
+                            Content=". . ."
+                            Command="{Binding FolderBrowserDialogCommand}"
+                            CommandParameter="{Binding RootDirectoryName}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock 
+                            Width="150"
+                            Text="ユーザーディレクトリ名" />
+                        <TextBox
+                            Width="400"
+                            Text="{Binding UserDirectoryName}" />
+                    </StackPanel>
+                </StackPanel>
             </DataTemplate>
 
             <DataTemplate

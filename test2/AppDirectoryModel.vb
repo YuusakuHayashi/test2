@@ -21,11 +21,13 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     Private Shared _DBTEST_IMAGE As String _
         = _AppImageDirectory & "\rpa.ico"
 
-    Public Const DBTEST As String = "データベーステスト(.dbt)"
+    Public Const DBTEST As String = "データベーステスト"
+    Public Const RpaProject As String = "RPAプロジェクト"
 
     Public Shared ProjectKindList As List(Of String) _
         = New List(Of String) From {
-            DBTEST
+            DBTEST,
+            RpaProject
         }
 
     Private _ProjectInfo As ProjectInfoModel

@@ -40,9 +40,10 @@
 
     Private Sub _OpenViewRequestAccept(ByVal v As ViewItemModel)
         Dim obj As Object
+        Dim [define] = ViewDefineHandler
         Dim idx = ViewModel.Views.IndexOf(v)
         ViewModel.Views(idx).OpenState = True
-        obj = GetViewOfName(ViewModel.Views(idx).Name)
+        obj = [define](ViewModel.Views(idx).Name)
         Call obj.Initialize(AppInfo, ViewModel)
         ViewModel.Views(idx).Content = obj
         Call Me.AddView(ViewModel.Views(idx))
