@@ -92,11 +92,7 @@ Public Class MenuViewModel
     End Property
 
     Private Sub _ResaveProjectCommandExecute(ByVal parameter As Object)
-        Call ProjectModelSave()
-        Call ProjectViewModelSave()
-        Call ProjectSave()
-        Call PushProject(AppInfo.ProjectInfo)
-        Call AppSave()
+        Call AllSave()
     End Sub
 
     Private Function _ResaveProjectCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -160,11 +156,7 @@ Public Class MenuViewModel
                 .Kind = AppInfo.ProjectInfo.Kind
             }
             Call project.Launch()
-            Call ProjectModelSave(project)
-            Call ProjectViewModelSave(project)
-            Call ProjectSave(project)
-            Call PushProject(project)
-            Call AppSave()
+            Call AllSave(project)
         End If
     End Sub
 
@@ -244,10 +236,12 @@ Public Class MenuViewModel
         ' 3 ... モデルが不正
         Select Case i
             Case 0
+                Call InitializeViewContent()
                 Call ProjectLoad(project)
                 Call PushProject(AppInfo.ProjectInfo)
                 Call ProjectModelLoad()
                 Call ModelSetup()
+                Call ProjectViewModelLoad()
                 Call ViewModelSetup()
                 Call AppSave()
             Case 1

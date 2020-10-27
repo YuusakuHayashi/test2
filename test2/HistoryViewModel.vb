@@ -6,6 +6,9 @@ Public Class HistoryViewModel
     Private _History As HistoryModel
     Public Property History As HistoryModel
         Get
+            If Me._History Is Nothing Then
+                Me._History = New HistoryModel
+            End If
             Return Me._History
         End Get
         Set(value As HistoryModel)
@@ -125,7 +128,7 @@ Public Class HistoryViewModel
     '        Initializing(m, vm, ccep2, ahp2)
     '    End Sub
     Private Sub _ViewInitialize()
-        Me.History = AppInfo.ProjectInfo.Model.Data.History
+        Me.History = AppInfo.ProjectInfo.Model.History
     End Sub
 
     Public Overrides Sub Initialize(ByRef app As AppDirectoryModel,

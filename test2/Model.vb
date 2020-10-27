@@ -15,6 +15,8 @@ Public Class Model
         End Set
     End Property
 
+    Public History As HistoryModel
+
     'Public Sub DataSave(ByVal project As ProjectInfoModel)
     '    Call Me.ModelSave(project.ModelFileName, Me)
     'End Sub

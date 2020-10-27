@@ -1,34 +1,27 @@
 ﻿Public Module ViewSetupModule
     Public Sub DBTESTViewSetupExecute(ByRef app As AppDirectoryModel,
                                       ByRef vm As ViewModel)
-        Dim v1, v2, v3
+        Dim v1, v2
         Dim cvm = New ConnectionViewModel
         Dim dbtvm = New DBTestViewModel
         Dim dbevm = New DBExplorerViewModel
         Dim vevm = New ViewExplorerViewModel
-        Dim hvm = New HistoryViewModel
-        Dim mvm = New MenuViewModel
+        'Dim hvm = New HistoryViewModel
 
         Call cvm.Initialize(app, vm)
-        Call hvm.Initialize(app, vm)
-        Call mvm.Initialize(app, vm)
+        'Call hvm.Initialize(app, vm)
 
         ' ビューへの追加
         v1 = cvm.AddViewItem(cvm,
                              ViewModel.MULTI_VIEW,
                              MultiViewModel.MAIN_FRAME,
                              MultiViewModel.TAB_VIEW)
-        v2 = hvm.AddViewItem(hvm,
-                             ViewModel.MULTI_VIEW,
-                             MultiViewModel.HISTORY_FRAME,
-                             MultiViewModel.TAB_VIEW)
-        v3 = mvm.AddViewItem(mvm,
-                             ViewModel.MULTI_VIEW,
-                             MultiViewModel.MENU_FRAME,
-                             MultiViewModel.NORMAL_VIEW)
+        'v2 = hvm.AddViewItem(hvm,
+        '                     ViewModel.MULTI_VIEW,
+        '                     MultiViewModel.HISTORY_FRAME,
+        '                     MultiViewModel.TAB_VIEW)
         Call cvm.AddView(v1)
-        Call hvm.AddView(v2)
-        Call mvm.AddView(v3)
+        'Call hvm.AddView(v2)
     End Sub
 
     Public Function DBTESTViewDefineExecute(ByVal [name] As String) As Object
@@ -42,10 +35,6 @@
                 obj = New DBExplorerViewModel
             Case (New ViewExplorerViewModel).GetType.Name
                 obj = New ViewExplorerViewModel
-            Case (New HistoryViewModel).GetType.Name
-                obj = New HistoryViewModel
-            Case (New MenuViewModel).GetType.Name
-                obj = New MenuViewModel
             Case Else
                 obj = Nothing
         End Select

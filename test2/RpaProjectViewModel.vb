@@ -17,6 +17,8 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
         End Get
         Set(value As String)
             Me._RootDirectoryName = value
+            RaisePropertyChanged("RootDirectoryName")
+            AppInfo.ProjectInfo.Model.Data.RootDirectoryName = value
         End Set
     End Property
 
@@ -30,6 +32,8 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
         End Get
         Set(value As String)
             Me._UserDirectoryName = value
+            RaisePropertyChanged("UserDirectoryName")
+            AppInfo.ProjectInfo.Model.Data.UserDirectoryName = value
         End Set
     End Property
 
@@ -82,10 +86,20 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
     End Property
 
     Private Sub _FolderBrowserDialogCommandExecute(ByVal parameter As Object)
+        Dim dsc As String
+        Dim fbd As FolderBrowserDialog
         Dim f = CType(parameter, String)
         Dim pd = Directory.GetParent(f).FullName
-        Dim fbd As New FolderBrowserDialog With {
-            .Description = "ルートディレクトリの指定",
+
+        Select Case f
+            Case Me.RootDirectoryName
+                dsc = "ルートディレクトリの指定"
+            Case Me.UserDirectoryName
+                dsc = "ユーザーディレクトリの指定"
+        End Select
+
+        fbd = New FolderBrowserDialog With {
+            .Description = dsc,
             .SelectedPath = $"{f}",
             .ShowNewFolderButton = True
         }

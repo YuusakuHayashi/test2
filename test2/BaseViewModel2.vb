@@ -64,6 +64,7 @@ Public MustInherit Class BaseViewModel2
         Call project.ModelSave(
             project.ProjectInfoFileName, project
         )
+        Call AppSave()
     End Sub
 
     Public Overloads Sub ProjectModelSave(ByVal project As ProjectInfoModel)
@@ -91,6 +92,18 @@ Public MustInherit Class BaseViewModel2
         Call ViewModel.ModelSave(
             AppInfo.ProjectInfo.ViewModelFileName, ViewModel
         )
+    End Sub
+
+    Public Overloads Sub AllSave()
+        Call ProjectModelSave()
+        Call ProjectViewModelSave()
+        Call ProjectSave()
+    End Sub
+
+    Public Overloads Sub AllSave(ByVal project As ProjectInfoModel)
+        Call ProjectModelSave(project)
+        Call ProjectViewModelSave(project)
+        Call ProjectSave(project)
     End Sub
 
     Public Sub PushProject(ByVal project As ProjectInfoModel)
@@ -211,6 +224,10 @@ Public MustInherit Class BaseViewModel2
     Public MustOverride Sub Initialize(ByRef app As AppDirectoryModel,
                                        ByRef vm As ViewModel) Implements BaseViewModelInterface.Initialize
 
+    Public Sub InitializeViewContent()
+        ViewModel.SingleView = Nothing
+        ViewModel.MultiView = Nothing
+    End Sub
 
     Private Sub _SetContent(ByVal obj As Object)
         ViewModel.Content = obj
@@ -339,16 +356,6 @@ Public MustInherit Class BaseViewModel2
         ViewModel.MultiView.TabsDictionary(frame).SelectedIndex = idx
     End Sub
 
-    ' コレクションにタブがなければ追加、あれば更新
-    'Private Overloads Sub _AddTabItem(ByVal v As ViewItemModel)
-    '    Dim t = New TabItemModel With {
-    '        .Name = v.Name,
-    '        .FrameType = v.FrameType,
-    '        .Content = v.Content
-    '    }
-    '    Call _AddTabItem(t)
-    'End Sub
-
     Public Sub AddView(ByVal v As ViewItemModel)
         Select Case v.LayoutType
             Case ViewModel.SINGLE_VIEW
@@ -386,13 +393,11 @@ Public MustInherit Class BaseViewModel2
         ' ViewModel, AppDirectoryModel, ProjectInfoModelは登録しない
         Select Case True
             Case obj.Equals(ViewModel)
-                '
             Case obj.Equals(AppInfo)
-                '
             Case obj.GetType.Name = (New ProjectInfoModel).GetType.Name
-                '
             Case obj.GetType.Name = (New ProjectViewModel).GetType.Name
-                '
+            Case obj.GetType.Name = (New MenuViewModel).GetType.Name
+            Case obj.GetType.Name = (New HistoryViewModel).GetType.Name
             Case Else
                 ViewModel.Views.Add(v)
         End Select
@@ -431,26 +436,23 @@ Public MustInherit Class BaseViewModel2
     End Property
 
     Public Overloads Sub ViewModelSetup()
-        Dim v0, v1
+        Dim v0, v1, v2, v3
+        Dim mvm, hvm
         Dim obj
         Dim [setup] = ViewSetupHandler
         Dim [define] = ViewDefineHandler
 
         If ViewModel.Views.Count < 1 Then
-            If [setup] <> Nothing Then
-                Call [setup](AppInfo, ViewModel)
-            End If
+            Call [setup](AppInfo, ViewModel)
         Else
-            If [define] <> Nothing Then
-                For Each v In ViewModel.Views
-                    If v.OpenState Then
-                        obj = [define](v.Name)
-                        obj.Initialize(AppInfo, ViewModel)
-                        v.Content = obj
-                        Call AddView(v)
-                    End If
-                Next
-            End If
+            For Each v In ViewModel.Views
+                If v.OpenState Then
+                    obj = [define](v.Name)
+                    obj.Initialize(AppInfo, ViewModel)
+                    v.Content = obj
+                    Call AddView(v)
+                End If
+            Next
         End If
 
         ' 特殊なビューのセット(ViewModel)
@@ -462,7 +464,21 @@ Public MustInherit Class BaseViewModel2
                          ViewModel.MULTI_VIEW,
                          MultiViewModel.EXPLORER_FRAME,
                          MultiViewModel.TAB_VIEW)
+        mvm = New MenuViewModel
+        mvm.Initialize(AppInfo, ViewModel)
+        v2 = AddViewItem(mvm,
+                         ViewModel.MULTI_VIEW,
+                         MultiViewModel.MENU_FRAME,
+                         MultiViewModel.NORMAL_VIEW)
+        hvm = New HistoryViewModel
+        hvm.Initialize(AppInfo, ViewModel)
+        v3 = AddViewItem(hvm,
+                         ViewModel.MULTI_VIEW,
+                         MultiViewModel.HISTORY_FRAME,
+                         MultiViewModel.TAB_VIEW)
         Call AddView(v0)
         Call AddView(v1)
+        Call AddView(v2)
+        Call AddView(v3)
     End Sub
 End Class

@@ -857,6 +857,10 @@
                         <TextBox
                             Width="400"
                             Text="{Binding UserDirectoryName}" />
+                        <Button
+                            Content=". . ."
+                            Command="{Binding FolderBrowserDialogCommand}"
+                            CommandParameter="{Binding UserDirectoryName}" />
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>
