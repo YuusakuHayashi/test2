@@ -61,6 +61,16 @@ Public Class ViewItemModel
         End Set
     End Property
 
+    Private _ModelName As String
+    Public Property ModelName As String
+        Get
+            Return Me._ModelName
+        End Get
+        Set(value As String)
+            Me._ModelName = value
+        End Set
+    End Property
+
     Private _ViewType As String
     Public Property ViewType As String
         Get
@@ -102,7 +112,6 @@ Public Class ViewItemModel
     End Property
 
     Private _Content As Object
-    <JsonIgnore>
     Public Property Content As Object
         Get
             Return Me._Content

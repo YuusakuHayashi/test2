@@ -23,8 +23,6 @@ Public Class RpaViewModel : Inherits BaseViewModel2
 
     Public Sub _ViewInitializing()
         With AppInfo.ProjectInfo.Model.Data
-            Me.ProjectRootDirectoryName = .ProjectRootDirectoryName
-            Me.ProjectUserDirectoryName = .ProjectUserDirectoryName
         End With
     End Sub
 

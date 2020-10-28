@@ -1,4 +1,7 @@
-﻿Public Module ViewSetupModule
+﻿Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+
+Public Module ViewSetupModule
     Public Sub DBTESTViewSetupExecute(ByRef app As AppDirectoryModel,
                                       ByRef vm As ViewModel)
         Dim v1, v2
@@ -24,9 +27,10 @@
         'Call hvm.AddView(v2)
     End Sub
 
-    Public Function DBTESTViewDefineExecute(ByVal [name] As String) As Object
+    'Public Function DBTESTViewDefineExecute(ByVal [name] As String) As Object
+    Public Function DBTESTViewDefineExecute(ByVal v As ViewItemModel) As Object
         Dim obj As Object
-        Select Case [name]
+        Select Case v.Name
             Case (New ConnectionViewModel).GetType.Name
                 obj = New ConnectionViewModel
             Case (New DBTestViewModel).GetType.Name
@@ -62,18 +66,63 @@
         Call rpapmvm.AddView(v2)
     End Sub
 
-    Public Function RpaProjectViewDefineExecute(ByVal [name] As String) As Object
+    Public Sub RpaProjectViewLoadExecute(ByRef app As AppDirectoryModel,
+                                         ByRef vm As ViewModel)
         Dim obj As Object
-        Select Case [name]
-            Case (New RpaProjectViewModel).GetType.Name
-                obj = New RpaProjectViewModel
-            Case (New RpaViewModel).GetType.Name
-                obj = New RpaViewModel
-            Case (New RpaProjectMenuViewModel).GetType.Name
-                obj = New RpaProjectMenuViewModel
-            Case Else
-                obj = Nothing
-        End Select
+        For Each v In vm.Views
+            If v.OpenState Then
+                obj = RpaProjectViewDefineExecute(v)
+                obj.Initialize(app, vm)
+                v.Content = obj
+                Call obj.AddView(v)
+            End If
+        Next
+    End Sub
+
+    Public Function RpaProjectViewDefineExecute(ByVal v As ViewItemModel) As Object
+        Dim obj As Object
+        Dim ck1, ck2, ck3
+
+        ck1 = TryCast(
+            _CheckLoadedModel(Of RpaProjectMenuViewModel)(v.Content),
+            RpaProjectMenuViewModel
+        )
+        ck2 = TryCast(
+            _CheckLoadedModel(Of RpaProjectViewModel)(v.Content),
+            RpaProjectViewModel
+        )
+        ck3 = TryCast(
+            _CheckLoadedModel(Of RpaViewModel)(v.Content),
+            RpaViewModel
+        )
+
+        If ck1 IsNot Nothing Then
+            obj = New RpaProjectMenuViewModel
+        End If
+        If ck2 IsNot Nothing Then
+            obj = New RpaProjectViewModel
+        End If
+        If ck3 IsNot Nothing Then
+            obj = New RpaViewModel
+        End If
+
         RpaProjectViewDefineExecute = obj
     End Function
+
+    Private Function _CheckLoadedModel(Of T As {New})(ByVal old As Object) As Object
+        Dim [new] As Object
+
+        Select Case old.GetType
+            Case (New Object).GetType
+                [new] = CType(old, T)
+            Case (New JObject).GetType
+                ' Ｊｓｏｎからロードした場合は、JObject型になっている
+                [new] = old.ToObject(Of T)
+            Case (New T).GetType
+                [new] = old
+        End Select
+
+        _CheckLoadedModel = [new]
+    End Function
+
 End Module

@@ -1,4 +1,6 @@
 ﻿Imports test2
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class RpaProjectMenuViewModel : Inherits BaseViewModel2
 
@@ -24,6 +26,83 @@ Public Class RpaProjectMenuViewModel : Inherits BaseViewModel2
         End Set
     End Property
 
+    ' コマンドプロパティ（フォルダ選択）
+    '---------------------------------------------------------------------------------------------'
+    Private _RpaLaunchCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property RpaLaunchCommand As ICommand
+        Get
+            If Me._RpaLaunchCommand Is Nothing Then
+                Me._RpaLaunchCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _RpaLaunchCommandExecute,
+                    .CanExecuteHandler = AddressOf _RpaLaunchCommandCanExecute
+                }
+                Return Me._RpaLaunchCommand
+            Else
+                Return Me._RpaLaunchCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckRpaLaunchCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._RpaLaunchCommandEnableFlag = b
+    End Sub
+
+    Private __RpaLaunchCommandEnableFlag As Boolean
+    Private Property _RpaLaunchCommandEnableFlag As Boolean
+        Get
+            Return Me.__RpaLaunchCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__RpaLaunchCommandEnableFlag = value
+            RaisePropertyChanged("_RpaLaunchCommandEnableFlag")
+            CType(RpaLaunchCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _RpaLaunchCommandExecute(ByVal parameter As Object)
+        Dim v As ViewItemModel
+        Dim rpa = New RpaModel
+        Dim rpavm = New RpaViewModel
+        rpavm.Initialize(AppInfo, ViewModel)
+        v = AddViewItem(
+            rpavm,
+            ViewModel.MULTI_VIEW,
+            MultiViewModel.MAIN_FRAME,
+            MultiViewModel.TAB_VIEW,
+            "BrankRpa" & _GetIndex().ToString()
+        )
+        Call AddView(v)
+        AppInfo.ProjectInfo.Model.Data.Rpas.Add(rpa)
+    End Sub
+
+    Private Function _RpaLaunchCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._RpaLaunchCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    Private Function _GetIndex() As Integer
+        Dim i = 0
+        Dim b = False
+        With AppInfo.ProjectInfo.Model.Data
+            Do Until True = False
+                b = False
+                For Each rpa In .Rpas
+                    If i = rpa.Index Then
+                        i += 1
+                        b = True
+                        Exit For
+                    End If
+                Next
+                If Not b Then
+                    Exit Do
+                End If
+            Loop
+        End With
+        _GetIndex = i
+    End Function
+
     Public Sub _ViewInitialize()
         Dim f As Func(Of String, BitmapImage)
         f = Function(ByVal img As String) As BitmapImage
@@ -43,6 +122,9 @@ Public Class RpaProjectMenuViewModel : Inherits BaseViewModel2
 
     Public Overrides Sub Initialize(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
         InitializeHandler = AddressOf _ViewInitialize
+        CheckCommandEnabledHandler = [Delegate].Combine(
+            New Action(AddressOf _CheckRpaLaunchCommandEnabled)
+        )
         BaseInitialize(app, vm)
     End Sub
 End Class

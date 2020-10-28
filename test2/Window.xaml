@@ -842,33 +842,28 @@
                     Margin="10,0,0,0"
                     Orientation="Horizontal">
                     <Button
+                        Command="{Binding RpaLaunchCommand}"
                         Background="Transparent"
+                        Width="20"
+                        Height="20"
                         BorderThickness="0">
-                        <Image 
-                            Width="20"
-                            Height="20"
-                            Source="{Binding StartupIcon}" />
+                        <Image Source="{Binding StartupIcon}" />
                     </Button>
                     <Button
+                        Command="{Binding RobotStartCommand}"
                         Content="▶"
                         Margin="5,0,0,0"
                         Width="20" Height="20"
                         Background="Transparent"
                         BorderThickness="0">
-                        <!--<Image 
-                            Width="20"
-                            Height="20"
-                            Source="{Binding RunIcon}" />-->
                     </Button>
                     <Button
+                        Command="{Binding RobotUpdateCommand}"
                         Margin="5,0,0,0"
                         Width="20" Height="20"
                         Background="Transparent"
                         BorderThickness="0">
-                        <Image 
-                            Width="20"
-                            Height="20"
-                            Source="{Binding DownloadIcon}" />
+                        <Image Source="{Binding DownloadIcon}" />
                     </Button>
                 </StackPanel>
             </DataTemplate>

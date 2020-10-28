@@ -6,12 +6,13 @@ Imports System.Windows.Forms
 Imports System.IO
 
 Public Class RpaProjectViewModel : Inherits BaseViewModel2
+    Private Const SHIFT_JIS As String = "Shift-JIS"
 
     Private _RootDirectoryName As String
     Public Property RootDirectoryName As String
         Get
             If Me._RootDirectoryName Is Nothing Then
-                Me._RootDirectoryName = AppInfo.ProjectInfo.DirectoryName
+                Me._RootDirectoryName = "ルートディレクトリを入力してください"
             End If
             Return Me._RootDirectoryName
         End Get
@@ -27,7 +28,7 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
     Public Property UserDirectoryName As String
         Get
             If Me._UserDirectoryName Is Nothing Then
-                Me._UserDirectoryName = AppInfo.ProjectInfo.DirectoryName
+                Me._UserDirectoryName = "ユーザーディレクトリを入力してください"
             End If
             Return Me._UserDirectoryName
         End Get
@@ -42,6 +43,9 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
     Private _SystemDirectoryName As String
     Public Property SystemDirectoryName As String
         Get
+            If Me._SystemDirectoryName Is Nothing Then
+                Me._SystemDirectoryName = "システムディレクトリを入力してください"
+            End If
             Return Me._SystemDirectoryName
         End Get
         Set(value As String)
@@ -55,6 +59,9 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
     Private _PythonPathName As String
     Public Property PythonPathName As String
         Get
+            If Me._PythonPathName Is Nothing Then
+                Me._PythonPathName = "Input Python Path"
+            End If
             Return Me._PythonPathName
         End Get
         Set(value As String)
@@ -77,6 +84,7 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
     End Property
 
     Private _Rpas As ObservableCollection(Of RpaModel)
+    <JsonIgnore>
     Public Property Rpas As ObservableCollection(Of RpaModel)
         Get
             If Me._Rpas Is Nothing Then
@@ -128,12 +136,14 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
         Dim dsc As String
         Dim fbd As FolderBrowserDialog
         Dim f = CType(parameter, String)
+        Dim b = True
 
         Select Case f
             Case Me.RootDirectoryName
                 dsc = "ルートディレクトリの指定"
             Case Me.SystemDirectoryName
                 dsc = "システムディレクトリの指定"
+                b = False
             Case Me.UserDirectoryName
                 dsc = "ユーザーディレクトリの指定"
             Case Me.PythonPathName
@@ -143,10 +153,19 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
         fbd = New FolderBrowserDialog With {
             .Description = dsc,
             .SelectedPath = $"{f}",
-            .ShowNewFolderButton = True
+            .ShowNewFolderButton = False
         }
         If fbd.ShowDialog() = DialogResult.OK Then
-            Me.RootDirectoryName = fbd.SelectedPath
+            Select Case f
+                Case Me.RootDirectoryName
+                    Me.RootDirectoryName = fbd.SelectedPath
+                Case Me.SystemDirectoryName
+                    Me.SystemDirectoryName = fbd.SelectedPath
+                Case Me.UserDirectoryName
+                    Me.UserDirectoryName = fbd.SelectedPath
+                Case Me.PythonPathName
+                    Me.PythonPathName = fbd.SelectedPath
+            End Select
         End If
     End Sub
 
@@ -192,7 +211,7 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
         If b Then
             If Directory.Exists(Me.SystemDirectoryName) Then
                 b = False
-                msg = $"すでにプロジェクトが存在します"
+                msg = $"Error: システムディレクトリの同名ディレクトリが既に存在します"
             End If
         End If
         Me._LaunchCommandEnableFlag = b
@@ -212,18 +231,71 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
     End Property
 
     Private Sub _LaunchCommandExecute(ByVal parameter As Object)
+        Dim b As Boolean
+        Call _CheckLaunchCommandEnabled()
+        If _LaunchCommandEnableFlag Then
+            Directory.CreateDirectory(Me.SystemDirectoryName)
+            With AppInfo.ProjectInfo.Model.Data
+                Directory.CreateDirectory(.SysDirectoryName)
+                b = _MakeFile(.MyDirFileName, Me.UserDirectoryName)
+                b = _MakeFile(.MyPythonFileName, Me.PythonPathName)
+                b = _MakeFile(.RpaProjectFileName, vbNullString)
+                b = _FilesImportRecursive(.RootSysDirectoryName, .SysDirectoryName)
+            End With
+        End If
+        Call _CheckLaunchCommandEnabled()
     End Sub
 
     Private Function _LaunchCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._LaunchCommandEnableFlag
     End Function
-    '---------------------------------------------------------------------------------------------'
+    '---------------------------------------------------------------------------------------------    
 
+    Private Function _FilesImportRecursive(ByVal src As String, ByVal dst As String) As Boolean
+        Dim b = False
+        Dim sdi = New DirectoryInfo(src)
+        Try
+            For Each f In sdi.GetFiles
+                f.CopyTo($"{dst}\{f.Name}")
+                b = True
+            Next
+            For Each d In sdi.GetDirectories
+                b = _FilesImportRecursive(d.FullName, dst)
+            Next
+        Catch ex As Exception
+            b = False
+        Finally
+            _FilesImportRecursive = False
+        End Try
+    End Function
+
+
+    Private Function _MakeFile(ByVal f As String, ByVal txt As String) As Boolean
+        Dim b = False
+        Dim sw As System.IO.StreamWriter
+        Try
+            sw = New System.IO.StreamWriter(
+                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+            )
+            sw.Write(txt)
+            b = True
+        Catch ex As Exception
+            b = False
+        Finally
+            If sw IsNot Nothing Then
+                sw.Close()
+                sw.Dispose()
+            End If
+            _MakeFile = b
+        End Try
+    End Function
 
     Public Sub _ViewInitializing()
         With AppInfo.ProjectInfo.Model.Data
             Me.RootDirectoryName = .RootDirectoryName
             Me.UserDirectoryName = .UserDirectoryName
+            Me.SystemDirectoryName = .SystemDirectoryName
+            Me.PythonPathName = .PythonPathName
             Me.Rpas = .Rpas
         End With
     End Sub

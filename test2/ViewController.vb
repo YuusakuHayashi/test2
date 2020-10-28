@@ -43,10 +43,10 @@
         Dim [define] = ViewDefineHandler
         Dim idx = ViewModel.Views.IndexOf(v)
         ViewModel.Views(idx).OpenState = True
-        obj = [define](ViewModel.Views(idx).Name)
+        obj = [define](ViewModel.Views(idx))
         Call obj.Initialize(AppInfo, ViewModel)
         ViewModel.Views(idx).Content = obj
-        Call Me.AddView(ViewModel.Views(idx))
+        Call AddView(ViewModel.Views(idx))
     End Sub
     '---------------------------------------------------------------------------------------------'
 End Class

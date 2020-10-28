@@ -19,6 +19,7 @@ Public MustInherit Class BaseViewModel2
     '--------------------------------------------------------------------------------------------------'
 
     Private _AppInfo As AppDirectoryModel
+    <JsonIgnore>
     Public Property AppInfo As AppDirectoryModel
         Get
             Return _AppInfo
@@ -208,8 +209,11 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
 
+    <JsonIgnore>
     Protected Property InitializeHandler As Action
+    <JsonIgnore>
     Protected Property CheckCommandEnabledHandler As Action
+    <JsonIgnore>
     Protected Property [AddHandler] As Action
 
 
@@ -398,9 +402,11 @@ Public MustInherit Class BaseViewModel2
     Public Function AddViewItem(ByVal obj As Object,
                                 ByVal [layout] As String,
                                 ByVal frame As String,
-                                ByVal view As String) As ViewItemModel
+                                ByVal view As String,
+                                Optional ByVal nm As String = vbNullString) As ViewItemModel
+        Dim [name] = IIf(String.IsNullOrEmpty(nm), obj.GetType.Name, nm)
         Dim v As New ViewItemModel With {
-            .Name = obj.GetType.Name,
+            .Name = [name],
             .FrameType = frame,
             .ViewType = view,
             .LayoutType = [layout],
@@ -438,9 +444,26 @@ Public MustInherit Class BaseViewModel2
         End Get
     End Property
 
+    'Public Delegate Sub ViewLoadDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
+    ''<< Add Case >>
+    '<JsonIgnore>
+    'Public ReadOnly Property ViewLoadHandler As ViewLoadDelegater
+    '    Get
+    '        Select Case AppInfo.ProjectInfo.Kind
+    '            Case AppDirectoryModel.DBTEST
+    '                Return AddressOf _ViewModelLoad
+    '            Case AppDirectoryModel.RpaProject
+    '                Return AddressOf ViewSetupModule.RpaProjectViewLoadExecute
+    '            Case Else
+    '                Throw New Exception("No ViewLoadHandler")
+    '        End Select
+    '    End Get
+    'End Property
+
     '<< Add Case >>
     <JsonIgnore>
-    Public ReadOnly Property ViewDefineHandler As Func(Of String, Object)
+    Public ReadOnly Property ViewDefineHandler As Func(Of ViewItemModel, Object)
+        'Public ReadOnly Property ViewDefineHandler As Func(Of String, Object)
         Get
             Select Case AppInfo.ProjectInfo.Kind
                 Case AppDirectoryModel.DBTEST
@@ -453,24 +476,47 @@ Public MustInherit Class BaseViewModel2
         End Get
     End Property
 
+    Private Sub _ViewModelLoad(ByRef obj1 As Object, ByRef obj2 As Object)
+        Dim obj As Object
+        Dim [define] = Me.ViewDefineHandler
+        For Each v In ViewModel.Views
+            If v.OpenState Then
+                obj = [define](v)
+                obj.Initialize(AppInfo, ViewModel)
+                v.Content = obj
+                Call AddView(v)
+            End If
+        Next
+    End Sub
+
     Public Overloads Sub ViewModelSetup()
         Dim v0, v1, v2, v3
         Dim mvm, hvm
         Dim obj
         Dim [setup] = ViewSetupHandler
+        'Dim [load] = ViewLoadHandler
         Dim [define] = ViewDefineHandler
 
         If ViewModel.Views.Count < 1 Then
             Call [setup](AppInfo, ViewModel)
         Else
+            'Call [load](AppInfo, ViewModel)
             For Each v In ViewModel.Views
                 If v.OpenState Then
-                    obj = [define](v.Name)
+                    obj = [define](v)
                     obj.Initialize(AppInfo, ViewModel)
                     v.Content = obj
                     Call AddView(v)
                 End If
             Next
+            'For Each v In ViewModel.Views
+            '    If v.OpenState Then
+            '        obj = [define](v.Name)
+            '        obj.Initialize(AppInfo, ViewModel)
+            '        v.Content = obj
+            '        Call AddView(v)
+            '    End If
+            'Next
         End If
 
         ' 特殊なビューのセット(ViewModel)
