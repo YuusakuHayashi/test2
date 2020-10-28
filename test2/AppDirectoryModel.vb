@@ -15,11 +15,11 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     Public Shared AppIniFileName _
         = AppDirectoryModel.AppDirectoryName & "\App.ini"
 
-    Private Shared _AppImageDirectory _
+    Public Shared AppImageDirectory _
         = AppDirectoryModel.AppDirectoryName & "\Image"
 
     Private Shared _DBTEST_IMAGE As String _
-        = _AppImageDirectory & "\rpa.ico"
+        = AppImageDirectory & "\rpa.ico"
 
     Public Const DBTEST As String = "データベーステスト"
     Public Const RpaProject As String = "RPAプロジェクト"
@@ -123,7 +123,7 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
                 code = 997
                 If File.Exists(AppDirectoryModel.ModelFileName) Then
                     code = 996
-                    If Directory.Exists(AppDirectoryModel._AppImageDirectory) Then
+                    If Directory.Exists(AppDirectoryModel.AppImageDirectory) Then
                         code = 0
                     End If
                 End If
@@ -142,7 +142,7 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
             MsgBox("Error AppLaunch = 998")
         End If
         If code >= 996 Then
-            fds.Add(New DirectoryInfo(AppDirectoryModel._AppImageDirectory))
+            fds.Add(New DirectoryInfo(AppDirectoryModel.AppImageDirectory))
         End If
         If code >= 997 Then
             fds.Add(New FileInfo(AppDirectoryModel.ModelFileName))

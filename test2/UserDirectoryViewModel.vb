@@ -353,13 +353,8 @@ Public Class UserDirectoryViewModel
         Dim i = -1
         Dim jh As New JsonHandler(Of Object)
 
-        ' 新規プロジェクト情報
-        Dim project As New ProjectInfoModel With {
-            .DirectoryName = Me.ProjectDirectoryName,
-            .Name = Me.ProjectName,
-            .Kind = Me.ProjectKind,
-            .IconFileName = AppInfo.AssignIconOfProject(Me.ProjectKind)
-        }
+        Dim project = AppInfo.ProjectInfo
+        Call AppInfo.AssignIconOfProject(project.Kind)
 
         Dim launcher As New DelegateAction With {
             .CanExecuteHandler = AddressOf project.CheckProjectNotExist,
@@ -370,12 +365,9 @@ Public Class UserDirectoryViewModel
         If i = 0 Then
             'Call PushProject(project)
             AppInfo.ProjectInfo = project
-            Call ProjectSave()
-            Call AppSave()
             Call ModelSetup()
-            Call ProjectModelSave(project)
             Call ViewModelSetup()
-            Call ProjectViewModelSave(project)
+            Call AllSave()
         Else
             MsgBox("Error AddProjectCommandExecute")
             Exit Sub
@@ -404,11 +396,7 @@ Public Class UserDirectoryViewModel
         ' 3 ... モデルが不正
         Select Case i
             Case 0
-                Call ProjectLoad(project)
-                Call ProjectModelLoad()
-                Call ModelSetup()
-                Call ProjectViewModelLoad()
-                Call ViewModelSetup()
+                Call AllLoad(project)
                 msg = vbNullString
             Case 1
                 Call _DeleteProject(project)
@@ -425,29 +413,13 @@ Public Class UserDirectoryViewModel
 
 
     Private Sub _DeleteProject(ByVal project As ProjectInfoModel)
-
         For Each p In Me.CurrentProjects
             If p.DirectoryName = project.DirectoryName Then
                 Me.CurrentProjects.Remove(p)
                 Exit For
             End If
         Next
-
-        'If Me.CurrentProjects.Contains(project) Then
-        '    Me.CurrentProjects.Remove(project)
-        'End If
-
         Call AppSave()
-        'Dim pim As ProjectInfoModel
-        'For Each p In Me.CurrentProjects
-        '    If p.DirectoryName = project.DirectoryName Then
-        '        pim = p
-        '        Exit For
-        '    End If
-        'Next
-        'If pim IsNot Nothing Then
-        '    Me.CurrentProjects.Remove(pim)
-        'End If
     End Sub
 
 
@@ -473,12 +445,6 @@ Public Class UserDirectoryViewModel
         Call AddView(v)
     End Sub
 
-    'Private Sub _FixedProjectUpdatedAddHandler()
-    '    AddHandler _
-    '        AppInfo.FixedProjects.CollectionChanged,
-    '        AddressOf _FixedProjectsUpdate
-    'End Sub
-
     Private Sub _RemoveFixedProject(ByVal project As ProjectInfoModel)
         For Each p In Me.FixedProjects
             If p.DirectoryName = project.DirectoryName Then
@@ -486,10 +452,6 @@ Public Class UserDirectoryViewModel
                 Exit For
             End If
         Next
-
-        'If Me.FixedProjects.Contains(project) Then
-        '    Me.FixedProjects.Remove(project)
-        'End If
 
         Call AppSave()
     End Sub

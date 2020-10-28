@@ -46,13 +46,20 @@
     Public Sub RpaProjectViewSetupExecute(ByRef app As AppDirectoryModel,
                                           ByRef vm As ViewModel)
         Dim rpapvm = New RpaProjectViewModel
-        Dim v As ViewItemModel
+        Dim rpapmvm = New RpaProjectMenuViewModel
+        Dim v1, v2
         Call rpapvm.Initialize(app, vm)
-        v = rpapvm.AddViewItem(rpapvm,
-                               ViewModel.MULTI_VIEW,
-                               MultiViewModel.MAIN_FRAME,
-                               MultiViewModel.TAB_VIEW)
-        Call rpapvm.AddView(v)
+        Call rpapmvm.Initialize(app, vm)
+        v1 = rpapvm.AddViewItem(rpapvm,
+                                ViewModel.MULTI_VIEW,
+                                MultiViewModel.MAIN_FRAME,
+                                MultiViewModel.TAB_VIEW)
+        v2 = rpapvm.AddViewItem(rpapmvm,
+                                ViewModel.MULTI_VIEW,
+                                MultiViewModel.PROJECT_MENU_FRAME,
+                                MultiViewModel.NORMAL_VIEW)
+        Call rpapvm.AddView(v1)
+        Call rpapmvm.AddView(v2)
     End Sub
 
     Public Function RpaProjectViewDefineExecute(ByVal [name] As String) As Object
@@ -62,6 +69,8 @@
                 obj = New RpaProjectViewModel
             Case (New RpaViewModel).GetType.Name
                 obj = New RpaViewModel
+            Case (New RpaProjectMenuViewModel).GetType.Name
+                obj = New RpaProjectMenuViewModel
             Case Else
                 obj = Nothing
         End Select

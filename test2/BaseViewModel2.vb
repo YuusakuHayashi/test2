@@ -94,6 +94,22 @@ Public MustInherit Class BaseViewModel2
         )
     End Sub
 
+    'Public Overloads Sub AllLoad()
+    '    Call ProjectLoad()
+    '    Call ProjectModelLoad()
+    '    Call ModelSetup()
+    '    Call ProjectViewModelLoad()
+    '    Call ViewModelSetup()
+    'End Sub
+
+    Public Overloads Sub AllLoad(project)
+        Call ProjectLoad(project)
+        Call ProjectModelLoad()
+        Call ModelSetup()
+        Call ProjectViewModelLoad()
+        Call ViewModelSetup()
+    End Sub
+
     Public Overloads Sub AllSave()
         Call ProjectModelSave()
         Call ProjectViewModelSave()
@@ -266,6 +282,8 @@ Public MustInherit Class BaseViewModel2
                 ViewModel.MultiView.HistoryViewContent = o
             Case MultiViewModel.MENU_FRAME
                 ViewModel.MultiView.MenuViewContent = o
+            Case MultiViewModel.PROJECT_MENU_FRAME
+                ViewModel.MultiView.ProjectMenuViewContent = o
             Case Else
                 ' Nothing To Do
         End Select
@@ -295,7 +313,7 @@ Public MustInherit Class BaseViewModel2
         End If
     End Sub
 
-    ' ビューのDataContentに実際にセットします
+
     Private Sub _SetTabItemToMultiViewContent(ByVal v As ViewItemModel)
         Dim o As TabViewModel
         o = ViewModel.MultiView.TabsDictionary(v.FrameType)

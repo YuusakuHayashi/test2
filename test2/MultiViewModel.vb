@@ -18,6 +18,7 @@ Public Class MultiViewModel
     Public Const EXPLORER_FRAME As String = "ExplorerView"
     Public Const HISTORY_FRAME As String = "HistoryView"
     Public Const MENU_FRAME As String = "MenuView"
+    Public Const PROJECT_MENU_FRAME As String = "ProjectMenuView"
 
     Public Const NORMAL_VIEW As String = "Normal"
     Public Const TAB_VIEW As String = "Tab"
@@ -71,6 +72,17 @@ Public Class MultiViewModel
         End Set
     End Property
 
+    Private _ProjectMenuViewContent As Object
+    <JsonIgnore>
+    Public Property ProjectMenuViewContent As Object
+        Get
+            Return Me._ProjectMenuViewContent
+        End Get
+        Set(value As Object)
+            Me._ProjectMenuViewContent = value
+            RaisePropertyChanged("ProjectMenuViewContent")
+        End Set
+    End Property
 
     ' コンテントディクショナリ関連 ---------------------------------------------------------------'
     ' コンテントディクショナリ

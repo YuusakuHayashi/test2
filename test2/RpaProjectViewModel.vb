@@ -19,6 +19,7 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
             Me._RootDirectoryName = value
             RaisePropertyChanged("RootDirectoryName")
             AppInfo.ProjectInfo.Model.Data.RootDirectoryName = value
+            Call _CheckLaunchCommandEnabled()
         End Set
     End Property
 
@@ -34,6 +35,44 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
             Me._UserDirectoryName = value
             RaisePropertyChanged("UserDirectoryName")
             AppInfo.ProjectInfo.Model.Data.UserDirectoryName = value
+            Call _CheckLaunchCommandEnabled()
+        End Set
+    End Property
+
+    Private _SystemDirectoryName As String
+    Public Property SystemDirectoryName As String
+        Get
+            Return Me._SystemDirectoryName
+        End Get
+        Set(value As String)
+            Me._SystemDirectoryName = value
+            RaisePropertyChanged("SystemDirectoryName")
+            AppInfo.ProjectInfo.Model.Data.SystemDirectoryName = value
+            Call _CheckLaunchCommandEnabled()
+        End Set
+    End Property
+
+    Private _PythonPathName As String
+    Public Property PythonPathName As String
+        Get
+            Return Me._PythonPathName
+        End Get
+        Set(value As String)
+            Me._PythonPathName = value
+            RaisePropertyChanged("PythonPathName")
+            AppInfo.ProjectInfo.Model.Data.PythonPathName = value
+            Call _CheckLaunchCommandEnabled()
+        End Set
+    End Property
+
+    Private _ErrorMessage As String
+    Public Property ErrorMessage As String
+        Get
+            Return Me._ErrorMessage
+        End Get
+        Set(value As String)
+            Me._ErrorMessage = value
+            RaisePropertyChanged("ErrorMessage")
         End Set
     End Property
 
@@ -89,13 +128,16 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
         Dim dsc As String
         Dim fbd As FolderBrowserDialog
         Dim f = CType(parameter, String)
-        Dim pd = Directory.GetParent(f).FullName
 
         Select Case f
             Case Me.RootDirectoryName
                 dsc = "ルートディレクトリの指定"
+            Case Me.SystemDirectoryName
+                dsc = "システムディレクトリの指定"
             Case Me.UserDirectoryName
                 dsc = "ユーザーディレクトリの指定"
+            Case Me.PythonPathName
+                dsc = "Python Path Setting"
         End Select
 
         fbd = New FolderBrowserDialog With {
@@ -113,6 +155,70 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
     End Function
     '---------------------------------------------------------------------------------------------'
 
+    ' コマンドプロパティ（プロジェクト作成）
+    '---------------------------------------------------------------------------------------------'
+    Private _LaunchCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property LaunchCommand As ICommand
+        Get
+            If Me._LaunchCommand Is Nothing Then
+                Me._LaunchCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _LaunchCommandExecute,
+                    .CanExecuteHandler = AddressOf _LaunchCommandCanExecute
+                }
+                Return Me._LaunchCommand
+            Else
+                Return Me._LaunchCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckLaunchCommandEnabled()
+        Dim b As Boolean : b = True
+        Dim dq = """"
+        Dim msg = vbNullString
+        If Not Directory.Exists(Me.PythonPathName) Then
+            b = False
+            msg = $"Error: Python Path{dq}{Me.PythonPathName}{dq} Is Not Exist"
+        End If
+        If Not Directory.Exists(Me.RootDirectoryName) Then
+            b = False
+            msg = $"Error: ユーザーディレクトリ{dq}{Me.UserDirectoryName}{dq} は存在しません"
+        End If
+        If Not Directory.Exists(Me.RootDirectoryName) Then
+            b = False
+            msg = $"Error: ルートディレクトリ{dq}{Me.RootDirectoryName}{dq} は存在しません"
+        End If
+        If b Then
+            If Directory.Exists(Me.SystemDirectoryName) Then
+                b = False
+                msg = $"すでにプロジェクトが存在します"
+            End If
+        End If
+        Me._LaunchCommandEnableFlag = b
+        Me.ErrorMessage = msg
+    End Sub
+
+    Private __LaunchCommandEnableFlag As Boolean
+    Private Property _LaunchCommandEnableFlag As Boolean
+        Get
+            Return Me.__LaunchCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__LaunchCommandEnableFlag = value
+            RaisePropertyChanged("_LaunchCommandEnableFlag")
+            CType(LaunchCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _LaunchCommandExecute(ByVal parameter As Object)
+    End Sub
+
+    Private Function _LaunchCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._LaunchCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
 
     Public Sub _ViewInitializing()
         With AppInfo.ProjectInfo.Model.Data
@@ -127,7 +233,8 @@ Public Class RpaProjectViewModel : Inherits BaseViewModel2
         InitializeHandler = AddressOf _ViewInitializing
         CheckCommandEnabledHandler _
             = [Delegate].Combine(
-                New Action(AddressOf _CheckFolderBrowserDialogCommandEnabled)
+                New Action(AddressOf _CheckFolderBrowserDialogCommandEnabled),
+                New Action(AddressOf _CheckLaunchCommandEnabled)
             )
         Call BaseInitialize(app, vm)
     End Sub
