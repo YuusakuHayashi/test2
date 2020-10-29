@@ -964,6 +964,10 @@
                         <TextBox
                             Width="400"
                             Text="{Binding RootProjectName}" />
+                        <Button
+                            Content=". . ."
+                            Command="{Binding FolderBrowserDialogCommand}"
+                            CommandParameter="{Binding RootProjectName}" />
                     </StackPanel>
                     <StackPanel 
                         Margin="0,10,0,0"
@@ -974,6 +978,10 @@
                         <TextBox
                             Width="400"
                             Text="{Binding UserProjectName}" />
+                        <Button
+                            Content=". . ."
+                            Command="{Binding FolderBrowserDialogCommand}"
+                            CommandParameter="{Binding UserProjectName}" />
                     </StackPanel>
                     <StackPanel 
                         Margin="0,10,0,0"
@@ -984,6 +992,30 @@
                         <TextBox
                             Width="400"
                             Text="{Binding RunParameter}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock 
+                            Text="{Binding ErrorMessage}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Margin="450,10,0,0"
+                        Orientation="Horizontal">
+                        <Button
+                            Command="{Binding ConnectProjectCommand}"
+                            Content="接続"
+                            Width="30" Height="20" />
+                        <Button
+                            Command="{Binding DeleteProjectCommand}"
+                            Margin="5,0,0,0"
+                            Content="削除"
+                            Width="30" Height="20" />
+                        <Button
+                            Command="{Binding RunCommand}"
+                            Margin="5,0,0,0"
+                            Content="実行"
+                            Width="30" Height="20" />
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>

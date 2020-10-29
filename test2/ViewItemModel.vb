@@ -112,6 +112,7 @@ Public Class ViewItemModel
     End Property
 
     Private _Content As Object
+    <JsonIgnore>
     Public Property Content As Object
         Get
             Return Me._Content
