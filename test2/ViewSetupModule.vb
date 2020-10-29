@@ -15,16 +15,16 @@ Public Module ViewSetupModule
         'Call hvm.Initialize(app, vm)
 
         ' ビューへの追加
-        v1 = cvm.AddViewItem(cvm,
-                             ViewModel.MULTI_VIEW,
-                             MultiViewModel.MAIN_FRAME,
-                             MultiViewModel.TAB_VIEW)
-        'v2 = hvm.AddViewItem(hvm,
-        '                     ViewModel.MULTI_VIEW,
-        '                     MultiViewModel.HISTORY_FRAME,
-        '                     MultiViewModel.TAB_VIEW)
+        v1 = New ViewItemModel With {
+            .Content = cvm,
+            .Name = cvm.GetType.Name,
+            .FrameType = MultiViewModel.MAIN_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True
+        }
+        Call cvm.AddViewItem(v1)
         Call cvm.AddView(v1)
-        'Call hvm.AddView(v2)
     End Sub
 
     'Public Function DBTESTViewDefineExecute(ByVal [name] As String) As Object
@@ -54,14 +54,26 @@ Public Module ViewSetupModule
         Dim v1, v2
         Call rpapvm.Initialize(app, vm)
         Call rpapmvm.Initialize(app, vm)
-        v1 = rpapvm.AddViewItem(rpapvm,
-                                ViewModel.MULTI_VIEW,
-                                MultiViewModel.MAIN_FRAME,
-                                MultiViewModel.TAB_VIEW)
-        v2 = rpapvm.AddViewItem(rpapmvm,
-                                ViewModel.MULTI_VIEW,
-                                MultiViewModel.PROJECT_MENU_FRAME,
-                                MultiViewModel.NORMAL_VIEW)
+        v1 = New ViewItemModel With {
+            .Content = rpapvm,
+            .Name = rpapvm.GetType.Name,
+            .FrameType = MultiViewModel.MAIN_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True,
+            .ModelName = rpapvm.GetType.Name
+        }
+        v2 = New ViewItemModel With {
+            .Content = rpapmvm,
+            .Name = rpapmvm.GetType.Name,
+            .FrameType = MultiViewModel.PROJECT_MENU_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.NORMAL_VIEW,
+            .OpenState = True,
+            .ModelName = rpapmvm.GetType.Name
+        }
+        Call rpapvm.AddViewItem(v1)
+        Call rpapmvm.AddViewItem(v2)
         Call rpapvm.AddView(v1)
         Call rpapmvm.AddView(v2)
     End Sub
@@ -81,30 +93,17 @@ Public Module ViewSetupModule
 
     Public Function RpaProjectViewDefineExecute(ByVal v As ViewItemModel) As Object
         Dim obj As Object
-        Dim ck1, ck2, ck3
 
-        ck1 = TryCast(
-            _CheckLoadedModel(Of RpaProjectMenuViewModel)(v.Content),
-            RpaProjectMenuViewModel
-        )
-        ck2 = TryCast(
-            _CheckLoadedModel(Of RpaProjectViewModel)(v.Content),
-            RpaProjectViewModel
-        )
-        ck3 = TryCast(
-            _CheckLoadedModel(Of RpaViewModel)(v.Content),
-            RpaViewModel
-        )
-
-        If ck1 IsNot Nothing Then
-            obj = New RpaProjectMenuViewModel
-        End If
-        If ck2 IsNot Nothing Then
-            obj = New RpaProjectViewModel
-        End If
-        If ck3 IsNot Nothing Then
-            obj = New RpaViewModel
-        End If
+        Select Case v.ModelName
+            Case (New RpaProjectMenuViewModel).GetType.Name
+                obj = New RpaProjectMenuViewModel
+            Case (New RpaProjectViewModel).GetType.Name
+                obj = New RpaProjectViewModel
+            Case (New RpaViewModel).GetType.Name
+                obj = New RpaViewModel
+            Case Else
+                obj = Nothing
+        End Select
 
         RpaProjectViewDefineExecute = obj
     End Function

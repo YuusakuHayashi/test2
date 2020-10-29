@@ -43,12 +43,15 @@ Public Class MenuViewModel
         Dim v As ViewItemModel
         Dim pvm = New ProjectViewModel
         pvm.Initialize(AppInfo, ViewModel)
-        v = AddViewItem(
-            pvm,
-            ViewModel.MULTI_VIEW,
-            MultiViewModel.MAIN_FRAME,
-            MultiViewModel.TAB_VIEW
-        )
+        v = New ViewItemModel With {
+            .Content = pvm,
+            .Name = pvm.GetType.Name,
+            .FrameType = MultiViewModel.MAIN_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True
+        }
+        Call AddViewItem(v)
         Call AddView(v)
     End Sub
 

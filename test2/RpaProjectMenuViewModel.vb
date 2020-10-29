@@ -63,18 +63,19 @@ Public Class RpaProjectMenuViewModel : Inherits BaseViewModel2
 
     Private Sub _RpaLaunchCommandExecute(ByVal parameter As Object)
         Dim v As ViewItemModel
-        Dim rpa = New RpaModel
-        Dim rpavm = New RpaViewModel
+        Dim rpavm As New RpaViewModel
         rpavm.Initialize(AppInfo, ViewModel)
-        v = AddViewItem(
-            rpavm,
-            ViewModel.MULTI_VIEW,
-            MultiViewModel.MAIN_FRAME,
-            MultiViewModel.TAB_VIEW,
-            "BrankRpa" & _GetIndex().ToString()
-        )
+        v = New ViewItemModel With {
+            .Content = rpavm,
+            .Name = "BrankRpa" & _GetIndex().ToString(),
+            .FrameType = MultiViewModel.MAIN_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True,
+            .ModelName = rpavm.GetType.Name
+        }
+        Call AddViewItem(v)
         Call AddView(v)
-        AppInfo.ProjectInfo.Model.Data.Rpas.Add(rpa)
     End Sub
 
     Private Function _RpaLaunchCommandCanExecute(ByVal parameter As Object) As Boolean

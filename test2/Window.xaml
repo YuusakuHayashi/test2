@@ -944,6 +944,51 @@
                 </StackPanel>
             </DataTemplate>
 
+            <DataTemplate                
+                DataType="{x:Type local:RpaViewModel}">
+                <StackPanel Margin="10,0,0,0">
+                    <StackPanel 
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock 
+                            Width="150"
+                            Text="状態" />
+                        <TextBlock Text="{Binding StatusText, Mode=OneWay}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock 
+                            Width="150"
+                            Text="ルートプロジェクト名" />
+                        <TextBox
+                            Width="400"
+                            Text="{Binding RootProjectName}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock 
+                            Width="150"
+                            Text="プロジェクト名" />
+                        <TextBox
+                            Width="400"
+                            Text="{Binding UserProjectName}" />
+                    </StackPanel>
+                    <StackPanel 
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock 
+                            Width="150"
+                            Text="実行パラメータ" />
+                        <TextBox
+                            Width="400"
+                            Text="{Binding RunParameter}" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+
+
             <DataTemplate
                 DataType="{x:Type local:HistoryViewModel}">
                 <DockPanel

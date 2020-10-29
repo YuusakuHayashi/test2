@@ -399,22 +399,37 @@ Public MustInherit Class BaseViewModel2
         End Select
     End Sub
 
-    Public Function AddViewItem(ByVal obj As Object,
-                                ByVal [layout] As String,
-                                ByVal frame As String,
-                                ByVal view As String,
-                                Optional ByVal nm As String = vbNullString) As ViewItemModel
-        Dim [name] = IIf(String.IsNullOrEmpty(nm), obj.GetType.Name, nm)
-        Dim v As New ViewItemModel With {
-            .Name = [name],
-            .FrameType = frame,
-            .ViewType = view,
-            .LayoutType = [layout],
-            .OpenState = True,
-            .Content = obj
-        }
+    'Public Function AddViewItem(ByVal obj As Object,
+    '                            ByVal [layout] As String,
+    '                            ByVal frame As String,
+    '                            ByVal view As String,
+    '                            Optional ByVal nm As String = vbNullString) As ViewItemModel
+    'Dim [name] = IIf(String.IsNullOrEmpty(nm), obj.GetType.Name, nm)
+    'Dim v As New ViewItemModel With {
+    '    .Name = [name],
+    '    .FrameType = frame,
+    '    .ViewType = view,
+    '    .LayoutType = [layout],
+    '    .OpenState = True,
+    '    .Content = obj
+    '}
 
-        ' ViewModel, AppDirectoryModel, ProjectInfoModelは登録しない
+    ' ViewModel, AppDirectoryModel, ProjectInfoModelは登録しない
+    'Select Case True
+    '    Case obj.Equals(ViewModel)
+    '    Case obj.Equals(AppInfo)
+    '    Case obj.GetType.Name = (New ProjectInfoModel).GetType.Name
+    '    Case obj.GetType.Name = (New ProjectViewModel).GetType.Name
+    '    Case obj.GetType.Name = (New MenuViewModel).GetType.Name
+    '    Case obj.GetType.Name = (New HistoryViewModel).GetType.Name
+    '    Case Else
+    '        ViewModel.Views.Add(v)
+    'End Select
+    'AddViewItem = v
+    'End Function
+
+    Public Sub AddViewItem(ByVal v As ViewItemModel)
+        Dim obj = v.Content
         Select Case True
             Case obj.Equals(ViewModel)
             Case obj.Equals(AppInfo)
@@ -425,8 +440,7 @@ Public MustInherit Class BaseViewModel2
             Case Else
                 ViewModel.Views.Add(v)
         End Select
-        AddViewItem = v
-    End Function
+    End Sub
 
     Public Delegate Sub ViewSetupDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
     '<< Add Case >>
@@ -520,26 +534,46 @@ Public MustInherit Class BaseViewModel2
         End If
 
         ' 特殊なビューのセット(ViewModel)
-        v0 = AddViewItem(ViewModel,
-                         ViewModel.MULTI_VIEW,
-                         MultiViewModel.EXPLORER_FRAME,
-                         MultiViewModel.TAB_VIEW)
-        v1 = AddViewItem(AppInfo,
-                         ViewModel.MULTI_VIEW,
-                         MultiViewModel.EXPLORER_FRAME,
-                         MultiViewModel.TAB_VIEW)
+        v0 = New ViewItemModel With {
+            .Content = ViewModel,
+            .Name = ViewModel.GetType.Name,
+            .FrameType = MultiViewModel.EXPLORER_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True
+        }
+        v1 = New ViewItemModel With {
+            .Content = AppInfo,
+            .Name = AppInfo.GetType.Name,
+            .FrameType = MultiViewModel.EXPLORER_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True
+        }
         mvm = New MenuViewModel
         mvm.Initialize(AppInfo, ViewModel)
-        v2 = AddViewItem(mvm,
-                         ViewModel.MULTI_VIEW,
-                         MultiViewModel.MENU_FRAME,
-                         MultiViewModel.NORMAL_VIEW)
+        v2 = New ViewItemModel With {
+            .Content = mvm,
+            .Name = mvm.GetType.Name,
+            .FrameType = MultiViewModel.MENU_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.NORMAL_VIEW,
+            .OpenState = True
+        }
         hvm = New HistoryViewModel
         hvm.Initialize(AppInfo, ViewModel)
-        v3 = AddViewItem(hvm,
-                         ViewModel.MULTI_VIEW,
-                         MultiViewModel.HISTORY_FRAME,
-                         MultiViewModel.TAB_VIEW)
+        v3 = New ViewItemModel With {
+            .Content = hvm,
+            .Name = hvm.GetType.Name,
+            .FrameType = MultiViewModel.HISTORY_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True
+        }
+        Call AddViewItem(v0)
+        Call AddViewItem(v1)
+        Call AddViewItem(v2)
+        Call AddViewItem(v3)
         Call AddView(v0)
         Call AddView(v1)
         Call AddView(v2)

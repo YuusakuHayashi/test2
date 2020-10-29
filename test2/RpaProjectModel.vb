@@ -44,4 +44,26 @@ Public Class RpaProjectModel
             Return Me.SystemDirectoryName & "\rpa_project.yaml"
         End Get
     End Property
+
+    Public Sub ProjectAdd(ByVal [name] As String)
+    End Sub
+
+    Public Function GetRpaIndex() As Integer
+        Dim i = 0
+        Dim b = False
+        Do Until True = False
+            b = False
+            For Each rpa In Me.Rpas
+                If i = rpa.Index Then
+                    i += 1
+                    b = True
+                    Exit For
+                End If
+            Next
+            If Not b Then
+                Exit Do
+            End If
+        Loop
+        GetRpaIndex = i
+    End Function
 End Class
