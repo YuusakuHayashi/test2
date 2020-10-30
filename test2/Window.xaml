@@ -107,7 +107,8 @@
                             <Border BorderThickness="{TemplateBinding Border.BorderThickness}" Padding="{TemplateBinding Control.Padding}" BorderBrush="{TemplateBinding Border.BorderBrush}" Background="{TemplateBinding Panel.Background}" Name="Bd" SnapsToDevicePixels="True" Grid.Column="1">
                                 <ContentPresenter Content="{TemplateBinding HeaderedContentControl.Header}" ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}" ContentStringFormat="{TemplateBinding HeaderedItemsControl.HeaderStringFormat}" ContentSource="Header" Name="PART_Header" HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                             </Border>
-                            <ItemsPresenter Name="ItemsHost" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"/>
+                            <ItemsPresenter Name="ItemsHost" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"/>
+                            <!--<ItemsPresenter Name="ItemsHost" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"/>-->
                             <!--<ItemsPresenter Name="ItemsHost" Grid.Column="1" Grid.Row="1"/>-->
                         </Grid>
                         <ControlTemplate.Triggers>
