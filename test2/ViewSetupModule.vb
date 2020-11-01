@@ -23,7 +23,7 @@ Public Module ViewSetupModule
             .ViewType = MultiViewModel.TAB_VIEW,
             .OpenState = True
         }
-        Call cvm.AddViewItem(v1)
+        'Call cvm.AddViewItem(v1)
         Call cvm.AddView(v1)
     End Sub
 
@@ -72,29 +72,25 @@ Public Module ViewSetupModule
             .OpenState = True,
             .ModelName = rpapmvm.GetType.Name
         }
-        Call rpapvm.AddViewItem(v1)
-        Call rpapmvm.AddViewItem(v2)
+        'Call rpapvm.AddViewItem(v1)
+        vm.Views.Add(v1)
+        vm.Views.Add(v2)
         Call rpapvm.AddView(v1)
         Call rpapmvm.AddView(v2)
-    End Sub
-
-    Public Sub RpaProjectViewLoadExecute(ByRef app As AppDirectoryModel,
-                                         ByRef vm As ViewModel)
-        Dim obj As Object
-        For Each v In vm.Views
-            If v.OpenState Then
-                obj = RpaProjectViewDefineExecute(v)
-                obj.Initialize(app, vm)
-                v.Content = obj
-                Call obj.AddView(v)
-            End If
-        Next
     End Sub
 
     Public Function RpaProjectViewDefineExecute(ByVal v As ViewItemModel) As Object
         Dim obj As Object
 
         Select Case v.ModelName
+            Case (New AppDirectoryModel).GetType.Name
+                obj = New AppDirectoryModel
+            Case (New ViewModel).GetType.Name
+                obj = New ViewModel
+            Case (New HistoryViewModel).GetType.Name
+                obj = New HistoryViewModel
+            Case (New MenuViewModel).GetType.Name
+                obj = New MenuViewModel
             Case (New RpaProjectMenuViewModel).GetType.Name
                 obj = New RpaProjectMenuViewModel
             Case (New RpaProjectViewModel).GetType.Name

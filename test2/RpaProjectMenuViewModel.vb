@@ -67,14 +67,14 @@ Public Class RpaProjectMenuViewModel : Inherits BaseViewModel2
         rpavm.Initialize(AppInfo, ViewModel)
         v = New ViewItemModel With {
             .Content = rpavm,
-            .Name = "BrankRpa" & _GetIndex().ToString(),
+            .Name = "Rpa" & _GetIndex().ToString(),
+            .ModelName = rpavm.GetType.Name,
             .FrameType = MultiViewModel.MAIN_FRAME,
             .LayoutType = ViewModel.MULTI_VIEW,
             .ViewType = MultiViewModel.TAB_VIEW,
-            .OpenState = True,
-            .ModelName = rpavm.GetType.Name
+            .OpenState = True
         }
-        Call AddViewItem(v)
+        ViewModel.Views.Add(v)
         Call AddView(v)
     End Sub
 

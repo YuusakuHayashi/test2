@@ -4,6 +4,27 @@ Imports Newtonsoft.Json.Linq
 Public Class ViewItemModel
     Inherits BaseViewModel
 
+    Private _IconFileName As String
+    Public Property IconFileName As String
+        Get
+            Return _IconFileName
+        End Get
+        Set(value As String)
+            _IconFileName = value
+        End Set
+    End Property
+
+    Private _Icon As BitmapImage
+    <JsonIgnore>
+    Public Property [Icon] As BitmapImage
+        Get
+            Return _Icon
+        End Get
+        Set(value As BitmapImage)
+            _Icon = value
+        End Set
+    End Property
+
     Private _BoxVisibility As Visibility
     <JsonIgnore>
     Public Property BoxVisibility As Visibility

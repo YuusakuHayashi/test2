@@ -23,6 +23,267 @@ Public Class MultiViewModel
     Public Const NORMAL_VIEW As String = "Normal"
     Public Const TAB_VIEW As String = "Tab"
 
+    Private _MainViewHeight As Double
+    Public Property MainViewHeight As Double
+        Get
+            Return Me._MainViewHeight
+        End Get
+        Set(value As Double)
+            Me._MainViewHeight = value
+        End Set
+    End Property
+
+    Private _MainViewPreservedHeight As Double
+    Public Property MainViewPreservedHeight As Double
+        Get
+            Return Me._MainViewPreservedHeight
+        End Get
+        Set(value As Double)
+            Me._MainViewPreservedHeight = value
+        End Set
+    End Property
+
+    Private _MainGridHeight As GridLength
+    <JsonIgnore>
+    Public Property MainGridHeight As GridLength
+        Get
+            Return Me._MainGridHeight
+        End Get
+        Set(value As GridLength)
+            Me._MainGridHeight = value
+            Me.MainViewHeight = value.Value
+            RaisePropertyChanged("MainGridHeight")
+        End Set
+    End Property
+
+    Private _ExplorerViewHeight As Double
+    Public Property ExplorerViewHeight As Double
+        Get
+            Return Me._ExplorerViewHeight
+        End Get
+        Set(value As Double)
+            Me._ExplorerViewHeight = value
+        End Set
+    End Property
+
+    Private _ExplorerViewPreservedHeight As Double
+    Public Property ExplorerViewPreservedHeight As Double
+        Get
+            Return Me._ExplorerViewPreservedHeight
+        End Get
+        Set(value As Double)
+            Me._ExplorerViewPreservedHeight = value
+        End Set
+    End Property
+
+    Private _ExplorerGridHeight As GridLength
+    <JsonIgnore>
+    Public Property ExplorerGridHeight As GridLength
+        Get
+            Return Me._ExplorerGridHeight
+        End Get
+        Set(value As GridLength)
+            Me._ExplorerGridHeight = value
+            Me.ExplorerViewHeight = value.Value
+        End Set
+    End Property
+
+    Private _HistoryViewHeight As Double
+    Public Property HistoryViewHeight As Double
+        Get
+            Return Me._HistoryViewHeight
+        End Get
+        Set(value As Double)
+            Me._HistoryViewHeight = value
+        End Set
+    End Property
+
+    Private _HistoryViewPreservedHeight As Double
+    Public Property HistoryViewPreservedHeight As Double
+        Get
+            Return Me._HistoryViewPreservedHeight
+        End Get
+        Set(value As Double)
+            Me._HistoryViewPreservedHeight = value
+        End Set
+    End Property
+
+    Private _HistoryGridHeight As GridLength
+    <JsonIgnore>
+    Public Property HistoryGridHeight As GridLength
+        Get
+            Return Me._HistoryGridHeight
+        End Get
+        Set(value As GridLength)
+            Me._HistoryGridHeight = value
+            Me.HistoryViewHeight = value.Value
+        End Set
+    End Property
+
+    'Private _MainViewWidth As Double
+    'Public Property MainViewWidth As Double
+    '    Get
+    '        Return Me._MainViewWidth
+    '    End Get
+    '    Set(value As Double)
+    '        Me._MainViewWidth = value
+    '    End Set
+    'End Property
+
+    'Private _MainViewPreservedWidth As Double
+    'Public Property MainViewPreservedWidth As Double
+    '    Get
+    '        Return Me._MainViewPreservedWidth
+    '    End Get
+    '    Set(value As Double)
+    '        Me._MainViewPreservedWidth = value
+    '    End Set
+    'End Property
+
+    'Private _MainGridWidth As GridLength
+    '<JsonIgnore>
+    'Public Property MainGridWidth As GridLength
+    '    Get
+    '        Return Me._MainGridWidth
+    '    End Get
+    '    Set(value As GridLength)
+    '        Me._MainGridWidth = value
+    '        Me.MainViewWidth = value.Value
+    '        RaisePropertyChanged("MainGridWidth")
+    '    End Set
+    'End Property
+
+    'Private _ExplorerViewWidth As Double
+    'Public Property ExplorerViewWidth As Double
+    '    Get
+    '        Return Me._ExplorerViewWidth
+    '    End Get
+    '    Set(value As Double)
+    '        Me._ExplorerViewWidth = value
+    '    End Set
+    'End Property
+
+    'Private _ExplorerViewPreservedWidth As Double
+    'Public Property ExplorerViewPreservedWidth As Double
+    '    Get
+    '        Return Me._ExplorerViewPreservedWidth
+    '    End Get
+    '    Set(value As Double)
+    '        Me._ExplorerViewPreservedWidth = value
+    '    End Set
+    'End Property
+
+    'Private _ExplorerGridWidth As GridLength
+    '<JsonIgnore>
+    'Public Property ExplorerGridWidth As GridLength
+    '    Get
+    '        Return Me._ExplorerGridWidth
+    '    End Get
+    '    Set(value As GridLength)
+    '        Me._ExplorerGridWidth = value
+    '        Me.ExplorerViewWidth = value.Value
+    '    End Set
+    'End Property
+
+    'Private _HistoryViewWidth As Double
+    'Public Property HistoryViewWidth As Double
+    '    Get
+    '        Return Me._HistoryViewWidth
+    '    End Get
+    '    Set(value As Double)
+    '        Me._HistoryViewWidth = value
+    '    End Set
+    'End Property
+
+    'Private _HistoryViewPreservedWidth As Double
+    'Public Property HistoryViewPreservedWidth As Double
+    '    Get
+    '        Return Me._HistoryViewPreservedWidth
+    '    End Get
+    '    Set(value As Double)
+    '        Me._HistoryViewPreservedWidth = value
+    '    End Set
+    'End Property
+
+    'Private _HistoryGridWidth As GridLength
+    '<JsonIgnore>
+    'Public Property HistoryGridWidth As GridLength
+    '    Get
+    '        Return Me._HistoryGridWidth
+    '    End Get
+    '    Set(value As GridLength)
+    '        Me._HistoryGridWidth = value
+    '        Me.HistoryViewWidth = value.Value
+    '        RaisePropertyChanged("HistoryGridWidth")
+    '    End Set
+    'End Property
+
+    Private _RightViewWidth As Double
+    Public Property RightViewWidth As Double
+        Get
+            Return Me._RightViewWidth
+        End Get
+        Set(value As Double)
+            Me._RightViewWidth = value
+        End Set
+    End Property
+
+    Private _RightViewPreservedWidth As Double
+    Public Property RightViewPreservedWidth As Double
+        Get
+            Return Me._RightViewPreservedWidth
+        End Get
+        Set(value As Double)
+            Me._RightViewPreservedWidth = value
+        End Set
+    End Property
+
+    Private _LeftViewWidth As Double
+    Public Property LeftViewWidth As Double
+        Get
+            Return Me._LeftViewWidth
+        End Get
+        Set(value As Double)
+            Me._LeftViewWidth = value
+        End Set
+    End Property
+
+    Private _LeftViewPreservedWidth As Double
+    Public Property LeftViewPreservedWidth As Double
+        Get
+            Return Me._LeftViewPreservedWidth
+        End Get
+        Set(value As Double)
+            Me._LeftViewPreservedWidth = value
+        End Set
+    End Property
+
+    Private _RightGridWidth As GridLength
+    <JsonIgnore>
+    Public Property RightGridWidth As GridLength
+        Get
+            Return Me._RightGridWidth
+        End Get
+        Set(value As GridLength)
+            Me._RightGridWidth = value
+            Me.RightViewWidth = value.Value
+            RaisePropertyChanged("RightGridWidth")
+        End Set
+    End Property
+
+    Private _LeftGridWidth As GridLength
+    <JsonIgnore>
+    Public Property LeftGridWidth As GridLength
+        Get
+            Return Me._LeftGridWidth
+        End Get
+        Set(value As GridLength)
+            Me._LeftGridWidth = value
+            Me.LeftViewWidth = value.Value
+            RaisePropertyChanged("LeftGridWidth")
+        End Set
+    End Property
+
     Private _MainViewContent As Object
     <JsonIgnore>
     Public Property MainViewContent As Object
@@ -100,20 +361,6 @@ Public Class MultiViewModel
         End Set
     End Property
 
-    ' --------------------------------------------------------------------------------------------'
-    'Private _Views As ObservableCollection(Of ViewItemModel)
-    'Public Property Views As ObservableCollection(Of ViewItemModel)
-    '    Get
-    '        If Me._Views Is Nothing Then
-    '            Me._Views = New ObservableCollection(Of ViewItemModel)
-    '        End If
-    '        Return Me._Views
-    '    End Get
-    '    Set(value As ObservableCollection(Of ViewItemModel))
-    '        Me._Views = value
-    '    End Set
-    'End Property
-    ' --------------------------------------------------------------------------------------------'
 
     ' タブコレクション関連
     ' タブディクショナリ

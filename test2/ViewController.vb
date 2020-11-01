@@ -4,11 +4,39 @@
                                     ByRef vm As ViewModel)
         Me.[AddHandler] = [Delegate].Combine(
             New Action(AddressOf _TabCloseAddHandler),
-            New Action(AddressOf _OpenViewAddHandler)
+            New Action(AddressOf _OpenViewAddHandler),
+            New Action(AddressOf _MultiViewSizeChangedAddHandler)
         )
         Call BaseInitialize(adm, vm)
     End Sub
 
+    '--- タブを閉じる関連 ------------------------------------------------------------------------'
+    Private Sub _MultiViewSizeChangedReview(ByVal sender As Object, ByVal e As System.EventArgs)
+        Call _MultiViewSizeChangeAccept(sender)
+    End Sub
+
+    Private Sub _MultiViewSizeChangeAccept(ByVal sender As Object)
+        Select Case sender.Name
+            Case "MainView"
+                ViewModel.MultiView.MainGridHeight = New GridLength(sender.ActualHeight)
+                ViewModel.MultiView.RightGridWidth = New GridLength(sender.ActualWidth)
+            Case "ExplorerView"
+                ViewModel.MultiView.ExplorerGridHeight = New GridLength(sender.ActualHeight)
+                ViewModel.MultiView.LeftGridWidth = New GridLength(sender.ActualWidth)
+            Case "HistoryView"
+                ViewModel.MultiView.HistoryGridHeight = New GridLength(sender.ActualHeight)
+                ViewModel.MultiView.RightGridWidth = New GridLength(sender.ActualWidth)
+            Case Else
+                Throw New Exception("Error View Name")
+        End Select
+    End Sub
+
+    Private Sub _MultiViewSizeChangedAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.MultiViewSizeChanged,
+            AddressOf Me._MultiViewSizeChangedReview
+    End Sub
+    '---------------------------------------------------------------------------------------------'
 
     '--- タブを閉じる関連 ------------------------------------------------------------------------'
     Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
@@ -39,14 +67,13 @@
     End Sub
 
     Private Sub _OpenViewRequestAccept(ByVal v As ViewItemModel)
-        Dim obj As Object
-        Dim [define] = ViewDefineHandler
         Dim idx = ViewModel.Views.IndexOf(v)
         ViewModel.Views(idx).OpenState = True
-        obj = [define](ViewModel.Views(idx))
-        Call obj.Initialize(AppInfo, ViewModel)
-        ViewModel.Views(idx).Content = obj
-        Call AddView(ViewModel.Views(idx))
+        Call ViewLoad(ViewModel.Views(idx))
+        'obj = [define](ViewModel.Views(idx))
+        'Call obj.Initialize(AppInfo, ViewModel)
+        'ViewModel.Views(idx).Content = obj
+        'Call AddView(ViewModel.Views(idx))
     End Sub
     '---------------------------------------------------------------------------------------------'
 End Class

@@ -431,11 +431,12 @@ Public Class UserDirectoryViewModel
         Me.CurrentProjects = AppInfo.CurrentProjects
         Me.FixedProjects = AppInfo.FixedProjects
 
-        ' ViewModel.AddViewItem() から取得すると、
+        ' ViewModel.AddViewItem() を使用すると
         ' ViewModel.Viewsに登録されてしまい、
         ' ロード対象になってしまう
         v = New ViewItemModel With {
             .Name = Me.GetType.Name,
+            .ModelName = Me.GetType.Name,
             .LayoutType = ViewModel.SINGLE_VIEW,
             .FrameType = ViewModel.MultiView.MAIN_FRAME,
             .ViewType = ViewModel.MultiView.NORMAL_VIEW,

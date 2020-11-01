@@ -7,6 +7,7 @@
         End Get
     End Property
 
+    Public Event MultiViewSizeChanged As EventHandler
     Public Event RemoveFixedProjectRequested As EventHandler
     Public Event FixProjectRequested As EventHandler
     Public Event OpenViewRequested As EventHandler
@@ -17,9 +18,13 @@
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
 
+    Public Sub RaiseMultiViewSizeChanged(ByVal sender As Object)
+        RaiseEvent MultiViewSizeChanged(sender, EventArgs.Empty)
+    End Sub
     'Public Sub RaiseOpenViewRequested(ByVal child As ViewItemModel)
     '    RaiseEvent OpenViewRequested(child, EventArgs.Empty)
     'End Sub
+
     Public Sub RaiseRemoveFixedProjectRequested(ByVal p As ProjectInfoModel)
         RaiseEvent RemoveFixedProjectRequested(p, EventArgs.Empty)
     End Sub

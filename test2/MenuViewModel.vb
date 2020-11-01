@@ -5,6 +5,92 @@ Imports System.IO
 Public Class MenuViewModel
     Inherits BaseViewModel2
 
+    ' コマンドプロパティ（プロジェクトビュー表示）
+    '---------------------------------------------------------------------------------------------'
+    Private _ShowProjectExplorerCommand As ICommand
+    Public ReadOnly Property ShowProjectExplorerCommand As ICommand
+        Get
+            If Me._ShowProjectExplorerCommand Is Nothing Then
+                Me._ShowProjectExplorerCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _ShowProjectExplorerCommandExecute,
+                    .CanExecuteHandler = AddressOf _ShowProjectExplorerCommandCanExecute
+                }
+                Return Me._ShowProjectExplorerCommand
+            Else
+                Return Me._ShowProjectExplorerCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckShowProjectExplorerCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._ShowProjectExplorerCommandEnableFlag = b
+    End Sub
+
+    Private __ShowProjectExplorerCommandEnableFlag As Boolean
+    Public Property _ShowProjectExplorerCommandEnableFlag As Boolean
+        Get
+            Return Me.__ShowProjectExplorerCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__ShowProjectExplorerCommandEnableFlag = value
+            RaisePropertyChanged("_ShowProjectExplorerCommandEnableFlag")
+            CType(ShowProjectExplorerCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _ShowProjectExplorerCommandExecute(ByVal parameter As Object)
+        Call ShowProjectExplorer()
+    End Sub
+
+    Private Function _ShowProjectExplorerCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._ShowProjectExplorerCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    ' コマンドプロパティ（プロジェクトビュー表示）
+    '---------------------------------------------------------------------------------------------'
+    Private _ShowViewExplorerCommand As ICommand
+    Public ReadOnly Property ShowViewExplorerCommand As ICommand
+        Get
+            If Me._ShowViewExplorerCommand Is Nothing Then
+                Me._ShowViewExplorerCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _ShowViewExplorerCommandExecute,
+                    .CanExecuteHandler = AddressOf _ShowViewExplorerCommandCanExecute
+                }
+                Return Me._ShowViewExplorerCommand
+            Else
+                Return Me._ShowViewExplorerCommand
+            End If
+        End Get
+    End Property
+
+    Private Sub _CheckShowViewExplorerCommandEnabled()
+        Dim b As Boolean : b = True
+        Me._ShowViewExplorerCommandEnableFlag = b
+    End Sub
+
+    Private __ShowViewExplorerCommandEnableFlag As Boolean
+    Public Property _ShowViewExplorerCommandEnableFlag As Boolean
+        Get
+            Return Me.__ShowViewExplorerCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__ShowViewExplorerCommandEnableFlag = value
+            RaisePropertyChanged("_ShowViewExplorerCommandEnableFlag")
+            CType(ShowViewExplorerCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub _ShowViewExplorerCommandExecute(ByVal parameter As Object)
+        Call ShowViewExplorer()
+    End Sub
+
+    Private Function _ShowViewExplorerCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._ShowViewExplorerCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔ設定画面表示）
     '---------------------------------------------------------------------------------------------'
     Private _ShowProjectSettingCommand As ICommand
@@ -46,12 +132,13 @@ Public Class MenuViewModel
         v = New ViewItemModel With {
             .Content = pvm,
             .Name = pvm.GetType.Name,
+            .ModelName = pvm.GetType.Name,
             .FrameType = MultiViewModel.MAIN_FRAME,
             .LayoutType = ViewModel.MULTI_VIEW,
             .ViewType = MultiViewModel.TAB_VIEW,
             .OpenState = True
         }
-        Call AddViewItem(v)
+        ViewModel.Views.Add(v)
         Call AddView(v)
     End Sub
 
@@ -260,7 +347,9 @@ Public Class MenuViewModel
             New Action(AddressOf _CheckOpenProjectCommandEnabled),
             New Action(AddressOf _CheckSaveProjectCommandEnabled),
             New Action(AddressOf _CheckResaveProjectCommandEnabled),
-            New Action(AddressOf _CheckShowProjectSettingCommandEnabled)
+            New Action(AddressOf _CheckShowProjectSettingCommandEnabled),
+            New Action(AddressOf _CheckShowProjectExplorerCommandEnabled),
+            New Action(AddressOf _CheckShowViewExplorerCommandEnabled)
         )
 
         Call BaseInitialize(app, vm)

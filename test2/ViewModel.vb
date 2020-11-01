@@ -32,7 +32,6 @@ Public Class ViewModel
     End Property
 
     Private _MultiView As MultiViewModel
-    <JsonIgnore>
     Public Property MultiView As MultiViewModel
         Get
             If Me._MultiView Is Nothing Then

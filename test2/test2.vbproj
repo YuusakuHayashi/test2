@@ -88,6 +88,8 @@
     <Compile Include="BatchMenuViewModel.vb" />
     <Compile Include="CollectionModule.vb" />
     <Compile Include="CommonModule.vb" />
+    <Compile Include="Converters\DoubleGridLengthConverter.vb" />
+    <Compile Include="Converters\MinusConverter.vb" />
     <Compile Include="DelegateAction.vb" />
     <Compile Include="MenuItemModel.vb" />
     <Compile Include="MenuViewModel.vb" />

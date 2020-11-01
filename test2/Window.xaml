@@ -171,7 +171,7 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid>
+    <Grid x:Name="RootLayout">
         <Grid.Resources>
             <!-- タブで表示するタイプ -->
             <DataTemplate
@@ -772,6 +772,32 @@
                 </DockPanel>
             </DataTemplate>
 
+            <ContextMenu x:Key="ViewItemContextMenu">
+                <MenuItem 
+                    Header="名前の変更"
+                    Command="{Binding ChangeAliasCommand}"/>
+            </ContextMenu>
+
+            <DataTemplate                
+                DataType="{x:Type local:ViewItemModel}">
+                <DockPanel 
+                    Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}}"
+                    LastChildFill="True">
+                    <Image 
+                        Margin="0,0,5,0"
+                        Height="15" Width="15"
+                        Source="{Binding Icon}" />
+                    <TextBlock            
+                        Visibility="{Binding BlockVisibility}"
+                        ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                        Text="{Binding Alias}" />
+                    <TextBox            
+                        Visibility="{Binding BoxVisibility}"
+                        ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                        Text="{Binding Alias}" />
+                </DockPanel>
+            </DataTemplate>
+
             <DataTemplate                
                 DataType="{x:Type local:AppDirectoryModel}">
                 <DockPanel
@@ -807,7 +833,14 @@
                             </TreeViewItem.ItemContainerStyle>
                             <TreeViewItem.ItemTemplate>
                                 <HierarchicalDataTemplate DataType="{x:Type local:ProjectInfoModel}">
-                                    <TextBlock Text="{Binding Name}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image 
+                                            Height="15" Width="15"
+                                            Source="{Binding Icon}" />
+                                        <TextBlock 
+                                            Margin="5,0,0,0"
+                                            Text="{Binding Name}" />
+                                    </StackPanel>
                                 </HierarchicalDataTemplate>
                             </TreeViewItem.ItemTemplate>
                         </TreeViewItem>
@@ -815,27 +848,6 @@
                 </DockPanel>
             </DataTemplate>
 
-            <ContextMenu x:Key="ViewItemContextMenu">
-                <MenuItem 
-                    Header="名前の変更"
-                    Command="{Binding ChangeAliasCommand}"/>
-            </ContextMenu>
-
-            <DataTemplate                
-                DataType="{x:Type local:ViewItemModel}">
-                <DockPanel 
-                    Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}}"
-                    LastChildFill="True">
-                    <TextBlock            
-                        Visibility="{Binding BlockVisibility}"
-                        ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
-                        Text="{Binding Alias}" />
-                    <TextBox            
-                        Visibility="{Binding BoxVisibility}"
-                        ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
-                        Text="{Binding Alias}" />
-                </DockPanel>
-            </DataTemplate>
 
             <DataTemplate                
                 DataType="{x:Type local:RpaProjectMenuViewModel}">
@@ -1134,7 +1146,14 @@
                             Header="表示(V)"
                             Background="Transparent"
                             BorderBrush="Transparent"
-                            Margin="0,0,5,0" />
+                            Margin="0,0,5,0">
+                            <MenuItem 
+                                Header="プロジェクトエクスプローラー"
+                                Command="{Binding ShowProjectExplorerCommand}" />
+                            <MenuItem 
+                                Header="ビューエクスプローラー"
+                                Command="{Binding ShowViewExplorerCommand}" />
+                        </MenuItem>
                         <MenuItem
                             Header="プロジェクト(P)"
                             Background="Transparent"
@@ -1154,22 +1173,25 @@
                         Content="{Binding Content}" />
                 </Grid>
             </DataTemplate>
-            
-            <DataTemplate DataType="{x:Type local:MultiViewModel}">
-                <Grid>
+
+            <DataTemplate 
+                x:Name="MultiViewLayout"
+                DataType="{x:Type local:MultiViewModel}">
+                <Grid x:Name="MultiViewData">
                     <Grid.Resources>
-                    </Grid.Resources>                   
+                        <local:DoubleGridLengthConverter x:Key="DoubleGridLengthConverter" />
+                    </Grid.Resources>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="25" />
-                        <RowDefinition Height="25" />
-                        <RowDefinition Height="250" />
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="25"  />
+                        <RowDefinition Height="{Binding MainGridHeight}" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="{Binding RightGridWidth}" />
                     </Grid.ColumnDefinitions>
                     <ContentControl
                         Grid.Row="0"
@@ -1180,30 +1202,34 @@
                         Grid.Column="0" Grid.ColumnSpan="4"
                         Content="{Binding ProjectMenuViewContent}" />
                     <ContentControl
+                        x:Name="ExplorerView"
+                        SizeChanged="ExplorerView_SizeChanged"
                         Grid.Row="2" Grid.RowSpan="3"
                         Grid.Column="0"
                         Content="{Binding ExplorerViewContent}" />
-                    <GridSplitter            
+                    <GridSplitter                        
                         Grid.Row="2" Grid.RowSpan="3"
                         Grid.Column="1"
-                        Width="10"
                         ResizeDirection="Columns"
                         ResizeBehavior="PreviousAndNext"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <ContentControl
+                        x:Name="MainView"
+                        SizeChanged="MainView_SizeChanged"
                         Grid.Row="2"            
                         Grid.Column="2"              
                         Content="{Binding MainViewContent}" />
                     <GridSplitter
                         Grid.Row="3"
                         Grid.Column="2"
-                        Height="10"
                         ResizeDirection="Rows"                
                         ResizeBehavior="PreviousAndNext" 
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <ContentControl
+                        x:Name="HistoryView"
+                        SizeChanged="HistoryView_SizeChanged"
                         Grid.Row="4"
                         Grid.Column="2"           
                         Content="{Binding HistoryViewContent}" />
