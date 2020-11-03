@@ -7,6 +7,8 @@
         End Get
     End Property
 
+    Public Event DeleteViewRequested As EventHandler
+    Public Event OpenProjectRequested As EventHandler
     Public Event MultiViewSizeChanged As EventHandler
     Public Event RemoveFixedProjectRequested As EventHandler
     Public Event FixProjectRequested As EventHandler
@@ -17,6 +19,14 @@
     Public Event MigrateConditionUpdated As EventHandler
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
+
+    Public Sub RaiseDeleteViewRequested(ByVal [view] As ViewItemModel)
+        RaiseEvent DeleteViewRequested([view], EventArgs.Empty)
+    End Sub
+
+    Public Sub RaiseOpenProjectRequested(ByVal project As ProjectInfoModel)
+        RaiseEvent OpenProjectRequested(project, EventArgs.Empty)
+    End Sub
 
     Public Sub RaiseMultiViewSizeChanged(ByVal sender As Object)
         RaiseEvent MultiViewSizeChanged(sender, EventArgs.Empty)

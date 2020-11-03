@@ -8,7 +8,7 @@
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
         Title="Window" Height="500" Width="1000">
     <Window.Resources>
-        <Style TargetType="TreeViewItem">
+        <Style TargetType="TreeViewItem" x:Key="TreeViewItemStyle">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TreeViewItem" xmlns:s="clr-namespace:System;assembly=mscorlib">
@@ -107,9 +107,8 @@
                             <Border BorderThickness="{TemplateBinding Border.BorderThickness}" Padding="{TemplateBinding Control.Padding}" BorderBrush="{TemplateBinding Border.BorderBrush}" Background="{TemplateBinding Panel.Background}" Name="Bd" SnapsToDevicePixels="True" Grid.Column="1">
                                 <ContentPresenter Content="{TemplateBinding HeaderedContentControl.Header}" ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}" ContentStringFormat="{TemplateBinding HeaderedItemsControl.HeaderStringFormat}" ContentSource="Header" Name="PART_Header" HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                             </Border>
-                            <ItemsPresenter Name="ItemsHost" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"/>
                             <!--<ItemsPresenter Name="ItemsHost" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"/>-->
-                            <!--<ItemsPresenter Name="ItemsHost" Grid.Column="1" Grid.Row="1"/>-->
+                            <ItemsPresenter Name="ItemsHost" Grid.Column="1" Grid.Row="1"/>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="TreeViewItem.IsExpanded">
@@ -170,6 +169,400 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <SolidColorBrush x:Key="CyanBrush" Color="#00BCD4" />
+        <SolidColorBrush x:Key="PinkBrush" Color="#DB167C" />
+        <SolidColorBrush x:Key="LimeBrush" Color="#0BE182" />
+
+        <!-- つまみのデザイン。ここでは円（Ellipse）を描いていますが、他の図形や画像など、お好きにデザインしてください -->
+        <Style x:Key="SliderThumbStyle" TargetType="{x:Type Thumb}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Ellipse Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Slider}, Mode=FindAncestor}}" Width="10" Height="10"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- このサンプルでは、簡潔に記述する為に全て Foreground を基準に色を決定しています。個別に指定する場合は、適宜書き換えてください -->
+        <Style x:Key="CustomSliderStyle" TargetType="{x:Type Slider}">
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <!-- 横置きの場合 -->
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="25" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <!-- 上の目盛り -->
+                                    <TickBar Grid.Row="0" x:Name="TopTick" Placement="Top" Visibility="Collapsed" Fill="{TemplateBinding Foreground}" Height="8" Opacity="0.64" Margin="0,0,0,2" />
+
+                                    <!-- 下の目盛り -->
+                                    <TickBar Grid.Row="2" x:Name="BottomTick" Placement="Bottom" Visibility="Collapsed" Fill="{TemplateBinding Foreground}" Height="8" Opacity="0.64" Margin="0,2,0,0" />
+
+                                    <Track Grid.Row="1" x:Name="PART_Track">
+                                        <!-- 減少側のトラック（レール） -->
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="Slider.DecreaseLarge" Background="{TemplateBinding Foreground}" Height="5" BorderBrush="{x:Null}" Opacity="0.2"/>
+                                        </Track.DecreaseRepeatButton>
+
+                                        <!-- 増加側のトラック（レール） -->
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="Slider.IncreaseLarge" Background="{TemplateBinding Foreground}" Height="5" BorderBrush="{x:Null}" Opacity="0.5"/>
+                                        </Track.IncreaseRepeatButton>
+
+                                        <!-- つまみ -->
+                                        <Track.Thumb>
+                                            <Thumb Style="{StaticResource SliderThumbStyle}"/>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Grid>
+                                <!-- TickPlacement の設定によって目盛りの表示を切り替え -->
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="Slider.TickPlacement" Value="TopLeft">
+                                        <Setter TargetName="TopTick" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                    <Trigger Property="Slider.TickPlacement" Value="BottomRight">
+                                        <Setter TargetName="BottomTick" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                    <Trigger Property="Slider.TickPlacement" Value="Both">
+                                        <Setter TargetName="TopTick" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="BottomTick" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <!-- 縦置きの場合 -->
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="25" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <!-- 左の目盛り -->
+                                    <TickBar Grid.Column="0" x:Name="LeftTick" Placement="Left" Visibility="Collapsed" Fill="{TemplateBinding Foreground}" Width="8" Opacity="0.64" Margin="0,0,2,0" />
+
+                                    <!-- 右の目盛り -->
+                                    <TickBar Grid.Column="2" x:Name="RightTick" Placement="Right" Visibility="Collapsed" Fill="{TemplateBinding Foreground}" Width="8" Opacity="0.64" Margin="2,0,0,0" />
+
+                                    <Track Grid.Column="1" x:Name="PART_Track" IsDirectionReversed="true">
+                                        <!-- 減少側のトラック（レール） -->
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="Slider.DecreaseLarge" Background="{TemplateBinding Foreground}" Width="5" BorderBrush="{x:Null}" Opacity="0.2"/>
+                                        </Track.DecreaseRepeatButton>
+
+                                        <!-- 増加側のトラック（レール） -->
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="Slider.IncreaseLarge" Background="{TemplateBinding Foreground}" Width="5" BorderBrush="{x:Null}" Opacity="0.5"/>
+                                        </Track.IncreaseRepeatButton>
+
+                                        <!-- つまみ -->
+                                        <Track.Thumb>
+                                            <Thumb Style="{StaticResource SliderThumbStyle}"/>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Grid>
+                                <!-- TickPlacement の設定によって目盛りの表示を切り替え -->
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="Slider.TickPlacement" Value="TopLeft">
+                                        <Setter TargetName="LeftTick" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                    <Trigger Property="Slider.TickPlacement" Value="BottomRight">
+                                        <Setter TargetName="RightTick" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                    <Trigger Property="Slider.TickPlacement" Value="Both">
+                                        <Setter TargetName="LeftTick" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="RightTick" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Expander 関連 -->
+        <SolidColorBrush x:Key="Expander.MouseOver.Circle.Stroke" Color="#FF5593FF"/>
+        <SolidColorBrush x:Key="Expander.MouseOver.Circle.Fill" Color="#FFF3F9FF"/>
+        <SolidColorBrush x:Key="Expander.MouseOver.Arrow.Stroke" Color="#FF000000"/>
+        <SolidColorBrush x:Key="Expander.Pressed.Circle.Stroke" Color="#FF3C77DD"/>
+        <SolidColorBrush x:Key="Expander.Pressed.Circle.Fill" Color="#FFD9ECFF"/>
+        <SolidColorBrush x:Key="Expander.Pressed.Arrow.Stroke" Color="#FF000000"/>
+        <SolidColorBrush x:Key="Expander.Disabled.Circle.Stroke" Color="#FFBCBCBC"/>
+        <SolidColorBrush x:Key="Expander.Disabled.Circle.Fill" Color="#FFE6E6E6"/>
+        <SolidColorBrush x:Key="Expander.Disabled.Arrow.Stroke" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Expander.Static.Circle.Fill" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="Expander.Static.Circle.Stroke" Color="#FF333333"/>
+        <SolidColorBrush x:Key="Expander.Static.Arrow.Stroke" Color="#FF333333"/>
+        <Style x:Key="ExpanderRightHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid>
+                                    <Grid.LayoutTransform>
+                                        <TransformGroup>
+                                            <TransformGroup.Children>
+                                                <TransformCollection>
+                                                    <RotateTransform Angle="-90"/>
+                                                </TransformCollection>
+                                            </TransformGroup.Children>
+                                        </TransformGroup>
+                                    </Grid.LayoutTransform>
+                                    <Ellipse 
+                                        x:Name="circle" 
+                                        Fill="{StaticResource Expander.Static.Circle.Fill}" 
+                                        HorizontalAlignment="Center" 
+                                        Height="19" 
+                                        Stroke="{StaticResource Expander.Static.Circle.Stroke}" 
+                                        VerticalAlignment="Center" 
+                                        Width="19"/>
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ContentPresenter HorizontalAlignment="Center" Margin="0,4,0,0" Grid.Row="1" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Top"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderUpHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="19"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid>
+                                    <Grid.LayoutTransform>
+                                        <TransformGroup>
+                                            <TransformGroup.Children>
+                                                <TransformCollection>
+                                                    <RotateTransform Angle="180"/>
+                                                </TransformCollection>
+                                            </TransformGroup.Children>
+                                        </TransformGroup>
+                                    </Grid.LayoutTransform>
+                                    <Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="19" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="19"/>
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ContentPresenter Grid.Column="1" HorizontalAlignment="Left" Margin="4,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderLeftHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="19"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid>
+                                    <Grid.LayoutTransform>
+                                        <TransformGroup>
+                                            <TransformGroup.Children>
+                                                <TransformCollection>
+                                                    <RotateTransform Angle="90"/>
+                                                </TransformCollection>
+                                            </TransformGroup.Children>
+                                        </TransformGroup>
+                                    </Grid.LayoutTransform>
+                                    <Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="19" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="19"/>
+                                    <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                </Grid>
+                                <ContentPresenter HorizontalAlignment="Center" Margin="0,4,0,0" Grid.Row="1" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Top"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderHeaderFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border>
+                            <Rectangle Margin="0" SnapsToDevicePixels="true" Stroke="Black" StrokeThickness="1" StrokeDashArray="1 2"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderDownHeaderStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Padding="{TemplateBinding Padding}">
+                            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                                <Grid.ColumnDefinitions>
+                                    <!--<ColumnDefinition Width="19"/>-->
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <!--<Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="19" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="19"/>-->
+                                <Ellipse x:Name="circle" Fill="{StaticResource Expander.Static.Circle.Fill}" HorizontalAlignment="Center" Height="12" Stroke="{StaticResource Expander.Static.Circle.Stroke}" VerticalAlignment="Center" Width="12"/>
+                                <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5" HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="{StaticResource Expander.Static.Arrow.Stroke}" StrokeThickness="2" VerticalAlignment="Center"/>
+                                <ContentPresenter Grid.Column="1" HorizontalAlignment="Left" Margin="4,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter Property="Data" TargetName="arrow" Value="M 1,4.5  L 4.5,1  L 8,4.5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.MouseOver.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.MouseOver.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Stroke}"/>
+                                <Setter Property="StrokeThickness" TargetName="circle" Value="1.5"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Pressed.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Pressed.Arrow.Stroke}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Stroke" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Stroke}"/>
+                                <Setter Property="Fill" TargetName="circle" Value="{StaticResource Expander.Disabled.Circle.Fill}"/>
+                                <Setter Property="Stroke" TargetName="arrow" Value="{StaticResource Expander.Disabled.Arrow.Stroke}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ExpanderStyle1" TargetType="{x:Type Expander}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Expander}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="3" SnapsToDevicePixels="true">
+                            <DockPanel>
+                                <ToggleButton x:Name="HeaderSite" ContentTemplate="{TemplateBinding HeaderTemplate}" ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}" Content="{TemplateBinding Header}" DockPanel.Dock="Top" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FocusVisualStyle="{StaticResource ExpanderHeaderFocusVisual}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}" FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" MinWidth="0" MinHeight="0" Padding="{TemplateBinding Padding}" Style="{StaticResource ExpanderDownHeaderStyle}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                <ContentPresenter x:Name="ExpandSite" DockPanel.Dock="Bottom" Focusable="false" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" Visibility="Collapsed" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </DockPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="true">
+                                <Setter Property="Visibility" TargetName="ExpandSite" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="ExpandDirection" Value="Right">
+                                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Right"/>
+                                <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Left"/>
+                                <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderRightHeaderStyle}"/>
+                            </Trigger>
+                            <Trigger Property="ExpandDirection" Value="Up">
+                                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Top"/>
+                                <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Bottom"/>
+                                <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderUpHeaderStyle}"/>
+                            </Trigger>
+                            <Trigger Property="ExpandDirection" Value="Left">
+                                <Setter Property="DockPanel.Dock" TargetName="ExpandSite" Value="Left"/>
+                                <Setter Property="DockPanel.Dock" TargetName="HeaderSite" Value="Right"/>
+                                <Setter Property="Style" TargetName="HeaderSite" Value="{StaticResource ExpanderLeftHeaderStyle}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
     <Grid x:Name="RootLayout">
         <Grid.Resources>
@@ -734,33 +1127,62 @@
                 </DockPanel>
             </DataTemplate>
 
+            <ContextMenu x:Key="ViewItemContextMenu">
+                <MenuItem 
+                    Header="名前の変更"
+                    Command="{Binding ChangeAliasCommand}"/>
+                <!--<MenuItem 
+                    Header="削除"
+                    Command="{Binding DeleteViewCommand}"/>-->
+            </ContextMenu>
+
             <DataTemplate                
                 DataType="{x:Type local:ViewModel}">
-                <DockPanel
-                    VerticalAlignment="Stretch"
-                    HorizontalAlignment="Stretch"
-                    LastChildFill="True">
-                    <StackPanel 
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TreeView                         
                         DockPanel.Dock="Top"
-                        Orientation="Horizontal">
-                        <!--<Button
-                            Template="{StaticResource DBReLoadButton}"
-                            Command="{Binding DBLoadCommand}" />
-                        <Button
-                            Template="{StaticResource SaveButton}"
-                            Command="{Binding SaveCommand}" />-->
-                    </StackPanel>
-
-                    <TreeView
-                        ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        ScrollViewer.HorizontalScrollBarVisibility="Visible"                        
-                        VerticalAlignment="Stretch"
+                        Grid.Row="0"
                         HorizontalAlignment="Stretch"
-                        BorderThickness="0,0,0,0">
+                        HorizontalContentAlignment="Stretch"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.HorizontalScrollBarVisibility="Visible">
                         <TreeViewItem
-                            FontSize="11"
+                            Style="{StaticResource TreeViewItemStyle}"
+                            FontSize="{Binding FontSize, Mode=OneWay}"
                             Header="Views"
                             ItemsSource="{Binding Views}">
+                            <TreeViewItem.ItemTemplate>
+                                <HierarchicalDataTemplate>
+                                    <Grid HorizontalAlignment="Stretch">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Image
+                                            Width="12" Height="12"
+                                            Grid.Column="0"
+                                            Margin="0,0,5,0"
+                                            Source="{Binding Icon}" />
+                                        <StackPanel 
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            Orientation="Horizontal">
+                                            <TextBlock            
+                                                Visibility="{Binding BlockVisibility}"
+                                                ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                                                Text="{Binding Alias}" />
+                                            <TextBox          
+                                                Visibility="{Binding BoxVisibility}"
+                                                ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                                                Text="{Binding Alias}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </HierarchicalDataTemplate>
+                            </TreeViewItem.ItemTemplate>
                             <TreeViewItem.ItemContainerStyle>
                                 <Style TargetType="TreeViewItem">
                                     <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
@@ -769,23 +1191,41 @@
                             </TreeViewItem.ItemContainerStyle>
                         </TreeViewItem>
                     </TreeView>
-                </DockPanel>
+                    <Expander 
+                        Header="Settings" 
+                        Style="{StaticResource ExpanderStyle1}" 
+                        Grid.Row="2">
+                        <StackPanel 
+                            Orientation="Horizontal"
+                            Margin="5,0,0,0">
+                            <TextBlock 
+                                VerticalAlignment="Center"
+                                Text="Size: " />
+                            <Slider
+                                Width="100"
+                                Value="{Binding FontSize}"
+                                Minimum="6" Maximum="18"                        
+                                SmallChange="1" LargeChange="1" TickFrequency="1"
+                                Style="{StaticResource CustomSliderStyle}"
+                                Orientation="Horizontal" />
+                            <TextBlock 
+                                VerticalAlignment="Center"
+                                Margin="5,0,0,0"
+                                Text="{Binding FontSize, Mode=OneWay}" />
+                        </StackPanel>
+                    </Expander>
+                </Grid>
             </DataTemplate>
 
-            <ContextMenu x:Key="ViewItemContextMenu">
-                <MenuItem 
-                    Header="名前の変更"
-                    Command="{Binding ChangeAliasCommand}"/>
-            </ContextMenu>
 
-            <DataTemplate                
+            <!--<DataTemplate                
                 DataType="{x:Type local:ViewItemModel}">
                 <DockPanel 
                     Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}}"
                     LastChildFill="True">
                     <Image 
                         Margin="0,0,5,0"
-                        Height="15" Width="15"
+                        Height="12" Width="12"
                         Source="{Binding Icon}" />
                     <TextBlock            
                         Visibility="{Binding BlockVisibility}"
@@ -796,56 +1236,60 @@
                         ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
                         Text="{Binding Alias}" />
                 </DockPanel>
-            </DataTemplate>
+            </DataTemplate>-->
 
             <DataTemplate                
                 DataType="{x:Type local:AppDirectoryModel}">
-                <DockPanel
-                    VerticalAlignment="Stretch"
-                    HorizontalAlignment="Stretch"
-                    LastChildFill="True">
-                    <StackPanel 
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TreeView                         
                         DockPanel.Dock="Top"
-                        Orientation="Horizontal">
-                        <!--<Button
-                            Template="{StaticResource DBReLoadButton}"
-                            Command="{Binding DBLoadCommand}" />
-                        <Button
-                            Template="{StaticResource SaveButton}"
-                            Command="{Binding SaveCommand}" />-->
-                    </StackPanel>
-
-                    <TreeView
-                        ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        ScrollViewer.HorizontalScrollBarVisibility="Visible"                        
-                        VerticalAlignment="Stretch"
+                        Grid.Row="0"
                         HorizontalAlignment="Stretch"
-                        BorderThickness="0,0,0,0">
+                        HorizontalContentAlignment="Stretch"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.HorizontalScrollBarVisibility="Visible">
                         <TreeViewItem
-                            FontSize="11"
+                            Style="{StaticResource TreeViewItemStyle}"
+                            FontSize="{Binding FontSize, Mode=OneWay}"
                             Header="Projects"
                             ItemsSource="{Binding CurrentProjects}">
+                            <TreeViewItem.ItemTemplate>
+                                <HierarchicalDataTemplate>
+                                    <Grid HorizontalAlignment="Stretch">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Image
+                                            Width="12" Height="12"
+                                            Grid.Column="0"
+                                            Source="{Binding Icon}" />
+                                        <StackPanel 
+                                            Margin="5,0,0,0"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            Orientation="Horizontal">
+                                            <TextBlock 
+                                                Text="{Binding Name}" />
+                                            <TextBlock 
+                                                Text="{Binding ActiveStatus}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </HierarchicalDataTemplate>
+                            </TreeViewItem.ItemTemplate>
                             <TreeViewItem.ItemContainerStyle>
                                 <Style TargetType="TreeViewItem">
                                     <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
                                     <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                                 </Style>
                             </TreeViewItem.ItemContainerStyle>
-                            <TreeViewItem.ItemTemplate>
-                                <HierarchicalDataTemplate DataType="{x:Type local:ProjectInfoModel}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Image 
-                                            Height="15" Width="15"
-                                            Source="{Binding Icon}" />
-                                        <TextBlock 
-                                            Margin="5,0,0,0"
-                                            Text="{Binding Name}" />
-                                    </StackPanel>
-                                </HierarchicalDataTemplate>
-                            </TreeViewItem.ItemTemplate>
                         </TreeViewItem>
                     </TreeView>
-                </DockPanel>
+                </Grid>
             </DataTemplate>
 
 
@@ -1178,9 +1622,9 @@
                 x:Name="MultiViewLayout"
                 DataType="{x:Type local:MultiViewModel}">
                 <Grid x:Name="MultiViewData">
-                    <Grid.Resources>
+                    <!--<Grid.Resources>
                         <local:DoubleGridLengthConverter x:Key="DoubleGridLengthConverter" />
-                    </Grid.Resources>
+                    </Grid.Resources>-->
                     <Grid.RowDefinitions>
                         <RowDefinition Height="25" />
                         <RowDefinition Height="25"  />

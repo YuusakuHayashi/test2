@@ -161,9 +161,9 @@ Public Class ViewItemModel
         End Get
         Set(value As Boolean)
             Me._IsSelected = value
-            If value Then
-                Call DelegateEventListener.Instance.RaiseOpenViewRequested(Me)
-            End If
+            'If value Then
+            '    Call DelegateEventListener.Instance.RaiseOpenViewRequested(Me)
+            'End If
         End Set
     End Property
 
@@ -178,6 +178,7 @@ Public Class ViewItemModel
     '    End Set
     'End Property
 
+    '---------------------------------------------------------------------------------------------'
     ' コマンドプロパティ（接続確認）
     Private _ChangeAliasCommand As ICommand
     <JsonIgnore>
@@ -223,6 +224,56 @@ Public Class ViewItemModel
     Private Function _ChangeAliasCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._ChangeAliasCommandEnableFlag
     End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
+    ' 廃止
+    ' コマンドプロパティ（ビュー削除）
+    'Private _DeleteViewCommand As ICommand
+    '<JsonIgnore>
+    'Public ReadOnly Property DeleteViewCommand As ICommand
+    '    Get
+    '        If Me._DeleteViewCommand Is Nothing Then
+    '            Me._DeleteViewCommand = New DelegateCommand With {
+    '                .ExecuteHandler = AddressOf _DeleteViewCommandExecute,
+    '                .CanExecuteHandler = AddressOf _DeleteViewCommandCanExecute
+    '            }
+    '            Return Me._DeleteViewCommand
+    '        Else
+    '            Return Me._DeleteViewCommand
+    '        End If
+    '    End Get
+    'End Property
+
+    ''コマンド実行可否のチェック（ビュー削除）
+    'Private Sub _CheckDeleteViewCommandEnabled()
+    '    Dim b As Boolean : b = True
+    '    Me._DeleteViewCommandEnableFlag = b
+    'End Sub
+
+    '' コマンド実行可否のフラグ（ビュー削除）
+    'Private __DeleteViewCommandEnableFlag As Boolean
+    '<JsonIgnore>
+    'Public Property _DeleteViewCommandEnableFlag As Boolean
+    '    Get
+    '        Return Me.__DeleteViewCommandEnableFlag
+    '    End Get
+    '    Set(value As Boolean)
+    '        Me.__DeleteViewCommandEnableFlag = value
+    '        RaisePropertyChanged("_DeleteViewCommandEnableFlag")
+    '        CType(DeleteViewCommand, DelegateCommand).RaiseCanExecuteChanged()
+    '    End Set
+    'End Property
+
+    '' コマンド実行（ビュー削除）
+    'Private Sub _DeleteViewCommandExecute(ByVal parameter As Object)
+    '    Call DelegateEventListener.Instance.RaiseDeleteViewRequested(Me)
+    'End Sub
+
+    'Private Function _DeleteViewCommandCanExecute(ByVal parameter As Object) As Boolean
+    '    Return Me._DeleteViewCommandEnableFlag
+    'End Function
+    '---------------------------------------------------------------------------------------------'
 
     Public Sub Initialize()
         Call _CheckChangeAliasCommandEnabled()

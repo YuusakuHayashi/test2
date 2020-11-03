@@ -349,6 +349,7 @@ Public Class UserDirectoryViewModel
 
 
     ' コマンド実行（Ｐｒｏｊｅｃｔ追加）
+    ' Ａｄｄした時点で、一度セーブを行う
     Private Sub _AddProjectCommandExecute(ByVal parameter As Object)
         Dim i = -1
         Dim jh As New JsonHandler(Of Object)
@@ -363,14 +364,14 @@ Public Class UserDirectoryViewModel
 
         i = launcher.ExecuteIfCan(Nothing)
         If i = 0 Then
-            'Call PushProject(project)
             AppInfo.ProjectInfo = project
+            Call ProjectSetup()
+            Call PushProject()
             Call ModelSetup()
             Call ViewModelSetup()
             Call AllSave()
         Else
-            MsgBox("Error AddProjectCommandExecute")
-            Exit Sub
+            Throw New Exception("Error AddProjectCommandExecute")
         End If
     End Sub
 

@@ -43,13 +43,17 @@ Public MustInherit Class BaseViewModel2
         End Set
     End Property
 
+    Protected Sub AppLoad()
+        Dim jh As New JsonHandler(Of AppDirectoryModel)
+        AppInfo = jh.ModelLoad(AppDirectoryModel.ModelFileName)
+    End Sub
+
     Public Sub AppSave()
         Call AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
     End Sub
 
     Public Overloads Sub ProjectLoad()
-        Dim jh = New JsonHandler(Of ProjectInfoModel)
-        AppInfo.ProjectInfo = jh.ModelLoad(AppInfo.ProjectInfo.ProjectInfoFileName)
+        Call ProjectLoad(AppInfo.ProjectInfo)
     End Sub
     Public Overloads Sub ProjectLoad(ByVal project As ProjectInfoModel)
         Dim jh = New JsonHandler(Of ProjectInfoModel)
@@ -60,23 +64,16 @@ Public MustInherit Class BaseViewModel2
         Call ProjectSave(AppInfo.ProjectInfo)
     End Sub
     Public Overloads Sub ProjectSave(ByVal project As ProjectInfoModel)
-        project.LastUpdate = DateTime.Now.ToString("yyyy/MM/dd")
-        Call PushProject(project)
-        Call project.ModelSave(
-            project.ProjectInfoFileName, project
-        )
-        Call AppSave()
+        'project.LastUpdate = DateTime.Now.ToString("yyyy/MM/dd")
+        'Call PushProject(project)
+        Call project.ModelSave(project.ProjectInfoFileName, project)
     End Sub
 
     Public Overloads Sub ProjectModelSave(ByVal project As ProjectInfoModel)
-        Call project.Model.ModelSave(
-            project.ModelFileName, project.Model
-        )
+        Call project.Model.ModelSave(project.ModelFileName, project.Model)
     End Sub
     Public Overloads Sub ProjectModelSave()
-        Call AppInfo.ProjectInfo.Model.ModelSave(
-            AppInfo.ProjectInfo.ModelFileName, AppInfo.ProjectInfo.Model
-        )
+        Call AppInfo.ProjectInfo.Model.ModelSave(AppInfo.ProjectInfo.ModelFileName, AppInfo.ProjectInfo.Model)
     End Sub
 
     Public Overloads Sub ProjectModelLoad()
@@ -85,26 +82,20 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Public Overloads Sub ProjectViewModelSave(ByVal project As ProjectInfoModel)
-        Call ViewModel.ModelSave(
-            project.ViewModelFileName, ViewModel
-        )
+        Call ViewModel.ModelSave(project.ViewModelFileName, ViewModel)
     End Sub
     Public Overloads Sub ProjectViewModelSave()
-        Call ViewModel.ModelSave(
-            AppInfo.ProjectInfo.ViewModelFileName, ViewModel
-        )
+        Call ViewModel.ModelSave(AppInfo.ProjectInfo.ViewModelFileName, ViewModel)
     End Sub
 
-    'Public Overloads Sub AllLoad()
-    '    Call ProjectLoad()
-    '    Call ProjectModelLoad()
-    '    Call ModelSetup()
-    '    Call ProjectViewModelLoad()
-    '    Call ViewModelSetup()
-    'End Sub
-
+    ' ロード時にはロードしたプロジェクトをカレントに追加しない
+    ' (セーブ時に追加させる)
     Public Overloads Sub AllLoad(project)
+        'AppInfo.~のルートであるAppInfoをロードして直接更新すると、参照渡ししている各ビューモデルでおかしくなる
+        'Call AppLoad()
         Call ProjectLoad(project)
+        Call ProjectSetup()
+        Call PushProject(AppInfo.ProjectInfo)
         Call ProjectModelLoad()
         Call ModelSetup()
         Call ProjectViewModelLoad()
@@ -115,15 +106,22 @@ Public MustInherit Class BaseViewModel2
         Call ProjectModelSave()
         Call ProjectViewModelSave()
         Call ProjectSave()
+        Call AppSave()
     End Sub
 
+    ' Resave時
     Public Overloads Sub AllSave(ByVal project As ProjectInfoModel)
         Call ProjectModelSave(project)
         Call ProjectViewModelSave(project)
         Call ProjectSave(project)
+        Call AppSave()
     End Sub
 
-    Public Sub PushProject(ByVal project As ProjectInfoModel)
+    Protected Overloads Sub PushProject()
+        Call PushProject(AppInfo.ProjectInfo)
+    End Sub
+
+    Protected Overloads Sub PushProject(ByVal project As ProjectInfoModel)
         Dim [new] As New ObservableCollection(Of ProjectInfoModel)
 
         [new].Add(project)
@@ -161,6 +159,11 @@ Public MustInherit Class BaseViewModel2
             End If
         Loop
         project.[Index] = idx
+    End Sub
+
+    ' プロジェクト起動時にステータスを変更
+    Protected Overloads Sub ProjectSetup()
+        AppInfo.ProjectInfo.ActiveStatus = "(Active)"
     End Sub
 
     ' ＶｉｅｗＭｏｄｅｌはロードするとＭＶＶＭが機能しなくなるので、
@@ -486,54 +489,27 @@ Public MustInherit Class BaseViewModel2
         End If
     End Sub
 
-    'Public Sub AddViewItem(ByVal v As ViewItemModel)
-    '    Dim obj = v.Content
-    '    Select Case True
-    '        Case obj.Equals(ViewModel)
-    '        Case obj.Equals(AppInfo)
-    '        Case obj.GetType.Name = (New ProjectInfoModel).GetType.Name
-    '        Case obj.GetType.Name = (New ProjectViewModel).GetType.Name
-    '        Case obj.GetType.Name = (New MenuViewModel).GetType.Name
-    '        Case obj.GetType.Name = (New HistoryViewModel).GetType.Name
-    '        Case Else
-    '            ViewModel.Views.Add(v)
-    '    End Select
-    'End Sub
+    Private Delegate Sub ViewSetupDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
+    ''<< Add Case >>
+    '<JsonIgnore>
+    'Public ReadOnly Property ViewSetupHandler As ViewSetupDelegater
+    '    Get
+    '        Return AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
+    '    End Get
+    'End Property
 
-    Public Delegate Sub ViewSetupDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
-    '<< Add Case >>
-    <JsonIgnore>
-    Public ReadOnly Property ViewSetupHandler As ViewSetupDelegater
-        Get
-            Select Case AppInfo.ProjectInfo.Kind
-                Case AppDirectoryModel.DBTEST
-                    Return AddressOf ViewSetupModule.DBTESTViewSetupExecute
-                Case AppDirectoryModel.RpaProject
-                    Return AddressOf ViewSetupModule.RpaProjectViewSetupExecute
-                Case Else
-                    Throw New Exception("No ViewSetupHandler")
-            End Select
-        End Get
-    End Property
-
-    '<< Add Case >>
-    <JsonIgnore>
-    Public ReadOnly Property ViewDefineHandler As Func(Of ViewItemModel, Object)
-        Get
-            Select Case AppInfo.ProjectInfo.Kind
-                Case AppDirectoryModel.DBTEST
-                    Return AddressOf ViewSetupModule.DBTESTViewDefineExecute
-                Case AppDirectoryModel.RpaProject
-                    Return AddressOf ViewSetupModule.RpaProjectViewDefineExecute
-                Case Else
-                    Throw New Exception("No ViewDefineHandler")
-            End Select
-        End Get
-    End Property
+    ''<< Add Case >>
+    '<JsonIgnore>
+    'Public ReadOnly Property ViewDefineHandler As Func(Of ViewItemModel, Object)
+    '    Get
+    '        Return AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+    '    End Get
+    'End Property
 
     Private Sub _ViewModelLoad(ByRef obj1 As Object, ByRef obj2 As Object)
         Dim obj As Object
-        Dim [define] = Me.ViewDefineHandler
+        Dim [define] As Func(Of ViewItemModel, Object) _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
         For Each v In ViewModel.Views
             If v.OpenState Then
                 obj = [define](v)
@@ -542,6 +518,22 @@ Public MustInherit Class BaseViewModel2
                 Call AddView(v)
             End If
         Next
+    End Sub
+
+    Public Sub AddViewItem(ByVal [view] As ViewItemModel)
+        Dim idx = -1
+        For Each v In ViewModel.Views
+            If [view].Name = v.Name Then
+                idx = ViewModel.Views.IndexOf(v)
+                Exit For
+            End If
+        Next
+        If idx = -1 Then
+            ' 閉じるコマンドのセット
+            ViewModel.Views.Add([view])
+        Else
+            ViewModel.Views(idx) = [view]
+        End If
     End Sub
 
     Protected Sub ShowViewExplorer()
@@ -554,7 +546,7 @@ Public MustInherit Class BaseViewModel2
             .ViewType = MultiViewModel.TAB_VIEW,
             .OpenState = True
         }
-        ViewModel.Views.Add(v)
+        Call AddViewItem(v)
         Call AddView(v)
     End Sub
 
@@ -568,7 +560,7 @@ Public MustInherit Class BaseViewModel2
             .ViewType = MultiViewModel.TAB_VIEW,
             .OpenState = True
         }
-        ViewModel.Views.Add(v)
+        Call AddViewItem(v)
         Call AddView(v)
     End Sub
 
@@ -584,7 +576,7 @@ Public MustInherit Class BaseViewModel2
             .ViewType = MultiViewModel.NORMAL_VIEW,
             .OpenState = True
         }
-        ViewModel.Views.Add(v)
+        Call AddViewItem(v)
         Call AddView(v)
     End Sub
 
@@ -600,7 +592,7 @@ Public MustInherit Class BaseViewModel2
             .ViewType = MultiViewModel.TAB_VIEW,
             .OpenState = True
         }
-        ViewModel.Views.Add(v)
+        Call AddViewItem(v)
         Call AddView(v)
     End Sub
 
@@ -608,8 +600,12 @@ Public MustInherit Class BaseViewModel2
         Dim v2, v3
         Dim mvm, hvm
         Dim obj
-        Dim [setup] = ViewSetupHandler
-        Dim [define] = ViewDefineHandler
+        'Dim [setup] = ViewSetupHandler
+        'Dim [define] = ViewDefineHandler
+        Dim [setup] As ViewSetupDelegater _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
+        Dim [define] As Func(Of ViewItemModel, Object) _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
 
         If ViewModel.Views.Count < 1 Then
             Call [setup](AppInfo, ViewModel)
@@ -638,7 +634,9 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Protected Sub ViewLoad(ByVal v As ViewItemModel)
-        Dim [define] = ViewDefineHandler
+        Dim [define] As Func(Of ViewItemModel, Object) _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+
         Dim obj = [define](v)
         If obj IsNot Nothing Then
             Select Case v.ModelName

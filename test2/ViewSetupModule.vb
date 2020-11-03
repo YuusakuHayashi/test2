@@ -9,10 +9,8 @@ Public Module ViewSetupModule
         Dim dbtvm = New DBTestViewModel
         Dim dbevm = New DBExplorerViewModel
         Dim vevm = New ViewExplorerViewModel
-        'Dim hvm = New HistoryViewModel
 
         Call cvm.Initialize(app, vm)
-        'Call hvm.Initialize(app, vm)
 
         ' ビューへの追加
         v1 = New ViewItemModel With {
@@ -72,10 +70,9 @@ Public Module ViewSetupModule
             .OpenState = True,
             .ModelName = rpapmvm.GetType.Name
         }
-        'Call rpapvm.AddViewItem(v1)
-        vm.Views.Add(v1)
-        vm.Views.Add(v2)
+        Call rpapvm.AddViewItem(v1)
         Call rpapvm.AddView(v1)
+        Call rpapmvm.AddViewItem(v2)
         Call rpapmvm.AddView(v2)
     End Sub
 

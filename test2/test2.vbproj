@@ -163,7 +163,7 @@
     <Compile Include="InitView.xaml.vb">
       <DependentUpon>InitView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainModel.vb" />
+    <Compile Include="ProjectModel.vb" />
     <Compile Include="MainWin.xaml.vb">
       <DependentUpon>MainWin.xaml</DependentUpon>
     </Compile>
@@ -175,7 +175,6 @@
     <Compile Include="_MenuViewModel.vb" />
     <Compile Include="MyModule.vb" />
     <Compile Include="MyCommand.vb" />
-    <Compile Include="ProjectModel.vb" />
     <Compile Include="SaveButtonVM.vb" />
     <Compile Include="SaveTreeModel.vb" />
     <Compile Include="ServerModel.vb" />

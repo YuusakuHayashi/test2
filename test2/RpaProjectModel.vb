@@ -1,7 +1,8 @@
 ﻿Imports test2
 Imports System.Collections.ObjectModel
 
-Public Class RpaProjectModel
+Public Class RpaProjectModel : Inherits ProjectModel
+
     Public RootDirectoryName As String
     Public UserDirectoryName As String
     Public SystemDirectoryName As String
@@ -66,4 +67,84 @@ Public Class RpaProjectModel
         Loop
         GetRpaIndex = i
     End Function
+
+    Public Overrides Sub ViewSetupExecute(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
+        Dim rpapvm = New RpaProjectViewModel
+        Dim rpapmvm = New RpaProjectMenuViewModel
+        Dim v1, v2
+        Call rpapvm.Initialize(app, vm)
+        Call rpapmvm.Initialize(app, vm)
+        v1 = New ViewItemModel With {
+            .Content = rpapvm,
+            .Name = rpapvm.GetType.Name,
+            .FrameType = MultiViewModel.MAIN_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True,
+            .ModelName = rpapvm.GetType.Name
+        }
+        v2 = New ViewItemModel With {
+            .Content = rpapmvm,
+            .Name = rpapmvm.GetType.Name,
+            .FrameType = MultiViewModel.PROJECT_MENU_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.NORMAL_VIEW,
+            .OpenState = True,
+            .ModelName = rpapmvm.GetType.Name
+        }
+        Call rpapvm.AddViewItem(v1)
+        Call rpapvm.AddView(v1)
+        Call rpapmvm.AddViewItem(v2)
+        Call rpapmvm.AddView(v2)
+    End Sub
+
+    Public Overrides Function ViewDefineExecute(v As ViewItemModel) As Object
+        Dim obj As Object
+
+        Select Case v.ModelName
+            Case (New AppDirectoryModel).GetType.Name
+                obj = New AppDirectoryModel
+            Case (New ViewModel).GetType.Name
+                obj = New ViewModel
+            Case (New HistoryViewModel).GetType.Name
+                obj = New HistoryViewModel
+            Case (New MenuViewModel).GetType.Name
+                obj = New MenuViewModel
+            Case (New RpaProjectMenuViewModel).GetType.Name
+                obj = New RpaProjectMenuViewModel
+            Case (New RpaProjectViewModel).GetType.Name
+                obj = New RpaProjectViewModel
+            Case (New RpaViewModel).GetType.Name
+                obj = New RpaViewModel
+            Case Else
+                obj = Nothing
+        End Select
+
+        ViewDefineExecute = obj
+    End Function
+
+    ''--- ビュー削除 ------------------------------------------------------------------------------'
+    ' 廃止
+    '' ビューに削除に紐づいたモデルを削除がする
+    'Private Sub _DeleteViewAddHandler()
+    '    AddHandler _
+    '        DelegateEventListener.Instance.DeleteViewRequested,
+    '        AddressOf Me._DeleteViewRequestedReview
+    'End Sub
+
+    'Private Sub _DeleteViewRequestedReview(ByVal [view] As ViewItemModel, ByVal e As System.EventArgs)
+    '    Call _DeleteViewRequestAccept([view])
+    'End Sub
+
+    'Private Sub _DeleteViewRequestAccept(ByVal [view] As ViewItemModel)
+    '    If [view].ModelName = (New RpaViewModel).GetType.Name Then
+    '        For Each rpa In Me.Rpas
+    '            If rpa.Equals([view].Content) Then
+    '                Me.Rpas.Remove(rpa)
+    '                Exit For
+    '            End If
+    '        Next
+    '    End If
+    'End Sub
+    '---------------------------------------------------------------------------------------------'
 End Class

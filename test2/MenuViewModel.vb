@@ -327,13 +327,14 @@ Public Class MenuViewModel
         Select Case i
             Case 0
                 Call InitializeViewContent()
-                Call ProjectLoad(project)
-                Call PushProject(AppInfo.ProjectInfo)
-                Call ProjectModelLoad()
-                Call ModelSetup()
-                Call ProjectViewModelLoad()
-                Call ViewModelSetup()
-                Call AppSave()
+                Call AllLoad(project)
+                'Call ProjectLoad(project)
+                'Call PushProject(AppInfo.ProjectInfo)
+                'Call ProjectModelLoad()
+                'Call ModelSetup()
+                'Call ProjectViewModelLoad()
+                'Call ViewModelSetup()
+                'Call AppSave()
             Case 1
                 Call AppSave()
             Case 2

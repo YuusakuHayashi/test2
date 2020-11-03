@@ -5,12 +5,52 @@
         Me.[AddHandler] = [Delegate].Combine(
             New Action(AddressOf _TabCloseAddHandler),
             New Action(AddressOf _OpenViewAddHandler),
-            New Action(AddressOf _MultiViewSizeChangedAddHandler)
+            New Action(AddressOf _MultiViewSizeChangedAddHandler),
+            New Action(AddressOf _OpenProjectAddHandler)
         )
         Call BaseInitialize(adm, vm)
     End Sub
 
-    '--- タブを閉じる関連 ------------------------------------------------------------------------'
+    '--- ビュー削除 ------------------------------------------------------------------------------'
+    ' 廃止
+    ' ビューに紐づいたモデルは個々のモデルなどで削除する
+    'Private Sub _DeleteViewAddHandler()
+    '    AddHandler _
+    '        DelegateEventListener.Instance.DeleteViewRequested,
+    '        AddressOf Me._DeleteViewRequestedReview
+    'End Sub
+
+    'Private Sub _DeleteViewRequestedReview(ByVal [view] As ViewItemModel, ByVal e As System.EventArgs)
+    '    Call _DeleteViewRequestAccept([view])
+    'End Sub
+
+    'Private Sub _DeleteViewRequestAccept(ByVal [view] As ViewItemModel)
+    '    If ViewModel.Views.Contains([view]) Then
+    '        ViewModel.Views.Remove([view])
+    '    End If
+    'End Sub
+    '---------------------------------------------------------------------------------------------'
+
+    '--- タブを開く関連 --------------------------------------------------------------------------'
+    Private Sub _OpenProjectAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.OpenProjectRequested,
+            AddressOf Me._OpenProjectRequestedReview
+    End Sub
+
+    Private Sub _OpenProjectRequestedReview(ByVal p As ProjectInfoModel, ByVal e As System.EventArgs)
+        Call _OpenProjectRequestAccept(p)
+    End Sub
+
+    Private Sub _OpenProjectRequestAccept(ByVal p As ProjectInfoModel)
+        If AppInfo.ProjectInfo.DirectoryName <> p.DirectoryName Then
+            Call InitializeViewContent()
+            Call AllLoad(p)
+        End If
+    End Sub
+    '---------------------------------------------------------------------------------------------'
+
+    '--- ＳＰＬＩＴＴＥＲ変更 --------------------------------------------------------------------'
     Private Sub _MultiViewSizeChangedReview(ByVal sender As Object, ByVal e As System.EventArgs)
         Call _MultiViewSizeChangeAccept(sender)
     End Sub
@@ -70,10 +110,6 @@
         Dim idx = ViewModel.Views.IndexOf(v)
         ViewModel.Views(idx).OpenState = True
         Call ViewLoad(ViewModel.Views(idx))
-        'obj = [define](ViewModel.Views(idx))
-        'Call obj.Initialize(AppInfo, ViewModel)
-        'ViewModel.Views(idx).Content = obj
-        'Call AddView(ViewModel.Views(idx))
     End Sub
     '---------------------------------------------------------------------------------------------'
 End Class

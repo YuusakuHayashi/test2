@@ -70,6 +70,55 @@ Public Class ViewModel
         End Set
     End Property
 
+    Private _FontSize As Double
+    Public Property [FontSize] As Double
+        Get
+            If Me._FontSize = 0.0 Then
+                Me._FontSize = 11.0
+            End If
+            Return Me._FontSize
+        End Get
+        Set(value As Double)
+            Me._FontSize = value
+            RaisePropertyChanged("FontSize")
+        End Set
+    End Property
+
+    'Private _ViewExplorerStretchType As String
+    'Public Property ViewExplorerStretchType As String
+    '    Get
+    '        Return _ViewExplorerStretchType
+    '    End Get
+    '    Set(value As String)
+    '        _ViewExplorerStretchType = value
+    '        Call _SwitchViewExplorerStretch()
+    '        RaisePropertyChanged("ViewExplorerStretchType")
+    '    End Set
+    'End Property
+
+    'Private _ViewExplorerStretch As Stretch
+    'Public Property ViewExplorerStretch As Stretch
+    '    Get
+    '        Return _ViewExplorerStretch
+    '    End Get
+    '    Set(value As Stretch)
+    '        _ViewExplorerStretch = value
+    '    End Set
+    'End Property
+
+    'Private Sub _SwitchViewExplorerStretch()
+    '    Select Case ViewExplorerStretchType
+    '        Case "None"
+    '            ViewExplorerStretch = Stretch.None
+    '        Case "Fill"
+    '            ViewExplorerStretch = Stretch.Fill
+    '        Case "Uniform"
+    '            ViewExplorerStretch = Stretch.Uniform
+    '        Case "UniformToFill"
+    '            ViewExplorerStretch = Stretch.UniformToFill
+    '    End Select
+    'End Sub
+
     Public Const SINGLE_VIEW As String = "Single"
     Public Const MULTI_VIEW As String = "Multi"
 End Class

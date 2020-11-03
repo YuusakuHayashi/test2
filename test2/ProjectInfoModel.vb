@@ -127,22 +127,39 @@ Public Class ProjectInfoModel
     End Property
 
     Private _IsSelected As Boolean
+    <JsonIgnore>
     Public Property IsSelected As Boolean
         Get
-            Return _IsSelected
+            Return Me._IsSelected
         End Get
         Set(value As Boolean)
-            _IsSelected = value
+            Me._IsSelected = value
+            If value Then
+                Call DelegateEventListener.Instance.RaiseOpenProjectRequested(Me)
+            End If
         End Set
     End Property
 
     Private _IsExpand As Boolean
+    <JsonIgnore>
     Public Property IsExpand As Boolean
         Get
             Return _IsExpand
         End Get
         Set(value As Boolean)
             _IsExpand = value
+        End Set
+    End Property
+
+    Private _ActiveStatus As String
+    <JsonIgnore>
+    Public Property ActiveStatus As String
+        Get
+            Return _ActiveStatus
+        End Get
+        Set(value As String)
+            _ActiveStatus = value
+            RaisePropertyChanged("ActiveStatus")
         End Set
     End Property
 
