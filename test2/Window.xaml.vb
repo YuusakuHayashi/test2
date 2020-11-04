@@ -23,6 +23,8 @@ Public Class Window
         Dim udvm As New UserDirectoryViewModel
         Call udvm.Initialize(app, vm)
 
+        ' DynamicView に統一予定
+        vm.Content = vm.DynamicView
         Me.DataContext = vm
     End Sub
 

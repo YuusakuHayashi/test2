@@ -1611,6 +1611,7 @@
                 </StackPanel>
             </DataTemplate>
 
+            <!-- 旧仕様 -->
             <DataTemplate DataType="{x:Type local:SingleViewModel}">
                 <Grid>
                     <ContentControl
@@ -1618,6 +1619,7 @@
                 </Grid>
             </DataTemplate>
 
+            <!-- 旧仕様 -->
             <DataTemplate 
                 x:Name="MultiViewLayout"
                 DataType="{x:Type local:MultiViewModel}">
@@ -1679,7 +1681,52 @@
                         Content="{Binding HistoryViewContent}" />
                 </Grid>
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type local:DynamicViewModel}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="{Binding ButtomGridHeight}" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="{Binding RightGridWidth}" />
+                    </Grid.ColumnDefinitions>
+                    <ContentControl
+                        x:Name="TopLeftView"
+                        Grid.Row="0"            
+                        Grid.Column="0"              
+                        Content="{Binding TopLeftContent}" />
+                    <ContentControl
+                        x:Name="TopRightView"
+                        Grid.Row="0"
+                        Grid.Column="2"           
+                        Content="{Binding TopRightContent}" />
+                    <GridSplitter
+                        Grid.Row="0" Grid.RowSpan="3"
+                        Grid.Column="1"
+                        ResizeDirection="Columns"                
+                        ResizeBehavior="PreviousAndNext" 
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        Grid.Row="1"
+                        Grid.Column="0" Grid.ColumnSpan="3"
+                        ResizeDirection="Rows"                
+                        ResizeBehavior="PreviousAndNext" 
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <ContentControl
+                        x:Name="ButtomLeftView"
+                        Grid.Row="2"
+                        Grid.Column="0"           
+                        Content="{Binding ButtomLeftContent}" />
+                </Grid>
+            </DataTemplate>
         </Grid.Resources>
+        
         <ContentControl Content="{Binding Content}" />
     </Grid>
 </Window>

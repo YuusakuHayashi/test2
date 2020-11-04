@@ -72,18 +72,10 @@ Public Class RpaProjectModel : Inherits ProjectModel
         Dim rpapvm = New RpaProjectViewModel
         Dim rpapmvm = New RpaProjectMenuViewModel
         Dim v1, v2
+        Dim dvm As New DynamicViewModel
         Call rpapvm.Initialize(app, vm)
         Call rpapmvm.Initialize(app, vm)
         v1 = New ViewItemModel With {
-            .Content = rpapvm,
-            .Name = rpapvm.GetType.Name,
-            .FrameType = MultiViewModel.MAIN_FRAME,
-            .LayoutType = ViewModel.MULTI_VIEW,
-            .ViewType = MultiViewModel.TAB_VIEW,
-            .OpenState = True,
-            .ModelName = rpapvm.GetType.Name
-        }
-        v2 = New ViewItemModel With {
             .Content = rpapmvm,
             .Name = rpapmvm.GetType.Name,
             .FrameType = MultiViewModel.PROJECT_MENU_FRAME,
@@ -92,10 +84,19 @@ Public Class RpaProjectModel : Inherits ProjectModel
             .OpenState = True,
             .ModelName = rpapmvm.GetType.Name
         }
-        Call rpapvm.AddViewItem(v1)
-        Call rpapvm.AddView(v1)
-        Call rpapmvm.AddViewItem(v2)
-        Call rpapmvm.AddView(v2)
+        v2 = New ViewItemModel With {
+            .Content = New DynamicViewModel With {
+                .TopLeftViewContent = rpapvm
+            },
+            .Name = rpapvm.GetType.Name,
+            .FrameType = MultiViewModel.MAIN_FRAME,
+            .LayoutType = ViewModel.MULTI_VIEW,
+            .ViewType = MultiViewModel.TAB_VIEW,
+            .OpenState = True,
+            .ModelName = rpapvm.GetType.Name
+        }
+        vm.DynamicView.TopLeftViewContent = v1
+        vm.DynamicView.ButtomLeftViewContent = v2
     End Sub
 
     Public Overrides Function ViewDefineExecute(v As ViewItemModel) As Object

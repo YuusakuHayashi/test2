@@ -161,9 +161,9 @@ Public Class ViewItemModel
         End Get
         Set(value As Boolean)
             Me._IsSelected = value
-            'If value Then
-            '    Call DelegateEventListener.Instance.RaiseOpenViewRequested(Me)
-            'End If
+            If value Then
+                Call DelegateEventListener.Instance.RaiseOpenViewRequested(Me)
+            End If
         End Set
     End Property
 

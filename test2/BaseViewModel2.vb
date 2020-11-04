@@ -52,6 +52,8 @@ Public MustInherit Class BaseViewModel2
         Call AppInfo.ModelSave(AppDirectoryModel.ModelFileName, AppInfo)
     End Sub
 
+    '---------------------------------------------------------------------------------------------'
+    ' プロジェクトのロード
     Public Overloads Sub ProjectLoad()
         Call ProjectLoad(AppInfo.ProjectInfo)
     End Sub
@@ -59,15 +61,17 @@ Public MustInherit Class BaseViewModel2
         Dim jh = New JsonHandler(Of ProjectInfoModel)
         AppInfo.ProjectInfo = jh.ModelLoad(project.ProjectInfoFileName)
     End Sub
+    '---------------------------------------------------------------------------------------------'
 
+    '---------------------------------------------------------------------------------------------'
+    ' プロジェクトのセーブ
     Public Overloads Sub ProjectSave()
         Call ProjectSave(AppInfo.ProjectInfo)
     End Sub
     Public Overloads Sub ProjectSave(ByVal project As ProjectInfoModel)
-        'project.LastUpdate = DateTime.Now.ToString("yyyy/MM/dd")
-        'Call PushProject(project)
         Call project.ModelSave(project.ProjectInfoFileName, project)
     End Sub
+    '---------------------------------------------------------------------------------------------'
 
     Public Overloads Sub ProjectModelSave(ByVal project As ProjectInfoModel)
         Call project.Model.ModelSave(project.ModelFileName, project.Model)
@@ -163,6 +167,9 @@ Public MustInherit Class BaseViewModel2
 
     ' プロジェクト起動時にステータスを変更
     Protected Overloads Sub ProjectSetup()
+        For Each p In AppInfo.CurrentProjects
+            p.ActiveStatus = vbNullString
+        Next
         AppInfo.ProjectInfo.ActiveStatus = "(Active)"
     End Sub
 
@@ -265,6 +272,13 @@ Public MustInherit Class BaseViewModel2
         ViewModel.SingleView.Content = v.Content
         Call _SetContent(ViewModel.SingleView)
     End Sub
+
+    '---------------------------------------------------------------------------------------------'
+    ' ＤＹＮＡＭＩＣＶＩＥＷ
+    Private Sub _InitializeDynamicView()
+        ViewModel.DynamicView = Nothing
+    End Sub
+    '---------------------------------------------------------------------------------------------'
 
     ' ＭＵＬＴＩＶＩＥＷ ---------------------------------------------------------------------------------------------'
     ' コンテントディクショナリが存在しない場合、新規作成し
@@ -600,30 +614,39 @@ Public MustInherit Class BaseViewModel2
         Dim v2, v3
         Dim mvm, hvm
         Dim obj
-        'Dim [setup] = ViewSetupHandler
-        'Dim [define] = ViewDefineHandler
         Dim [setup] As ViewSetupDelegater _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
         Dim [define] As Func(Of ViewItemModel, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
 
-        If ViewModel.Views.Count < 1 Then
-            Call [setup](AppInfo, ViewModel)
+        'If ViewModel.Views.Count < 1 Then
+        '    Call [setup](AppInfo, ViewModel)
 
-            ' 特殊なビューのセット(ViewModel)
-            ' ViewDefineHandlerに登録したメソッドが定義してなければ、ビューは登録されない
-            If [define]((New ViewItemModel With {.ModelName = ViewModel.GetType.Name})).GetType.Name = ViewModel.GetType.Name Then
-                Call ShowViewExplorer()
-            End If
-            If [define]((New ViewItemModel With {.ModelName = AppInfo.GetType.Name})).GetType.Name = AppInfo.GetType.Name Then
-                Call ShowProjectExplorer()
-            End If
-            If [define]((New ViewItemModel With {.ModelName = (New MenuViewModel).GetType.Name})).GetType.Name = (New MenuViewModel).GetType.Name Then
-                Call ShowMenu()
-            End If
-            If [define]((New ViewItemModel With {.ModelName = (New HistoryViewModel).GetType.Name})).GetType.Name = (New HistoryViewModel).GetType.Name Then
-                Call ShowHistory()
-            End If
+        '    ' 特殊なビューのセット(ViewModel)
+        '    ' ViewDefineHandlerに登録したメソッドが定義してなければ、ビューは登録されない
+        '    If [define]((New ViewItemModel With {.ModelName = ViewModel.GetType.Name})).GetType.Name = ViewModel.GetType.Name Then
+        '        Call ShowViewExplorer()
+        '    End If
+        '    If [define]((New ViewItemModel With {.ModelName = AppInfo.GetType.Name})).GetType.Name = AppInfo.GetType.Name Then
+        '        Call ShowProjectExplorer()
+        '    End If
+        '    If [define]((New ViewItemModel With {.ModelName = (New MenuViewModel).GetType.Name})).GetType.Name = (New MenuViewModel).GetType.Name Then
+        '        Call ShowMenu()
+        '    End If
+        '    If [define]((New ViewItemModel With {.ModelName = (New HistoryViewModel).GetType.Name})).GetType.Name = (New HistoryViewModel).GetType.Name Then
+        '        Call ShowHistory()
+        '    End If
+        'Else
+        '    For Each v In ViewModel.Views
+        '        If v.OpenState Then
+        '            Call ViewLoad(v)
+        '        End If
+        '    Next
+        'End If
+        Call _InitializeDynamicView()
+
+        If ViewModel.DynamicView.TopLeftViewContent Is Nothing Then
+            Call [setup](AppInfo, ViewModel)
         Else
             For Each v In ViewModel.Views
                 If v.OpenState Then
@@ -631,6 +654,7 @@ Public MustInherit Class BaseViewModel2
                 End If
             Next
         End If
+        Call _SetContent(ViewModel.DynamicView)
     End Sub
 
     Protected Sub ViewLoad(ByVal v As ViewItemModel)

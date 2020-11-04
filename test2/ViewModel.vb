@@ -16,6 +16,24 @@ Public Class ViewModel
         )
     End Sub
 
+    '---------------------------------------------------------------------------------------------'
+    ' 新仕様
+    Private _DynamicView As DynamicViewModel
+    Public Property DynamicView As DynamicViewModel
+        Get
+            If Me._DynamicView Is Nothing Then
+                Me._DynamicView = New DynamicViewModel
+            End If
+            Return Me._DynamicView
+        End Get
+        Set(value As DynamicViewModel)
+            Me._DynamicView = value
+        End Set
+    End Property
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
+    ' 旧仕様
     Private _SingleView As SingleViewModel
     <JsonIgnore>
     Public Property SingleView As SingleViewModel
@@ -44,6 +62,7 @@ Public Class ViewModel
             RaisePropertyChanged("MultiView")
         End Set
     End Property
+    '---------------------------------------------------------------------------------------------'
 
     Private _Content As Object
     <JsonIgnore>
