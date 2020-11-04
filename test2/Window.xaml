@@ -1685,26 +1685,27 @@
             <DataTemplate DataType="{x:Type local:DynamicViewModel}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="5" />
-                        <RowDefinition Height="{Binding ButtomGridHeight}" />
+                        <RowDefinition Height="{Binding ContentGridHeight}" />
+                        <RowDefinition Height="{Binding VerticalSplitterHeight}" />
+                        <RowDefinition Height="{Binding BottomGridHeight}" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="{Binding ContentGridWidth}" />
+                        <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
                         <ColumnDefinition Width="{Binding RightGridWidth}" />
                     </Grid.ColumnDefinitions>
                     <ContentControl
                         x:Name="TopLeftView"
                         Grid.Row="0"            
                         Grid.Column="0"              
-                        Content="{Binding TopLeftContent}" />
+                        Content="{Binding MainContent}" />
                     <ContentControl
                         x:Name="TopRightView"
                         Grid.Row="0"
                         Grid.Column="2"           
-                        Content="{Binding TopRightContent}" />
+                        Content="{Binding RightContent}" />
                     <GridSplitter
+                        IsEnabled="{Binding IsHorizontalSplitterEnabled}"
                         Grid.Row="0" Grid.RowSpan="3"
                         Grid.Column="1"
                         ResizeDirection="Columns"                
@@ -1712,6 +1713,7 @@
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <GridSplitter
+                        IsEnabled="{Binding IsVerticalSplitterEnabled}"
                         Grid.Row="1"
                         Grid.Column="0" Grid.ColumnSpan="3"
                         ResizeDirection="Rows"                
@@ -1719,10 +1721,10 @@
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <ContentControl
-                        x:Name="ButtomLeftView"
+                        x:Name="BottomLeftView"
                         Grid.Row="2"
                         Grid.Column="0"           
-                        Content="{Binding ButtomLeftContent}" />
+                        Content="{Binding BottomContent}" />
                 </Grid>
             </DataTemplate>
         </Grid.Resources>

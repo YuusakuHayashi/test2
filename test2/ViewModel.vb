@@ -18,18 +18,18 @@ Public Class ViewModel
 
     '---------------------------------------------------------------------------------------------'
     ' 新仕様
-    Private _DynamicView As DynamicViewModel
-    Public Property DynamicView As DynamicViewModel
-        Get
-            If Me._DynamicView Is Nothing Then
-                Me._DynamicView = New DynamicViewModel
-            End If
-            Return Me._DynamicView
-        End Get
-        Set(value As DynamicViewModel)
-            Me._DynamicView = value
-        End Set
-    End Property
+    'Private _DynamicView As DynamicViewModel
+    'Public Property DynamicView As DynamicViewModel
+    '    Get
+    '        If Me._DynamicView Is Nothing Then
+    '            Me._DynamicView = New DynamicViewModel
+    '        End If
+    '        Return Me._DynamicView
+    '    End Get
+    '    Set(value As DynamicViewModel)
+    '        Me._DynamicView = value
+    '    End Set
+    'End Property
     '---------------------------------------------------------------------------------------------'
 
     '---------------------------------------------------------------------------------------------'

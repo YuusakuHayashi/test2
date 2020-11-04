@@ -446,14 +446,16 @@ Public Class UserDirectoryViewModel
         '}
         'Call AddView(v)
 
-        v = New ViewItemModel With {
-            .Name = Me.GetType.Name,
-            .ModelName = Me.GetType.Name,
-            .LayoutType = ViewModel.SINGLE_VIEW,
-            .OpenState = True,
-            .Content = Me
+        Dim dvm = New DynamicViewModel With {
+                .MainViewContent = New ViewItemModel With {
+                .Name = Me.GetType.Name,
+                .ModelName = Me.GetType.Name,
+                .LayoutType = ViewModel.SINGLE_VIEW,
+                .OpenState = True,
+                .Content = Me
+            }
         }
-        ViewModel.DynamicView.TopLeftViewContent = v
+        ViewModel.Content = dvm
     End Sub
 
     Private Sub _RemoveFixedProject(ByVal project As ProjectInfoModel)

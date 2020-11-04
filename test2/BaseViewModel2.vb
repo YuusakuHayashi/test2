@@ -259,8 +259,9 @@ Public MustInherit Class BaseViewModel2
                                        ByRef vm As ViewModel) Implements BaseViewModelInterface.Initialize
 
     Public Sub InitializeViewContent()
-        ViewModel.SingleView = Nothing
-        ViewModel.MultiView = Nothing
+        'ViewModel.SingleView = Nothing
+        'ViewModel.MultiView = Nothing
+        ViewModel.Content = Nothing
     End Sub
 
     Private Sub _SetContent(ByVal obj As Object)
@@ -276,7 +277,7 @@ Public MustInherit Class BaseViewModel2
     '---------------------------------------------------------------------------------------------'
     ' ＤＹＮＡＭＩＣＶＩＥＷ
     Private Sub _InitializeDynamicView()
-        ViewModel.DynamicView = Nothing
+        'ViewModel.DynamicView = Nothing
     End Sub
     '---------------------------------------------------------------------------------------------'
 
@@ -643,9 +644,9 @@ Public MustInherit Class BaseViewModel2
         '        End If
         '    Next
         'End If
-        Call _InitializeDynamicView()
+        Call InitializeViewContent()
 
-        If ViewModel.DynamicView.TopLeftViewContent Is Nothing Then
+        If ViewModel.Content Is Nothing Then
             Call [setup](AppInfo, ViewModel)
         Else
             For Each v In ViewModel.Views
@@ -654,7 +655,6 @@ Public MustInherit Class BaseViewModel2
                 End If
             Next
         End If
-        Call _SetContent(ViewModel.DynamicView)
     End Sub
 
     Protected Sub ViewLoad(ByVal v As ViewItemModel)

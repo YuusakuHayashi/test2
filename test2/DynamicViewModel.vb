@@ -14,92 +14,100 @@ Public Class DynamicViewModel
         )
     End Sub
 
-    'Private _TopView As DynamicViewModel
-    'Public Property TopView As DynamicViewModel
-    '    Get
-    '        If Me._TopView Is Nothing Then
-    '            Me._TopView = New DynamicViewModel
-    '        End If
-    '        Return Me._TopView
-    '    End Get
-    '    Set(value As DynamicViewModel)
-    '        Me._TopView = value
-    '        RaisePropertyChanged("TopView")
-    '    End Set
-    'End Property
-
-    'Private _ButtomView As DynamicViewModel
-    'Public Property ButtomView As DynamicViewModel
-    '    Get
-    '        If Me._ButtomView Is Nothing Then
-    '            Me._ButtomView = New DynamicViewModel
-    '        End If
-    '        Return Me._ButtomView
-    '    End Get
-    '    Set(value As DynamicViewModel)
-    '        Me._ButtomView = value
-    '        RaisePropertyChanged("ButtomView")
-    '    End Set
-    'End Property
-
-    'Private _LeftView As DynamicViewModel
-    'Public Property LeftView As DynamicViewModel
-    '    Get
-    '        If Me._LeftView Is Nothing Then
-    '            Me._LeftView = New DynamicViewModel
-    '        End If
-    '        Return Me._LeftView
-    '    End Get
-    '    Set(value As DynamicViewModel)
-    '        Me._LeftView = value
-    '        RaisePropertyChanged("LeftView")
-    '    End Set
-    'End Property
-
-    'Private _RightView As DynamicViewModel
-    'Public Property RightView As DynamicViewModel
-    '    Get
-    '        If Me._RightView Is Nothing Then
-    '            Me._RightView = New DynamicViewModel
-    '        End If
-    '        Return Me._RightView
-    '    End Get
-    '    Set(value As DynamicViewModel)
-    '        Me._RightView = value
-    '        RaisePropertyChanged("RightView")
-    '    End Set
-    'End Property
-
-    Private _ButtomViewHeight As Double
-    Public Property ButtomViewHeight As Double
+    Private _ContentViewHeight As Double
+    Public Property ContentViewHeight As Double
         Get
-            Return Me._ButtomViewHeight
+            Return Me._ContentViewHeight
         End Get
         Set(value As Double)
-            Me._ButtomViewHeight = value
+            Me._ContentViewHeight = value
         End Set
     End Property
 
-    Private _ButtomViewPreservedHeight As Double
-    Public Property ButtomViewPreservedHeight As Double
+    Private _ContentViewPreservedHeight As Double
+    Public Property ContentViewPreservedHeight As Double
         Get
-            Return Me._ButtomViewPreservedHeight
+            Return Me._ContentViewPreservedHeight
         End Get
         Set(value As Double)
-            Me._ButtomViewPreservedHeight = value
+            Me._ContentViewPreservedHeight = value
         End Set
     End Property
 
-    Private _ButtomGridHeight As GridLength
+    Private _ContentGridHeight As GridLength
     <JsonIgnore>
-    Public Property ButtomGridHeight As GridLength
+    Public Property ContentGridHeight As GridLength
         Get
-            Return Me._ButtomGridHeight
+            Return Me._ContentGridHeight
         End Get
         Set(value As GridLength)
-            Me._ButtomGridHeight = value
-            Me.ButtomViewHeight = value.Value
-            RaisePropertyChanged("ButtomGridHeight")
+            Me._ContentGridHeight = value
+            'Me.ContentViewHeight = value.Value
+        End Set
+    End Property
+
+    Private _ContentViewWidth As Double
+    Public Property ContentViewWidth As Double
+        Get
+            Return Me._ContentViewWidth
+        End Get
+        Set(value As Double)
+            Me._ContentViewWidth = value
+        End Set
+    End Property
+
+    Private _ContentViewPreservedWidth As Double
+    Public Property ContentViewPreservedWidth As Double
+        Get
+            Return Me._ContentViewPreservedWidth
+        End Get
+        Set(value As Double)
+            Me._ContentViewPreservedWidth = value
+        End Set
+    End Property
+
+    Private _ContentGridWidth As GridLength
+    <JsonIgnore>
+    Public Property ContentGridWidth As GridLength
+        Get
+            Return Me._ContentGridWidth
+        End Get
+        Set(value As GridLength)
+            Me._ContentGridWidth = value
+            'Me.ContentViewWidth = value.Value
+        End Set
+    End Property
+
+    Private _BottomViewHeight As Double
+    Public Property BottomViewHeight As Double
+        Get
+            Return Me._BottomViewHeight
+        End Get
+        Set(value As Double)
+            Me._BottomViewHeight = value
+        End Set
+    End Property
+
+    Private _BottomViewPreservedHeight As Double
+    Public Property BottomViewPreservedHeight As Double
+        Get
+            Return Me._BottomViewPreservedHeight
+        End Get
+        Set(value As Double)
+            Me._BottomViewPreservedHeight = value
+        End Set
+    End Property
+
+    Private _BottomGridHeight As GridLength
+    <JsonIgnore>
+    Public Property BottomGridHeight As GridLength
+        Get
+            Return Me._BottomGridHeight
+        End Get
+        Set(value As GridLength)
+            Me._BottomGridHeight = value
+            Me.BottomViewHeight = value.Value
+            RaisePropertyChanged("BottomGridHeight")
         End Set
     End Property
 
@@ -136,96 +144,159 @@ Public Class DynamicViewModel
         End Set
     End Property
 
-    Private _TopLeftContent As Object
+    Private _HorizontalSplitterWidth As GridLength
     <JsonIgnore>
-    Public Property TopLeftContent As Object
+    Public Property HorizontalSplitterWidth As GridLength
         Get
-            Return Me._TopLeftContent
+            Return Me._HorizontalSplitterWidth
         End Get
-        Set(value As Object)
-            Me._TopLeftContent = value
-            Call _OptimizeDynamicView()
-            RaisePropertyChanged("TopLeftContent")
+        Set(value As GridLength)
+            Me._HorizontalSplitterWidth = value
+            RaisePropertyChanged("HorizontalSplitterWidth")
         End Set
     End Property
 
-    Private _TopLeftViewContent As Object
-    Public Property TopLeftViewContent As Object
-        Get
-            Return Me._TopLeftViewContent
-        End Get
-        Set(value As Object)
-            Me._TopLeftViewContent = value
-            Me.TopLeftContent = _TakeOutContent(value)
-        End Set
-    End Property
-
-    Private _TopRightContent As Object
+    Private _VerticalSplitterHeight As GridLength
     <JsonIgnore>
-    Public Property TopRightContent As Object
+    Public Property VerticalSplitterHeight As GridLength
         Get
-            Return Me._TopRightContent
+            Return Me._VerticalSplitterHeight
         End Get
-        Set(value As Object)
-            Me._TopRightContent = value
-            Call _OptimizeDynamicView()
-            RaisePropertyChanged("TopRightContent")
+        Set(value As GridLength)
+            Me._VerticalSplitterHeight = value
+            RaisePropertyChanged("VerticalSplitterHeight")
         End Set
     End Property
 
-    Private _TopRightViewContent As Object
-    Public Property TopRightViewContent As Object
-        Get
-            Return Me._TopRightViewContent
-        End Get
-        Set(value As Object)
-            Me._TopRightViewContent = value
-            Me.TopRightContent = _TakeOutContent(value)
-        End Set
-    End Property
-
-    Private _ButtomLeftContent As Object
+    Private _MainContent As Object
     <JsonIgnore>
-    Public Property ButtomLeftContent As Object
+    Public Property MainContent As Object
         Get
-            Return Me._ButtomLeftContent
+            Return Me._MainContent
         End Get
         Set(value As Object)
-            Me._ButtomLeftContent = value
+            Me._MainContent = value
             Call _OptimizeDynamicView()
-            RaisePropertyChanged("ButtomLeftContent")
+            RaisePropertyChanged("MainContent")
         End Set
     End Property
 
-    Private _ButtomLeftViewContent As Object
-    Public Property ButtomLeftViewContent As Object
+    Private _MainViewContent As ViewItemModel
+    Public Property MainViewContent As ViewItemModel
         Get
-            Return Me._ButtomLeftViewContent
+            Return Me._MainViewContent
+        End Get
+        Set(value As ViewItemModel)
+            Me._MainViewContent = value
+            Me.MainContent = value.Content
+        End Set
+    End Property
+
+    Private _RightContent As Object
+    <JsonIgnore>
+    Public Property RightContent As Object
+        Get
+            Return Me._RightContent
         End Get
         Set(value As Object)
-            Me._ButtomLeftViewContent = value
-            Me.ButtomLeftContent = _TakeOutContent(value)
+            Me._RightContent = value
+            Call _OptimizeDynamicView()
+            RaisePropertyChanged("RightContent")
         End Set
     End Property
 
-    Private Function _TakeOutContent(value)
-        If TryCast(value, ViewItemModel) IsNot Nothing Then
-            Return value.Content
-        Else
-            Throw New Exception("DynamicViewModel TakeOutContent!!")
-        End If
-    End Function
+    Private _RightViewContent As ViewItemModel
+    Public Property RightViewContent As ViewItemModel
+        Get
+            Return Me._RightViewContent
+        End Get
+        Set(value As ViewItemModel)
+            Me._RightViewContent = value
+            Me.RightContent = value.Content
+        End Set
+    End Property
+
+    Private _BottomContent As Object
+    <JsonIgnore>
+    Public Property BottomContent As Object
+        Get
+            Return Me._BottomContent
+        End Get
+        Set(value As Object)
+            Me._BottomContent = value
+            Call _OptimizeDynamicView()
+            RaisePropertyChanged("BottomContent")
+        End Set
+    End Property
+
+    Private _BottomViewContent As ViewItemModel
+    Public Property BottomViewContent As ViewItemModel
+        Get
+            Return Me._BottomViewContent
+        End Get
+        Set(value As ViewItemModel)
+            Me._BottomViewContent = value
+            Me.BottomContent = value.Content
+        End Set
+    End Property
+
+    Private _IsHorizontalSplitterEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsHorizontalSplitterEnabled As Boolean
+        Get
+            Return Me._IsHorizontalSplitterEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsHorizontalSplitterEnabled = value
+            RaisePropertyChanged("IsHorizontalSplitterEnabled")
+        End Set
+    End Property
+
+    Private _IsVerticalSplitterEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsVerticalSplitterEnabled As Boolean
+        Get
+            Return Me._IsVerticalSplitterEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsVerticalSplitterEnabled = value
+            RaisePropertyChanged("IsVerticalSplitterEnabled")
+        End Set
+    End Property
 
     Private Sub _OptimizeDynamicView()
-        If Me.TopRightViewContent Is Nothing Then
+        If Me.RightViewContent Is Nothing Then
             Me.RightGridWidth = New GridLength(0.0)
+            Me.HorizontalSplitterWidth = New GridLength(0.0)
+            Me.IsHorizontalSplitterEnabled = False
         Else
-            Me.RightGridWidth = GridLength.Auto
+            If Me.ContentViewWidth > 0.0 Then
+                Me.ContentGridWidth = New GridLength(ContentViewWidth)
+                Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Else
+                Me.RightGridWidth = GridLength.Auto
+            End If
+            Me.HorizontalSplitterWidth = New GridLength(5.0)
+            Me.IsHorizontalSplitterEnabled = True
         End If
-        If Me.ButtomLeftViewContent Is Nothing Then
-            Me.ButtomGridHeight = New GridLength(0.0)
+        If Me.BottomViewContent Is Nothing Then
+            Me.BottomGridHeight = New GridLength(0.0)
+            Me.VerticalSplitterHeight = New GridLength(0.0)
+            Me.IsVerticalSplitterEnabled = False
         Else
-            Me.ButtomGridHeight = GridLength.Auto
+            If Me.ContentViewHeight > 0.0 Then
+                Me.ContentGridHeight = New GridLength(ContentViewHeight)
+                Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Else
+                Me.BottomGridHeight = GridLength.Auto
+            End If
+            Me.VerticalSplitterHeight = New GridLength(5.0)
+            Me.IsVerticalSplitterEnabled = True
         End If
+    End Sub
+
+    Public Sub New()
+        Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+        Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
     End Sub
 End Class

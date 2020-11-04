@@ -1,33 +1,24 @@
-?vm
-{test2.ViewModel}
-    ContentDictionary: Count = 1
-    ExplorerViewContent: Nothing
-    HistoryViewContent: Nothing
-    MainViewContent: {test2.UserDirectoryViewModel}
-    MenuViewContent: Nothing
-    TabsDictionary: Count = 3
-    Views: Count = 0
-    _ContentDictionary: Count = 1
-    _ExplorerViewContent: Nothing
-    _HistoryViewContent: Nothing
-    _MainViewContent: {test2.UserDirectoryViewModel}
-    _MenuViewContent: Nothing
-    _TabsDictionary: Count = 3
-    _Views: Count = 0
-
-
-{test2.ViewModel}
-    ContentDictionary: Count = 0
-    ExplorerViewContent: Nothing
-    HistoryViewContent: Nothing
-    MainViewContent: Nothing
-    MenuViewContent: Nothing
-    TabsDictionary: Count = 3
-    Views: Count = 4
-    _ContentDictionary: Count = 0
-    _ExplorerViewContent: Nothing
-    _HistoryViewContent: Nothing
-    _MainViewContent: Nothing
-    _MenuViewContent: Nothing
-    _TabsDictionary: Count = 3
-    _Views: Count = 4
+    <TreeView Name="tree" 
+        ItemsSource="{Binding Items}" 
+        HorizontalAlignment="Stretch" 
+        HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <TreeView.ItemTemplate>
+            <HierarchicalDataTemplate DataType="{x:Type TVItem}" ItemsSource="{Binding Items}">
+                <Border BorderBrush="Silver" BorderThickness="2" Margin="0.5" Padding="2">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition MinHeight="32"/>
+                            <RowDefinition MinHeight="20"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="{Binding Name}" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <Label Grid.Row="1" Grid.Column="0" Content="{Binding Status}" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <ProgressBar Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding Progress}" HorizontalAlignment="Stretch"/>
+                    </Grid>
+                </Border>
+            </HierarchicalDataTemplate>
+        </TreeView.ItemTemplate>
+    </TreeView>
