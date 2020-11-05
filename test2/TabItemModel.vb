@@ -12,6 +12,16 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
         End Set
     End Property
 
+    Private Property _ModelName As String
+    Public Property ModelName As String
+        Get
+            Return Me._ModelName
+        End Get
+        Set(value As String)
+            Me._ModelName = value
+        End Set
+    End Property
+
     Private Property _Alias As String
     Public Property [Alias] As String
         Get
@@ -123,7 +133,10 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
         Call _CheckTabCloseCommandEnabled()
     End Sub
 
-    Public Sub New()
+    Public Sub New(ByVal n As String, ByVal obj As Object)
+        Me.Name = n
+        Me.Content = obj
+        Me.ModelName = obj.GetType.Name
         Call Initialize()
     End Sub
 End Class

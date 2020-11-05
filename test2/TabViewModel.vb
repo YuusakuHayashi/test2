@@ -49,6 +49,19 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Set
     End Property
 
+    Private _Views As ObservableCollection(Of ViewItemModel)
+    Public Property Views As ObservableCollection(Of ViewItemModel)
+        Get
+            If Me._Views Is Nothing Then
+                Me._Views = New ObservableCollection(Of ViewItemModel)
+            End If
+            Return Me._Views
+        End Get
+        Set(value As ObservableCollection(Of ViewItemModel))
+            Me._Views = value
+        End Set
+    End Property
+
     Private Sub _ChangeTabCloseButtonVisibilities(ByVal [tab] As TabItemModel)
         For Each t In Me.Tabs
             If t.Equals([tab]) Then
@@ -67,5 +80,20 @@ Public Class TabViewModel : Inherits BaseViewModel
                 t.Color = Colors.White
             End If
         Next
+    End Sub
+
+    Public Sub AddTab(ByVal [tab] As TabItemModel)
+        Dim idx = -1
+        For Each t In Me.Tabs
+            If t.Name = [tab].Name Then
+                idx = Me.Tabs.IndexOf(t)
+                Exit For
+            End If
+        Next
+        If idx > -1 Then
+            Me.Tabs(idx) = [tab]
+        Else
+            Me.Tabs.Add([tab])
+        End If
     End Sub
 End Class

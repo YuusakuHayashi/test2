@@ -279,6 +279,58 @@ Public MustInherit Class BaseViewModel2
     Private Sub _InitializeDynamicView()
         'ViewModel.DynamicView = Nothing
     End Sub
+
+    ' 必ず、ShowDynamicView()を通じてViewModel.Contentにセットする
+
+    'Private Overloads Sub _CreateViews(ByVal dvm As DynamicViewModel)
+    '    Dim act As Action(Of Object, String)
+    '    act = Sub(ByVal obj As Object, ByVal [name] As String)
+    '              Dim dvm2 As DynamicViewModel
+    '              Dim tvm As TabViewModel
+    '              Select Case obj.GetType.Name
+    '                  Case "DynamicViewModel"
+    '                      dvm2 = CType(obj, DynamicViewModel)
+    '                      Call _CreateViews(dvm2)
+    '                  Case "TabViewModel"
+    '                      tvm = CType(obj, TabViewModel)
+    '                      Call _CreateViews(tvm)
+    '                  Case Else
+    '                      ViewModel.Views.Add(
+    '                         New ViewItemModel With {
+    '                             .Name = [name]
+    '                         }
+    '                     )
+    '              End Select
+    '          End Sub
+    '    Call act(dvm.MainContent, dvm.MainContentName)
+    '    If dvm.RightContent IsNot Nothing Then
+    '        Call act(dvm.RightContent, dvm.RightContentName)
+    '    End If
+    '    If dvm.BottomContent IsNot Nothing Then
+    '        Call act(dvm.BottomContent, dvm.BottomContentName)
+    '    End If
+    'End Sub
+
+    'Private Overloads Sub _CreateViews(ByVal tvm As TabViewModel)
+    '    Dim dvm As DynamicViewModel
+    '    Dim tvm2 As TabViewModel
+    '    For Each t In tvm.Tabs
+    '        Select Case t.Content.GetType.Name
+    '            Case "DynamicViewModel"
+    '                dvm = CType(t.Content, DynamicViewModel)
+    '                Call _CreateViews(dvm)
+    '            Case "TabViewModel"
+    '                tvm2 = CType(t.Content, TabViewModel)
+    '                Call _CreateViews(tvm2)
+    '            Case Else
+    '                ViewModel.Views.Add(
+    '                    New ViewItemModel With {
+    '                        .Name = t.Name
+    '                    }
+    '                )
+    '        End Select
+    '    Next
+    'End Sub
     '---------------------------------------------------------------------------------------------'
 
     ' ＭＵＬＴＩＶＩＥＷ ---------------------------------------------------------------------------------------------'
@@ -396,31 +448,31 @@ Public MustInherit Class BaseViewModel2
 
     ' コレクションにタブがなければ追加、あれば更新
     'Private Overloads Sub _AddTabItem(ByVal [tab] As TabItemModel)
-    Private Sub _AddTabItem(ByVal v As ViewItemModel)
-        Dim [tab] = New TabItemModel With {
-            .Name = v.Name,
-            .[Alias] = v.[Alias],
-            .FrameType = v.FrameType,
-            .Content = v.Content
-        }
+    'Private Sub _AddTabItem(ByVal v As ViewItemModel)
+    '    Dim [tab] = New TabItemModel With {
+    '        .Name = v.Name,
+    '        .[Alias] = v.[Alias],
+    '        .FrameType = v.FrameType,
+    '        .Content = v.Content
+    '    }
 
-        Dim idx = -1
-        Dim frame = [tab].FrameType
-        For Each t In ViewModel.MultiView.TabsDictionary(frame).Tabs
-            If [tab].Name = t.Name Then
-                idx = ViewModel.MultiView.TabsDictionary(frame).Tabs.IndexOf(t)
-            End If
-        Next
-        If idx = -1 Then
-            ' 閉じるコマンドのセット
-            ViewModel.MultiView.TabsDictionary(frame).Tabs.Add([tab])
-            idx = ViewModel.MultiView.TabsDictionary(frame).Tabs.IndexOf([tab])
-            Call _ResizeMultiViewOfAdd(frame)
-        Else
-            ViewModel.MultiView.TabsDictionary(frame).Tabs(idx).Content = [tab].Content
-        End If
-        ViewModel.MultiView.TabsDictionary(frame).SelectedIndex = idx
-    End Sub
+    '    Dim idx = -1
+    '    Dim frame = [tab].FrameType
+    '    For Each t In ViewModel.MultiView.TabsDictionary(frame).Tabs
+    '        If [tab].Name = t.Name Then
+    '            idx = ViewModel.MultiView.TabsDictionary(frame).Tabs.IndexOf(t)
+    '        End If
+    '    Next
+    '    If idx = -1 Then
+    '        ' 閉じるコマンドのセット
+    '        ViewModel.MultiView.TabsDictionary(frame).Tabs.Add([tab])
+    '        idx = ViewModel.MultiView.TabsDictionary(frame).Tabs.IndexOf([tab])
+    '        Call _ResizeMultiViewOfAdd(frame)
+    '    Else
+    '        ViewModel.MultiView.TabsDictionary(frame).Tabs(idx).Content = [tab].Content
+    '    End If
+    '    ViewModel.MultiView.TabsDictionary(frame).SelectedIndex = idx
+    'End Sub
 
     Private Sub _ResizeMultiViewOfAdd(ByVal frame As String)
         If ViewModel.MultiView.TabsDictionary(frame).Tabs.Count > 0 Then
@@ -451,25 +503,25 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Public Sub AddView(ByVal v As ViewItemModel)
-        Select Case v.LayoutType
-            Case ViewModel.SINGLE_VIEW
-                Call _SetItemToSingleViewContent(v)
-            Case ViewModel.MULTI_VIEW
-                Select Case v.ViewType
-                    Case MultiViewModel.NORMAL_VIEW
-                        Call _RegisterViewToDictionary(v)
-                        Call _AddItem(v)
-                        Call _SetItemToMultiViewContent(v)
-                    Case MultiViewModel.TAB_VIEW
-                        Call _RegisterTabViewToDictionary(v)
-                        Call _AssignIconOfView(v)
-                        Call _AddTabItem(v)
-                        Call _SetTabItemToMultiViewContent(v)
-                    Case Else
-                        MsgBox("ViewModel.AddView")
-                        Exit Sub
-                End Select
-        End Select
+        '    Select Case v.LayoutType
+        '        Case ViewModel.SINGLE_VIEW
+        '            Call _SetItemToSingleViewContent(v)
+        '        Case ViewModel.MULTI_VIEW
+        '            Select Case v.ViewType
+        '                Case MultiViewModel.NORMAL_VIEW
+        '                    Call _RegisterViewToDictionary(v)
+        '                    Call _AddItem(v)
+        '                    Call _SetItemToMultiViewContent(v)
+        '                Case MultiViewModel.TAB_VIEW
+        '                    Call _RegisterTabViewToDictionary(v)
+        '                    Call _AssignIconOfView(v)
+        '                    Call _AddTabItem(v)
+        '                    Call _SetTabItemToMultiViewContent(v)
+        '                Case Else
+        '                    MsgBox("ViewModel.AddView")
+        '                    Exit Sub
+        '            End Select
+        '    End Select
     End Sub
 
     Private Sub _AssignIconOfView(ByRef v As ViewItemModel)
@@ -521,19 +573,19 @@ Public MustInherit Class BaseViewModel2
     '    End Get
     'End Property
 
-    Private Sub _ViewModelLoad(ByRef obj1 As Object, ByRef obj2 As Object)
-        Dim obj As Object
-        Dim [define] As Func(Of ViewItemModel, Object) _
-            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
-        For Each v In ViewModel.Views
-            If v.OpenState Then
-                obj = [define](v)
-                obj.Initialize(AppInfo, ViewModel)
-                v.Content = obj
-                Call AddView(v)
-            End If
-        Next
-    End Sub
+    'Private Sub _ViewModelLoad(ByRef obj1 As Object, ByRef obj2 As Object)
+    '    Dim obj As Object
+    '    Dim [define] As Func(Of ViewItemModel, Object) _
+    '        = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+    '    For Each v In ViewModel.Views
+    '        If v.OpenState Then
+    '            obj = [define](v)
+    '            obj.Initialize(AppInfo, ViewModel)
+    '            v.Content = obj
+    '            Call AddView(v)
+    '        End If
+    '    Next
+    'End Sub
 
     Public Sub AddViewItem(ByVal [view] As ViewItemModel)
         Dim idx = -1
@@ -552,63 +604,63 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Protected Sub ShowViewExplorer()
-        Dim v = New ViewItemModel With {
-            .Content = ViewModel,
-            .Name = ViewModel.GetType.Name,
-            .ModelName = ViewModel.GetType.Name,
-            .FrameType = MultiViewModel.EXPLORER_FRAME,
-            .LayoutType = ViewModel.MULTI_VIEW,
-            .ViewType = MultiViewModel.TAB_VIEW,
-            .OpenState = True
-        }
-        Call AddViewItem(v)
-        Call AddView(v)
+        '    Dim v = New ViewItemModel With {
+        '        .Content = ViewModel,
+        '        .Name = ViewModel.GetType.Name,
+        '        .ModelName = ViewModel.GetType.Name,
+        '        .FrameType = MultiViewModel.EXPLORER_FRAME,
+        '        .LayoutType = ViewModel.MULTI_VIEW,
+        '        .ViewType = MultiViewModel.TAB_VIEW,
+        '        .OpenState = True
+        '    }
+        '    Call AddViewItem(v)
+        '    Call AddView(v)
     End Sub
 
     Protected Sub ShowProjectExplorer()
-        Dim v = New ViewItemModel With {
-            .Content = AppInfo,
-            .Name = AppInfo.GetType.Name,
-            .ModelName = AppInfo.GetType.Name,
-            .FrameType = MultiViewModel.EXPLORER_FRAME,
-            .LayoutType = ViewModel.MULTI_VIEW,
-            .ViewType = MultiViewModel.TAB_VIEW,
-            .OpenState = True
-        }
-        Call AddViewItem(v)
-        Call AddView(v)
+        '    Dim v = New ViewItemModel With {
+        '        .Content = AppInfo,
+        '        .Name = AppInfo.GetType.Name,
+        '        .ModelName = AppInfo.GetType.Name,
+        '        .FrameType = MultiViewModel.EXPLORER_FRAME,
+        '        .LayoutType = ViewModel.MULTI_VIEW,
+        '        .ViewType = MultiViewModel.TAB_VIEW,
+        '        .OpenState = True
+        '    }
+        '    Call AddViewItem(v)
+        '    Call AddView(v)
     End Sub
 
     Protected Sub ShowMenu()
-        Dim mvm = New MenuViewModel
-        mvm.Initialize(AppInfo, ViewModel)
-        Dim v = New ViewItemModel With {
-            .Content = mvm,
-            .Name = mvm.GetType.Name,
-            .ModelName = mvm.GetType.Name,
-            .FrameType = MultiViewModel.MENU_FRAME,
-            .LayoutType = ViewModel.MULTI_VIEW,
-            .ViewType = MultiViewModel.NORMAL_VIEW,
-            .OpenState = True
-        }
-        Call AddViewItem(v)
-        Call AddView(v)
+        '    Dim mvm = New MenuViewModel
+        '    mvm.Initialize(AppInfo, ViewModel)
+        '    Dim v = New ViewItemModel With {
+        '        .Content = mvm,
+        '        .Name = mvm.GetType.Name,
+        '        .ModelName = mvm.GetType.Name,
+        '        .FrameType = MultiViewModel.MENU_FRAME,
+        '        .LayoutType = ViewModel.MULTI_VIEW,
+        '        .ViewType = MultiViewModel.NORMAL_VIEW,
+        '        .OpenState = True
+        '    }
+        '    Call AddViewItem(v)
+        '    Call AddView(v)
     End Sub
 
     Protected Sub ShowHistory()
-        Dim hvm = New HistoryViewModel
-        hvm.Initialize(AppInfo, ViewModel)
-        Dim v = New ViewItemModel With {
-            .Content = hvm,
-            .Name = hvm.GetType.Name,
-            .ModelName = hvm.GetType.Name,
-            .FrameType = MultiViewModel.HISTORY_FRAME,
-            .LayoutType = ViewModel.MULTI_VIEW,
-            .ViewType = MultiViewModel.TAB_VIEW,
-            .OpenState = True
-        }
-        Call AddViewItem(v)
-        Call AddView(v)
+        '    Dim hvm = New HistoryViewModel
+        '    hvm.Initialize(AppInfo, ViewModel)
+        '    Dim v = New ViewItemModel With {
+        '        .Content = hvm,
+        '        .Name = hvm.GetType.Name,
+        '        .ModelName = hvm.GetType.Name,
+        '        .FrameType = MultiViewModel.HISTORY_FRAME,
+        '        .LayoutType = ViewModel.MULTI_VIEW,
+        '        .ViewType = MultiViewModel.TAB_VIEW,
+        '        .OpenState = True
+        '    }
+        '    Call AddViewItem(v)
+        '    Call AddView(v)
     End Sub
 
     Public Overloads Sub ViewModelSetup()
@@ -658,24 +710,24 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Protected Sub ViewLoad(ByVal v As ViewItemModel)
-        Dim [define] As Func(Of ViewItemModel, Object) _
-            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+        'Dim [define] As Func(Of ViewItemModel, Object) _
+        '    = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
 
-        Dim obj = [define](v)
-        If obj IsNot Nothing Then
-            Select Case v.ModelName
-                Case (New ViewModel).GetType.Name
-                    v.Content = ViewModel
-                    Call AddView(v)
-                Case (New AppDirectoryModel).GetType.Name
-                    v.Content = AppInfo
-                    Call AddView(v)
-                Case Else
-                    obj.Initialize(AppInfo, ViewModel)
-                    v.Content = obj
-                    Call AddView(v)
-            End Select
-        End If
+        'Dim obj = [define](v)
+        'If obj IsNot Nothing Then
+        '    Select Case v.ModelName
+        '        Case (New ViewModel).GetType.Name
+        '            v.Content = ViewModel
+        '            Call AddView(v)
+        '        Case (New AppDirectoryModel).GetType.Name
+        '            v.Content = AppInfo
+        '            Call AddView(v)
+        '        Case Else
+        '            obj.Initialize(AppInfo, ViewModel)
+        '            v.Content = obj
+        '            Call AddView(v)
+        '    End Select
+        'End If
     End Sub
 
 End Class

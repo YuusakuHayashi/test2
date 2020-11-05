@@ -17,22 +17,6 @@ Public Class ViewModel
     End Sub
 
     '---------------------------------------------------------------------------------------------'
-    ' 新仕様
-    'Private _DynamicView As DynamicViewModel
-    'Public Property DynamicView As DynamicViewModel
-    '    Get
-    '        If Me._DynamicView Is Nothing Then
-    '            Me._DynamicView = New DynamicViewModel
-    '        End If
-    '        Return Me._DynamicView
-    '    End Get
-    '    Set(value As DynamicViewModel)
-    '        Me._DynamicView = value
-    '    End Set
-    'End Property
-    '---------------------------------------------------------------------------------------------'
-
-    '---------------------------------------------------------------------------------------------'
     ' 旧仕様
     Private _SingleView As SingleViewModel
     <JsonIgnore>
@@ -50,6 +34,7 @@ Public Class ViewModel
     End Property
 
     Private _MultiView As MultiViewModel
+    <JsonIgnore>
     Public Property MultiView As MultiViewModel
         Get
             If Me._MultiView Is Nothing Then
@@ -76,6 +61,12 @@ Public Class ViewModel
         End Set
     End Property
 
+    Public Sub ShowDynamicView(ByVal dvm As DynamicViewModel)
+        Me.Views = Nothing
+        Call _CreateViews(dvm)
+        Me.Content = dvm
+    End Sub
+
     Private _Views As ObservableCollection(Of ViewItemModel)
     Public Property Views As ObservableCollection(Of ViewItemModel)
         Get
@@ -88,6 +79,71 @@ Public Class ViewModel
             Me._Views = value
         End Set
     End Property
+
+    Private Overloads Sub _CreateViews(ByVal dvm As DynamicViewModel)
+        'Dim act As Action(Of Object, String)
+        'act = Sub(ByVal obj As Object, ByVal [name] As String)
+        '          Dim dvm2 As DynamicViewModel
+        '          Dim tvm As TabViewModel
+        '          Select Case obj.GetType.Name
+        '              Case "DynamicViewModel"
+        '                  dvm2 = CType(obj, DynamicViewModel)
+        '                  Call _CreateViews(dvm2)
+        '              Case "TabViewModel"
+        '                  tvm = CType(obj, TabViewModel)
+        '                  Call _CreateViews(tvm)
+        '              Case Else
+        '                  ViewModel.Views.Add(
+        '                     New ViewItemModel With {
+        '                         .Name = [name]
+        '                     }
+        '                 )
+        '          End Select
+        '      End Sub
+        Dim act As Action(Of ViewItemModel)
+        act = Sub(ByVal v As ViewItemModel)
+                  Dim dvm2 As DynamicViewModel
+                  Dim tvm As TabViewModel
+                  Select Case v.Content.GetType.Name
+                      Case "DynamicViewModel"
+                          dvm2 = CType(v.Content, DynamicViewModel)
+                          Call _CreateViews(dvm2)
+                      Case "TabViewModel"
+                          tvm = CType(v.Content, TabViewModel)
+                          Call _CreateViews(tvm)
+                      Case Else
+                          Me.Views.Add(v)
+                  End Select
+              End Sub
+        Call act(dvm.MainViewContent)
+        If dvm.RightContent IsNot Nothing Then
+            Call act(dvm.RightViewContent)
+        End If
+        If dvm.BottomContent IsNot Nothing Then
+            Call act(dvm.BottomViewContent)
+        End If
+    End Sub
+
+    Private Overloads Sub _CreateViews(ByVal tvm As TabViewModel)
+        Dim dvm As DynamicViewModel
+        Dim tvm2 As TabViewModel
+        For Each t In tvm.Tabs
+            Select Case t.Content.GetType.Name
+                Case "DynamicViewModel"
+                    dvm = CType(t.Content, DynamicViewModel)
+                    Call _CreateViews(dvm)
+                Case "TabViewModel"
+                    tvm2 = CType(t.Content, TabViewModel)
+                    Call _CreateViews(tvm2)
+                Case Else
+                    Me.Views.Add(
+                        New ViewItemModel With {
+                            .Name = t.Name
+                        }
+                    )
+            End Select
+        Next
+    End Sub
 
     Private _FontSize As Double
     Public Property [FontSize] As Double

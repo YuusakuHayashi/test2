@@ -432,30 +432,12 @@ Public Class UserDirectoryViewModel
         Me.CurrentProjects = AppInfo.CurrentProjects
         Me.FixedProjects = AppInfo.FixedProjects
 
-        ' ViewModel.AddViewItem() を使用すると
-        ' ViewModel.Viewsに登録されてしまい、
-        ' ロード対象になってしまう
-        'v = New ViewItemModel With {
-        '    .Name = Me.GetType.Name,
-        '    .ModelName = Me.GetType.Name,
-        '    .LayoutType = ViewModel.SINGLE_VIEW,
-        '    .FrameType = ViewModel.MultiView.MAIN_FRAME,
-        '    .ViewType = ViewModel.MultiView.NORMAL_VIEW,
-        '    .OpenState = True,
-        '    .Content = Me
-        '}
-        'Call AddView(v)
-
         Dim dvm = New DynamicViewModel With {
-                .MainViewContent = New ViewItemModel With {
-                .Name = Me.GetType.Name,
-                .ModelName = Me.GetType.Name,
-                .LayoutType = ViewModel.SINGLE_VIEW,
-                .OpenState = True,
+            .MainViewContent = New ViewItemModel With {
                 .Content = Me
             }
         }
-        ViewModel.Content = dvm
+        Call ViewModel.ShowDynamicView(dvm)
     End Sub
 
     Private Sub _RemoveFixedProject(ByVal project As ProjectInfoModel)

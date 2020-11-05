@@ -168,14 +168,35 @@ Public Class DynamicViewModel
         End Set
     End Property
 
+    Private _MainContentName As String
+    Public Property MainContentName As String
+        Get
+            Return Me._MainContentName
+        End Get
+        Set(value As String)
+            Me._MainContentName = value
+        End Set
+    End Property
+
+    ' ロードするときの定義名
+    Private _MainContentModelName As String
+    Public Property MainContentModelName As String
+        Get
+            Return Me._MainContentModelName
+        End Get
+        Set(value As String)
+            Me._MainContentModelName = value
+        End Set
+    End Property
+
     Private _MainContent As Object
-    <JsonIgnore>
     Public Property MainContent As Object
         Get
             Return Me._MainContent
         End Get
         Set(value As Object)
             Me._MainContent = value
+            Me.MainContentModelName = value.GetType.Name
             Call _OptimizeDynamicView()
             RaisePropertyChanged("MainContent")
         End Set
@@ -192,14 +213,35 @@ Public Class DynamicViewModel
         End Set
     End Property
 
+    Private _RightContentName As String
+    Public Property RightContentName As String
+        Get
+            Return Me._RightContentName
+        End Get
+        Set(value As String)
+            Me._RightContentName = value
+        End Set
+    End Property
+
+    ' ロードするときの定義名
+    Private _RightContentModelName As String
+    Public Property RightContentModelName As String
+        Get
+            Return Me._RightContentModelName
+        End Get
+        Set(value As String)
+            Me._RightContentModelName = value
+        End Set
+    End Property
+
     Private _RightContent As Object
-    <JsonIgnore>
     Public Property RightContent As Object
         Get
             Return Me._RightContent
         End Get
         Set(value As Object)
             Me._RightContent = value
+            Me.RightContentModelName = value.GetType.Name
             Call _OptimizeDynamicView()
             RaisePropertyChanged("RightContent")
         End Set
@@ -216,14 +258,35 @@ Public Class DynamicViewModel
         End Set
     End Property
 
+    Private _BottomContentName As String
+    Public Property BottomContentName As String
+        Get
+            Return Me._BottomContentName
+        End Get
+        Set(value As String)
+            Me._BottomContentName = value
+        End Set
+    End Property
+
+    ' ロードするときの定義名
+    Private _BottomContentModelName As String
+    Public Property BottomContentModelName As String
+        Get
+            Return Me._BottomContentModelName
+        End Get
+        Set(value As String)
+            Me._BottomContentModelName = value
+        End Set
+    End Property
+
     Private _BottomContent As Object
-    <JsonIgnore>
     Public Property BottomContent As Object
         Get
             Return Me._BottomContent
         End Get
         Set(value As Object)
             Me._BottomContent = value
+            Me.BottomContentModelName = value.GetType.Name
             Call _OptimizeDynamicView()
             RaisePropertyChanged("BottomContent")
         End Set
@@ -265,7 +328,7 @@ Public Class DynamicViewModel
     End Property
 
     Private Sub _OptimizeDynamicView()
-        If Me.RightViewContent Is Nothing Then
+        If Me.RightContent Is Nothing Then
             Me.RightGridWidth = New GridLength(0.0)
             Me.HorizontalSplitterWidth = New GridLength(0.0)
             Me.IsHorizontalSplitterEnabled = False
@@ -279,7 +342,7 @@ Public Class DynamicViewModel
             Me.HorizontalSplitterWidth = New GridLength(5.0)
             Me.IsHorizontalSplitterEnabled = True
         End If
-        If Me.BottomViewContent Is Nothing Then
+        If Me.BottomContent Is Nothing Then
             Me.BottomGridHeight = New GridLength(0.0)
             Me.VerticalSplitterHeight = New GridLength(0.0)
             Me.IsVerticalSplitterEnabled = False
