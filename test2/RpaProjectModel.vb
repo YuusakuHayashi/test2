@@ -75,19 +75,28 @@ Public Class RpaProjectModel : Inherits ProjectModel
         Call mvm.Initialize(app, vm)
         Call rpapvm.Initialize(app, vm)
         Call rpapmvm.Initialize(app, vm)
-        Dim dvm = New DynamicViewModel With {
+        Dim dvm = New FlexibleViewModel With {
             .ContentViewHeight = 25.0,
-            .MainContent = mvm,
-            .MainContentName = "メニュー",
-            .BottomContent = New DynamicViewModel With {
-                .ContentViewHeight = 25.0,
-                .MainContent = rpapmvm,
-                .MainContentName = "Rpaプロジェクトメニュー",
-                .BottomContent = rpapvm,
-                .BottomContentName = "Rpaプロジェクト"
+            .MainViewContent = New ViewItemModel With {
+                .Name = "メニュー", 
+                .Content = mvm
+            },
+            .BottomViewContent = New ViewItemModel With {
+                .Name = vbNullString,
+                .Content = New FlexibleViewModel With {
+                    .ContentViewHeight = 25.0,
+                    .MainViewContent = New ViewItemModel With {
+                        .Name = "Rpaプロジェクトメニュー",
+                        .Content = rpapmvm
+                    },
+                    .BottomViewContent = New ViewItemModel With {
+                        .Name = "Rpaプロジェクト",
+                        .Content = rpapvm
+                    }
+                }
             }
         }
-        vm.ShowDynamicView(dvm)
+        vm.ShowFlexibleView(dvm)
     End Sub
 
     Public Overrides Function ViewDefineExecute(v As ViewItemModel) As Object

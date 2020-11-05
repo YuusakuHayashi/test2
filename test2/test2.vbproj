@@ -91,7 +91,7 @@
     <Compile Include="Converters\DoubleGridLengthConverter.vb" />
     <Compile Include="Converters\MinusConverter.vb" />
     <Compile Include="DelegateAction.vb" />
-    <Compile Include="DynamicViewModel.vb" />
+    <Compile Include="FlexibleViewModel.vb" />
     <Compile Include="DynamicViewStructureModel.vb" />
     <Compile Include="MenuItemModel.vb" />
     <Compile Include="MenuViewModel.vb" />

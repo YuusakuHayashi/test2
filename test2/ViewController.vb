@@ -107,9 +107,9 @@
     End Sub
 
     Private Sub _OpenViewRequestAccept(ByVal v As ViewItemModel)
-        Dim idx = ViewModel.Views.IndexOf(v)
-        ViewModel.Views(idx).OpenState = True
-        Call ViewLoad(ViewModel.Views(idx))
+        'Dim idx = ViewModel.Views.IndexOf(v)
+        'ViewModel.Views(idx).OpenState = True
+        'Call ViewLoad(ViewModel.Views(idx))
     End Sub
     '---------------------------------------------------------------------------------------------'
 End Class

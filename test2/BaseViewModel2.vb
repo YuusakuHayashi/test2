@@ -180,7 +180,8 @@ Public MustInherit Class BaseViewModel2
         Dim vm = jh.ModelLoad(AppInfo.ProjectInfo.ViewModelFileName)
 
         ' ロードしたいメンバーをここに追加していく
-        ViewModel.Views = vm.Views
+        ' ViewModel.Views = vm.Views
+        ViewModel.SaveContent = vm.Content
         ViewModel.MultiView.MainGridHeight _
             = New GridLength(vm.MultiView.MainViewHeight)
         ViewModel.MultiView.RightGridWidth _
@@ -696,38 +697,122 @@ Public MustInherit Class BaseViewModel2
         '        End If
         '    Next
         'End If
+        Dim [save] As FlexibleViewModel
+        Dim [load] As FlexibleViewModel
         Call InitializeViewContent()
 
-        If ViewModel.Content Is Nothing Then
+        If ViewModel.SaveContent Is Nothing Then
             Call [setup](AppInfo, ViewModel)
         Else
-            For Each v In ViewModel.Views
-                If v.OpenState Then
-                    Call ViewLoad(v)
-                End If
-            Next
+            [save] = CType(ViewModel.SaveContent, FlexibleViewModel)
+            [load] = FlexibleViewLoad([save])
+            'For Each v In ViewModel.Views
+            '    If v.OpenState Then
+            '        Call ViewLoad(v)
+            '    End If
+            'Next
         End If
     End Sub
 
-    Protected Sub ViewLoad(ByVal v As ViewItemModel)
-        'Dim [define] As Func(Of ViewItemModel, Object) _
-        '    = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
 
-        'Dim obj = [define](v)
-        'If obj IsNot Nothing Then
-        '    Select Case v.ModelName
-        '        Case (New ViewModel).GetType.Name
-        '            v.Content = ViewModel
-        '            Call AddView(v)
-        '        Case (New AppDirectoryModel).GetType.Name
-        '            v.Content = AppInfo
-        '            Call AddView(v)
-        '        Case Else
-        '            obj.Initialize(AppInfo, ViewModel)
-        '            v.Content = obj
-        '            Call AddView(v)
-        '    End Select
-        'End If
-    End Sub
+
+    Protected Function FlexibleViewLoad(ByVal [save] As FlexibleViewModel) As FlexibleViewModel
+        If [save].MainViewContent IsNot Nothing Then
+            [save].MainViewContent = _ViewItemLoad([save].MainViewContent)
+        End If
+        If [save].RightViewContent IsNot Nothing Then
+            [save].RightViewContent = _ViewItemLoad([save].RightViewContent)
+        End If
+        If [save].BottomViewContent IsNot Nothing Then
+            [save].BottomViewContent = _ViewItemLoad([save].BottomViewContent)
+        End If
+
+        FlexibleViewLoad = [save]
+    End Function
+
+    Private Function _ViewItemLoad(ByVal [save] As ViewItemModel)
+        Dim obj As Object
+        Dim [define] As Func(Of ViewItemModel, Object) _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+        Select Case [save].ModelName
+            Case "FlexibleViewModel"
+                [save].Content = FlexibleViewLoad([save].Content)
+            Case "TabViewModel"
+                [save].Content = _TabViewLoad([save].Content)
+            Case Else
+                obj = [define]([save])
+                obj.Initialize(AppInfo, ViewModel)
+                [save].Content = obj
+        End Select
+        _ViewItemLoad = [save]
+    End Function
+
+    Private Function _TabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
+        Dim obj As Object
+        Dim v As ViewItemModel
+        Dim [define] As Func(Of ViewItemModel, Object) _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+        For Each t In [save].Tabs
+            Select Case t.ModelName
+                Case "FlexibleTabModel"
+                    t.Content = FlexibleViewLoad(t.Content)
+                Case "TabViewModel"
+                    t.Content = _TabViewLoad(t.Content)
+                Case Else
+                    v = New ViewItemModel With {
+                        .Name = t.Name,
+                        .Content = t.Content
+                    }
+                    obj = [define](v)
+                    obj.Initialize(AppInfo, ViewModel)
+                    t.Content = obj
+            End Select
+        Next
+        _TabViewLoad = [save]
+    End Function
+
+    'Protected Overloads Function FlexibleViewLoad(ByVal [save] As TabViewModel, ByVal [load] As TabViewModel) As FlexibleViewModel
+    '    Dim obj As Object
+    '    Dim [define] As Func(Of ViewItemModel, Object) _
+    '        = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+    '    If [save].MainViewContent IsNot Nothing Then
+    '        Select Case [save].MainViewContent.ModelName
+    '            Case "FlexibleViewModel"
+    '                [load].MainViewContent.Content _
+    '                    = FlexibleViewLoad([save].MainViewContent.Content, [load].MainViewContent.Content)
+    '            Case "TabViewModel"
+    '                [load].MainViewContent.Content _
+    '                    = FlexibleViewLoad([save].MainViewContent.Content, [load].MainViewContent.Content)
+    '            Case Else
+    '                obj = [define]([save].MainViewContent.ModelName)
+    '                obj.Initialize(AppInfo, ViewModel)
+    '                [save].MainViewContent.Content = obj
+    '                [load].MainViewContent = [save].MainViewContent
+    '        End Select
+    '    End If
+
+    '    FlexibleViewLoad = [load]
+    '    End Sub
+
+    'Protected Sub ViewLoad(ByVal v As ViewItemModel)
+    '    Dim [define] As Func(Of ViewItemModel, Object) _
+    '        = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+
+    '    Dim obj = [define](v)
+    '    If obj IsNot Nothing Then
+    '        Select Case v.ModelName
+    '            Case (New ViewModel).GetType.Name
+    '                v.Content = ViewModel
+    '                Call AddView(v)
+    '            Case (New AppDirectoryModel).GetType.Name
+    '                v.Content = AppInfo
+    '                Call AddView(v)
+    '            Case Else
+    '                obj.Initialize(AppInfo, ViewModel)
+    '                v.Content = obj
+    '                Call AddView(v)
+    '        End Select
+    '    End If
+    'End Sub
 
 End Class

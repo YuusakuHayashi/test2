@@ -126,20 +126,20 @@ Public Class MenuViewModel
     End Property
 
     Private Sub _ShowProjectSettingCommandExecute(ByVal parameter As Object)
-        Dim v As ViewItemModel
-        Dim pvm = New ProjectViewModel
-        pvm.Initialize(AppInfo, ViewModel)
-        v = New ViewItemModel With {
-            .Content = pvm,
-            .Name = pvm.GetType.Name,
-            .ModelName = pvm.GetType.Name,
-            .FrameType = MultiViewModel.MAIN_FRAME,
-            .LayoutType = ViewModel.MULTI_VIEW,
-            .ViewType = MultiViewModel.TAB_VIEW,
-            .OpenState = True
-        }
-        ViewModel.Views.Add(v)
-        Call AddView(v)
+        'Dim v As ViewItemModel
+        'Dim pvm = New ProjectViewModel
+        'pvm.Initialize(AppInfo, ViewModel)
+        'v = New ViewItemModel With {
+        '    .Content = pvm,
+        '    .Name = pvm.GetType.Name,
+        '    .ModelName = pvm.GetType.Name,
+        '    .FrameType = MultiViewModel.MAIN_FRAME,
+        '    .LayoutType = ViewModel.MULTI_VIEW,
+        '    .ViewType = MultiViewModel.TAB_VIEW,
+        '    .OpenState = True
+        '}
+        'ViewModel.Views.Add(v)
+        'Call AddView(v)
     End Sub
 
     Private Function _ShowProjectSettingCommandCanExecute(ByVal parameter As Object) As Boolean

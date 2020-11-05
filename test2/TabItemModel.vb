@@ -46,12 +46,14 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
     End Property
 
     Private Property _Content As Object
+    <JsonIgnore>
     Public Property Content As Object
         Get
             Return Me._Content
         End Get
         Set(value As Object)
             Me._Content = value
+            Me.ModelName = value.GetType.Name
         End Set
     End Property
 
@@ -134,9 +136,6 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
     End Sub
 
     Public Sub New(ByVal n As String, ByVal obj As Object)
-        Me.Name = n
-        Me.Content = obj
-        Me.ModelName = obj.GetType.Name
         Call Initialize()
     End Sub
 End Class

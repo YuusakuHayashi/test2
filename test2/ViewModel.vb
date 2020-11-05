@@ -50,7 +50,6 @@ Public Class ViewModel
     '---------------------------------------------------------------------------------------------'
 
     Private _Content As Object
-    <JsonIgnore>
     Public Property Content As Object
         Get
             Return Me._Content
@@ -61,7 +60,18 @@ Public Class ViewModel
         End Set
     End Property
 
-    Public Sub ShowDynamicView(ByVal dvm As DynamicViewModel)
+    Private _SaveContent As Object
+    <JsonIgnore>
+    Public Property SaveContent As Object
+        Get
+            Return Me._SaveContent
+        End Get
+        Set(value As Object)
+            Me._SaveContent = value
+        End Set
+    End Property
+
+    Public Sub ShowFlexibleView(ByVal dvm As FlexibleViewModel)
         Me.Views = Nothing
         Call _CreateViews(dvm)
         Me.Content = dvm
@@ -80,14 +90,14 @@ Public Class ViewModel
         End Set
     End Property
 
-    Private Overloads Sub _CreateViews(ByVal dvm As DynamicViewModel)
+    Private Overloads Sub _CreateViews(ByVal dvm As FlexibleViewModel)
         'Dim act As Action(Of Object, String)
         'act = Sub(ByVal obj As Object, ByVal [name] As String)
-        '          Dim dvm2 As DynamicViewModel
+        '          Dim dvm2 As FlexibleViewModel
         '          Dim tvm As TabViewModel
         '          Select Case obj.GetType.Name
-        '              Case "DynamicViewModel"
-        '                  dvm2 = CType(obj, DynamicViewModel)
+        '              Case "FlexibleViewModel"
+        '                  dvm2 = CType(obj, FlexibleViewModel)
         '                  Call _CreateViews(dvm2)
         '              Case "TabViewModel"
         '                  tvm = CType(obj, TabViewModel)
@@ -102,11 +112,11 @@ Public Class ViewModel
         '      End Sub
         Dim act As Action(Of ViewItemModel)
         act = Sub(ByVal v As ViewItemModel)
-                  Dim dvm2 As DynamicViewModel
+                  Dim dvm2 As FlexibleViewModel
                   Dim tvm As TabViewModel
                   Select Case v.Content.GetType.Name
-                      Case "DynamicViewModel"
-                          dvm2 = CType(v.Content, DynamicViewModel)
+                      Case "FlexibleViewModel"
+                          dvm2 = CType(v.Content, FlexibleViewModel)
                           Call _CreateViews(dvm2)
                       Case "TabViewModel"
                           tvm = CType(v.Content, TabViewModel)
@@ -125,12 +135,12 @@ Public Class ViewModel
     End Sub
 
     Private Overloads Sub _CreateViews(ByVal tvm As TabViewModel)
-        Dim dvm As DynamicViewModel
+        Dim dvm As FlexibleViewModel
         Dim tvm2 As TabViewModel
         For Each t In tvm.Tabs
             Select Case t.Content.GetType.Name
-                Case "DynamicViewModel"
-                    dvm = CType(t.Content, DynamicViewModel)
+                Case "FlexibleViewModel"
+                    dvm = CType(t.Content, FlexibleViewModel)
                     Call _CreateViews(dvm)
                 Case "TabViewModel"
                     tvm2 = CType(t.Content, TabViewModel)
@@ -138,7 +148,8 @@ Public Class ViewModel
                 Case Else
                     Me.Views.Add(
                         New ViewItemModel With {
-                            .Name = t.Name
+                            .Name = t.Name,
+                            .Content = t.Content
                         }
                     )
             End Select

@@ -1682,7 +1682,7 @@
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type local:DynamicViewModel}">
+            <DataTemplate DataType="{x:Type local:FlexibleViewModel}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{Binding ContentGridHeight}" />

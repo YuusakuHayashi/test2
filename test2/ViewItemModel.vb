@@ -140,6 +140,7 @@ Public Class ViewItemModel
         End Get
         Set(value As Object)
             Me._Content = value
+            Me.ModelName = value.GetType.Name
         End Set
     End Property
 
