@@ -168,27 +168,6 @@ Public Class FlexibleViewModel
         End Set
     End Property
 
-    'Private _MainContentName As String
-    'Public Property MainContentName As String
-    '    Get
-    '        Return Me._MainContentName
-    '    End Get
-    '    Set(value As String)
-    '        Me._MainContentName = value
-    '    End Set
-    'End Property
-
-    '' ロードするときの定義名
-    'Private _MainContentModelName As String
-    'Public Property MainContentModelName As String
-    '    Get
-    '        Return Me._MainContentModelName
-    '    End Get
-    '    Set(value As String)
-    '        Me._MainContentModelName = value
-    '    End Set
-    'End Property
-
     Private _MainContent As Object
     <JsonIgnore>
     Public Property MainContent As Object
@@ -197,7 +176,6 @@ Public Class FlexibleViewModel
         End Get
         Set(value As Object)
             Me._MainContent = value
-            'Me.MainContentModelName = value.GetType.Name
             Call _OptimizeDynamicView()
             RaisePropertyChanged("MainContent")
         End Set
@@ -210,30 +188,13 @@ Public Class FlexibleViewModel
         End Get
         Set(value As ViewItemModel)
             Me._MainViewContent = value
-            Me.MainContent = value.Content
+            If value Is Nothing Then
+                Me.MainContent = Nothing
+            Else
+                Me.MainContent = value.Content
+            End If
         End Set
     End Property
-
-    'Private _RightContentName As String
-    'Public Property RightContentName As String
-    '    Get
-    '        Return Me._RightContentName
-    '    End Get
-    '    Set(value As String)
-    '        Me._RightContentName = value
-    '    End Set
-    'End Property
-
-    '' ロードするときの定義名
-    'Private _RightContentModelName As String
-    'Public Property RightContentModelName As String
-    '    Get
-    '        Return Me._RightContentModelName
-    '    End Get
-    '    Set(value As String)
-    '        Me._RightContentModelName = value
-    '    End Set
-    'End Property
 
     Private _RightContent As Object
     <JsonIgnore>
@@ -243,7 +204,6 @@ Public Class FlexibleViewModel
         End Get
         Set(value As Object)
             Me._RightContent = value
-            'Me.RightContentModelName = value.GetType.Name
             Call _OptimizeDynamicView()
             RaisePropertyChanged("RightContent")
         End Set
@@ -256,30 +216,13 @@ Public Class FlexibleViewModel
         End Get
         Set(value As ViewItemModel)
             Me._RightViewContent = value
-            Me.RightContent = value.Content
+            If value Is Nothing Then
+                Me.RightContent = Nothing
+            Else
+                Me.RightContent = value.Content
+            End If
         End Set
     End Property
-
-    'Private _BottomContentName As String
-    'Public Property BottomContentName As String
-    '    Get
-    '        Return Me._BottomContentName
-    '    End Get
-    '    Set(value As String)
-    '        Me._BottomContentName = value
-    '    End Set
-    'End Property
-
-    '' ロードするときの定義名
-    'Private _BottomContentModelName As String
-    'Public Property BottomContentModelName As String
-    '    Get
-    '        Return Me._BottomContentModelName
-    '    End Get
-    '    Set(value As String)
-    '        Me._BottomContentModelName = value
-    '    End Set
-    'End Property
 
     Private _BottomContent As Object
     <JsonIgnore>
@@ -289,7 +232,6 @@ Public Class FlexibleViewModel
         End Get
         Set(value As Object)
             Me._BottomContent = value
-            'Me.BottomContentModelName = value.GetType.Name
             Call _OptimizeDynamicView()
             RaisePropertyChanged("BottomContent")
         End Set
@@ -302,7 +244,11 @@ Public Class FlexibleViewModel
         End Get
         Set(value As ViewItemModel)
             Me._BottomViewContent = value
-            Me.BottomContent = value.Content
+            If value Is Nothing Then
+                Me.BottomContent = Nothing
+            Else
+                Me.BottomContent = value.Content
+            End If
         End Set
     End Property
 

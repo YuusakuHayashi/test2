@@ -432,13 +432,13 @@ Public Class UserDirectoryViewModel
         Me.CurrentProjects = AppInfo.CurrentProjects
         Me.FixedProjects = AppInfo.FixedProjects
 
-        Dim dvm = New FlexibleViewModel With {
+        Dim fvm = New FlexibleViewModel With {
             .MainViewContent = New ViewItemModel With {
                 .Name = "プロジェクト選択",
                 .Content = Me
             }
         }
-        Call ViewModel.ShowFlexibleView(dvm)
+        Call ViewModel.VisualizeView(fvm)
     End Sub
 
     Private Sub _RemoveFixedProject(ByVal project As ProjectInfoModel)

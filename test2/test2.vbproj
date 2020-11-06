@@ -92,7 +92,7 @@
     <Compile Include="Converters\MinusConverter.vb" />
     <Compile Include="DelegateAction.vb" />
     <Compile Include="FlexibleViewModel.vb" />
-    <Compile Include="DynamicViewStructureModel.vb" />
+    <Compile Include="FlexibleStructureModel.vb" />
     <Compile Include="MenuItemModel.vb" />
     <Compile Include="MenuViewModel.vb" />
     <Compile Include="MultiViewModel.vb" />

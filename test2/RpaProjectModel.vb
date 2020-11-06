@@ -70,39 +70,50 @@ Public Class RpaProjectModel : Inherits ProjectModel
 
     Public Overrides Sub ViewSetupExecute(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
         Dim mvm = New MenuViewModel
+        Dim vevm = New ViewExplorerViewModel
         Dim rpapvm = New RpaProjectViewModel
         Dim rpapmvm = New RpaProjectMenuViewModel
         Call mvm.Initialize(app, vm)
+        Call vevm.Initialize(app, vm)
         Call rpapvm.Initialize(app, vm)
         Call rpapmvm.Initialize(app, vm)
         Dim dvm = New FlexibleViewModel With {
             .ContentViewHeight = 25.0,
             .MainViewContent = New ViewItemModel With {
-                .Name = "メニュー", 
+                .Name = "メニュー",
                 .Content = mvm
             },
             .BottomViewContent = New ViewItemModel With {
                 .Name = vbNullString,
                 .Content = New FlexibleViewModel With {
-                    .ContentViewHeight = 25.0,
+                    .ContentViewWidth = 200.0,
                     .MainViewContent = New ViewItemModel With {
-                        .Name = "Rpaプロジェクトメニュー",
-                        .Content = rpapmvm
+                        .Name = "ビューエクスプローラー",
+                        .Content = vevm
                     },
-                    .BottomViewContent = New ViewItemModel With {
-                        .Name = "Rpaプロジェクト",
-                        .Content = rpapvm
+                    .RightViewContent = New ViewItemModel With {
+                        .Name = vbNullString,
+                        .Content = New FlexibleViewModel With {
+                            .ContentViewHeight = 25.0,
+                            .MainViewContent = New ViewItemModel With {
+                                .Name = "Rpaプロジェクトメニュー",
+                                .Content = rpapmvm
+                            },
+                            .BottomViewContent = New ViewItemModel With {
+                                .Name = "Rpaプロジェクト",
+                                .Content = rpapvm
+                            }
+                        }
                     }
                 }
             }
         }
-        vm.ShowFlexibleView(dvm)
+        vm.VisualizeView(dvm)
     End Sub
 
-    Public Overrides Function ViewDefineExecute(v As ViewItemModel) As Object
+    Public Overrides Function ViewDefineExecute(ByVal mname As String) As Object
         Dim obj As Object
-
-        Select Case v.ModelName
+        Select Case mname
             Case (New AppDirectoryModel).GetType.Name
                 obj = New AppDirectoryModel
             Case (New ViewModel).GetType.Name

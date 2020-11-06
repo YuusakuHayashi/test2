@@ -1137,7 +1137,7 @@
             </ContextMenu>
 
             <DataTemplate                
-                DataType="{x:Type local:ViewModel}">
+                DataType="{x:Type local:ViewExplorerViewModel}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />

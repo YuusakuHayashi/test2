@@ -18,7 +18,9 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
             Return Me._ModelName
         End Get
         Set(value As String)
-            Me._ModelName = value
+            If String.IsNullOrEmpty(Me._ModelName) Then
+                Me._ModelName = value
+            End If
         End Set
     End Property
 
@@ -46,7 +48,6 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
     End Property
 
     Private Property _Content As Object
-    <JsonIgnore>
     Public Property Content As Object
         Get
             Return Me._Content

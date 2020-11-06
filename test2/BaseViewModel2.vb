@@ -182,10 +182,10 @@ Public MustInherit Class BaseViewModel2
         ' ロードしたいメンバーをここに追加していく
         ' ViewModel.Views = vm.Views
         ViewModel.SaveContent = vm.Content
-        ViewModel.MultiView.MainGridHeight _
-            = New GridLength(vm.MultiView.MainViewHeight)
-        ViewModel.MultiView.RightGridWidth _
-            = New GridLength(vm.MultiView.RightViewWidth)
+        'ViewModel.MultiView.MainGridHeight _
+        '    = New GridLength(vm.MultiView.MainViewHeight)
+        'ViewModel.MultiView.RightGridWidth _
+        '    = New GridLength(vm.MultiView.RightViewWidth)
     End Sub
 
 
@@ -665,55 +665,25 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Public Overloads Sub ViewModelSetup()
-        Dim v2, v3
-        Dim mvm, hvm
-        Dim obj
         Dim [setup] As ViewSetupDelegater _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
-        Dim [define] As Func(Of ViewItemModel, Object) _
+        Dim [define] As Func(Of String, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
 
-        'If ViewModel.Views.Count < 1 Then
-        '    Call [setup](AppInfo, ViewModel)
-
-        '    ' 特殊なビューのセット(ViewModel)
-        '    ' ViewDefineHandlerに登録したメソッドが定義してなければ、ビューは登録されない
-        '    If [define]((New ViewItemModel With {.ModelName = ViewModel.GetType.Name})).GetType.Name = ViewModel.GetType.Name Then
-        '        Call ShowViewExplorer()
-        '    End If
-        '    If [define]((New ViewItemModel With {.ModelName = AppInfo.GetType.Name})).GetType.Name = AppInfo.GetType.Name Then
-        '        Call ShowProjectExplorer()
-        '    End If
-        '    If [define]((New ViewItemModel With {.ModelName = (New MenuViewModel).GetType.Name})).GetType.Name = (New MenuViewModel).GetType.Name Then
-        '        Call ShowMenu()
-        '    End If
-        '    If [define]((New ViewItemModel With {.ModelName = (New HistoryViewModel).GetType.Name})).GetType.Name = (New HistoryViewModel).GetType.Name Then
-        '        Call ShowHistory()
-        '    End If
-        'Else
-        '    For Each v In ViewModel.Views
-        '        If v.OpenState Then
-        '            Call ViewLoad(v)
-        '        End If
-        '    Next
-        'End If
-        Dim [save] As FlexibleViewModel
-        Dim [load] As FlexibleViewModel
+        Dim sv As Object
+        Dim obj As Object
+        Dim ld As FlexibleViewModel
         Call InitializeViewContent()
 
         If ViewModel.SaveContent Is Nothing Then
             Call [setup](AppInfo, ViewModel)
         Else
-            [save] = CType(ViewModel.SaveContent, FlexibleViewModel)
-            [load] = FlexibleViewLoad([save])
-            'For Each v In ViewModel.Views
-            '    If v.OpenState Then
-            '        Call ViewLoad(v)
-            '    End If
-            'Next
+            sv = ViewModel.SaveContent
+            obj = _ConvertJObjToObj(Of FlexibleViewModel)(sv)
+            ld = FlexibleViewLoad(obj)
+            Call ViewModel.VisualizeView(ld)
         End If
     End Sub
-
 
 
     Protected Function FlexibleViewLoad(ByVal [save] As FlexibleViewModel) As FlexibleViewModel
@@ -732,15 +702,17 @@ Public MustInherit Class BaseViewModel2
 
     Private Function _ViewItemLoad(ByVal [save] As ViewItemModel)
         Dim obj As Object
-        Dim [define] As Func(Of ViewItemModel, Object) _
+        Dim [define] As Func(Of String, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
         Select Case [save].ModelName
             Case "FlexibleViewModel"
-                [save].Content = FlexibleViewLoad([save].Content)
+                obj = _ConvertJObjToObj(Of FlexibleViewModel)([save].Content)
+                [save].Content = FlexibleViewLoad(obj)
             Case "TabViewModel"
-                [save].Content = _TabViewLoad([save].Content)
+                obj = _ConvertJObjToObj(Of TabViewModel)([save].Content)
+                [save].Content = _TabViewLoad(obj)
             Case Else
-                obj = [define]([save])
+                obj = [define]([save].ModelName)
                 obj.Initialize(AppInfo, ViewModel)
                 [save].Content = obj
         End Select
@@ -750,20 +722,18 @@ Public MustInherit Class BaseViewModel2
     Private Function _TabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
         Dim obj As Object
         Dim v As ViewItemModel
-        Dim [define] As Func(Of ViewItemModel, Object) _
+        Dim [define] As Func(Of String, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
         For Each t In [save].Tabs
             Select Case t.ModelName
                 Case "FlexibleTabModel"
-                    t.Content = FlexibleViewLoad(t.Content)
+                    obj = _ConvertJObjToObj(Of FlexibleViewModel)(t.Content)
+                    t.Content = FlexibleViewLoad(obj)
                 Case "TabViewModel"
-                    t.Content = _TabViewLoad(t.Content)
+                    obj = _ConvertJObjToObj(Of TabViewModel)(t.Content)
+                    t.Content = _TabViewLoad(obj)
                 Case Else
-                    v = New ViewItemModel With {
-                        .Name = t.Name,
-                        .Content = t.Content
-                    }
-                    obj = [define](v)
+                    obj = [define](t.ModelName)
                     obj.Initialize(AppInfo, ViewModel)
                     t.Content = obj
             End Select
@@ -771,48 +741,20 @@ Public MustInherit Class BaseViewModel2
         _TabViewLoad = [save]
     End Function
 
-    'Protected Overloads Function FlexibleViewLoad(ByVal [save] As TabViewModel, ByVal [load] As TabViewModel) As FlexibleViewModel
-    '    Dim obj As Object
-    '    Dim [define] As Func(Of ViewItemModel, Object) _
-    '        = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
-    '    If [save].MainViewContent IsNot Nothing Then
-    '        Select Case [save].MainViewContent.ModelName
-    '            Case "FlexibleViewModel"
-    '                [load].MainViewContent.Content _
-    '                    = FlexibleViewLoad([save].MainViewContent.Content, [load].MainViewContent.Content)
-    '            Case "TabViewModel"
-    '                [load].MainViewContent.Content _
-    '                    = FlexibleViewLoad([save].MainViewContent.Content, [load].MainViewContent.Content)
-    '            Case Else
-    '                obj = [define]([save].MainViewContent.ModelName)
-    '                obj.Initialize(AppInfo, ViewModel)
-    '                [save].MainViewContent.Content = obj
-    '                [load].MainViewContent = [save].MainViewContent
-    '        End Select
-    '    End If
-
-    '    FlexibleViewLoad = [load]
-    '    End Sub
-
-    'Protected Sub ViewLoad(ByVal v As ViewItemModel)
-    '    Dim [define] As Func(Of ViewItemModel, Object) _
-    '        = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
-
-    '    Dim obj = [define](v)
-    '    If obj IsNot Nothing Then
-    '        Select Case v.ModelName
-    '            Case (New ViewModel).GetType.Name
-    '                v.Content = ViewModel
-    '                Call AddView(v)
-    '            Case (New AppDirectoryModel).GetType.Name
-    '                v.Content = AppInfo
-    '                Call AddView(v)
-    '            Case Else
-    '                obj.Initialize(AppInfo, ViewModel)
-    '                v.Content = obj
-    '                Call AddView(v)
-    '        End Select
-    '    End If
-    'End Sub
+    Private Function _ConvertJObjToObj(Of T As {New})(ByVal jobj As Object) As T
+        Dim obj As Object
+        Select Case jobj.GetType
+            Case (New Object).GetType
+                obj = CType(jobj, T)
+            Case (New JObject).GetType
+                ' Ｊｓｏｎからロードした場合は、JObject型になっている
+                obj = jobj.ToObject(Of T)
+            Case (New T).GetType
+                obj = jobj
+            Case Else
+                Throw New Exception("BaseViewModel2.ConvertJObjToObj Error!!!")
+        End Select
+        _ConvertJObjToObj = obj
+    End Function
 
 End Class

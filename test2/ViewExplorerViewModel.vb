@@ -1,7 +1,45 @@
 ﻿Imports System.Collections.ObjectModel
+Imports test2
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class ViewExplorerViewModel
-    'Inherits BaseViewModel2
+    Inherits BaseViewModel2
+
+    Private _FontSize As Double
+    <JsonIgnore>
+    Public Property FontSize As Double
+        Get
+            Return Me._FontSize
+        End Get
+        Set(value As Double)
+            Me._FontSize = value
+        End Set
+    End Property
+
+    Private _Views As ObservableCollection(Of ViewItemModel)
+    <JsonIgnore>
+    Public Property Views As ObservableCollection(Of ViewItemModel)
+        Get
+            If Me._Views Is Nothing Then
+                Me._Views = New ObservableCollection(Of ViewItemModel)
+            End If
+            Return Me._Views
+        End Get
+        Set(value As ObservableCollection(Of ViewItemModel))
+            Me._Views = value
+            RaisePropertyChanged("Views")
+        End Set
+    End Property
+
+    Private Sub _ViewInitializing()
+        Me.Views = ViewModel.Views
+    End Sub
+
+    Public Overrides Sub Initialize(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
+        [AddHandler] = AddressOf _ViewInitializing
+        Call BaseInitialize(app, vm)
+    End Sub
 
     '''Public Overrides ReadOnly Property FrameType As String
     '''    Get

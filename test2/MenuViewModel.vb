@@ -1,6 +1,8 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.Windows.Forms
 Imports System.IO
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class MenuViewModel
     Inherits BaseViewModel2
@@ -8,6 +10,7 @@ Public Class MenuViewModel
     ' コマンドプロパティ（プロジェクトビュー表示）
     '---------------------------------------------------------------------------------------------'
     Private _ShowProjectExplorerCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property ShowProjectExplorerCommand As ICommand
         Get
             If Me._ShowProjectExplorerCommand Is Nothing Then
@@ -28,7 +31,7 @@ Public Class MenuViewModel
     End Sub
 
     Private __ShowProjectExplorerCommandEnableFlag As Boolean
-    Public Property _ShowProjectExplorerCommandEnableFlag As Boolean
+    Private Property _ShowProjectExplorerCommandEnableFlag As Boolean
         Get
             Return Me.__ShowProjectExplorerCommandEnableFlag
         End Get
@@ -51,6 +54,7 @@ Public Class MenuViewModel
     ' コマンドプロパティ（プロジェクトビュー表示）
     '---------------------------------------------------------------------------------------------'
     Private _ShowViewExplorerCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property ShowViewExplorerCommand As ICommand
         Get
             If Me._ShowViewExplorerCommand Is Nothing Then
@@ -71,7 +75,7 @@ Public Class MenuViewModel
     End Sub
 
     Private __ShowViewExplorerCommandEnableFlag As Boolean
-    Public Property _ShowViewExplorerCommandEnableFlag As Boolean
+    Private Property _ShowViewExplorerCommandEnableFlag As Boolean
         Get
             Return Me.__ShowViewExplorerCommandEnableFlag
         End Get
@@ -94,6 +98,7 @@ Public Class MenuViewModel
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔ設定画面表示）
     '---------------------------------------------------------------------------------------------'
     Private _ShowProjectSettingCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property ShowProjectSettingCommand As ICommand
         Get
             If Me._ShowProjectSettingCommand Is Nothing Then
@@ -114,7 +119,7 @@ Public Class MenuViewModel
     End Sub
 
     Private __ShowProjectSettingCommandEnableFlag As Boolean
-    Public Property _ShowProjectSettingCommandEnableFlag As Boolean
+    Private Property _ShowProjectSettingCommandEnableFlag As Boolean
         Get
             Return Me.__ShowProjectSettingCommandEnableFlag
         End Get
@@ -150,6 +155,7 @@ Public Class MenuViewModel
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを上書き）
     '---------------------------------------------------------------------------------------------'
     Private _ResaveProjectCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property ResaveProjectCommand As ICommand
         Get
             If Me._ResaveProjectCommand Is Nothing Then
@@ -170,7 +176,7 @@ Public Class MenuViewModel
     End Sub
 
     Private __ResaveProjectCommandEnableFlag As Boolean
-    Public Property _ResaveProjectCommandEnableFlag As Boolean
+    Private Property _ResaveProjectCommandEnableFlag As Boolean
         Get
             Return Me.__ResaveProjectCommandEnableFlag
         End Get
@@ -193,6 +199,7 @@ Public Class MenuViewModel
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを保存）
     '---------------------------------------------------------------------------------------------'
     Private _SaveProjectCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property SaveProjectCommand As ICommand
         Get
             If Me._SaveProjectCommand Is Nothing Then
@@ -213,7 +220,7 @@ Public Class MenuViewModel
     End Sub
 
     Private __SaveProjectCommandEnableFlag As Boolean
-    Public Property _SaveProjectCommandEnableFlag As Boolean
+    Private Property _SaveProjectCommandEnableFlag As Boolean
         Get
             Return Me.__SaveProjectCommandEnableFlag
         End Get
@@ -259,6 +266,7 @@ Public Class MenuViewModel
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔを開く）
     '---------------------------------------------------------------------------------------------'
     Private _OpenProjectCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property OpenProjectCommand As ICommand
         Get
             If Me._OpenProjectCommand Is Nothing Then
@@ -279,7 +287,7 @@ Public Class MenuViewModel
     End Sub
 
     Private __OpenProjectCommandEnableFlag As Boolean
-    Public Property _OpenProjectCommandEnableFlag As Boolean
+    Private Property _OpenProjectCommandEnableFlag As Boolean
         Get
             Return Me.__OpenProjectCommandEnableFlag
         End Get
