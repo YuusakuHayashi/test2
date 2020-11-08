@@ -2,6 +2,7 @@
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 Imports System.Collections.ObjectModel
+Imports System.IO
 
 'Public Class BaseViewModel2(Of T As {New})
 Public MustInherit Class BaseViewModel2
@@ -98,10 +99,10 @@ Public MustInherit Class BaseViewModel2
         'AppInfo.~のルートであるAppInfoをロードして直接更新すると、参照渡ししている各ビューモデルでおかしくなる
         'Call AppLoad()
         Call ProjectLoad(project)
-        Call ProjectSetup()
-        Call PushProject(AppInfo.ProjectInfo)
         Call ProjectModelLoad()
         Call ModelSetup()
+        Call ProjectSetup()
+        Call PushProject(AppInfo.ProjectInfo)
         Call ProjectViewModelLoad()
         Call ViewModelSetup()
     End Sub
@@ -189,6 +190,7 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
 
+    ' ConvertJObjToObj に統合予定
     Private Sub _DataInitialize(Of T As {New})()
         Dim old As Object
         Dim [new] As Object
@@ -221,6 +223,12 @@ Public MustInherit Class BaseViewModel2
             Case Else
         End Select
         '----------------------------------------------'
+
+        ' IConFileNameはプロジェクトのモデルが確定した時点で決定する
+        If File.Exists(AppInfo.ProjectInfo.Model.Data.IconFileName) Then
+            AppInfo.ProjectInfo.IconFileName _
+                = AppInfo.ProjectInfo.Model.Data.IconFileName
+        End If
     End Sub
 
 
@@ -271,8 +279,8 @@ Public MustInherit Class BaseViewModel2
 
     ' ＳＩＮＧＬＥＶＩＥＷ -------------------------------------------------------------------------------------------'
     Private Sub _SetItemToSingleViewContent(ByVal v As ViewItemModel)
-        ViewModel.SingleView.Content = v.Content
-        Call _SetContent(ViewModel.SingleView)
+        'ViewModel.SingleView.Content = v.Content
+        'Call _SetContent(ViewModel.SingleView)
     End Sub
 
     '---------------------------------------------------------------------------------------------'
@@ -338,113 +346,113 @@ Public MustInherit Class BaseViewModel2
     ' コンテントディクショナリが存在しない場合、新規作成し
     ' ビューディクショナリが存在しない場合、追加します
     Private Sub _RegisterViewToDictionary(ByVal v As ViewItemModel)
-        Dim frame = v.FrameType
-        If ViewModel.MultiView.ContentDictionary Is Nothing Then
-            ViewModel.MultiView.ContentDictionary = New Dictionary(Of String, Dictionary(Of String, Object))
-        End If
-        If Not ViewModel.MultiView.ContentDictionary.ContainsKey(frame) Then
-            ViewModel.MultiView.ContentDictionary.Add(frame, New Dictionary(Of String, Object))
-        End If
+        'Dim frame = v.FrameType
+        'If ViewModel.MultiView.ContentDictionary Is Nothing Then
+        '    ViewModel.MultiView.ContentDictionary = New Dictionary(Of String, Dictionary(Of String, Object))
+        'End If
+        'If Not ViewModel.MultiView.ContentDictionary.ContainsKey(frame) Then
+        '    ViewModel.MultiView.ContentDictionary.Add(frame, New Dictionary(Of String, Object))
+        'End If
     End Sub
 
     ' ビューのDataContentに実際にセットします
     Private Sub _SetItemToMultiViewContent(ByVal v As ViewItemModel)
-        Dim o As Object
-        o = ViewModel.MultiView.ContentDictionary(v.FrameType)(v.Name)
+        'Dim o As Object
+        'o = ViewModel.MultiView.ContentDictionary(v.FrameType)(v.Name)
 
-        Select Case v.FrameType
-            Case MultiViewModel.MAIN_FRAME
-                ViewModel.MultiView.MainViewContent = o
-            Case MultiViewModel.EXPLORER_FRAME
-                ViewModel.MultiView.ExplorerViewContent = o
-            Case MultiViewModel.HISTORY_FRAME
-                ViewModel.MultiView.HistoryViewContent = o
-            Case MultiViewModel.MENU_FRAME
-                ViewModel.MultiView.MenuViewContent = o
-            Case MultiViewModel.PROJECT_MENU_FRAME
-                ViewModel.MultiView.ProjectMenuViewContent = o
-            Case Else
-                ' Nothing To Do
-        End Select
-        Call _SetContent(ViewModel.MultiView)
+        'Select Case v.FrameType
+        '    Case MultiViewModel.MAIN_FRAME
+        '        ViewModel.MultiView.MainViewContent = o
+        '    Case MultiViewModel.EXPLORER_FRAME
+        '        ViewModel.MultiView.ExplorerViewContent = o
+        '    Case MultiViewModel.HISTORY_FRAME
+        '        ViewModel.MultiView.HistoryViewContent = o
+        '    Case MultiViewModel.MENU_FRAME
+        '        ViewModel.MultiView.MenuViewContent = o
+        '    Case MultiViewModel.PROJECT_MENU_FRAME
+        '        ViewModel.MultiView.ProjectMenuViewContent = o
+        '    Case Else
+        '        ' Nothing To Do
+        'End Select
+        'Call _SetContent(ViewModel.MultiView)
     End Sub
 
     Private Sub _AddItem(ByVal v As ViewItemModel)
-        Dim obj = v.Content
-        Dim frame = v.FrameType
-        Dim [name] = obj.GetType.Name
-        If ViewModel.MultiView.ContentDictionary(frame).ContainsKey([name]) Then
-            ViewModel.MultiView.ContentDictionary(frame)([name]) = obj
-        Else
-            ViewModel.MultiView.ContentDictionary(frame).Add([name], obj)
-        End If
+        'Dim obj = v.Content
+        'Dim frame = v.FrameType
+        'Dim [name] = obj.GetType.Name
+        'If ViewModel.MultiView.ContentDictionary(frame).ContainsKey([name]) Then
+        '    ViewModel.MultiView.ContentDictionary(frame)([name]) = obj
+        'Else
+        '    ViewModel.MultiView.ContentDictionary(frame).Add([name], obj)
+        'End If
     End Sub
     ' --------------------------------------------------------------------------------------------'
 
     ' タブコレクションディクショナリが存在しない場合、新規作成し
     ' タブコレクションが存在しない場合、追加します
     Private Sub _RegisterTabViewToDictionary(ByVal v As ViewItemModel)
-        Dim frame = v.FrameType
-        Dim tvm As TabViewModel
-        If Not ViewModel.MultiView.TabsDictionary.ContainsKey(frame) Then
-            tvm = New TabViewModel
-            ViewModel.MultiView.TabsDictionary.Add(frame, tvm)
-        End If
+        'Dim frame = v.FrameType
+        'Dim tvm As TabViewModel
+        'If Not ViewModel.MultiView.TabsDictionary.ContainsKey(frame) Then
+        '    tvm = New TabViewModel
+        '    ViewModel.MultiView.TabsDictionary.Add(frame, tvm)
+        'End If
     End Sub
 
 
     Private Sub _SetTabItemToMultiViewContent(ByVal v As ViewItemModel)
-        Dim o As TabViewModel
-        o = ViewModel.MultiView.TabsDictionary(v.FrameType)
+        'Dim o As TabViewModel
+        'o = ViewModel.MultiView.TabsDictionary(v.FrameType)
 
-        Select Case v.FrameType
-            Case MultiViewModel.MAIN_FRAME
-                ViewModel.MultiView.MainViewContent = o
-            Case MultiViewModel.EXPLORER_FRAME
-                ViewModel.MultiView.ExplorerViewContent = o
-            Case MultiViewModel.HISTORY_FRAME
-                ViewModel.MultiView.HistoryViewContent = o
-            Case Else
-                ' Nothing To Do
-        End Select
-        Call _SetContent(ViewModel.MultiView)
+        'Select Case v.FrameType
+        '    Case MultiViewModel.MAIN_FRAME
+        '        ViewModel.MultiView.MainViewContent = o
+        '    Case MultiViewModel.EXPLORER_FRAME
+        '        ViewModel.MultiView.ExplorerViewContent = o
+        '    Case MultiViewModel.HISTORY_FRAME
+        '        ViewModel.MultiView.HistoryViewContent = o
+        '    Case Else
+        '         Nothing To Do
+        'End Select
+        'Call _SetContent(ViewModel.MultiView)
     End Sub
 
-    Public Overloads Sub RemoveTabItem(ByVal [tab] As TabItemModel)
-        For Each pair In ViewModel.MultiView.TabsDictionary
-            If pair.Value.Tabs.Contains([tab]) Then
-                pair.Value.Tabs.Remove([tab])
-                Call _ResizeMultiViewOfRemove(pair)
-                Exit For
-            End If
-        Next
+    'Public Overloads Sub CloseTabItem(ByVal [tab] As TabItemModel)
+    '    'For Each pair In ViewModel.MultiView.TabsDictionary
+    '    '    If pair.Value.Tabs.Contains([tab]) Then
+    '    '        pair.Value.Tabs.Remove([tab])
+    '    '        Call _ResizeMultiViewOfRemove(pair)
+    '    '        Exit For
+    '    '    End If
+    '    'Next
 
-        ' ビューからの開閉状態記録
-        For Each v In ViewModel.Views
-            If v.Name = [tab].Name Then
-                v.OpenState = False
-            End If
-        Next
-    End Sub
+    '    '' ビューからの開閉状態記録
+    '    'For Each v In ViewModel.Views
+    '    '    If v.Name = [tab].Name Then
+    '    '        v.OpenState = False
+    '    '    End If
+    '    'Next
+    'End Sub
 
     Private Sub _ResizeMultiViewOfRemove(ByVal pair As KeyValuePair(Of String, TabViewModel))
-        Dim tvm = pair.Value
+        'Dim tvm = pair.Value
 
-        If tvm.Tabs.Count = 0 Then
-            Select Case pair.Key
-                Case MultiViewModel.MAIN_FRAME
-                Case MultiViewModel.EXPLORER_FRAME
-                    ViewModel.MultiView.LeftViewPreservedWidth _
-                        = ViewModel.MultiView.LeftViewWidth
-                    ViewModel.MultiView.RightGridWidth _
-                        = New GridLength(ViewModel.MultiView.RightViewWidth + ViewModel.MultiView.LeftViewWidth)
-                Case MultiViewModel.HISTORY_FRAME
-                    ViewModel.MultiView.HistoryViewPreservedHeight _
-                        = ViewModel.MultiView.HistoryViewHeight
-                    ViewModel.MultiView.MainGridHeight _
-                        = New GridLength(ViewModel.MultiView.MainViewHeight + ViewModel.MultiView.HistoryViewHeight)
-            End Select
-        End If
+        'If tvm.Tabs.Count = 0 Then
+        '    Select Case pair.Key
+        '        Case MultiViewModel.MAIN_FRAME
+        '        Case MultiViewModel.EXPLORER_FRAME
+        '            ViewModel.MultiView.LeftViewPreservedWidth _
+        '                = ViewModel.MultiView.LeftViewWidth
+        '            ViewModel.MultiView.RightGridWidth _
+        '                = New GridLength(ViewModel.MultiView.RightViewWidth + ViewModel.MultiView.LeftViewWidth)
+        '        Case MultiViewModel.HISTORY_FRAME
+        '            ViewModel.MultiView.HistoryViewPreservedHeight _
+        '                = ViewModel.MultiView.HistoryViewHeight
+        '            ViewModel.MultiView.MainGridHeight _
+        '                = New GridLength(ViewModel.MultiView.MainViewHeight + ViewModel.MultiView.HistoryViewHeight)
+        '    End Select
+        'End If
     End Sub
 
     ' コレクションにタブがなければ追加、あれば更新
@@ -476,31 +484,31 @@ Public MustInherit Class BaseViewModel2
     'End Sub
 
     Private Sub _ResizeMultiViewOfAdd(ByVal frame As String)
-        If ViewModel.MultiView.TabsDictionary(frame).Tabs.Count > 0 Then
-            Select Case frame
-                Case MultiViewModel.MAIN_FRAME
-                Case MultiViewModel.EXPLORER_FRAME
-                    If ViewModel.MultiView.LeftViewWidth = 0.0 Then
-                        If ViewModel.MultiView.LeftViewPreservedWidth > 0.0 Then
-                            ViewModel.MultiView.RightGridWidth _
-                                = New GridLength(ViewModel.MultiView.RightViewWidth - ViewModel.MultiView.LeftViewPreservedWidth)
-                        Else
-                            ' 面倒なので、後で実装（実装の必要性ある？）
-                            'Throw New Exception("LeftGridWidth Error")
-                        End If
-                    End If
-                Case MultiViewModel.HISTORY_FRAME
-                    If ViewModel.MultiView.HistoryViewHeight = 0.0 Then
-                        If ViewModel.MultiView.HistoryViewPreservedHeight > 0.0 Then
-                            ViewModel.MultiView.MainGridHeight _
-                                = New GridLength(ViewModel.MultiView.MainViewHeight - ViewModel.MultiView.HistoryViewPreservedHeight)
-                        Else
-                            ' 面倒なので、後で実装（実装の必要性ある？）
-                            'Throw New Exception("HistoryGridHeight Error")
-                        End If
-                    End If
-            End Select
-        End If
+        'If ViewModel.MultiView.TabsDictionary(frame).Tabs.Count > 0 Then
+        '    Select Case frame
+        '        Case MultiViewModel.MAIN_FRAME
+        '        Case MultiViewModel.EXPLORER_FRAME
+        '            If ViewModel.MultiView.LeftViewWidth = 0.0 Then
+        '                If ViewModel.MultiView.LeftViewPreservedWidth > 0.0 Then
+        '                    ViewModel.MultiView.RightGridWidth _
+        '                        = New GridLength(ViewModel.MultiView.RightViewWidth - ViewModel.MultiView.LeftViewPreservedWidth)
+        '                Else
+        '                    ' 面倒なので、後で実装（実装の必要性ある？）
+        '                    'Throw New Exception("LeftGridWidth Error")
+        '                End If
+        '            End If
+        '        Case MultiViewModel.HISTORY_FRAME
+        '            If ViewModel.MultiView.HistoryViewHeight = 0.0 Then
+        '                If ViewModel.MultiView.HistoryViewPreservedHeight > 0.0 Then
+        '                    ViewModel.MultiView.MainGridHeight _
+        '                        = New GridLength(ViewModel.MultiView.MainViewHeight - ViewModel.MultiView.HistoryViewPreservedHeight)
+        '                Else
+        '                    ' 面倒なので、後で実装（実装の必要性ある？）
+        '                    'Throw New Exception("HistoryGridHeight Error")
+        '                End If
+        '            End If
+        '    End Select
+        'End If
     End Sub
 
     Public Sub AddView(ByVal v As ViewItemModel)
@@ -670,7 +678,8 @@ Public MustInherit Class BaseViewModel2
         Dim [define] As Func(Of String, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
 
-        Dim sv As Object
+        'Dim sv As Object
+        Dim sv As FlexibleViewModel
         Dim obj As Object
         Dim ld As FlexibleViewModel
         Call InitializeViewContent()
@@ -679,14 +688,23 @@ Public MustInherit Class BaseViewModel2
             Call [setup](AppInfo, ViewModel)
         Else
             sv = ViewModel.SaveContent
-            obj = _ConvertJObjToObj(Of FlexibleViewModel)(sv)
-            ld = FlexibleViewLoad(obj)
+            ld = FlexibleViewLoad(sv)
             Call ViewModel.VisualizeView(ld)
         End If
     End Sub
 
+    '' セーブされたデータにおけるObject型の各メンバーはJObjectとなってしまっているので、Objectに変換する
+    'Private Function _DeserializeObjectMember(ByVal [save] As FlexibleViewModel)
+    '    If [save].MainViewContent IsNot Nothing Then
+    '        Select Case [save].MainViewContent.ModelName
+    '            Case "FlexibleViewModel"
 
-    Protected Function FlexibleViewLoad(ByVal [save] As FlexibleViewModel) As FlexibleViewModel
+    '        End Select
+    '    End If
+    'End Function
+
+
+    Private Function FlexibleViewLoad(ByVal [save] As FlexibleViewModel) As FlexibleViewModel
         If [save].MainViewContent IsNot Nothing Then
             [save].MainViewContent = _ViewItemLoad([save].MainViewContent)
         End If
@@ -696,7 +714,6 @@ Public MustInherit Class BaseViewModel2
         If [save].BottomViewContent IsNot Nothing Then
             [save].BottomViewContent = _ViewItemLoad([save].BottomViewContent)
         End If
-
         FlexibleViewLoad = [save]
     End Function
 
@@ -710,7 +727,9 @@ Public MustInherit Class BaseViewModel2
                 [save].Content = FlexibleViewLoad(obj)
             Case "TabViewModel"
                 obj = _ConvertJObjToObj(Of TabViewModel)([save].Content)
-                [save].Content = _TabViewLoad(obj)
+                obj = _TabViewLoad(obj)
+                obj = _PreservedTabViewLoad(obj)
+                [save].Content = obj
             Case Else
                 obj = [define]([save].ModelName)
                 obj.Initialize(AppInfo, ViewModel)
@@ -720,25 +739,21 @@ Public MustInherit Class BaseViewModel2
     End Function
 
     Private Function _TabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
-        Dim obj As Object
-        Dim v As ViewItemModel
-        Dim [define] As Func(Of String, Object) _
-            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+        Dim vim As ViewItemModel
         For Each t In [save].Tabs
-            Select Case t.ModelName
-                Case "FlexibleTabModel"
-                    obj = _ConvertJObjToObj(Of FlexibleViewModel)(t.Content)
-                    t.Content = FlexibleViewLoad(obj)
-                Case "TabViewModel"
-                    obj = _ConvertJObjToObj(Of TabViewModel)(t.Content)
-                    t.Content = _TabViewLoad(obj)
-                Case Else
-                    obj = [define](t.ModelName)
-                    obj.Initialize(AppInfo, ViewModel)
-                    t.Content = obj
-            End Select
+            vim = _ViewItemLoad(t.ViewContent)
+            t.ViewContent = vim
         Next
         _TabViewLoad = [save]
+    End Function
+
+    Private Function _PreservedTabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
+        Dim vim As ViewItemModel
+        For Each pt In [save].PreservedTabs
+            vim = _ViewItemLoad(pt.ViewContent)
+            pt.ViewContent = vim
+        Next
+        _PreservedTabViewLoad = [save]
     End Function
 
     Private Function _ConvertJObjToObj(Of T As {New})(ByVal jobj As Object) As T

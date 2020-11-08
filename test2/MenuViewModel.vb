@@ -43,13 +43,16 @@ Public Class MenuViewModel
     End Property
 
     Private Sub _ShowProjectExplorerCommandExecute(ByVal parameter As Object)
-        Call ShowProjectExplorer()
+        Call _ShowProjectExplorer(ViewModel.Content)
     End Sub
 
     Private Function _ShowProjectExplorerCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._ShowProjectExplorerCommandEnableFlag
     End Function
     '---------------------------------------------------------------------------------------------'
+
+    Private Sub _ShowProjectExplorer(ByRef fvm As FlexibleViewModel)
+    End Sub
 
     ' コマンドプロパティ（プロジェクトビュー表示）
     '---------------------------------------------------------------------------------------------'
@@ -87,13 +90,42 @@ Public Class MenuViewModel
     End Property
 
     Private Sub _ShowViewExplorerCommandExecute(ByVal parameter As Object)
-        Call ShowViewExplorer()
+        Call _ShowViewExplorer(ViewModel.Content)
     End Sub
 
     Private Function _ShowViewExplorerCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me._ShowViewExplorerCommandEnableFlag
     End Function
     '---------------------------------------------------------------------------------------------'
+
+    Private Delegate Sub _ShowViewExplorerHandler(ByRef obj As Object)
+
+    Private Sub _ShowViewExplorer(ByRef fvm As FlexibleViewModel)
+        Dim act As _ShowViewExplorerHandler
+        act = Sub(ByRef obj As Object, ByVal vim As String)
+                  Dim fvm2 As FlexibleViewModel
+                  Dim tvm As TabViewModel
+                  Select Case vim.ModelName
+                      Case "FlexibleViewModel"
+                          fvm2 = CType(obj, FlexibleViewModel)
+                          Call _ShowViewExplorer(fvm2)
+                      Case "TabViewModel"
+                          tvm = CType(obj, TabViewModel)
+                          Call _ShowViewExplorer(tvm)
+                      Case "ViewExplorerViewModel"
+                  End Select
+              End Sub
+        '
+        If fvm.MainViewContent IsNot Nothing Then
+            Call act(fvm.MainContent, fvm.MainViewContent)
+        End If
+        If fvm.RightViewContent IsNot Nothing Then
+            Call act(fvm.RightContent, fvm.RightViewContent)
+        End If
+        If fvm.BottomViewContent IsNot Nothing Then
+            Call act(fvm.BottomContent, fvm.BottomViewContent)
+        End If
+    End Sub
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔ設定画面表示）
     '---------------------------------------------------------------------------------------------'

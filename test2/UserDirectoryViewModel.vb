@@ -355,7 +355,6 @@ Public Class UserDirectoryViewModel
         Dim jh As New JsonHandler(Of Object)
 
         Dim project = AppInfo.ProjectInfo
-        Call AppInfo.AssignIconOfProject(project.Kind)
 
         Dim launcher As New DelegateAction With {
             .CanExecuteHandler = AddressOf project.CheckProjectNotExist,
@@ -366,8 +365,8 @@ Public Class UserDirectoryViewModel
         If i = 0 Then
             AppInfo.ProjectInfo = project
             Call ProjectSetup()
-            Call PushProject()
             Call ModelSetup()
+            Call PushProject()
             Call ViewModelSetup()
             Call AllSave()
         Else

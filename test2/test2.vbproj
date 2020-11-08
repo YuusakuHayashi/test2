@@ -97,6 +97,8 @@
     <Compile Include="MenuViewModel.vb" />
     <Compile Include="MultiViewModel.vb" />
     <Compile Include="NormalViewModel.vb" />
+    <Compile Include="ProjectExplorerViewModel.vb" />
+    <Compile Include="Projects.vb" />
     <Compile Include="ProjectViewModel.vb" />
     <Compile Include="RpaModel.vb" />
     <Compile Include="RpaProjectMenuViewModel.vb" />

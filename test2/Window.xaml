@@ -1239,7 +1239,7 @@
             </DataTemplate>-->
 
             <DataTemplate                
-                DataType="{x:Type local:AppDirectoryModel}">
+                DataType="{x:Type local:ProjectExplorerViewModel}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -1256,7 +1256,7 @@
                             Style="{StaticResource TreeViewItemStyle}"
                             FontSize="{Binding FontSize, Mode=OneWay}"
                             Header="Projects"
-                            ItemsSource="{Binding CurrentProjects}">
+                            ItemsSource="{Binding Projects}">
                             <TreeViewItem.ItemTemplate>
                                 <HierarchicalDataTemplate>
                                     <Grid HorizontalAlignment="Stretch">
@@ -1649,7 +1649,6 @@
                         Content="{Binding ProjectMenuViewContent}" />
                     <ContentControl
                         x:Name="ExplorerView"
-                        SizeChanged="ExplorerView_SizeChanged"
                         Grid.Row="2" Grid.RowSpan="3"
                         Grid.Column="0"
                         Content="{Binding ExplorerViewContent}" />
@@ -1662,7 +1661,6 @@
                         HorizontalAlignment="Stretch" />
                     <ContentControl
                         x:Name="MainView"
-                        SizeChanged="MainView_SizeChanged"
                         Grid.Row="2"            
                         Grid.Column="2"              
                         Content="{Binding MainViewContent}" />
@@ -1675,7 +1673,6 @@
                         HorizontalAlignment="Stretch" />
                     <ContentControl
                         x:Name="HistoryView"
-                        SizeChanged="HistoryView_SizeChanged"
                         Grid.Row="4"
                         Grid.Column="2"           
                         Content="{Binding HistoryViewContent}" />
@@ -1685,7 +1682,7 @@
             <DataTemplate DataType="{x:Type local:FlexibleViewModel}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="{Binding ContentGridHeight}" />
+                        <RowDefinition Height="{Binding ContentGridHeight}"/>
                         <RowDefinition Height="{Binding VerticalSplitterHeight}" />
                         <RowDefinition Height="{Binding BottomGridHeight}" />
                     </Grid.RowDefinitions>
@@ -1695,24 +1692,27 @@
                         <ColumnDefinition Width="{Binding RightGridWidth}" />
                     </Grid.ColumnDefinitions>
                     <ContentControl
-                        x:Name="TopLeftView"
-                        Grid.Row="0"            
-                        Grid.Column="0"              
+                        x:Name="MainView"       
+                        Grid.Row="0" Grid.Column="0"
+                        SizeChanged="MainView_SizeChanged"
                         Content="{Binding MainContent}" />
                     <ContentControl
-                        x:Name="TopRightView"
+                        x:Name="RightView"
                         Grid.Row="0"
-                        Grid.Column="2"           
+                        Grid.Column="2"         
+                        SizeChanged="RightView_SizeChanged"
                         Content="{Binding RightContent}" />
                     <GridSplitter
+                        x:Name="HorizontalSplitter"
                         IsEnabled="{Binding IsHorizontalSplitterEnabled}"
                         Grid.Row="0" Grid.RowSpan="3"
-                        Grid.Column="1"
+                        Grid.Column="1"                        
                         ResizeDirection="Columns"                
                         ResizeBehavior="PreviousAndNext" 
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <GridSplitter
+                        x:Name="VerticalSplitter"                        
                         IsEnabled="{Binding IsVerticalSplitterEnabled}"
                         Grid.Row="1"
                         Grid.Column="0" Grid.ColumnSpan="3"
@@ -1721,9 +1721,10 @@
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <ContentControl
-                        x:Name="BottomLeftView"
+                        x:Name="BottomView"
                         Grid.Row="2"
                         Grid.Column="0"           
+                        SizeChanged="BottomView_SizeChanged"
                         Content="{Binding BottomContent}" />
                 </Grid>
             </DataTemplate>

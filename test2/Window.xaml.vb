@@ -15,7 +15,6 @@ Public Class Window
             app = New AppDirectoryModel
         End If
         app.ModelSave(AppDirectoryModel.ModelFileName, app)
-        app.Initialize()
 
         Dim vc As New ViewController
         Call vc.Initialize(app, vm)
@@ -27,6 +26,18 @@ Public Class Window
         Me.DataContext = vm
     End Sub
 
+    Private Sub MainView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+        DelegateEventListener.Instance.RaiseViewResized()
+    End Sub
+
+    Private Sub RightView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+        DelegateEventListener.Instance.RaiseViewResized()
+    End Sub
+
+    Private Sub BottomView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+        DelegateEventListener.Instance.RaiseViewResized()
+    End Sub
+
     'Private Sub GridSplitter_Drop(sender As Object, e As DragEventArgs)
     '    DelegateEventListener.Instance.RaiseMultiViewRowGridSplitterChanged(sender)
     'End Sub
@@ -35,17 +46,25 @@ Public Class Window
     '    DelegateEventListener.Instance.RaiseMultiViewRowGridSplitterChanged(sender)
     'End Sub
 
-    Private Sub ExplorerView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-        DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
-    End Sub
+    'Private Sub ExplorerView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    '    DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
+    'End Sub
 
-    Private Sub MainView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-        DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
-    End Sub
+    'Private Sub MainView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    '    DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
+    'End Sub
 
-    Private Sub HistoryView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-        DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
-    End Sub
+    'Private Sub HistoryView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    '    DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
+    'End Sub
+
+    'Private Sub HorizontalSplitter_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    '    DelegateEventListener.Instance.RaiseViewResized(sender)
+    'End Sub
+
+    'Private Sub VerticalSplitter_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    '    DelegateEventListener.Instance.RaiseViewResized(sender)
+    'End Sub
 
     'Private Sub GridSplitter_KeyDown(sender As Object, e As KeyEventArgs)
     '    If e.Key = Key.F2 Then

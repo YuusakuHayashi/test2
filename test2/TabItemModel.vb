@@ -1,4 +1,5 @@
-﻿Imports Newtonsoft.Json
+﻿Imports System
+Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public Class TabItemModel : Inherits BaseModel(Of Object)
@@ -47,6 +48,23 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
         End Set
     End Property
 
+    Private Property _ViewContent As ViewItemModel
+    Public Property ViewContent As ViewItemModel
+        Get
+            Return Me._ViewContent
+        End Get
+        Set(value As ViewItemModel)
+            Me._ViewContent = value
+            If value Is Nothing Then
+                Me.Content = Nothing
+            Else
+                Me.Content =
+                    CType(MemberwiseClone(), TabItemModel).ViewContent.Content
+                Me.Name = value.Name
+            End If
+        End Set
+    End Property
+
     Private Property _Content As Object
     Public Property Content As Object
         Get
@@ -87,6 +105,7 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
     ' コマンドプロパティ（接続確認）
     '---------------------------------------------------------------------------------------------'
     Private _TabCloseCommand As ICommand
+    <JsonIgnore>
     Public ReadOnly Property TabCloseCommand As ICommand
         Get
             If Me._TabCloseCommand Is Nothing Then
@@ -109,7 +128,7 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
 
     ' コマンド実行可否のフラグ（接続確認）
     Private __TabCloseCommandEnableFlag As Boolean
-    Public Property _TabCloseCommandEnableFlag As Boolean
+    Private Property _TabCloseCommandEnableFlag As Boolean
         Get
             Return Me.__TabCloseCommandEnableFlag
         End Get
@@ -136,7 +155,7 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
         Call _CheckTabCloseCommandEnabled()
     End Sub
 
-    Public Sub New(ByVal n As String, ByVal obj As Object)
+    Public Sub New()
         Call Initialize()
     End Sub
 End Class

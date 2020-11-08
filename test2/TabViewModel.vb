@@ -1,4 +1,6 @@
 ﻿Imports System.Collections.ObjectModel
+Imports System.Collections.Specialized
+Imports System.ComponentModel
 
 Public Class TabViewModel : Inherits BaseViewModel
 
@@ -10,10 +12,6 @@ Public Class TabViewModel : Inherits BaseViewModel
         Set(value As Integer)
             Me._SelectedIndex = value
             RaisePropertyChanged("SelectedIndex")
-            'If value = -1 Then
-            '    Me.SelectedIndex = 0
-            '    RaisePropertyChanged("SelectedIndex")
-            'End If
         End Set
     End Property
 
@@ -27,12 +25,6 @@ Public Class TabViewModel : Inherits BaseViewModel
             RaisePropertyChanged("SelectedItem")
             Call _ChangeTabCloseButtonVisibilities(value)
             Call _ChangeTabColors(value)
-            'If value Is Nothing Then
-            '    If Tabs(0) IsNot Nothing Then
-            '        Me.SelectedItem = Tabs(0)
-            '    End If
-            'End If
-            'RaisePropertyChanged("SelectedItem")
         End Set
     End Property
 
@@ -49,16 +41,16 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Set
     End Property
 
-    Private _Views As ObservableCollection(Of ViewItemModel)
-    Public Property Views As ObservableCollection(Of ViewItemModel)
+    Private _PreservedTabs As ObservableCollection(Of TabItemModel)
+    Public Property PreservedTabs As ObservableCollection(Of TabItemModel)
         Get
-            If Me._Views Is Nothing Then
-                Me._Views = New ObservableCollection(Of ViewItemModel)
+            If Me._PreservedTabs Is Nothing Then
+                Me._PreservedTabs = New ObservableCollection(Of TabItemModel)
             End If
-            Return Me._Views
+            Return Me._PreservedTabs
         End Get
-        Set(value As ObservableCollection(Of ViewItemModel))
-            Me._Views = value
+        Set(value As ObservableCollection(Of TabItemModel))
+            Me._PreservedTabs = value
         End Set
     End Property
 
@@ -95,5 +87,42 @@ Public Class TabViewModel : Inherits BaseViewModel
         Else
             Me.Tabs.Add([tab])
         End If
+
+        For Each pt In Me.PreservedTabs
+            If pt.Name = [tab].Name Then
+                idx = Me.PreservedTabs.IndexOf(pt)
+                Exit For
+            End If
+        Next
+        If idx > -1 Then
+            Me.PreservedTabs(idx) = [tab]
+        Else
+            Me.PreservedTabs.Add([tab])
+        End If
+    End Sub
+
+    '--- タブを閉じる関連 ------------------------------------------------------------------------'
+    Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
+        If Me.Tabs.Contains(t) Then
+            Call _TabCloseRequestAccept(t)
+        End If
+    End Sub
+
+    Private Sub _TabCloseRequestAccept(ByVal [tab] As TabItemModel)
+        Me.Tabs.Remove([tab])
+        If Me.Tabs.Count = 0 Then
+            Call DelegateEventListener.Instance.RaiseTabViewClosed()
+        End If
+    End Sub
+
+    Private Sub _TabCloseAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.TabCloseRequested,
+            AddressOf Me._TabCloseRequestedReview
+    End Sub
+    '---------------------------------------------------------------------------------------------'
+
+    Public Sub New()
+        Call _TabCloseAddHandler()
     End Sub
 End Class

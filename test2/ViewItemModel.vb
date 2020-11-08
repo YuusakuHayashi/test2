@@ -141,7 +141,11 @@ Public Class ViewItemModel
         End Get
         Set(value As Object)
             Me._Content = value
-            Me.ModelName = value.GetType.Name
+            If value Is Nothing Then
+                Me.ModelName = Nothing
+            Else
+                Me.ModelName = value.GetType.Name
+            End If
         End Set
     End Property
 

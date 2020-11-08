@@ -7,19 +7,15 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
     Public Shared AppDirectoryName _
         = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\hys"
 
+    Public Shared AppIniFileName _
+        = AppDirectoryModel.AppDirectoryName & "\App.ini"
+
     ' この静的メンバはアプリケーションディレクトリを表します
     Public Shared ModelFileName _
         = AppDirectoryModel.AppDirectoryName & "\Model.json"
 
-    ' この静的メンバはアプリケーションディレクトリを表します
-    Public Shared AppIniFileName _
-        = AppDirectoryModel.AppDirectoryName & "\App.ini"
-
     Public Shared AppImageDirectory _
         = AppDirectoryModel.AppDirectoryName & "\Image"
-
-    Private Shared _DBTEST_IMAGE As String _
-        = AppImageDirectory & "\rpa.ico"
 
     Public Const DBTEST As String = "データベーステスト"
     Public Const RpaProject As String = "RPAプロジェクト"
@@ -29,6 +25,9 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
             DBTEST,
             RpaProject
         }
+
+    Private Shared NoIcon _
+        = AppDirectoryModel.AppImageDirectory & "\NoIcon.png"
 
     Private _ProjectInfo As ProjectInfoModel
     <JsonIgnore>
@@ -68,6 +67,19 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         End Try
     End Sub
 
+    Private __IconDictionary As Dictionary(Of String, BitmapImage)
+    Private Property _IconDictionary As Dictionary(Of String, BitmapImage)
+        Get
+            If Me.__IconDictionary Is Nothing Then
+                Me.__IconDictionary = New Dictionary(Of String, BitmapImage)
+            End If
+            Return __IconDictionary
+        End Get
+        Set(value As Dictionary(Of String, BitmapImage))
+            Me.__IconDictionary = value
+        End Set
+    End Property
+
     ' このプロパティはアプリケーションが持つプロジェクトの一覧を表します
     Private _CurrentProjects As ObservableCollection(Of ProjectInfoModel)
     Public Property CurrentProjects As ObservableCollection(Of ProjectInfoModel)
@@ -78,7 +90,8 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
             Return _CurrentProjects
         End Get
         Set(value As ObservableCollection(Of ProjectInfoModel))
-            _CurrentProjects = value
+            Me._CurrentProjects = value
+            Call _AssignIconOfProject(value)
         End Set
     End Property
 
@@ -92,19 +105,33 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
         End Get
         Set(value As ObservableCollection(Of ProjectInfoModel))
             _FixedProjects = value
+            Call _AssignIconOfProject(value)
         End Set
     End Property
 
-    Public Function AssignIconOfProject(ByVal kind As String)
-        Dim url = vbNullString
-        Select Case kind
-            Case DBTEST
-                url = _DBTEST_IMAGE
-            Case Else
-                url = _DBTEST_IMAGE
-        End Select
-        AssignIconOfProject = url
-    End Function
+    Private Sub _AssignIconOfProject(ByRef projects As ObservableCollection(Of ProjectInfoModel))
+        Dim iconf As String
+        For Each p In projects
+            If p.Icon Is Nothing Then
+                If Not String.IsNullOrEmpty(p.IconFileName) Then
+                    iconf = IIf(File.Exists(p.IconFileName), p.IconFileName, NOICON)
+                    If Not Me._IconDictionary.ContainsKey(iconf) Then
+                        Call _RegisterIcon(iconf)
+                    End If
+                    p.Icon = Me._IconDictionary(iconf)
+                End If
+            End If
+        Next
+    End Sub
+
+    Private Sub _RegisterIcon(ByVal f As String)
+        Dim bi = New BitmapImage
+        bi.BeginInit()
+        bi.UriSource = New Uri((f), UriKind.Absolute)
+        bi.EndInit()
+
+        Me._IconDictionary(f) = bi
+    End Sub
 
     Private Sub _Make(ByVal fds As List(Of Object))
         Dim fi As FileInfo
@@ -158,30 +185,6 @@ Public Class AppDirectoryModel : Inherits JsonHandler(Of AppDirectoryModel)
 
         AppLaunch = code
     End Function
-
-    Public Sub Initialize()
-        Dim bi As BitmapImage
-        For Each p In Me.CurrentProjects
-            If String.IsNullOrEmpty(p.IconFileName) Then
-                p.IconFileName = _DBTEST_IMAGE
-            End If
-            bi = New BitmapImage
-            bi.BeginInit()
-            bi.UriSource = New Uri((p.IconFileName), UriKind.Absolute)
-            bi.EndInit()
-            p.Icon = bi
-        Next
-        For Each p In Me.FixedProjects
-            If String.IsNullOrEmpty(p.IconFileName) Then
-                p.IconFileName = _DBTEST_IMAGE
-            End If
-            bi = New BitmapImage
-            bi.BeginInit()
-            bi.UriSource = New Uri((p.IconFileName), UriKind.Absolute)
-            bi.EndInit()
-            p.Icon = bi
-        Next
-    End Sub
 
     Sub New()
         Call AppLaunch()

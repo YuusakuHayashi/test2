@@ -7,9 +7,13 @@
         End Get
     End Property
 
+    Public Event ViewsChanged As EventHandler                   ' ビューエクスプローラー関連
+    Public Event ViewResized As EventHandler
+    Public Event TabViewClosed As EventHandler
+    Public Event ProjectsChanged As EventHandler
     Public Event DeleteViewRequested As EventHandler
     Public Event OpenProjectRequested As EventHandler
-    Public Event MultiViewSizeChanged As EventHandler
+    Public Event ViewSizeChanged As EventHandler
     Public Event RemoveFixedProjectRequested As EventHandler
     Public Event FixProjectRequested As EventHandler
     Public Event OpenViewRequested As EventHandler
@@ -20,6 +24,22 @@
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
 
+    Public Overloads Sub RaiseViewResized()
+        RaiseEvent ViewResized(Nothing , EventArgs.Empty)
+    End Sub
+
+    Public Overloads Sub RaiseViewsChanged()
+        RaiseEvent ViewsChanged(Nothing, EventArgs.Empty)
+    End Sub
+
+    Public Sub RaiseProjectsChanged()
+        RaiseEvent ProjectsChanged(Nothing, EventArgs.Empty)
+    End Sub
+
+    Public Sub RaiseTabViewClosed()
+        RaiseEvent TabViewClosed(Nothing, EventArgs.Empty)
+    End Sub
+
     Public Sub RaiseDeleteViewRequested(ByVal [view] As ViewItemModel)
         RaiseEvent DeleteViewRequested([view], EventArgs.Empty)
     End Sub
@@ -28,9 +48,9 @@
         RaiseEvent OpenProjectRequested(project, EventArgs.Empty)
     End Sub
 
-    Public Sub RaiseMultiViewSizeChanged(ByVal sender As Object)
-        RaiseEvent MultiViewSizeChanged(sender, EventArgs.Empty)
-    End Sub
+    'Public Sub RaiseMultiViewSizeChanged(ByVal sender As Object)
+    '    RaiseEvent MultiViewSizeChanged(sender, EventArgs.Empty)
+    'End Sub
     'Public Sub RaiseOpenViewRequested(ByVal child As ViewItemModel)
     '    RaiseEvent OpenViewRequested(child, EventArgs.Empty)
     'End Sub

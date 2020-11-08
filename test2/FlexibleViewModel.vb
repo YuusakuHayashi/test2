@@ -42,7 +42,7 @@ Public Class FlexibleViewModel
         End Get
         Set(value As GridLength)
             Me._ContentGridHeight = value
-            'Me.ContentViewHeight = value.Value
+            RaisePropertyChanged("ContentGridHeight")
         End Set
     End Property
 
@@ -74,7 +74,7 @@ Public Class FlexibleViewModel
         End Get
         Set(value As GridLength)
             Me._ContentGridWidth = value
-            'Me.ContentViewWidth = value.Value
+            RaisePropertyChanged("ContentGridWidth")
         End Set
     End Property
 
@@ -106,7 +106,6 @@ Public Class FlexibleViewModel
         End Get
         Set(value As GridLength)
             Me._BottomGridHeight = value
-            Me.BottomViewHeight = value.Value
             RaisePropertyChanged("BottomGridHeight")
         End Set
     End Property
@@ -139,7 +138,6 @@ Public Class FlexibleViewModel
         End Get
         Set(value As GridLength)
             Me._RightGridWidth = value
-            Me.RightViewWidth = value.Value
             RaisePropertyChanged("RightGridWidth")
         End Set
     End Property
@@ -191,7 +189,8 @@ Public Class FlexibleViewModel
             If value Is Nothing Then
                 Me.MainContent = Nothing
             Else
-                Me.MainContent = value.Content
+                Me.MainContent _
+                    = CType(MemberwiseClone(), FlexibleViewModel).MainViewContent.Content
             End If
         End Set
     End Property
@@ -219,7 +218,9 @@ Public Class FlexibleViewModel
             If value Is Nothing Then
                 Me.RightContent = Nothing
             Else
-                Me.RightContent = value.Content
+                'Me.RightContent = value.Content
+                Me.RightContent _
+                    = CType(MemberwiseClone(), FlexibleViewModel).RightViewContent.Content
             End If
         End Set
     End Property
@@ -247,7 +248,9 @@ Public Class FlexibleViewModel
             If value Is Nothing Then
                 Me.BottomContent = Nothing
             Else
-                Me.BottomContent = value.Content
+                'Me.BottomContent = value.Content
+                Me.BottomContent _
+                    = CType(MemberwiseClone(), FlexibleViewModel).BottomViewContent.Content
             End If
         End Set
     End Property
@@ -277,33 +280,51 @@ Public Class FlexibleViewModel
     End Property
 
     Private Sub _OptimizeDynamicView()
-        If Me.RightContent Is Nothing Then
-            Me.RightGridWidth = New GridLength(0.0)
+        ' メイン
+        If Me.MainContent Is Nothing Then
+            Me.ContentGridWidth = GridLength.Auto
+            Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.HorizontalSplitterWidth = New GridLength(0.0)
             Me.IsHorizontalSplitterEnabled = False
-        Else
-            If Me.ContentViewWidth > 0.0 Then
-                Me.ContentGridWidth = New GridLength(ContentViewWidth)
-                Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-            Else
-                Me.RightGridWidth = GridLength.Auto
-            End If
-            Me.HorizontalSplitterWidth = New GridLength(5.0)
-            Me.IsHorizontalSplitterEnabled = True
-        End If
-        If Me.BottomContent Is Nothing Then
-            Me.BottomGridHeight = New GridLength(0.0)
+
+            Me.ContentGridHeight = GridLength.Auto
+            Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.VerticalSplitterHeight = New GridLength(0.0)
             Me.IsVerticalSplitterEnabled = False
         Else
-            If Me.ContentViewHeight > 0.0 Then
-                Me.ContentGridHeight = New GridLength(ContentViewHeight)
-                Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            ' 右
+            If Me.RightContent Is Nothing Then
+                Me.RightGridWidth = New GridLength(0.0)
+                Me.HorizontalSplitterWidth = New GridLength(0.0)
+                Me.IsHorizontalSplitterEnabled = False
             Else
-                Me.BottomGridHeight = GridLength.Auto
+                ' 長さ指定がある場合、スターを入れ替える
+                If Me.ContentViewWidth > 0.0 Then
+                    Me.ContentGridWidth = New GridLength(ContentViewWidth)
+                    Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+                Else
+                    Me.RightGridWidth = GridLength.Auto
+                End If
+                Me.HorizontalSplitterWidth = New GridLength(5.0)
+                Me.IsHorizontalSplitterEnabled = True
             End If
-            Me.VerticalSplitterHeight = New GridLength(5.0)
-            Me.IsVerticalSplitterEnabled = True
+
+            ' 下
+            If Me.BottomContent Is Nothing Then
+                Me.BottomGridHeight = New GridLength(0.0)
+                Me.VerticalSplitterHeight = New GridLength(0.0)
+                Me.IsVerticalSplitterEnabled = False
+            Else
+                ' 長さ指定がある場合、スターを入れ替える
+                If Me.ContentViewHeight > 0.0 Then
+                    Me.ContentGridHeight = New GridLength(ContentViewHeight)
+                    Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+                Else
+                    Me.BottomGridHeight = GridLength.Auto
+                End If
+                Me.VerticalSplitterHeight = New GridLength(5.0)
+                Me.IsVerticalSplitterEnabled = True
+            End If
         End If
     End Sub
 
