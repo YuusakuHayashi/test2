@@ -149,6 +149,16 @@ Public Class ViewItemModel
         End Set
     End Property
 
+    Private _WrapperName As String
+    Public Property WrapperName As String
+        Get
+            Return Me._WrapperName
+        End Get
+        Set(value As String)
+            Me._WrapperName = value
+        End Set
+    End Property
+
     'Private _IsExpand As Boolean
     'Public Property IsExpand As Boolean
     '    Get

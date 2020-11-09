@@ -101,21 +101,23 @@ Public Class RpaProjectModel : Inherits ProjectModel
         })
 
         Dim dvm = New FlexibleViewModel With {
+            .Name = "FlexView1",
             .ContentViewHeight = 25.0,
             .MainViewContent = New ViewItemModel With {
                 .Name = "メニュー",
                 .Content = mvm
             },
             .BottomViewContent = New ViewItemModel With {
-                .Name = vbNullString,
                 .Content = New FlexibleViewModel With {
+                    .Name = "FlexView2",
                     .ContentViewWidth = 200.0,
                     .MainViewContent = New ViewItemModel With {
+                        .Name = "エクスプローラータブ",
                         .Content = tvm
                     },
                     .RightViewContent = New ViewItemModel With {
-                        .Name = vbNullString,
                         .Content = New FlexibleViewModel With {
+                            .Name = "FlexView3",
                             .ContentViewHeight = 25.0,
                             .MainViewContent = New ViewItemModel With {
                                 .Name = "Rpaプロジェクトメニュー",

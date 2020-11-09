@@ -14,6 +14,16 @@ Public Class FlexibleViewModel
         )
     End Sub
 
+    Private _Name As String
+    Public Property Name As String
+        Get
+            Return Me._Name
+        End Get
+        Set(value As String)
+            Me._Name = value
+        End Set
+    End Property
+
     Private _ContentViewHeight As Double
     Public Property ContentViewHeight As Double
         Get
@@ -189,6 +199,7 @@ Public Class FlexibleViewModel
             If value Is Nothing Then
                 Me.MainContent = Nothing
             Else
+                value.WrapperName = Me.Name
                 Me.MainContent _
                     = CType(MemberwiseClone(), FlexibleViewModel).MainViewContent.Content
             End If
@@ -218,6 +229,7 @@ Public Class FlexibleViewModel
             If value Is Nothing Then
                 Me.RightContent = Nothing
             Else
+                value.WrapperName = Me.Name
                 'Me.RightContent = value.Content
                 Me.RightContent _
                     = CType(MemberwiseClone(), FlexibleViewModel).RightViewContent.Content
@@ -248,6 +260,7 @@ Public Class FlexibleViewModel
             If value Is Nothing Then
                 Me.BottomContent = Nothing
             Else
+                value.WrapperName = Me.Name
                 'Me.BottomContent = value.Content
                 Me.BottomContent _
                     = CType(MemberwiseClone(), FlexibleViewModel).BottomViewContent.Content

@@ -98,46 +98,75 @@ Public Class MenuViewModel
     End Function
     '---------------------------------------------------------------------------------------------'
 
-    Private Delegate Sub _ShowViewExplorerHandler(ByRef obj As Object)
-
-    Private Function _ShowViewExplorer(ByRef fvm As FlexibleViewModel)
+    Private Overloads Function _SearchViewExplorer(ByRef fvm As FlexibleViewModel) As ViewItemModel
         Dim fnc As Func(Of ViewItemModel, Boolean)
         fnc = Function(ByVal vim As ViewItemModel) As Boolean
-                  Dim b = False
-                  Dim fvm2 As FlexibleViewModel
-                  Dim tvm As TabViewModel
+                  Dim v = Nothing
                   Select Case vim.ModelName
                       Case "FlexibleViewModel"
-                          fvm2 = CType(vim.Content, FlexibleViewModel)
-                          If fvm2.MainViewContent IsNot Nothing Then
-                              If fnc(fvm2.MainViewContent) Then
-                                  b = True
+                          If v Is Nothing Then
+                              If vim.Content.MainViewContent IsNot Nothing Then
+                                  v = fnc(vim.Content.MainViewContent)
+                              End If
+                          End If
+                          If v Is Nothing Then
+                              If vim.Content.RightViewContent IsNot Nothing Then
+                                  v = fnc(vim.Content.RightViewContent)
+                              End If
+                          End If
+                          If v Is Nothing Then
+                              If vim.Content.BottomViewContent IsNot Nothing Then
+                                  v = fnc(vim.Content.BottomViewContent)
                               End If
                           End If
                       Case "TabViewModel"
-                          tvm = CType(obj, TabViewModel)
-                          If _TabViewCheck(tvm) Then
-                          End If
+                          For Each pt In vim.Content.PreservedTabs
+                              v = fnc(pt.ViewContent)
+                              Exit For
+                          Next
                       Case "ViewExplorerViewModel"
+                          v = vim
+                      Case Else
                   End Select
-                  Return b
+                  Return v
               End Function
         '
         If fvm.MainViewContent IsNot Nothing Then
-            Select Case fvm.MainViewContent.ModelName
-                Case "FlexibleViewModel"
-                Case "TabViewModel"
-                Case "ViewExplorerViewModel"
-            End Select
-            Call act(fvm.MainContent, fvm.MainViewContent)
+           vim2 = fnc(fvm.MainViewContent)
+           If vim2 Is Nothing Then
+           End If
         End If
-        If fvm.RightViewContent IsNot Nothing Then
-            Call act(fvm.RightContent, fvm.RightViewContent)
-        End If
-        If fvm.BottomViewContent IsNot Nothing Then
-            Call act(fvm.BottomContent, fvm.BottomViewContent)
-        End If
-    End Sub
+    End Function
+
+    Private Overloads Function _SearchViewExplorer(ByRef vim As FlexibleViewModel) As ViewItemModel
+        Select Case vim.ModelName
+            Case "FlexibleViewModel"
+                If v Is Nothing Then
+                    If vim.Content.MainViewContent IsNot Nothing Then
+                        v = _SearchViewExplorer(vim.Content.MainViewContent)
+                    End If
+                End If
+                If v Is Nothing Then
+                    If vim.Content.RightViewContent IsNot Nothing Then
+                        v = _SearchViewExplorer(vim.Content.RightViewContent)
+                    End If
+                End If
+                If v Is Nothing Then
+                    If vim.Content.BottomViewContent IsNot Nothing Then
+                        v = _SearchViewExplorer(vim.Content.BottomViewContent)
+                    End If
+                End If
+            Case "TabViewModel"
+                For Each pt In vim.Content.PreservedTabs
+                    v = _SearchViewExplorer(pt.ViewContent)
+                    Exit For
+                Next
+            Case "ViewExplorerViewModel"
+                v = vim
+            Case Else
+        End Select
+        Return v
+    End Function
 
     ' コマンドプロパティ（Ｐｒｏｊｅｃｔ設定画面表示）
     '---------------------------------------------------------------------------------------------'
