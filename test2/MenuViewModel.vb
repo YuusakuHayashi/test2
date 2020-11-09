@@ -100,23 +100,35 @@ Public Class MenuViewModel
 
     Private Delegate Sub _ShowViewExplorerHandler(ByRef obj As Object)
 
-    Private Sub _ShowViewExplorer(ByRef fvm As FlexibleViewModel)
-        Dim act As _ShowViewExplorerHandler
-        act = Sub(ByRef obj As Object, ByVal vim As String)
+    Private Function _ShowViewExplorer(ByRef fvm As FlexibleViewModel)
+        Dim fnc As Func(Of ViewItemModel, Boolean)
+        fnc = Function(ByVal vim As ViewItemModel) As Boolean
+                  Dim b = False
                   Dim fvm2 As FlexibleViewModel
                   Dim tvm As TabViewModel
                   Select Case vim.ModelName
                       Case "FlexibleViewModel"
-                          fvm2 = CType(obj, FlexibleViewModel)
-                          Call _ShowViewExplorer(fvm2)
+                          fvm2 = CType(vim.Content, FlexibleViewModel)
+                          If fvm2.MainViewContent IsNot Nothing Then
+                              If fnc(fvm2.MainViewContent) Then
+                                  b = True
+                              End If
+                          End If
                       Case "TabViewModel"
                           tvm = CType(obj, TabViewModel)
-                          Call _ShowViewExplorer(tvm)
+                          If _TabViewCheck(tvm) Then
+                          End If
                       Case "ViewExplorerViewModel"
                   End Select
-              End Sub
+                  Return b
+              End Function
         '
         If fvm.MainViewContent IsNot Nothing Then
+            Select Case fvm.MainViewContent.ModelName
+                Case "FlexibleViewModel"
+                Case "TabViewModel"
+                Case "ViewExplorerViewModel"
+            End Select
             Call act(fvm.MainContent, fvm.MainViewContent)
         End If
         If fvm.RightViewContent IsNot Nothing Then

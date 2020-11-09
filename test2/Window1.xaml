@@ -274,14 +274,5 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid>
-        <Expander Header="Expander" HorizontalAlignment="Left" Height="100" Margin="393,110,0,0" VerticalAlignment="Top" Width="100" Style="{DynamicResource ExpanderStyle1}">
-            <Grid Background="#FFE5E5E5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="73*"/>
-                    <ColumnDefinition Width="25*"/>
-                </Grid.ColumnDefinitions>
-            </Grid>
-        </Expander>
-    </Grid>
+    <Grid/>
 </Window>
