@@ -87,15 +87,27 @@ Public Class RpaProjectModel : Inherits ProjectModel
         Call rpapmvm.Initialize(app, vm)
         Dim tvm = New TabViewModel
 
-        Call tvm.AddTab(New TabItemModel With {
-            .ViewContent = New ViewItemModel With {
-                .Name = "ビューエクスプローラー",
+        'Call tvm.AddTab(New TabItemModel With {
+        '    .ViewContent = New ViewItemModel With {
+        '        .Name = "ビューエクスプローラー",
+        '        .Content = vevm
+        '    }
+        '})
+        'Call tvm.AddTab(New TabItemModel With {
+        '    .ViewContent = New ViewItemModel With {
+        '        .Name = "プロジェクトエクスプローラー",
+        '        .Content = pevm
+        '    }
+        '})
+        Call tvm.AddTab(New ViewItemModel With {
+            .Name = "ビューエクスプローラー",
+            .Content = New TabItemModel With {
                 .Content = vevm
             }
         })
-        Call tvm.AddTab(New TabItemModel With {
-            .ViewContent = New ViewItemModel With {
-                .Name = "プロジェクトエクスプローラー",
+        Call tvm.AddTab(New ViewItemModel With {
+            .Name = "プロジェクトエクスプローラー",
+            .Content = New TabItemModel With {
                 .Content = pevm
             }
         })

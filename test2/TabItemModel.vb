@@ -73,7 +73,9 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
         End Get
         Set(value As Object)
             Me._Content = value
-            Me.ModelName = value.GetType.Name
+            If Me._Content IsNot Nothing Then
+                Me.ModelName = value.GetType.Name
+            End If
         End Set
     End Property
 

@@ -88,6 +88,7 @@
                   End Select
                   Return b
               End Function
+
         If fvm.MainContent IsNot Nothing Then
             If fnc(fvm.MainContent, fvm.MainViewContent.ModelName) Then
                 fvm.MainContent = Nothing
@@ -211,20 +212,20 @@
         Dim obj As Object
         Dim [define] As Func(Of String, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
-        For Each pt In tvm.PreservedTabs
-            Select Case pt.ViewContent.ModelName
+        For Each vt In tvm.ViewContentTabs
+            Select Case vt.ModelName
                 Case "FlexibleViewModel"
-                    fvm = CType(pt.ViewContent.Content, FlexibleViewModel)
+                    fvm = CType(vt.Content, FlexibleViewModel)
                     Call _OpenViewRequestAccept(v, fvm)
                 Case "TabViewModel"
-                    tvm2 = CType(pt.ViewContent.Content, TabViewModel)
+                    tvm2 = CType(vt.Content, TabViewModel)
                     Call _OpenTabViewRequestAccept(v, tvm2)
                 Case v.ModelName
-                    If v.Name = pt.ViewContent.Name Then
-                        If pt.ViewContent.Content Is Nothing Then
+                    If v.Name = vt.Name Then
+                        If vt.Content Is Nothing Then
                             Throw New Exception("ViewController._OpenTabViewRequestAccept Error!")
                         Else
-                            tvm.AddTab(pt)
+                            tvm.AddTab(vt)
                         End If
                         Exit For
                     End If

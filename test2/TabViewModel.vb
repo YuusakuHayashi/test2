@@ -54,6 +54,19 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Set
     End Property
 
+    Private _ViewContentTabs As ObservableCollection(Of ViewItemModel)
+    Public Property ViewContentTabs As ObservableCollection(Of ViewItemModel)
+        Get
+            If Me._ViewContentTabs Is Nothing Then
+                Me._ViewContentTabs = New ObservableCollection(Of ViewItemModel)
+            End If
+            Return Me._ViewContentTabs
+        End Get
+        Set(value As ObservableCollection(Of ViewItemModel))
+            Me._ViewContentTabs = value
+        End Set
+    End Property
+
     Private Sub _ChangeTabCloseButtonVisibilities(ByVal [tab] As TabItemModel)
         For Each t In Me.Tabs
             If t.Equals([tab]) Then
@@ -74,30 +87,59 @@ Public Class TabViewModel : Inherits BaseViewModel
         Next
     End Sub
 
-    Public Sub AddTab(ByVal [tab] As TabItemModel)
+    'Public Overloads Sub AddTab(ByVal [tab] As TabItemModel)
+    '    Dim idx = -1
+    '    For Each t In Me.Tabs
+    '        If t.Name = [tab].Name Then
+    '            idx = Me.Tabs.IndexOf(t)
+    '            Exit For
+    '        End If
+    '    Next
+    '    If idx > -1 Then
+    '        Me.Tabs(idx) = [tab]
+    '    Else
+    '        Me.Tabs.Add([tab])
+    '    End If
+
+    '    For Each pt In Me.PreservedTabs
+    '        If pt.Name = [tab].Name Then
+    '            idx = Me.PreservedTabs.IndexOf(pt)
+    '            Exit For
+    '        End If
+    '    Next
+    '    If idx > -1 Then
+    '        Me.PreservedTabs(idx) = [tab]
+    '    Else
+    '        Me.PreservedTabs.Add([tab])
+    '    End If
+    'End Sub
+
+    Public Overloads Sub AddTab(ByVal vim As ViewItemModel)
         Dim idx = -1
+        For Each vt In Me.ViewContentTabs
+            If vt.Name = vim.Name Then
+                idx = Me.ViewContentTabs.IndexOf(vt)
+                Exit For
+            End If
+        Next
+        If idx > -1 Then
+            Me.ViewContentTabs(idx) = vim
+        Else
+            Me.ViewContentTabs.Add(vim)
+        End If
+
+        idx = -1
         For Each t In Me.Tabs
-            If t.Name = [tab].Name Then
+            If t.Name = vim.Name Then
                 idx = Me.Tabs.IndexOf(t)
                 Exit For
             End If
         Next
         If idx > -1 Then
-            Me.Tabs(idx) = [tab]
+            Me.Tabs(idx) = vim.Content
         Else
-            Me.Tabs.Add([tab])
-        End If
-
-        For Each pt In Me.PreservedTabs
-            If pt.Name = [tab].Name Then
-                idx = Me.PreservedTabs.IndexOf(pt)
-                Exit For
-            End If
-        Next
-        If idx > -1 Then
-            Me.PreservedTabs(idx) = [tab]
-        Else
-            Me.PreservedTabs.Add([tab])
+            vim.Content.Name = vim.Name
+            Me.Tabs.Add(vim.Content)
         End If
     End Sub
 

@@ -728,7 +728,8 @@ Public MustInherit Class BaseViewModel2
             Case "TabViewModel"
                 obj = _ConvertJObjToObj(Of TabViewModel)([save].Content)
                 obj = _TabViewLoad(obj)
-                obj = _PreservedTabViewLoad(obj)
+                'obj = _PreservedTabViewLoad(obj)
+                obj = _ViewContentTabViewLoad(obj)
                 [save].Content = obj
             Case Else
                 obj = [define]([save].ModelName)
@@ -747,13 +748,20 @@ Public MustInherit Class BaseViewModel2
         _TabViewLoad = [save]
     End Function
 
-    Private Function _PreservedTabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
-        Dim vim As ViewItemModel
-        For Each pt In [save].PreservedTabs
-            vim = _ViewItemLoad(pt.ViewContent)
-            pt.ViewContent = vim
+    'Private Function _PreservedTabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
+    '    Dim vim As ViewItemModel
+    '    For Each pt In [save].PreservedTabs
+    '        vim = _ViewItemLoad(pt.ViewContent)
+    '        pt.ViewContent = vim
+    '    Next
+    '    _PreservedTabViewLoad = [save]
+    'End Function
+
+    Private Function _ViewContentTabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
+        For Each vt In [save].ViewContentTabs
+            vt = _ViewItemLoad(vt)
         Next
-        _PreservedTabViewLoad = [save]
+        _ViewContentTabViewLoad = [save]
     End Function
 
     Private Function _ConvertJObjToObj(Of T As {New})(ByVal jobj As Object) As T

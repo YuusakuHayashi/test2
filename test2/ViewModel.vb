@@ -114,19 +114,19 @@ Public Class ViewModel
     Private Overloads Sub _CreateViews(ByVal tvm As TabViewModel)
         Dim fvm As FlexibleViewModel
         Dim tvm2 As TabViewModel
-        For Each t In tvm.PreservedTabs
-            Select Case t.ViewContent.Content.GetType.Name
+        For Each vt In tvm.ViewContentTabs
+            Select Case vt.Content.GetType.Name
                 Case "FlexibleViewModel"
-                    fvm = CType(t.ViewContent.Content, FlexibleViewModel)
+                    fvm = CType(vt.Content, FlexibleViewModel)
                     Call _CreateViews(fvm)
                 Case "TabViewModel"
-                    tvm2 = CType(t.ViewContent.Content, TabViewModel)
+                    tvm2 = CType(vt.Content, TabViewModel)
                     Call _CreateViews(tvm2)
                 Case Else
                     Me.Views.Add(
                         New ViewItemModel With {
-                            .Name = t.Name,
-                            .ModelName = t.ModelName
+                            .Name = vt.Name,
+                            .ModelName = vt.ModelName
                         }
                     )
             End Select
