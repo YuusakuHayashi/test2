@@ -92,7 +92,7 @@ Public Class MenuViewModel
     Private Sub _ShowViewExplorerCommandExecute(ByVal parameter As Object)
         Dim names = _SearchViewExplorer(New List(Of String), ViewModel.Content)
         If names.Count > 0 Then
-            Call _ShowViewExplorer(ViewModel.Content, names)
+            Call _ShowViewExplorerFromFlex(ViewModel.Content, names)
         End If
     End Sub
 
@@ -172,6 +172,40 @@ Public Class MenuViewModel
         _PopData = [new]
     End Function
 
+    Private Sub _ShowViewExplorerFromFlex(ByRef fvm As FlexibleViewModel, names As List(Of String))
+        If fvm.MainViewContent IsNot Nothing Then
+            If fvm.MainViewContent.Name = names(0) Then
+                If fvm.MainContent Is Nothing Then
+                    fvm.MainContent = fvm.MainViewContent.Content
+                Else
+                    names = _PopData(names)
+                    Call _ShowViewExplorerContent(fvm.MainContent, fvm.MainViewContent, names)
+                End If
+            End If
+        End If
+        If fvm.RightViewContent IsNot Nothing Then
+            If fvm.RightViewContent.Name = names(0) Then
+                If fvm.RightContent Is Nothing Then
+                    fvm.RightContent = fvm.RightViewContent.Content
+                Else
+                    names = _PopData(names)
+                    Call _ShowViewExplorerContent(fvm.RightContent, fvm.RightViewContent, names)
+                End If
+            End If
+        End If
+        If fvm.BottomViewContent IsNot Nothing Then
+            If fvm.BottomViewContent.Name = names(0) Then
+                If fvm.BottomContent Is Nothing Then
+                    fvm.BottomContent = fvm.BottomViewContent.Content
+                Else
+                    names = _PopData(names)
+                    Call _ShowViewExplorerContent(fvm.BottomContent, fvm.BottomViewContent, names)
+                End If
+            End If
+        End If
+    End Sub
+
+
     Private Sub _ShowViewExplorerContent(ByRef obj As Object, ByVal vim As ViewItemModel, names As List(Of String))
         Dim fvm As FlexibleViewModel
         Dim tvm As TabViewModel
@@ -186,68 +220,48 @@ Public Class MenuViewModel
                         Call _ShowViewExplorerFromFlex(fvm, names)
                     Case "TabViewModel"
                         tvm = CType(obj, TabViewModel)
-                        Call _ShowViewExplorer(tvm, names)
+                        Call _ShowViewExplorerFromTabs(tvm, names)
                     Case Else
-                        Call _ShowViewExplorerContent(obj, names)
+                        Call _ShowViewExplorerContent(obj, vim, names)
                 End Select
             End If
         End If
     End Sub
 
-    Private Sub _ShowViewExplorerFromTabs(ByRef tvm As FlexibleViewModel, names As List(Of String))
-        Dim idx As Integer
+    Private Sub _ShowViewExplorerFromTabs(ByRef tvm As TabViewModel, names As List(Of String))
         Dim fvm As FlexibleViewModel
         Dim tvm2 As TabViewModel
+        Dim tim As TabItemModel
+        Dim idx = -1
 
-        For Each vt In tvm.ViewContentTabs
-            idx = -1
-            If vt.Name = names(0) Then
+        For Each t In tvm.Tabs
+            If t.ViewContent.Name = names(0) Then
+                idx = tvm.Tabs.IndexOf(t)
                 names = _PopData(names)
-                Select Case vt.ModelName
-                    Case "FlexibleViewModel"
-                        fvm = CType(obj, FlexibleViewModel)
+                Select Case t.ViewContent.ModelName
+                    Case "FlexViewModel"
+                        fvm = CType(t.Content, FlexibleViewModel)
                         Call _ShowViewExplorerFromFlex(fvm, names)
                     Case "TabViewModel"
-                        tvm2 = CType(obj, TabViewModel)
+                        tvm2 = CType(t.Content, TabViewModel)
                         Call _ShowViewExplorerFromTabs(tvm2, names)
                     Case Else
-                        Call _ShowViewExplorerContent(obj, names)
+                        Call _ShowViewExplorerContent(t.Content, t.ViewContent, names)
                 End Select
                 Exit For
             End If
         Next
-    End If
 
-    Private Sub _ShowViewExplorerFromFlex(ByRef fvm As FlexibleViewModel, names As List(Of String))
-        If fvm.MainViewContent IsNot Nothing Then
-            If fvm.MainViewContent.Name = names(0) Then
-                If fvm.MainContent Is Nothing Then
-                    fvm.MainContent = fvm.MainViewContent.Content
-                Else
+        ' 対象がない
+        If idx = -1 Then
+            For Each vt In tvm.ViewContentTabs
+                If vt.Name = names(0) Then
                     names = _PopData(names)
-                    Call _ShowViewExplorerContent(fvm.MainContent, fvm.MainViewContent)
+                    ' 今の状態だとタブに含まれるものはすべて復元されると思われる
+                    tvm.AddTab(vt)
+                    Exit For
                 End If
-            End If
-        End If
-        If fvm.RightViewContent IsNot Nothing Then
-            If fvm.RightViewContent.Name = names(0) Then
-                If fvm.RightContent Is Nothing Then
-                    fvm.RightContent = fvm.RightViewContent.Content
-                Else
-                    names = _PopData(names)
-                    Call _ShowViewExplorerContent(fvm.RightContent, fvm.RightViewContent)
-                End If
-            End If
-        End If
-        If fvm.BottomViewContent IsNot Nothing Then
-            If fvm.BottomViewContent.Name = names(0) Then
-                If fvm.BottomContent Is Nothing Then
-                    fvm.BottomContent = fvm.BottomViewContent.Content
-                Else
-                    names = _PopData(names)
-                    Call _ShowViewExplorerContent(fvm.BottomContent, fvm.BottomViewContent)
-                End If
-            End If
+            Next
         End If
     End Sub
 
