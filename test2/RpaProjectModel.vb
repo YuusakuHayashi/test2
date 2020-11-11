@@ -86,50 +86,32 @@ Public Class RpaProjectModel : Inherits ProjectModel
         Call rpapvm.Initialize(app, vm)
         Call rpapmvm.Initialize(app, vm)
         Dim tvm = New TabViewModel
-
-        'Call tvm.AddTab(New TabItemModel With {
-        '    .ViewContent = New ViewItemModel With {
-        '        .Name = "ビューエクスプローラー",
-        '        .Content = vevm
-        '    }
-        '})
-        'Call tvm.AddTab(New TabItemModel With {
-        '    .ViewContent = New ViewItemModel With {
-        '        .Name = "プロジェクトエクスプローラー",
-        '        .Content = pevm
-        '    }
-        '})
         Call tvm.AddTab(New ViewItemModel With {
             .Name = "ビューエクスプローラー",
-            .Content = New TabItemModel With {
-                .Content = vevm
-            }
+            .Content = vevm
         })
         Call tvm.AddTab(New ViewItemModel With {
             .Name = "プロジェクトエクスプローラー",
-            .Content = New TabItemModel With {
-                .Content = pevm
-            }
+            .Content = pevm
         })
 
         Dim dvm = New FlexibleViewModel With {
-            .Name = "FlexView1",
             .ContentViewHeight = 25.0,
             .MainViewContent = New ViewItemModel With {
                 .Name = "メニュー",
                 .Content = mvm
             },
             .BottomViewContent = New ViewItemModel With {
+                .Name = "LeftFlexView",
                 .Content = New FlexibleViewModel With {
-                    .Name = "FlexView2",
                     .ContentViewWidth = 200.0,
                     .MainViewContent = New ViewItemModel With {
                         .Name = "エクスプローラータブ",
                         .Content = tvm
                     },
                     .RightViewContent = New ViewItemModel With {
+                        .Name = "MainFlexView",
                         .Content = New FlexibleViewModel With {
-                            .Name = "FlexView3",
                             .ContentViewHeight = 25.0,
                             .MainViewContent = New ViewItemModel With {
                                 .Name = "Rpaプロジェクトメニュー",

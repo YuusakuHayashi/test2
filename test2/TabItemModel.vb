@@ -58,9 +58,7 @@ Public Class TabItemModel : Inherits BaseModel(Of Object)
             If value Is Nothing Then
                 Me.Content = Nothing
             Else
-                value.WrapperName = Me.Name
-                Me.Content =
-                    CType(MemberwiseClone(), TabItemModel).ViewContent.Content
+                Me.Content = CType(MemberwiseClone(), TabItemModel).ViewContent.Content
                 Me.Name = value.Name
             End If
         End Set

@@ -4,6 +4,17 @@ Imports System.ComponentModel
 
 Public Class TabViewModel : Inherits BaseViewModel
 
+    Private Property _Name As String
+    Public Property Name As String
+        Get
+            Return Me._Name
+        End Get
+        Set(value As String)
+            Me._Name = value
+            RaisePropertyChanged("Name")
+        End Set
+    End Property
+
     Private Property _SelectedIndex As Integer
     Public Property SelectedIndex As Integer
         Get
@@ -116,6 +127,9 @@ Public Class TabViewModel : Inherits BaseViewModel
 
     Public Overloads Sub AddTab(ByVal vim As ViewItemModel)
         Dim idx = -1
+
+        vim.WrapperName = Me.Name
+
         For Each vt In Me.ViewContentTabs
             If vt.Name = vim.Name Then
                 idx = Me.ViewContentTabs.IndexOf(vt)
@@ -128,6 +142,11 @@ Public Class TabViewModel : Inherits BaseViewModel
             Me.ViewContentTabs.Add(vim)
         End If
 
+        Dim tim = New TabItemModel With {
+            .Name = vim.Name,
+            .ViewContent = vim
+        }
+
         idx = -1
         For Each t In Me.Tabs
             If t.Name = vim.Name Then
@@ -136,10 +155,9 @@ Public Class TabViewModel : Inherits BaseViewModel
             End If
         Next
         If idx > -1 Then
-            Me.Tabs(idx) = vim.Content
+            Me.Tabs(idx) = tim
         Else
-            vim.Content.Name = vim.Name
-            Me.Tabs.Add(vim.Content)
+            Me.Tabs.Add(tim)
         End If
     End Sub
 
