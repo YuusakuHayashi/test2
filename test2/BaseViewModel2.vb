@@ -565,7 +565,7 @@ Public MustInherit Class BaseViewModel2
         End If
     End Sub
 
-    Private Delegate Sub ViewSetupDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
+    Private Delegate Function ViewSetupDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel) As ViewItemModel
     ''<< Add Case >>
     '<JsonIgnore>
     'Public ReadOnly Property ViewSetupHandler As ViewSetupDelegater
@@ -685,12 +685,55 @@ Public MustInherit Class BaseViewModel2
         Call InitializeViewContent()
 
         If ViewModel.SaveContent Is Nothing Then
-            Call [setup](AppInfo, ViewModel)
+            Call _NewViewSetup()
         Else
             sv = ViewModel.SaveContent
             ld = FlexibleViewLoad(sv)
             Call ViewModel.VisualizeView(ld)
         End If
+    End Sub
+
+    Private Sub _NewViewSetup()
+        Dim [setup] As ViewSetupDelegater _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
+        Dim fvm As FlexibleViewModel
+        Dim mvm = New MenuViewModel
+        Dim tvm = New TabViewModel
+        Dim pevm = New ProjectExplorerViewModel
+        Dim vevm = New ViewExplorerViewModel
+
+        Call mvm.Initialize(AppInfo, ViewModel)
+        Call pevm.Initialize(AppInfo, ViewModel)
+        Call vevm.Initialize(AppInfo, ViewModel)
+
+        Call tvm.AddTab(New ViewItemModel With {
+            .Name = "ビューエクスプローラー",
+            .Content = vevm
+        })
+        Call tvm.AddTab(New ViewItemModel With {
+            .Name = "プロジェクトエクスプローラー",
+            .Content = pevm
+        })
+
+        fvm = New FlexibleViewModel With {
+            .ContentViewHeight = 25.0,
+            .MainViewContent = New ViewItemModel With {
+                .Name = "メニュー",
+                .Content = mvm
+            },
+            .BottomViewContent = New ViewItemModel With {
+                .Name = "LeftFlexView",
+                .Content = New FlexibleViewModel With {
+                    .ContentViewWidth = 200.0,
+                    .MainViewContent = New ViewItemModel With {
+                        .Name = "ExplorerTabs",
+                        .Content = tvm
+                    },
+                    .RightViewContent = [setup](AppInfo, ViewModel)
+                }
+            }
+        }
+        Call ViewModel.VisualizeView(fvm)
     End Sub
 
     '' セーブされたデータにおけるObject型の各メンバーはJObjectとなってしまっているので、Objectに変換する
@@ -728,7 +771,6 @@ Public MustInherit Class BaseViewModel2
             Case "TabViewModel"
                 obj = _ConvertJObjToObj(Of TabViewModel)([save].Content)
                 obj = _TabViewLoad(obj)
-                'obj = _PreservedTabViewLoad(obj)
                 obj = _ViewContentTabViewLoad(obj)
                 [save].Content = obj
             Case Else

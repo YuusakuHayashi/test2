@@ -74,60 +74,28 @@ Public Class RpaProjectModel : Inherits ProjectModel
         GetRpaIndex = i
     End Function
 
-    Public Overrides Sub ViewSetupExecute(ByRef app As AppDirectoryModel, ByRef vm As ViewModel)
-        Dim mvm = New MenuViewModel
-        Dim vevm = New ViewExplorerViewModel
-        Dim pevm = New ProjectExplorerViewModel
+    Public Overrides Function ViewSetupExecute(ByRef app As AppDirectoryModel, ByRef vm As ViewModel) As ViewItemModel
+        Dim vim As ViewItemModel
         Dim rpapvm = New RpaProjectViewModel
         Dim rpapmvm = New RpaProjectMenuViewModel
-        Call mvm.Initialize(app, vm)
-        Call pevm.Initialize(app, vm)
-        Call vevm.Initialize(app, vm)
         Call rpapvm.Initialize(app, vm)
         Call rpapmvm.Initialize(app, vm)
-        Dim tvm = New TabViewModel
-        Call tvm.AddTab(New ViewItemModel With {
-            .Name = "ビューエクスプローラー",
-            .Content = vevm
-        })
-        Call tvm.AddTab(New ViewItemModel With {
-            .Name = "プロジェクトエクスプローラー",
-            .Content = pevm
-        })
-
-        Dim dvm = New FlexibleViewModel With {
-            .ContentViewHeight = 25.0,
-            .MainViewContent = New ViewItemModel With {
-                .Name = "メニュー",
-                .Content = mvm
-            },
-            .BottomViewContent = New ViewItemModel With {
-                .Name = "LeftFlexView",
-                .Content = New FlexibleViewModel With {
-                    .ContentViewWidth = 200.0,
-                    .MainViewContent = New ViewItemModel With {
-                        .Name = "エクスプローラータブ",
-                        .Content = tvm
-                    },
-                    .RightViewContent = New ViewItemModel With {
-                        .Name = "MainFlexView",
-                        .Content = New FlexibleViewModel With {
-                            .ContentViewHeight = 25.0,
-                            .MainViewContent = New ViewItemModel With {
-                                .Name = "Rpaプロジェクトメニュー",
-                                .Content = rpapmvm
-                            },
-                            .BottomViewContent = New ViewItemModel With {
-                                .Name = "Rpaプロジェクト",
-                                .Content = rpapvm
-                            }
-                        }
-                    }
+        vim = New ViewItemModel With {
+            .Name = "MainFlexView",
+            .Content = New FlexibleViewModel With {
+                .ContentViewHeight = 25.0,
+                .MainViewContent = New ViewItemModel With {
+                    .Name = "Rpaプロジェクトメニュー",
+                    .Content = rpapmvm
+                },
+                .BottomViewContent = New ViewItemModel With {
+                    .Name = "Rpaプロジェクト",
+                    .Content = rpapvm
                 }
             }
         }
-        vm.VisualizeView(dvm)
-    End Sub
+        ViewSetupExecute = vim
+    End Function
 
     Public Overrides Function ViewDefineExecute(ByVal mname As String) As Object
         Dim obj As Object
