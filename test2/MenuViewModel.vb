@@ -90,9 +90,9 @@ Public Class MenuViewModel
     End Property
 
     Private Sub _ShowViewExplorerCommandExecute(ByVal parameter As Object)
-        Dim names = _SearchViewExplorer(New List(Of String), ViewModel.Content)
-        If names.Count > 0 Then
-            Call _ShowViewExplorerFromFlex(ViewModel.Content, names)
+        Dim vims = _SearchViewExplorer(New List(Of ViewItemModel), ViewModel.Content)
+        If vims.Count > 0 Then
+            Call _ShowViewExplorerFromFlex(ViewModel.Content, vims)
         End If
     End Sub
 
@@ -101,65 +101,66 @@ Public Class MenuViewModel
     End Function
     '---------------------------------------------------------------------------------------------'
 
-    Private Overloads Function _SearchViewExplorer(ByVal NewNames As List(Of String),
-                                                   ByVal fvm As FlexibleViewModel) As List(Of String)
-        Dim oldcount = NewNames.Count
-        If NewNames.Count = oldcount Then
+    Private Overloads Function _SearchViewExplorer(ByVal NewViewItems As List(Of ViewItemModel),
+                                                   ByVal fvm As FlexibleViewModel) As List(Of ViewItemModel)
+        Dim oldcount = NewViewItems.Count
+
+        If NewViewItems.Count = oldcount Then
             If fvm.MainViewContent IsNot Nothing Then
-                NewNames = _SearchViewExplorer(NewNames, fvm.MainViewContent)
+                NewViewItems = _SearchViewExplorer(NewViewItems, fvm.MainViewContent)
             End If
         End If
-        If NewNames.Count = oldcount Then
+        If NewViewItems.Count = oldcount Then
             If fvm.RightViewContent IsNot Nothing Then
-                NewNames = _SearchViewExplorer(NewNames, fvm.RightViewContent)
+                NewViewItems = _SearchViewExplorer(NewViewItems, fvm.RightViewContent)
             End If
         End If
-        If NewNames.Count = oldcount Then
+        If NewViewItems.Count = oldcount Then
             If fvm.BottomViewContent IsNot Nothing Then
-                NewNames = _SearchViewExplorer(NewNames, fvm.BottomViewContent)
+                NewViewItems = _SearchViewExplorer(NewViewItems, fvm.BottomViewContent)
             End If
         End If
-        Return NewNames
+        Return NewViewItems
     End Function
 
-    Private Overloads Function _SearchViewExplorer(ByVal NewNames As List(Of String),
-                                                   ByVal vim As ViewItemModel) As List(Of String)
+    Private Overloads Function _SearchViewExplorer(ByVal NewViewItems As List(Of ViewItemModel),
+                                                   ByVal vim As ViewItemModel) As List(Of ViewItemModel)
         Dim fvm As FlexibleViewModel
         Dim tvm As TabViewModel
 
-        Dim OldNames As New List(Of String)
+        Dim OldViewItems As New List(Of ViewItemModel)
         '何故か和が求まらない
-        'OldNames.Concat(NewNames)
-        For Each nn In NewNames
-            OldNames.Add(nn)
+        'OldViewItems.Concat(NewViewItems)
+        For Each nvi In NewViewItems
+            OldViewItems.Add(nvi)
         Next
 
-        NewNames.Add(vim.Name)
+        NewViewItems.Add(vim)
 
         Select Case vim.ModelName
             Case "FlexibleViewModel"
                 fvm = CType(vim.Content, FlexibleViewModel)
-                NewNames = _SearchViewExplorer(NewNames, fvm)
+                NewViewItems = _SearchViewExplorer(NewViewItems, fvm)
             Case "TabViewModel"
                 tvm = CType(vim.Content, TabViewModel)
-                NewNames = _SearchViewExplorer(NewNames, tvm)
+                NewViewItems = _SearchViewExplorer(NewViewItems, tvm)
             Case "ViewExplorerViewModel"
-                'NewNames.Add(vim.Name)
+                'NewViewItems.Add(vim.Name)
             Case Else
-                NewNames = OldNames
+                NewViewItems = OldViewItems
         End Select
-        _SearchViewExplorer = NewNames
+        _SearchViewExplorer = NewViewItems
     End Function
 
-    Private Overloads Function _SearchViewExplorer(ByVal NewNames As List(Of String),
-                                                   ByVal tvm As TabViewModel) As List(Of String)
-        Dim oldcount = NewNames.Count
+    Private Overloads Function _SearchViewExplorer(ByVal NewViewItems As List(Of ViewItemModel),
+                                                   ByVal tvm As TabViewModel) As List(Of ViewItemModel)
+        Dim oldcount = NewViewItems.Count
         For Each vt In tvm.ViewContentTabs
-            If NewNames.Count = oldcount Then
-                NewNames = _SearchViewExplorer(NewNames, vt)
+            If NewViewItems.Count = oldcount Then
+                NewViewItems = _SearchViewExplorer(NewViewItems, vt)
             End If
         Next
-        Return NewNames
+        Return NewViewItems
     End Function
 
     Private Function _PopData(Of T As {New, IList})(ByVal old As T) As T
@@ -175,10 +176,12 @@ Public Class MenuViewModel
     Private Sub _ShowViewExplorerFromFlex(ByRef fvm As FlexibleViewModel, names As List(Of String))
         If fvm.MainViewContent IsNot Nothing Then
             If fvm.MainViewContent.Name = names(0) Then
-                If fvm.MainContent Is Nothing Then
+                names = _PopData(names)
+                If (fvm.MainContent Is Nothing) And (names(0) = names.Last) Then
                     fvm.MainContent = fvm.MainViewContent.Content
+                    '不要なものまでセット
+                    Call _CheckViewExplorerContent(fvm.MainContent, fvm.MainViewContent, names)
                 Else
-                    names = _PopData(names)
                     Call _ShowViewExplorerContent(fvm.MainContent, fvm.MainViewContent, names)
                 End If
             End If
@@ -209,23 +212,20 @@ Public Class MenuViewModel
     Private Sub _ShowViewExplorerContent(ByRef obj As Object, ByVal vim As ViewItemModel, names As List(Of String))
         Dim fvm As FlexibleViewModel
         Dim tvm As TabViewModel
-        If vim.Name = names(0) Then
-            If obj Is Nothing Then
-                obj = vim.Content
-            Else
-                names = _PopData(names)
-                Select Case vim.ModelName
-                    Case "FlexibleViewModel"
-                        fvm = CType(obj, FlexibleViewModel)
-                        Call _ShowViewExplorerFromFlex(fvm, names)
-                    Case "TabViewModel"
-                        tvm = CType(obj, TabViewModel)
-                        Call _ShowViewExplorerFromTabs(tvm, names)
-                    Case Else
-                        Call _ShowViewExplorerContent(obj, vim, names)
-                End Select
-            End If
-        End If
+        Select Case vim.ModelName
+            Case "FlexibleViewModel"
+                fvm = CType(obj, FlexibleViewModel)
+                Call _ShowViewExplorerFromFlex(fvm, names)
+            Case "TabViewModel"
+                tvm = CType(obj, TabViewModel)
+                Call _ShowViewExplorerFromTabs(tvm, names)
+            Case Else
+                If vim.Name = names(0) Then
+                    If obj Is Nothing Then
+                        obj = vim.Content
+                    End If
+                End If
+        End Select
     End Sub
 
     Private Sub _ShowViewExplorerFromTabs(ByRef tvm As TabViewModel, names As List(Of String))
