@@ -90,7 +90,6 @@ Public Class MenuViewModel
     End Property
 
     Private Sub _ShowViewExplorerCommandExecute(ByVal parameter As Object)
-        Call _ShowViewExplorer()
     End Sub
 
     Private Function _ShowViewExplorerCommandCanExecute(ByVal parameter As Object) As Boolean
