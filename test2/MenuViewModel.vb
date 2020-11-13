@@ -113,6 +113,7 @@ Public Class MenuViewModel
             End If
         End If
     End Sub
+
     'Private Overloads Function _SearchViewExplorer(ByVal NewViewItems As List(Of ViewItemModel),
     '                                               ByVal fvm As FlexibleViewModel) As List(Of ViewItemModel)
     '    Dim oldcount = NewViewItems.Count
