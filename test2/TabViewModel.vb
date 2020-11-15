@@ -79,23 +79,27 @@ Public Class TabViewModel : Inherits BaseViewModel
     End Property
 
     Private Sub _ChangeTabCloseButtonVisibilities(ByVal [tab] As TabItemModel)
-        For Each t In Me.Tabs
-            If t.Equals([tab]) Then
-                t.TabCloseButtonVisibility = Visibility.Visible
-            Else
-                t.TabCloseButtonVisibility = Visibility.Collapsed
-            End If
-        Next
+        If Me.Tabs IsNot Nothing Then
+            For Each t In Me.Tabs
+                If t.Equals([tab]) Then
+                    t.TabCloseButtonVisibility = Visibility.Visible
+                Else
+                    t.TabCloseButtonVisibility = Visibility.Collapsed
+                End If
+            Next
+        End If
     End Sub
 
     Private Sub _ChangeTabColors(ByVal [tab] As TabItemModel)
-        For Each t In Me.Tabs
-            If t.Equals([tab]) Then
-                t.Color = Colors.Goldenrod
-            Else
-                t.Color = Colors.White
-            End If
-        Next
+        If Me.Tabs IsNot Nothing Then
+            For Each t In Me.Tabs
+                If t.Equals([tab]) Then
+                    t.Color = Colors.Goldenrod
+                Else
+                    t.Color = Colors.White
+                End If
+            Next
+        End If
     End Sub
 
     'Public Overloads Sub AddTab(ByVal [tab] As TabItemModel)
@@ -170,6 +174,13 @@ Public Class TabViewModel : Inherits BaseViewModel
 
     Private Sub _TabCloseRequestAccept(ByVal [tab] As TabItemModel)
         Me.Tabs.Remove([tab])
+        For Each vt In Me.ViewContentTabs
+            If vt.Name = [tab].ViewContent.Name Then
+                vt.IsVisible = False
+                Exit For
+            End If
+        Next
+
         If Me.Tabs.Count = 0 Then
             Call DelegateEventListener.Instance.RaiseTabViewClosed()
         End If

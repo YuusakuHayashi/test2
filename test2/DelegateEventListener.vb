@@ -7,7 +7,9 @@
         End Get
     End Property
 
-    Public Event ViewsChanged As EventHandler                   ' ビューエクスプローラー関連
+    ' ビューエクスプローラー関連
+    Public Event ReloadViewsRequested As EventHandler                '
+    Public Event ViewsChanged As EventHandler                        'ViewModel.Views, ViewExplorerViewMode.Viewsを同期
     Public Event ViewResized As EventHandler
     Public Event TabViewClosed As EventHandler
     Public Event ProjectsChanged As EventHandler
@@ -23,6 +25,10 @@
     Public Event MigrateConditionUpdated As EventHandler
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
+
+    Public Overloads Sub RaiseReloadViewsRequested()
+        RaiseEvent ReloadViewsRequested(Nothing, EventArgs.Empty)
+    End Sub
 
     Public Overloads Sub RaiseViewResized()
         RaiseEvent ViewResized(Nothing , EventArgs.Empty)

@@ -4,6 +4,35 @@ Imports Newtonsoft.Json.Linq
 Public Class ViewItemModel
     Inherits BaseViewModel
 
+    ' 初回セット時はViewModel.ReloadViews()しないようにするため
+    Private _IsVisibleFirstCheck As Boolean
+    Private _IsVisible As Boolean
+    Public Property IsVisible As Boolean
+        Get
+            Return _IsVisible
+        End Get
+        Set(value As Boolean)
+            _IsVisible = value
+            If Me._IsVisibleFirstCheck Then
+                Call DelegateEventListener.Instance.RaiseReloadViewsRequested()
+            Else
+                Me._IsVisibleFirstCheck = True
+            End If
+        End Set
+    End Property
+
+    Private _VisibleIcon As BitmapImage
+    <JsonIgnore>
+    Public Property VisibleIcon As BitmapImage
+        Get
+            Return _VisibleIcon
+        End Get
+        Set(value As BitmapImage)
+            _VisibleIcon = value
+            RaisePropertyChanged("VisibleIcon")
+        End Set
+    End Property
+
     Private _IconFileName As String
     Public Property IconFileName As String
         Get

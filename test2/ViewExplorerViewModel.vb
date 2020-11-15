@@ -6,6 +6,51 @@ Imports Newtonsoft.Json.Linq
 Public Class ViewExplorerViewModel
     Inherits BaseViewModel2
 
+    Private _VisibleIconFileName As String _
+        = AppDirectoryModel.AppImageDirectory & "\visible.png"
+    Private _InvisibleIconFileName As String _
+        = AppDirectoryModel.AppImageDirectory & "\invisible.png"
+
+    Private Property _VisibleIconBase As BitmapImage
+    Public Property VisibleIconBase As BitmapImage
+        Get
+            If _VisibleIconBase Is Nothing Then
+                Dim bi = New BitmapImage
+                bi.BeginInit()
+                bi.UriSource = New Uri(
+                    Me._VisibleIconFileName,
+                    UriKind.Absolute
+                )
+                bi.EndInit()
+                Me._VisibleIconBase = bi
+            End If
+            Return Me._VisibleIconBase
+        End Get
+        Set(value As BitmapImage)
+            Me._VisibleIconBase = value
+        End Set
+    End Property
+
+    Private Property _InvisibleIconBase As BitmapImage
+    Public Property InvisibleIconBase As BitmapImage
+        Get
+            If _InvisibleIconBase Is Nothing Then
+                Dim bi = New BitmapImage
+                bi.BeginInit()
+                bi.UriSource = New Uri(
+                    Me._InvisibleIconFileName,
+                    UriKind.Absolute
+                )
+                bi.EndInit()
+                Me._InvisibleIconBase = bi
+            End If
+            Return Me._InvisibleIconBase
+        End Get
+        Set(value As BitmapImage)
+            Me._InvisibleIconBase = value
+        End Set
+    End Property
+
     Private _FontSize As Double
     <JsonIgnore>
     Public Property FontSize As Double
@@ -31,10 +76,18 @@ Public Class ViewExplorerViewModel
             Return Me._Views
         End Get
         Set(value As ObservableCollection(Of ViewItemModel))
+            Call _AssignVisibleIcon(value)
             Me._Views = value
             RaisePropertyChanged("Views")
         End Set
     End Property
+
+    ' Visibleに関するアイコンの割り当て
+    Private Sub _AssignVisibleIcon(ByRef vims As ObservableCollection(Of ViewItemModel))
+        For Each vim In vims
+            vim.VisibleIcon = IIf(vim.IsVisible, Me.VisibleIconBase, Me.InvisibleIconBase)
+        Next
+    End Sub
 
     Private Sub _ViewInitializing()
         Me.Views = ViewModel.Views
