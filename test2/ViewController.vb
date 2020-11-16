@@ -6,10 +6,35 @@
             New Action(AddressOf _OpenViewAddHandler),
             New Action(AddressOf _OpenProjectAddHandler),
             New Action(AddressOf _TabViewClosedAddHandler),
-            New Action(AddressOf _ReloadViewsRequestedAddHandler)
+            New Action(AddressOf _ReloadViewsRequestedAddHandler),
+            New Action(AddressOf _ViewResizedAddHandler)
         )
         Call BaseInitialize(adm, vm)
     End Sub
+
+    '--- ビューサイズ変更 -------------------------------------------------------------------------'
+    Private Sub _ViewResizedAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.ViewResized,
+            AddressOf Me._ViewResizedReview
+    End Sub
+
+    Private Sub _ViewResizedReview(ByVal sender As Object, ByVal e As SizeChangedEventArgs)
+        Call _ViewResizedAccept(sender)
+    End Sub
+
+    Private Sub _ViewResizedAccept(ByRef sender As Object)
+        Select Case sender.Name
+            Case "MainView"
+                sender.DataContext.ContentViewWidth = sender.ActualWidth
+                sender.DataContext.ContentViewHeight = sender.ActualHeight
+            Case "RightView"
+                sender.DataContext.RightViewWidth = sender.ActualWidth
+            Case "BottomView"
+                sender.DataContext.BottomViewHeight = sender.ActualHeight
+        End Select
+    End Sub
+    '---------------------------------------------------------------------------------------------'
 
     '--- タブを開く関連 --------------------------------------------------------------------------'
     Private Sub _ReloadViewsRequestedAddHandler()

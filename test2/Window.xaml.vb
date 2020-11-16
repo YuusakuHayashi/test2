@@ -27,15 +27,15 @@ Public Class Window
     End Sub
 
     Private Sub MainView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-        DelegateEventListener.Instance.RaiseViewResized()
+        DelegateEventListener.Instance.RaiseViewResized(sender, e)
     End Sub
 
     Private Sub RightView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-        DelegateEventListener.Instance.RaiseViewResized()
+        DelegateEventListener.Instance.RaiseViewResized(sender, e)
     End Sub
 
     Private Sub BottomView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-        DelegateEventListener.Instance.RaiseViewResized()
+        DelegateEventListener.Instance.RaiseViewResized(sender, e)
     End Sub
 
     'Private Sub GridSplitter_Drop(sender As Object, e As DragEventArgs)

@@ -30,8 +30,8 @@
         RaiseEvent ReloadViewsRequested(Nothing, EventArgs.Empty)
     End Sub
 
-    Public Overloads Sub RaiseViewResized()
-        RaiseEvent ViewResized(Nothing , EventArgs.Empty)
+    Public Overloads Sub RaiseViewResized(ByVal sender As Object, ByVal e As SizeChangedEventArgs)
+        RaiseEvent ViewResized(sender, e)
     End Sub
 
     Public Overloads Sub RaiseViewsChanged()

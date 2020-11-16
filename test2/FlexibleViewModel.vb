@@ -316,81 +316,124 @@ Public Class FlexibleViewModel
 
     Private Sub _OptimizeView()
         If Me.MainContent Is Nothing Then
-            ' メインがなければ、ライトとボトムを拡張する
             Me.ContentGridWidth = GridLength.Auto
-            Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.HorizontalSplitterWidth = New GridLength(0.0)
             Me.IsHorizontalSplitterEnabled = False
 
             Me.ContentGridHeight = GridLength.Auto
-            Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.VerticalSplitterHeight = New GridLength(0.0)
             Me.IsVerticalSplitterEnabled = False
         Else
-            ' メインがあれば、メインを基準に考える
-            ' 右
-            If Me.RightContent Is Nothing Then
-                Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                Me.RightGridWidth = GridLength.Auto
-                Me.HorizontalSplitterWidth = New GridLength(0.0)
-                Me.IsHorizontalSplitterEnabled = False
+            Me.ContentGridWidth = IIf(Me.ContentViewWidth = 0.0, GridLength.Auto, New GridLength(Me.ContentViewWidth))
+            Me.HorizontalSplitterWidth = New GridLength(5.0)
+            Me.IsHorizontalSplitterEnabled = True
 
-                'Me.RightGridWidth = New GridLength(0.0)
-                'Me.HorizontalSplitterWidth = New GridLength(0.0)
-                'Me.IsHorizontalSplitterEnabled = False
-            Else
-                ' 長さ指定がある場合、スターを入れ替える
-                If Me.ContentViewWidth > 0.0 Then
-                    Me.ContentGridWidth = New GridLength(ContentViewWidth)
-                    Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                Else
-                    Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                    Me.RightGridWidth = GridLength.Auto
-                End If
-
-                If Me.RightViewWidth > 0.0 Then
-                    Me.RightGridWidth = New GridLength(RightViewWidth)
-                    Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                Else
-                    Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                    Me.ContentGridWidth = GridLength.Auto
-                End If
-                Me.HorizontalSplitterWidth = New GridLength(5.0)
-                Me.IsHorizontalSplitterEnabled = True
-            End If
-
-            ' 下
-            If Me.BottomContent Is Nothing Then
-                Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                Me.BottomGridHeight = GridLength.Auto
-                Me.VerticalSplitterHeight = New GridLength(0.0)
-                Me.IsVerticalSplitterEnabled = False
-
-                'Me.BottomGridHeight = New GridLength(0.0)
-                'Me.VerticalSplitterHeight = New GridLength(0.0)
-                'Me.IsVerticalSplitterEnabled = False
-            Else
-                ' 長さ指定がある場合、スターを入れ替える
-                If Me.ContentViewHeight > 0.0 Then
-                    Me.ContentGridHeight = New GridLength(ContentViewHeight)
-                    Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                Else
-                    Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                    Me.BottomGridHeight = GridLength.Auto
-                End If
-
-                If Me.BottomViewHeight > 0.0 Then
-                    Me.BottomGridHeight = New GridLength(BottomViewHeight)
-                    Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                Else
-                    Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-                    Me.ContentGridHeight = GridLength.Auto
-                End If
-                Me.VerticalSplitterHeight = New GridLength(5.0)
-                Me.IsVerticalSplitterEnabled = True
-            End If
+            Me.ContentGridHeight = IIf(Me.ContentViewHeight = 0.0, GridLength.Auto, New GridLength(Me.ContentViewHeight))
+            Me.VerticalSplitterHeight = New GridLength(5.0)
+            Me.IsVerticalSplitterEnabled = True
+        End If
+        '
+        If Me.RightContent Is Nothing Then
+            Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.RightGridWidth = GridLength.Auto
+            Me.HorizontalSplitterWidth = New GridLength(0.0)
+            Me.IsHorizontalSplitterEnabled = False
+        Else
+            Me.ContentGridWidth = IIf(Me.ContentViewWidth = 0.0, GridLength.Auto, New GridLength(Me.ContentViewWidth))
+            Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.HorizontalSplitterWidth = New GridLength(5.0)
+            Me.IsHorizontalSplitterEnabled = True
+        End If
+        '
+        If Me.BottomContent Is Nothing Then
+            Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.BottomGridHeight = GridLength.Auto
+            Me.VerticalSplitterHeight = New GridLength(0.0)
+            Me.IsVerticalSplitterEnabled = False
+        Else
+            Me.ContentGridHeight = IIf(Me.ContentViewHeight = 0.0, GridLength.Auto, New GridLength(Me.ContentViewHeight))
+            Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.VerticalSplitterHeight = New GridLength(5.0)
+            Me.IsVerticalSplitterEnabled = True
         End If
     End Sub
+    'Private Sub _OptimizeView()
+    '    If Me.MainContent Is Nothing Then
+    '        ' メインがなければ、ライトとボトムを拡張する
+    '        'Me.ContentGridWidth = GridLength.Auto
+    '        'Me.RightGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '        'Me.HorizontalSplitterWidth = New GridLength(0.0)
+    '        'Me.IsHorizontalSplitterEnabled = False
+    '        Me.ContentGridWidth = GridLength.Auto
+    '        Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '        Me.HorizontalSplitterWidth = New GridLength(0.0)
+    '        Me.IsHorizontalSplitterEnabled = False
+
+    '        Me.ContentGridHeight = GridLength.Auto
+    '        Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '        Me.VerticalSplitterHeight = New GridLength(0.0)
+    '        Me.IsVerticalSplitterEnabled = False
+    '    Else
+    '        ' メインがあれば、メインを基準に考える
+    '        ' 右
+    '        If Me.RightContent Is Nothing Then
+    '            Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '            Me.RightGridWidth = GridLength.Auto
+    '            Me.HorizontalSplitterWidth = New GridLength(0.0)
+    '            Me.IsHorizontalSplitterEnabled = False
+    '        Else
+    '            ' 長さ指定がある場合、スターを入れ替える
+    '            If Me.ContentViewWidth > 0.0 Then
+    '                Me.ContentGridWidth = New GridLength(ContentViewWidth)
+    '                Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '            Else
+    '                Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '                Me.RightGridWidth = GridLength.Auto
+    '            End If
+
+    '            If Me.RightViewWidth > 0.0 Then
+    '                Me.RightGridWidth = New GridLength(RightViewWidth)
+    '                Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '            Else
+    '                Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '                Me.ContentGridWidth = GridLength.Auto
+    '            End If
+    '            Me.HorizontalSplitterWidth = New GridLength(5.0)
+    '            Me.IsHorizontalSplitterEnabled = True
+    '        End If
+
+    '        ' 下
+    '        If Me.BottomContent Is Nothing Then
+    '            Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '            Me.BottomGridHeight = GridLength.Auto
+    '            Me.VerticalSplitterHeight = New GridLength(0.0)
+    '            Me.IsVerticalSplitterEnabled = False
+
+    '            'Me.BottomGridHeight = New GridLength(0.0)
+    '            'Me.VerticalSplitterHeight = New GridLength(0.0)
+    '            'Me.IsVerticalSplitterEnabled = False
+    '        Else
+    '            ' 長さ指定がある場合、スターを入れ替える
+    '            If Me.ContentViewHeight > 0.0 Then
+    '                Me.ContentGridHeight = New GridLength(ContentViewHeight)
+    '                Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '            Else
+    '                Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '                Me.BottomGridHeight = GridLength.Auto
+    '            End If
+
+    '            If Me.BottomViewHeight > 0.0 Then
+    '                Me.BottomGridHeight = New GridLength(BottomViewHeight)
+    '                Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '            Else
+    '                Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+    '                Me.ContentGridHeight = GridLength.Auto
+    '            End If
+    '            Me.VerticalSplitterHeight = New GridLength(5.0)
+    '            Me.IsVerticalSplitterEnabled = True
+    '        End If
+    '    End If
+    'End Sub
 
     Public Sub New()
         Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)

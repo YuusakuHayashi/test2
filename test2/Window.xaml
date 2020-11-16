@@ -1688,6 +1688,16 @@
                         <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
                         <ColumnDefinition Width="{Binding RightGridWidth}" />
                     </Grid.ColumnDefinitions>
+                    <!--<Grid.RowDefinitions>
+                        <RowDefinition Height="{Binding ContentGridHeight}"/>
+                        <RowDefinition Height="{Binding VerticalSplitterHeight}" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding ContentGridWidth}" />
+                        <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>-->
                     <ContentControl
                         x:Name="MainView"       
                         Grid.Row="0" Grid.Column="0"
