@@ -240,7 +240,6 @@ Public MustInherit Class BaseViewModel2
     Protected Property [AddHandler] As Action
 
 
-    ' Model型のDataObjectはJsonからデシリアライズされたものはJObject型になっている
     Protected Sub BaseInitialize(ByVal app As AppDirectoryModel,
                                  ByRef vm As ViewModel)
         Dim ih = Me.InitializeHandler
@@ -268,8 +267,6 @@ Public MustInherit Class BaseViewModel2
                                        ByRef vm As ViewModel) Implements BaseViewModelInterface.Initialize
 
     Public Sub InitializeViewContent()
-        'ViewModel.SingleView = Nothing
-        'ViewModel.MultiView = Nothing
         ViewModel.Content = Nothing
     End Sub
 
@@ -277,37 +274,37 @@ Public MustInherit Class BaseViewModel2
         ViewModel.Content = obj
     End Sub
 
-    Private Sub _AssignIconOfView(ByRef v As ViewItemModel)
-        Dim iconf As String
-        Dim f As Func(Of String, BitmapImage)
-        Dim bi As BitmapImage
+    'Private Sub _AssignIconOfView(ByRef v As ViewItemModel)
+    '    Dim iconf As String
+    '    Dim f As Func(Of String, BitmapImage)
+    '    Dim bi As BitmapImage
 
-        Select Case v.FrameType
-            Case MultiViewModel.MAIN_FRAME
-                iconf = AppDirectoryModel.AppImageDirectory & "\mainframe.png"
-            Case MultiViewModel.EXPLORER_FRAME
-                iconf = AppDirectoryModel.AppImageDirectory & "\explorerframe.png"
-            Case MultiViewModel.MENU_FRAME
-                iconf = AppDirectoryModel.AppImageDirectory & "\menuframe.png"
-            Case MultiViewModel.PROJECT_MENU_FRAME
-                iconf = AppDirectoryModel.AppImageDirectory & "\projectmenuframe.png"
-            Case MultiViewModel.HISTORY_FRAME
-                iconf = AppDirectoryModel.AppImageDirectory & "\historyframe.png"
-            Case Else
-                iconf = vbNullString
-        End Select
+    '    Select Case v.FrameType
+    '        Case MultiViewModel.MAIN_FRAME
+    '            iconf = AppDirectoryModel.AppImageDirectory & "\mainframe.png"
+    '        Case MultiViewModel.EXPLORER_FRAME
+    '            iconf = AppDirectoryModel.AppImageDirectory & "\explorerframe.png"
+    '        Case MultiViewModel.MENU_FRAME
+    '            iconf = AppDirectoryModel.AppImageDirectory & "\menuframe.png"
+    '        Case MultiViewModel.PROJECT_MENU_FRAME
+    '            iconf = AppDirectoryModel.AppImageDirectory & "\projectmenuframe.png"
+    '        Case MultiViewModel.HISTORY_FRAME
+    '            iconf = AppDirectoryModel.AppImageDirectory & "\historyframe.png"
+    '        Case Else
+    '            iconf = vbNullString
+    '    End Select
 
-        If Not String.IsNullOrEmpty(iconf) Then
-            bi = New BitmapImage
-            bi.BeginInit()
-            bi.UriSource = New Uri(
-                iconf,
-                UriKind.Absolute
-            )
-            bi.EndInit()
-            v.Icon = bi
-        End If
-    End Sub
+    '    If Not String.IsNullOrEmpty(iconf) Then
+    '        bi = New BitmapImage
+    '        bi.BeginInit()
+    '        bi.UriSource = New Uri(
+    '            iconf,
+    '            UriKind.Absolute
+    '        )
+    '        bi.EndInit()
+    '        v.Icon = bi
+    '    End If
+    'End Sub
 
     Private Delegate Function ViewSetupDelegater(ByRef app As AppDirectoryModel, ByRef vm As ViewModel) As ViewItemModel
 
@@ -328,10 +325,10 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Public Overloads Sub ViewModelSetup()
-        Dim [setup] As ViewSetupDelegater _
-            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
-        Dim [define] As Func(Of String, Object) _
-            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
+        'Dim [setup] As ViewSetupDelegater _
+        '    = AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
+        'Dim [define] As Func(Of String, Object) _
+        '    = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
 
         Dim sv As FlexibleViewModel
         Dim obj As Object
@@ -410,9 +407,9 @@ Public MustInherit Class BaseViewModel2
         Call ViewModel.VisualizeView(fvm)
     End Sub
 
-    '---------------------------------------------------------------------------------------------'
-    ' 初回時(NewViewSetup時のみ実行され、各ViewItemに必要情報を付加する)
 
+    ' 初回時(NewViewSetup時のみ実行され、各ViewItemに必要情報を付加する)
+    '---------------------------------------------------------------------------------------------'
     Private Overloads Sub _ViewItemSetup(ByRef fvm As FlexibleViewModel)
         If fvm.MainViewContent IsNot Nothing Then
             Call _ViewItemSetup(fvm.MainViewContent)
@@ -453,6 +450,8 @@ Public MustInherit Class BaseViewModel2
     '---------------------------------------------------------------------------------------------'
 
 
+    ' ロード時
+    '---------------------------------------------------------------------------------------------'
     Private Function FlexibleViewLoad(ByVal [save] As FlexibleViewModel) As FlexibleViewModel
         If [save].MainViewContent IsNot Nothing Then
             [save].MainViewContent = _ViewItemLoad([save].MainViewContent)
@@ -502,6 +501,7 @@ Public MustInherit Class BaseViewModel2
         Next
         _ViewContentTabViewLoad = [save]
     End Function
+    '---------------------------------------------------------------------------------------------'
 
     Private Function _ConvertJObjToObj(Of T As {New})(ByVal jobj As Object) As T
         Dim obj As Object

@@ -16,6 +16,34 @@ Public Class ViewModel
         )
     End Sub
 
+    Private _WindowHeight As Double
+    Public Property WindowHeight As Double
+        Get
+            If Me._WindowHeight = 0.0 Then
+                Me._WindowHeight = 500.0
+            End If
+            Return Me._WindowHeight
+        End Get
+        Set(value As Double)
+            Me._WindowHeight = value
+            RaisePropertyChanged("WindowHeight")
+        End Set
+    End Property
+
+    Private _WindowWidth As Double
+    Public Property WindowWidth As Double
+        Get
+            If Me._WindowWidth = 0.0 Then
+                Me._WindowWidth = 1000.0
+            End If
+            Return Me._WindowWidth
+        End Get
+        Set(value As Double)
+            Me._WindowWidth = value
+            RaisePropertyChanged("WindowWidth")
+        End Set
+    End Property
+
     Private _Content As FlexibleViewModel
     Public Property Content As FlexibleViewModel
         Get
@@ -40,14 +68,11 @@ Public Class ViewModel
 
     Public Sub VisualizeView(ByVal fvm As FlexibleViewModel)
         Me.Views = Nothing
-        'Call _CreateViews(fvm)
         Me.Views = _CreateViews(fvm, Me.Views)
         Me.Content = fvm
     End Sub
 
     '---------------------------------------------------------------------------------------------'
-    ' ViewExplorerViewModelで変更を購読する為、イベントを発生させている
-    ' だが、参照のためか、ViewModel.CreateViewはView
     Private _Views As ObservableCollection(Of ViewItemModel)
     Public Property Views As ObservableCollection(Of ViewItemModel)
         Get
@@ -62,31 +87,6 @@ Public Class ViewModel
         End Set
     End Property
     '---------------------------------------------------------------------------------------------'
-
-    'Private Overloads Sub _CreateViews(ByVal fvm As FlexibleViewModel)
-    '    Dim act As Action(Of ViewItemModel)
-    '    act = Sub(ByVal v As ViewItemModel)
-    '              Dim fvm2 As FlexibleViewModel
-    '              Dim tvm As TabViewModel
-    '              Select Case v.Content.GetType.Name
-    '                  Case "FlexibleViewModel"
-    '                      fvm2 = CType(v.Content, FlexibleViewModel)
-    '                      Call _CreateViews(fvm2)
-    '                  Case "TabViewModel"
-    '                      tvm = CType(v.Content, TabViewModel)
-    '                      Call _CreateViews(tvm)
-    '                  Case Else
-    '                      Me.Views.Add(v)
-    '              End Select
-    '          End Sub
-    '    Call act(fvm.MainViewContent)
-    '    If fvm.RightContent IsNot Nothing Then
-    '        Call act(fvm.RightViewContent)
-    '    End If
-    '    If fvm.BottomContent IsNot Nothing Then
-    '        Call act(fvm.BottomViewContent)
-    '    End If
-    'End Sub
 
     Public Sub ReloadViews()
         Me.Views = Nothing

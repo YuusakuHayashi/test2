@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:test2"
         mc:Ignorable="d"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-        Title="Window" Height="500" Width="1000">
+        Title="Window" 
+        Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}">
     <Window.Resources>
         <Style TargetType="TreeViewItem" x:Key="TreeViewItemStyle">
             <Setter Property="Template">
@@ -1694,8 +1695,7 @@
                         Content="{Binding MainContent}" />
                     <ContentControl
                         x:Name="RightView"
-                        Grid.Row="0"
-                        Grid.Column="2"         
+                        Grid.Row="0" Grid.Column="2"         
                         SizeChanged="RightView_SizeChanged"
                         Content="{Binding RightContent}" />
                     <GridSplitter
@@ -1718,8 +1718,7 @@
                         HorizontalAlignment="Stretch" />
                     <ContentControl
                         x:Name="BottomView"
-                        Grid.Row="2"
-                        Grid.Column="0"           
+                        Grid.Row="2" Grid.Column="0"           
                         SizeChanged="BottomView_SizeChanged"
                         Content="{Binding BottomContent}" />
                 </Grid>

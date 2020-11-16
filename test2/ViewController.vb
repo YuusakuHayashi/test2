@@ -145,7 +145,6 @@
         Dim tvm As TabViewModel
         obj = New TabViewModel
         tvm = CType(obj, TabViewModel)
-        'Call _OpenViewRequestAccept(obj, vim, vims)
         Call _OpenViewRequestAccept(tvm, vim, vims)
     End Sub
 
@@ -156,7 +155,7 @@
                 If fvm.MainContent Is Nothing Then
                     Call _OpenViewSet(fvm.MainContent, fvm.MainViewContent, vims)
                 Else
-                    'vims = _PopData(vims)
+                    vims = IIf(fvm.MainViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
                     Call _OpenViewRequestAccept(fvm.MainContent, fvm.MainViewContent, vims)
                 End If
             End If
@@ -166,7 +165,7 @@
                 If fvm.RightContent Is Nothing Then
                     Call _OpenViewSet(fvm.RightContent, fvm.RightViewContent, vims)
                 Else
-                    'vims = _PopData(vims)
+                    vims = IIf(fvm.RightViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
                     Call _OpenViewRequestAccept(fvm.RightContent, fvm.RightViewContent, vims)
                 End If
             End If
@@ -176,7 +175,7 @@
                 If fvm.BottomContent Is Nothing Then
                     Call _OpenViewSet(fvm.BottomContent, fvm.BottomViewContent, vims)
                 Else
-                    'vims = _PopData(vims)
+                    vims = IIf(fvm.BottomViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
                     Call _OpenViewRequestAccept(fvm.BottomContent, fvm.BottomViewContent, vims)
                 End If
             End If
@@ -186,6 +185,19 @@
     Private Overloads Sub _OpenViewRequestAccept(ByRef tvm As TabViewModel,
                                                  ByVal vim As ViewItemModel,
                                                  ByVal vims As List(Of ViewItemModel))
+        ' a. TabViewModelが存在、TabItemModelがない場合
+        ' b. TabViewModelが存在しない
+        ' この２パターンの違いで内部的な動作が異なる
+        '
+        ' a.のケースの場合、
+        ' 存在するTabViewModelで、
+        ' _OpenViewRequestAccept(TabViewModel, ViewItemModel, List(Of ViewItemModel))
+        ' を実行する
+        '
+        ' b.のケースの場合、
+        ' _OpenViewSetで新たにTabViewModelを新規作成し、そのTabViewModelで、
+        ' _OpenViewRequestAccept(TabViewModel, ViewItemModel, List(Of ViewItemModel))
+        ' を実行する
         If vim.Name = vims(0).Name Then
             vims = _PopData(vims)
             For Each vt In vim.Content.ViewContentTabs
@@ -204,20 +216,20 @@
                                                  ByVal [old] As List(Of ViewItemModel))
         Dim fvm As FlexibleViewModel
         Dim tvm As TabViewModel
-        Dim [new] = New List(Of ViewItemModel)
+        'Dim [new] = New List(Of ViewItemModel)
 
-        [new] = _PopData([old])
+        '[new] = _PopData([old])
 
         Select Case vim.ModelName
             Case "FlexibleViewModel"
                 fvm = CType(obj, FlexibleViewModel)
-                Call _OpenViewRequestAccept(fvm, [new])
+                Call _OpenViewRequestAccept(fvm, [old])
             Case "TabViewModel"
                 tvm = CType(obj, TabViewModel)
                 Call _OpenViewRequestAccept(tvm, vim, [old])
             Case Else
                 '' UnExpected Case
-                Throw New Exception("ViewController._OpenViewRequestAccept Error!!!")
+                'Throw New Exception("ViewController._OpenViewRequestAccept Error!!!")
         End Select
     End Sub
 
@@ -289,7 +301,8 @@
     '    fnc = Function(ByVal vim2 As ViewItemModel, vim3 As ViewItemModel) As Boolean
     '              Dim b = False
     '              Dim fvm2 As FlexibleViewModel
-    '              Dim tvm As TabViewModel
+    '              Dim tvm As TabViewModel        'Call _OpenViewRequestAccept(obj, vim, vims)
+
     '              Select Case vim3.ModelName
     '                  Case "FlexibleViewModel"
     '                      fvm2 = CType(vim3.Content, FlexibleViewModel)
