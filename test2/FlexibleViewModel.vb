@@ -24,6 +24,28 @@ Public Class FlexibleViewModel
         End Set
     End Property
 
+    Private _ParentHeight As Double
+    <JsonIgnore>
+    Public Property ParentHeight As Double
+        Get
+            Return Me._ParentHeight
+        End Get
+        Set(value As Double)
+            Me._ParentHeight = value
+        End Set
+    End Property
+
+    Private _ParentWidth As Double
+    <JsonIgnore>
+    Public Property ParentWidth As Double
+        Get
+            Return Me._ParentWidth
+        End Get
+        Set(value As Double)
+            Me._ParentWidth = value
+        End Set
+    End Property
+
     Private _ContentViewHeight As Double
     Public Property ContentViewHeight As Double
         Get

@@ -183,6 +183,8 @@ Public MustInherit Class BaseViewModel2
         ' ロードしたいメンバーをここに追加していく
         ' ViewModel.Views = vm.Views
         ViewModel.SaveContent = vm.Content
+        ViewModel.WindowHeight = vm.WindowHeight
+        ViewModel.WindowWidth = vm.WindowWidth
         'ViewModel.MultiView.MainGridHeight _
         '    = New GridLength(vm.MultiView.MainViewHeight)
         'ViewModel.MultiView.RightGridWidth _
@@ -393,7 +395,7 @@ Public MustInherit Class BaseViewModel2
                         .Name = "RightView",
                         .Content = New FlexibleViewModel With {
                             .MainViewContent = [setup](AppInfo, ViewModel),
-                            .BottomViewHeight = 200.0,
+                            .BottomViewHeight = 150.0,
                             .BottomViewContent = New ViewItemModel With {
                                 .Name = "HistTabs",
                                 .Content = htvm
