@@ -21,7 +21,7 @@
     End Sub
 
     Private Sub _FlexViewOptimizationRequestedReview(ByVal sender As Object, ByVal e As System.EventArgs)
-        Call _FlexViewOptimizationRequestedAccept(ViewModel.Content)
+        'Call _FlexViewOptimizationRequestedAccept(ViewModel.Content)
     End Sub
 
     Private Overloads Sub _FlexViewOptimizationRequestedAccept(ByRef fvm As FlexibleViewModel)
