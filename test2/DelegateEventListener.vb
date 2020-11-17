@@ -7,7 +7,11 @@
         End Get
     End Property
 
-    ' ビューエクスプローラー関連
+
+    ' フレキシブルビューの最適化要求イベント
+    Public Event FlexViewOptimizationRequested As EventHandler
+
+    ' ビューエクスプローラーの更新イベント
     Public Event ReloadViewsRequested As EventHandler                '
     Public Event ViewsChanged As EventHandler                        'ViewModel.Views, ViewExplorerViewMode.Viewsを同期
     Public Event ViewResized As EventHandler
@@ -25,6 +29,10 @@
     Public Event MigrateConditionUpdated As EventHandler
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
+
+    Public Overloads Sub RaiseFlexViewOptimizationRequested()
+        RaiseEvent FlexViewOptimizationRequested(Nothing, EventArgs.Empty)
+    End Sub
 
     Public Overloads Sub RaiseReloadViewsRequested()
         RaiseEvent ReloadViewsRequested(Nothing, EventArgs.Empty)

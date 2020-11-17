@@ -7,10 +7,44 @@
             New Action(AddressOf _OpenProjectAddHandler),
             New Action(AddressOf _TabViewClosedAddHandler),
             New Action(AddressOf _ReloadViewsRequestedAddHandler),
-            New Action(AddressOf _ViewResizedAddHandler)
+            New Action(AddressOf _ViewResizedAddHandler),
+            New Action(AddressOf _FlexViewOptimizationRequestedAddHandler)
         )
         Call BaseInitialize(adm, vm)
     End Sub
+
+    '--- ビューサイズ最適化 ----------------------------------------------------------------------'
+    Private Sub _FlexViewOptimizationRequestedAddHandler()
+        AddHandler _
+            DelegateEventListener.Instance.FlexViewOptimizationRequested,
+            AddressOf Me._FlexViewOptimizationRequestedReview
+    End Sub
+
+    Private Sub _FlexViewOptimizationRequestedReview(ByVal sender As Object, ByVal e As System.EventArgs)
+        Call _FlexViewOptimizationRequestedAccept(ViewModel.Content)
+    End Sub
+
+    Private Overloads Sub _FlexViewOptimizationRequestedAccept(ByRef fvm As FlexibleViewModel)
+        Call fvm.OptimizeView()
+        If fvm.MainContent IsNot Nothing Then
+            Call _FlexViewOptimizationRequestedAccept(fvm.MainContent, fvm.MainViewContent)
+        End If
+        If fvm.RightContent IsNot Nothing Then
+            Call _FlexViewOptimizationRequestedAccept(fvm.RightContent, fvm.RightViewContent)
+        End If
+        If fvm.BottomContent IsNot Nothing Then
+            Call _FlexViewOptimizationRequestedAccept(fvm.BottomContent, fvm.BottomViewContent)
+        End If
+    End Sub
+
+    Private Overloads Sub _FlexViewOptimizationRequestedAccept(ByRef obj As Object, ByVal vim As ViewItemModel)
+        Dim fvm As FlexibleViewModel
+        If vim.ModelName = "FlexibleViewModel" Then
+            fvm = CType(obj, FlexibleViewModel)
+            Call _FlexViewOptimizationRequestedAccept(fvm)
+        End If
+    End Sub
+    '---------------------------------------------------------------------------------------------'
 
     '--- ビューサイズ変更 -------------------------------------------------------------------------'
     Private Sub _ViewResizedAddHandler()
@@ -52,7 +86,7 @@
     End Sub
     '---------------------------------------------------------------------------------------------'
 
-    '--- タブを開く関連 --------------------------------------------------------------------------'
+    '--- タブを閉じる関連 --------------------------------------------------------------------------'
     Private Sub _TabViewClosedAddHandler()
         AddHandler _
             DelegateEventListener.Instance.TabViewClosed,
@@ -61,6 +95,7 @@
 
     Private Sub _TabViewClosedReview(ByVal sender As Object, ByVal e As System.EventArgs)
         Call _TabViewClosedAccept(ViewModel.Content)
+        Call DelegateEventListener.Instance.RaiseFlexViewOptimizationRequested()
     End Sub
 
     Private Sub _TabViewClosedAccept(ByRef fvm As FlexibleViewModel)

@@ -24,28 +24,6 @@ Public Class FlexibleViewModel
         End Set
     End Property
 
-    Private _ParentHeight As Double
-    <JsonIgnore>
-    Public Property ParentHeight As Double
-        Get
-            Return Me._ParentHeight
-        End Get
-        Set(value As Double)
-            Me._ParentHeight = value
-        End Set
-    End Property
-
-    Private _ParentWidth As Double
-    <JsonIgnore>
-    Public Property ParentWidth As Double
-        Get
-            Return Me._ParentWidth
-        End Get
-        Set(value As Double)
-            Me._ParentWidth = value
-        End Set
-    End Property
-
     Private _ContentViewHeight As Double
     Public Property ContentViewHeight As Double
         Get
@@ -206,7 +184,7 @@ Public Class FlexibleViewModel
         End Get
         Set(value As Object)
             Me._MainContent = value
-            Call _OptimizeView()
+            Call OptimizeView()
             RaisePropertyChanged("MainContent")
         End Set
     End Property
@@ -236,7 +214,7 @@ Public Class FlexibleViewModel
         End Get
         Set(value As Object)
             Me._RightContent = value
-            Call _OptimizeView()
+            Call OptimizeView()
             RaisePropertyChanged("RightContent")
         End Set
     End Property
@@ -267,7 +245,7 @@ Public Class FlexibleViewModel
         End Get
         Set(value As Object)
             Me._BottomContent = value
-            Call _OptimizeView()
+            Call OptimizeView()
             RaisePropertyChanged("BottomContent")
         End Set
     End Property
@@ -314,50 +292,50 @@ Public Class FlexibleViewModel
         End Set
     End Property
 
-    Private Sub _OptimizeView()
+    Public Sub OptimizeView()
         If Me.MainContent Is Nothing Then
-            Me.ContentGridWidth = GridLength.Auto
-            Me.HorizontalSplitterWidth = New GridLength(0.0)
-            Me.IsHorizontalSplitterEnabled = False
-
-            Me.ContentGridHeight = GridLength.Auto
-            Me.VerticalSplitterHeight = New GridLength(0.0)
-            Me.IsVerticalSplitterEnabled = False
-        Else
-            Me.ContentGridWidth = IIf(Me.ContentViewWidth = 0.0, GridLength.Auto, New GridLength(Me.ContentViewWidth))
-            Me.HorizontalSplitterWidth = New GridLength(5.0)
-            Me.IsHorizontalSplitterEnabled = True
-
-            Me.ContentGridHeight = IIf(Me.ContentViewHeight = 0.0, GridLength.Auto, New GridLength(Me.ContentViewHeight))
-            Me.VerticalSplitterHeight = New GridLength(5.0)
-            Me.IsVerticalSplitterEnabled = True
-        End If
-        '
-        If Me.RightContent Is Nothing Then
-            Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-            Me.RightGridWidth = GridLength.Auto
-            Me.HorizontalSplitterWidth = New GridLength(0.0)
-            Me.IsHorizontalSplitterEnabled = False
-        Else
-            Me.ContentGridWidth = IIf(Me.ContentViewWidth = 0.0, GridLength.Auto, New GridLength(Me.ContentViewWidth))
+            'Me.ContentGridWidth = GridLength.Auto
+            Me.ContentGridWidth = New GridLength(0.0)
             Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-            Me.HorizontalSplitterWidth = New GridLength(5.0)
-            Me.IsHorizontalSplitterEnabled = True
-        End If
-        '
-        If Me.BottomContent Is Nothing Then
-            Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-            Me.BottomGridHeight = GridLength.Auto
+            Me.HorizontalSplitterWidth = New GridLength(0.0)
+            Me.IsHorizontalSplitterEnabled = False
+            '
+            'Me.ContentGridHeight = GridLength.Auto
+            Me.ContentGridHeight = New GridLength(0.0)
+            Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.VerticalSplitterHeight = New GridLength(0.0)
             Me.IsVerticalSplitterEnabled = False
         Else
-            Me.ContentGridHeight = IIf(Me.ContentViewHeight = 0.0, GridLength.Auto, New GridLength(Me.ContentViewHeight))
-            Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-            Me.VerticalSplitterHeight = New GridLength(5.0)
-            Me.IsVerticalSplitterEnabled = True
+            If Me.RightContent Is Nothing Then
+                Me.ContentGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+                Me.RightGridWidth = New GridLength(0.0)
+                'Me.RightGridWidth = GridLength.Auto
+                Me.HorizontalSplitterWidth = New GridLength(0.0)
+                Me.IsHorizontalSplitterEnabled = False
+            Else
+                'Me.ContentGridWidth = IIf(Me.ContentViewWidth = 0.0, GridLength.Auto, New GridLength(Me.ContentViewWidth))
+                Me.ContentGridWidth = GridLength.Auto
+                Me.RightGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+                Me.HorizontalSplitterWidth = New GridLength(5.0)
+                Me.IsHorizontalSplitterEnabled = True
+            End If
+            '
+            If Me.BottomContent Is Nothing Then
+                Me.ContentGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+                Me.BottomGridHeight = New GridLength(0.0)
+                'Me.BottomGridHeight = GridLength.Auto
+                Me.VerticalSplitterHeight = New GridLength(0.0)
+                Me.IsVerticalSplitterEnabled = False
+            Else
+                'Me.ContentGridHeight = IIf(Me.ContentViewHeight = 0.0, GridLength.Auto, New GridLength(Me.ContentViewHeight))
+                Me.ContentGridHeight = GridLength.Auto
+                Me.BottomGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+                Me.VerticalSplitterHeight = New GridLength(5.0)
+                Me.IsVerticalSplitterEnabled = True
+            End If
         End If
     End Sub
-    'Private Sub _OptimizeView()
+    'Private Sub OptimizeView()
     '    If Me.MainContent Is Nothing Then
     '        ' メインがなければ、ライトとボトムを拡張する
     '        'Me.ContentGridWidth = GridLength.Auto
