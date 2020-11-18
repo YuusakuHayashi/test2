@@ -1681,31 +1681,32 @@
             <DataTemplate DataType="{x:Type local:FlexibleViewModel}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="5" />
-                        <ColumnDefinition Width="*" />
                         <!--<ColumnDefinition Width="{Binding ContentGridWidth}" />
                         <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
                         <ColumnDefinition Width="{Binding RightGridWidth}" />-->
+                        <ColumnDefinition Width="{Binding ContentGridWidth}" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <!--<RowDefinition Height="{Binding ContentGridHeight}" />
+                        <RowDefinition Height="{Binding HorizontalSplitterHeight}" />
+                        <RowDefinition Height="{Binding BottomGridHeight}" />-->
+                        <RowDefinition Height="{Binding ContentGridHeight}" />
                         <RowDefinition Height="5" />
                         <RowDefinition Height="*" />
-                        <!--<ColumnDefinition Height="{Binding ContentGridHeight}" />
-                        <ColumnDefinition Height="{Binding HorizontalSplitterHeight}" />
-                        <ColumnDefinition Height="{Binding BottomGridHeight}" />-->
                     </Grid.RowDefinitions>
                     <StackPanel 
+                        x:Name="ContentPanel"
+                        Height="{Binding ContentViewHeight, Mode=OneWayToSource}"
+                        Width="{Binding ContentViewWidth, Mode=OneWayToSource}"
                         Grid.Row="0" Grid.Column="0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Hight=" />
-                            <!--<TextBlock Text="{Binding ContentViewHeight}" />-->
-                            <TextBlock Text="{Binding ElementName=MainView, Path=ActualHeight}" />
+                            <TextBlock Text="{Binding ContentViewHeight}" />
                             <TextBlock Text=", " />
                             <TextBlock Text="Width=" />
-                            <!--<TextBlock Text="{Binding ContentViewWidth}" />-->
-                            <TextBlock Text="{Binding ElementName=MainView, Path=ActualWidth}" />
+                            <TextBlock Text="{Binding ContentViewWidth}" />
                         </StackPanel>
                         <ContentControl
                             x:Name="MainView" 
@@ -1716,11 +1717,10 @@
                         Grid.Row="0" Grid.Column="2">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="RightWidth=" />
-                            <!--<TextBlock Text="{Binding RightViewWidth}" />-->
-                            <TextBlock Text="{Binding ElementName=RightView, Path=ActualWidth}" />
+                            <TextBlock Text="{Binding RightViewWidth}" />
                         </StackPanel>
                         <ContentControl
-                            x:Name="RightView"        
+                            x:Name="RightView"                                    
                             SizeChanged="RightView_SizeChanged"
                             Content="{Binding RightContent}" />
                     </StackPanel>
@@ -1728,8 +1728,7 @@
                         Grid.Row="2" Grid.Column="0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="BottomHeight=" />
-                            <!--<TextBlock Text="{Binding BottomViewHeight}" />-->
-                            <TextBlock Text="{Binding ElementName=BottomView, Path=ActualHeight}" />
+                            <TextBlock Text="{Binding BottomViewHeight}" />
                         </StackPanel>
                         <ContentControl
                             x:Name="BottomView"

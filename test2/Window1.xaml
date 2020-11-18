@@ -7,6 +7,17 @@
         mc:Ignorable="d"
         Title="Window1" Height="500" Width="800">
     <Grid>
+        <Grid.Resources>
+            <StackPanel x:Key="MainContentTemplate">
+                <TextBlock Text="MainContent" />
+            </StackPanel>
+            <StackPanel x:Key="RightContentTemplate">
+                <TextBlock Text="RightContent" />
+            </StackPanel>
+            <StackPanel x:Key="BottomContentTemplate">
+                <TextBlock Text="BottomContent" />
+            </StackPanel>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="5" />
@@ -18,23 +29,61 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <StackPanel 
-            Name="MainContent"
+            Name="MainPanel"
             Grid.Row="0" Grid.Column="0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Hight=" />
-                <TextBlock Text="{Binding ElementName=MainContent, Path=ActualHeight}" />
-                <TextBlock Text=", " />
-                <TextBlock Text="Width=" />
-                <TextBlock Text="{Binding ElementName=MainContent, Path=ActualWidth}" />
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Hight=" />
+                    <TextBlock Text="{Binding ElementName=MainPanel, Path=ActualHeight}" />
+                    <TextBlock Text=", " />
+                    <TextBlock Text="Width=" />
+                    <TextBlock Text="{Binding ElementName=MainPanel, Path=ActualWidth}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Hight=" />
+                    <TextBlock Text="{Binding ElementName=MainContent, Path=ActualHeight}" />
+                    <TextBlock Text=", " />
+                    <TextBlock Text="Width=" />
+                    <TextBlock Text="{Binding ElementName=MainContent, Path=ActualWidth}" />
+                </StackPanel>
             </StackPanel>
+            <ContentControl
+                x:Name="MainContent"
+                Content="{Binding Source={StaticResource MainContentTemplate}}"/>
         </StackPanel>
         <StackPanel           
-            Name="RightContent"
+            Name="RightPanel"
             Grid.Row="0" Grid.Column="2">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="RightWidth=" />
-                <TextBlock Text="{Binding ElementName=RightContent, Path=ActualWidth}" />
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="RightWidth=" />
+                    <TextBlock Text="{Binding ElementName=RightPanel, Path=ActualWidth}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="RightWidth=" />
+                    <TextBlock Text="{Binding ElementName=RightContent, Path=ActualWidth}" />
+                </StackPanel>
             </StackPanel>
+            <ContentControl
+                x:Name="RightContent"
+                Content="{Binding Source={StaticResource RightContentTemplate}}"/>
+        </StackPanel>
+        <StackPanel 
+            Name="BottomPanel"
+            Grid.Row="2" Grid.Column="0">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="BottomHeight=" />
+                    <TextBlock Text="{Binding ElementName=BottomPanel, Path=ActualHeight}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="BottomHeight=" />
+                    <TextBlock Text="{Binding ElementName=BottomContent, Path=ActualHeight}" />
+                </StackPanel>
+            </StackPanel>
+            <ContentControl
+                x:Name="BottomContent"
+                Content="{Binding Source={StaticResource BottomContentTemplate}}"/>
         </StackPanel>
         <GridSplitter
             x:Name="HorizontalSplitter"
@@ -54,13 +103,5 @@
             ResizeBehavior="PreviousAndNext"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch" />
-        <StackPanel 
-            Name="BottomContent"
-            Grid.Row="2" Grid.Column="0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="BottomHeight=" />
-                <TextBlock Text="{Binding ElementName=BottomContent, Path=ActualHeight}" />
-            </StackPanel>
-        </StackPanel>
     </Grid>
 </Window>
