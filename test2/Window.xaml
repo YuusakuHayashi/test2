@@ -612,7 +612,9 @@
 
             <DataTemplate
                 DataType="{x:Type local:UserDirectoryViewModel}">
-                <DockPanel>
+                <DockPanel
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch">
                     <StackPanel
                         Margin="10,0,0,0"
                         DockPanel.Dock="Left">
@@ -1678,59 +1680,80 @@
 
             <DataTemplate DataType="{x:Type local:FlexibleViewModel}">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="{Binding ContentGridHeight}"/>
-                        <RowDefinition Height="{Binding VerticalSplitterHeight}" />
-                        <RowDefinition Height="{Binding BottomGridHeight}" />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding ContentGridWidth}" />
-                        <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
-                        <ColumnDefinition Width="{Binding RightGridWidth}" />
-                    </Grid.ColumnDefinitions>
-                    <!--<Grid.RowDefinitions>
-                        <RowDefinition Height="{Binding ContentGridHeight}"/>
-                        <RowDefinition Height="{Binding VerticalSplitterHeight}" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding ContentGridWidth}" />
-                        <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
                         <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>-->
-                    <ContentControl
-                        x:Name="MainView"       
-                        Grid.Row="0" Grid.Column="0"
-                        SizeChanged="MainView_SizeChanged"
-                        Content="{Binding MainContent}" />
-                    <ContentControl
-                        x:Name="RightView"
-                        Grid.Row="0" Grid.Column="2"         
-                        SizeChanged="RightView_SizeChanged"
-                        Content="{Binding RightContent}" />
+                        <ColumnDefinition Width="5" />
+                        <ColumnDefinition Width="*" />
+                        <!--<ColumnDefinition Width="{Binding ContentGridWidth}" />
+                        <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
+                        <ColumnDefinition Width="{Binding RightGridWidth}" />-->
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="*" />
+                        <!--<ColumnDefinition Height="{Binding ContentGridHeight}" />
+                        <ColumnDefinition Height="{Binding HorizontalSplitterHeight}" />
+                        <ColumnDefinition Height="{Binding BottomGridHeight}" />-->
+                    </Grid.RowDefinitions>
+                    <StackPanel 
+                        Grid.Row="0" Grid.Column="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Hight=" />
+                            <!--<TextBlock Text="{Binding ContentViewHeight}" />-->
+                            <TextBlock Text="{Binding ElementName=MainView, Path=ActualHeight}" />
+                            <TextBlock Text=", " />
+                            <TextBlock Text="Width=" />
+                            <!--<TextBlock Text="{Binding ContentViewWidth}" />-->
+                            <TextBlock Text="{Binding ElementName=MainView, Path=ActualWidth}" />
+                        </StackPanel>
+                        <ContentControl
+                            x:Name="MainView" 
+                            SizeChanged="MainView_SizeChanged"
+                            Content="{Binding MainContent}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Row="0" Grid.Column="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="RightWidth=" />
+                            <!--<TextBlock Text="{Binding RightViewWidth}" />-->
+                            <TextBlock Text="{Binding ElementName=RightView, Path=ActualWidth}" />
+                        </StackPanel>
+                        <ContentControl
+                            x:Name="RightView"        
+                            SizeChanged="RightView_SizeChanged"
+                            Content="{Binding RightContent}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Row="2" Grid.Column="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="BottomHeight=" />
+                            <!--<TextBlock Text="{Binding BottomViewHeight}" />-->
+                            <TextBlock Text="{Binding ElementName=BottomView, Path=ActualHeight}" />
+                        </StackPanel>
+                        <ContentControl
+                            x:Name="BottomView"
+                            SizeChanged="BottomView_SizeChanged"
+                            Content="{Binding BottomContent}" />
+                    </StackPanel>
                     <GridSplitter
                         x:Name="HorizontalSplitter"
                         IsEnabled="{Binding IsHorizontalSplitterEnabled}"
-                        Grid.Row="0" Grid.RowSpan="3"
-                        Grid.Column="1"                        
+                        Grid.Row="0" Grid.RowSpan="2"
+                        Grid.Column="1"                                         
                         ResizeDirection="Columns"                
-                        ResizeBehavior="PreviousAndNext" 
+                        ResizeBehavior="PreviousAndNext"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <GridSplitter
                         x:Name="VerticalSplitter"                        
                         IsEnabled="{Binding IsVerticalSplitterEnabled}"
+                        Grid.Column="0" Grid.ColumnSpan="2"
                         Grid.Row="1"
-                        Grid.Column="0" Grid.ColumnSpan="3"
-                        ResizeDirection="Rows"                
-                        ResizeBehavior="PreviousAndNext" 
+                        ResizeDirection="Rows"
+                        ResizeBehavior="PreviousAndNext"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
-                    <ContentControl
-                        x:Name="BottomView"
-                        Grid.Row="2" Grid.Column="0"           
-                        SizeChanged="BottomView_SizeChanged"
-                        Content="{Binding BottomContent}" />
                 </Grid>
             </DataTemplate>
         </Grid.Resources>

@@ -395,7 +395,6 @@ Public MustInherit Class BaseViewModel2
                         .Name = "RightView",
                         .Content = New FlexibleViewModel With {
                             .MainViewContent = [setup](AppInfo, ViewModel),
-                            .BottomViewHeight = 150.0,
                             .BottomViewContent = New ViewItemModel With {
                                 .Name = "HistTabs",
                                 .Content = htvm
