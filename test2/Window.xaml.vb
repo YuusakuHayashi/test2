@@ -26,55 +26,15 @@ Public Class Window
         Me.DataContext = vm
     End Sub
 
-    Private Sub MainView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    Private Sub ContentPanel_SizeChanged(sender As Object, e As SizeChangedEventArgs)
         DelegateEventListener.Instance.RaiseViewResized(sender, e)
     End Sub
 
-    Private Sub RightView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    Private Sub RightPanel_SizeChanged(sender As Object, e As SizeChangedEventArgs)
         DelegateEventListener.Instance.RaiseViewResized(sender, e)
     End Sub
 
-    Private Sub BottomView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    Private Sub BottomPanel_SizeChanged(sender As Object, e As SizeChangedEventArgs)
         DelegateEventListener.Instance.RaiseViewResized(sender, e)
     End Sub
-
-    'Private Sub GridSplitter_Drop(sender As Object, e As DragEventArgs)
-    '    DelegateEventListener.Instance.RaiseMultiViewRowGridSplitterChanged(sender)
-    'End Sub
-
-    'Private Sub GridSplitter_DragOver(sender As Object, e As DragEventArgs)        Me.r
-    '    DelegateEventListener.Instance.RaiseMultiViewRowGridSplitterChanged(sender)
-    'End Sub
-
-    'Private Sub ExplorerView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
-    'End Sub
-
-    'Private Sub MainView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
-    'End Sub
-
-    'Private Sub HistoryView_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseMultiViewSizeChanged(sender)
-    'End Sub
-
-    'Private Sub HorizontalSplitter_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseViewResized(sender)
-    'End Sub
-
-    'Private Sub VerticalSplitter_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseViewResized(sender)
-    'End Sub
-
-    'Private Sub GridSplitter_KeyDown(sender As Object, e As KeyEventArgs)
-    '    If e.Key = Key.F2 Then
-    '        DelegateEventListener.Instance.RaiseMultiViewRowGridSplitterChanged(sender)
-    '    End If
-    'End Sub
-
-    'Private Sub GridSplitter_KeyUp(sender As Object, e As KeyEventArgs)
-    '    If e.Key = Key.F2 Then
-    '        DelegateEventListener.Instance.RaiseMultiViewRowGridSplitterChanged(sender)
-    '    End If
-    'End Sub
 End Class

@@ -59,12 +59,12 @@
 
     Private Sub _ViewResizedAccept(ByRef sender As Object)
         Select Case sender.Name
-            Case "MainView"
+            Case "ContentPanel"
                 sender.DataContext.ContentViewWidth = sender.ActualWidth
                 sender.DataContext.ContentViewHeight = sender.ActualHeight
-            Case "RightView"
+            Case "RightPanel"
                 sender.DataContext.RightViewWidth = sender.ActualWidth
-            Case "BottomView"
+            Case "BottomPanel"
                 sender.DataContext.BottomViewHeight = sender.ActualHeight
         End Select
     End Sub

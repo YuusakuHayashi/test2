@@ -612,9 +612,7 @@
 
             <DataTemplate
                 DataType="{x:Type local:UserDirectoryViewModel}">
-                <DockPanel
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch">
+                <DockPanel>
                     <StackPanel
                         Margin="10,0,0,0"
                         DockPanel.Dock="Left">
@@ -1678,67 +1676,89 @@
                 </Grid>
             </DataTemplate>
 
+
+            <DataTemplate DataType="{x:Type local:FrameViewModel}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding Column1GridWidth}" />
+                        <ColumnDefinition Width="{Binding Column1Column2GridSplitterWidth}" />
+                        <ColumnDefinition Width="{Binding Column2GridWidth}" />
+                        <ColumnDefinition Width="{Binding Column2Column3GridSplitterWidth}" />
+                        <ColumnDefinition Width="{Binding Column3GridWidth}" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{Binding Row1GridHeight}" />
+                        <RowDefinition Height="{Binding Row1Row2GridSplitterHeight}" />
+                        <RowDefinition Height="{Binding Row2GridHeight}" />
+                        <RowDefinition Height="{Binding Row2Row3GridSplitterHeight}" />
+                        <RowDefinition Height="{Binding Row3GridHeight}" />
+                    </Grid.RowDefinitions>
+                </Grid>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type local:FlexibleViewModel}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <!--<ColumnDefinition Width="{Binding ContentGridWidth}" />
-                        <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
-                        <ColumnDefinition Width="{Binding RightGridWidth}" />-->
                         <ColumnDefinition Width="{Binding ContentGridWidth}" />
+                        <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
+                        <ColumnDefinition Width="{Binding RightGridWidth}" />
+                        <!--<ColumnDefinition Width="*" />
                         <ColumnDefinition Width="5" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />-->
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <!--<RowDefinition Height="{Binding ContentGridHeight}" />
-                        <RowDefinition Height="{Binding HorizontalSplitterHeight}" />
-                        <RowDefinition Height="{Binding BottomGridHeight}" />-->
                         <RowDefinition Height="{Binding ContentGridHeight}" />
+                        <RowDefinition Height="{Binding VerticalSplitterHeight}" />
+                        <RowDefinition Height="{Binding BottomGridHeight}" />
+                        <!--<RowDefinition Height="*" />
                         <RowDefinition Height="5" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />-->
                     </Grid.RowDefinitions>
                     <StackPanel 
                         x:Name="ContentPanel"
+                        SizeChanged="ContentPanel_SizeChanged"
                         Height="{Binding ContentViewHeight, Mode=OneWayToSource}"
                         Width="{Binding ContentViewWidth, Mode=OneWayToSource}"
                         Grid.Row="0" Grid.Column="0">
-                        <StackPanel Orientation="Horizontal">
+                        <!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="Hight=" />
                             <TextBlock Text="{Binding ContentViewHeight}" />
                             <TextBlock Text=", " />
                             <TextBlock Text="Width=" />
                             <TextBlock Text="{Binding ContentViewWidth}" />
-                        </StackPanel>
+                        </StackPanel>-->
                         <ContentControl
                             x:Name="MainView" 
-                            SizeChanged="MainView_SizeChanged"
                             Content="{Binding MainContent}" />
                     </StackPanel>
                     <StackPanel
+                        x:Name="RightPanel"
+                        SizeChanged="RightPanel_SizeChanged"
                         Grid.Row="0" Grid.Column="2">
-                        <StackPanel Orientation="Horizontal">
+                        <!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="RightWidth=" />
                             <TextBlock Text="{Binding RightViewWidth}" />
-                        </StackPanel>
+                        </StackPanel>-->
                         <ContentControl
                             x:Name="RightView"                                    
-                            SizeChanged="RightView_SizeChanged"
                             Content="{Binding RightContent}" />
                     </StackPanel>
                     <StackPanel
+                        x:Name="BottomPanel"
+                        SizeChanged="BottomPanel_SizeChanged"
                         Grid.Row="2" Grid.Column="0">
-                        <StackPanel Orientation="Horizontal">
+                        <!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="BottomHeight=" />
                             <TextBlock Text="{Binding BottomViewHeight}" />
-                        </StackPanel>
+                        </StackPanel>-->
                         <ContentControl
                             x:Name="BottomView"
-                            SizeChanged="BottomView_SizeChanged"
                             Content="{Binding BottomContent}" />
                     </StackPanel>
                     <GridSplitter
                         x:Name="HorizontalSplitter"
                         IsEnabled="{Binding IsHorizontalSplitterEnabled}"
-                        Grid.Row="0" Grid.RowSpan="2"
+                        Grid.Row="0" Grid.RowSpan="3"
                         Grid.Column="1"                                         
                         ResizeDirection="Columns"                
                         ResizeBehavior="PreviousAndNext"
@@ -1747,7 +1767,7 @@
                     <GridSplitter
                         x:Name="VerticalSplitter"                        
                         IsEnabled="{Binding IsVerticalSplitterEnabled}"
-                        Grid.Column="0" Grid.ColumnSpan="2"
+                        Grid.Column="0" Grid.ColumnSpan="3"
                         Grid.Row="1"
                         ResizeDirection="Rows"
                         ResizeBehavior="PreviousAndNext"
