@@ -1680,19 +1680,92 @@
             <DataTemplate DataType="{x:Type local:FrameViewModel}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding Column1GridWidth}" />
-                        <ColumnDefinition Width="{Binding Column1Column2GridSplitterWidth}" />
-                        <ColumnDefinition Width="{Binding Column2GridWidth}" />
-                        <ColumnDefinition Width="{Binding Column2Column3GridSplitterWidth}" />
-                        <ColumnDefinition Width="{Binding Column3GridWidth}" />
+                        <ColumnDefinition Width="{Binding LeftExplorerGridWidth}" />
+                        <ColumnDefinition Width="{Binding LeftExplorerMainGridSplitterWidth}" />
+                        <ColumnDefinition Width="{Binding MainGridWidth}" />
+                        <ColumnDefinition Width="{Binding RightExplorerMainGridSplitterWidth}" />
+                        <ColumnDefinition Width="{Binding RightExplorerGridWidth}" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="{Binding Row1GridHeight}" />
-                        <RowDefinition Height="{Binding Row1Row2GridSplitterHeight}" />
-                        <RowDefinition Height="{Binding Row2GridHeight}" />
-                        <RowDefinition Height="{Binding Row2Row3GridSplitterHeight}" />
-                        <RowDefinition Height="{Binding Row3GridHeight}" />
+                        <RowDefinition Height="{Binding MenuGridHeight}" />
+                        <RowDefinition Height="{Binding MenuMainGridSplitterHeight}" />
+                        <RowDefinition Height="{Binding MainGridHeight}" />
+                        <RowDefinition Height="{Binding MainHistoryGridSplitterHeight}" />
+                        <RowDefinition Height="{Binding HistoryGridHeight}" />
                     </Grid.RowDefinitions>
+                    <StackPanel 
+                        Height="{Binding MenuViewHeight, Mode=OneWayToSource}"
+                        Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
+                        <ContentControl
+                            x:Name="MenuContent"
+                            Content="{Binding MenuContent}">
+                        </ContentControl>
+                    </StackPanel>
+                    <StackPanel 
+                        Width="{Binding LeftExplorerViewWidth, Mode=OneWayToSource}"
+                        Grid.Row="1" Grid.Column="0" Grid.RowSpan="4">
+                        <ContentControl
+                            x:Name="LeftExplorerContent"
+                            Content="{Binding LeftExplorerContent}">
+                        </ContentControl>
+                    </StackPanel>
+                    <StackPanel 
+                        Height="{Binding MainViewHeight, Mode=OneWayToSource}"
+                        Width="{Binding MainViewWidth, Mode=OneWayToSource}"
+                        Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3">
+                        <ContentControl
+                            x:Name="MainContent"
+                            Content="{Binding MainContent}">
+                        </ContentControl>
+                    </StackPanel>
+                    <StackPanel 
+                        Width="{Binding RightExplorerViewWidth, Mode=OneWayToSource}"
+                        Grid.Row="1" Grid.Column="4" Grid.RowSpan="4">
+                        <ContentControl
+                            x:Name="RightExplorerContent"
+                            Content="{Binding RightExplorerContent}">
+                        </ContentControl>
+                    </StackPanel>
+                    <StackPanel 
+                        Height="{Binding HistoryViewHeight, Mode=OneWayToSource}"
+                        Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3">
+                        <ContentControl
+                            x:Name="HistoryContent"
+                            Content="{Binding HistoryContent}">
+                        </ContentControl>
+                    </StackPanel>
+                    <GridSplitter
+                        IsEnabled="{Binding IsLeftExplorerContentMainContentGridSplitterEnabled}"
+                        Grid.Row="1" Grid.RowSpan="3"
+                        Grid.Column="1"                                         
+                        ResizeDirection="Rows"                
+                        ResizeBehavior="PreviousAndNext"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsRightExplorerContentMainContentGridSplitterEnabled}"
+                        Grid.Row="1" Grid.RowSpan="3"
+                        Grid.Column="4"
+                        ResizeDirection="Rows"
+                        ResizeBehavior="PreviousAndNext"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsMenuContentMainContentGridSplitterEnabled}"
+                        Grid.Row="1"
+                        Grid.Column="1" Grid.ColumnSpan="3"
+                        ResizeDirection="Columns"                
+                        ResizeBehavior="PreviousAndNext"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsMainContentHistoryContentGridSplitterEnabled}"
+                        Grid.Row="4"
+                        Grid.Column="1" Grid.ColumnSpan="3"
+                        ResizeDirection="Columns"                
+                        ResizeBehavior="PreviousAndNext"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
                 </Grid>
             </DataTemplate>
 
