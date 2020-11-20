@@ -573,7 +573,7 @@
                 <TabControl    
                     SelectedIndex="{Binding SelectedIndex}"
                     SelectedItem="{Binding SelectedItem}"
-                    ItemsSource="{Binding Tabs}">
+                    ItemsSource="{Binding ViewTabs}">
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="{Binding Color}">
@@ -1683,7 +1683,7 @@
                         <ColumnDefinition Width="{Binding LeftExplorerGridWidth}" />
                         <ColumnDefinition Width="{Binding LeftExplorerMainGridSplitterWidth}" />
                         <ColumnDefinition Width="{Binding MainGridWidth}" />
-                        <ColumnDefinition Width="{Binding RightExplorerMainGridSplitterWidth}" />
+                        <ColumnDefinition Width="{Binding MainRightExplorerGridSplitterWidth}" />
                         <ColumnDefinition Width="{Binding RightExplorerGridWidth}" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -1694,75 +1694,76 @@
                         <RowDefinition Height="{Binding HistoryGridHeight}" />
                     </Grid.RowDefinitions>
                     <StackPanel 
+                        Visibility="{Binding MenuContentVisibility}"
                         Height="{Binding MenuViewHeight, Mode=OneWayToSource}"
                         Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
                         <ContentControl
                             x:Name="MenuContent"
-                            Content="{Binding MenuContent}">
+                            Content="{Binding MenuViewContent.Content}">
                         </ContentControl>
                     </StackPanel>
                     <StackPanel 
                         Width="{Binding LeftExplorerViewWidth, Mode=OneWayToSource}"
-                        Grid.Row="1" Grid.Column="0" Grid.RowSpan="4">
+                        Grid.Row="2" Grid.Column="0" Grid.RowSpan="3">
                         <ContentControl
                             x:Name="LeftExplorerContent"
-                            Content="{Binding LeftExplorerContent}">
+                            Content="{Binding LeftExplorerViewContent.Content}">
                         </ContentControl>
                     </StackPanel>
                     <StackPanel 
                         Height="{Binding MainViewHeight, Mode=OneWayToSource}"
                         Width="{Binding MainViewWidth, Mode=OneWayToSource}"
-                        Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3">
+                        Grid.Row="2" Grid.Column="2">
                         <ContentControl
                             x:Name="MainContent"
-                            Content="{Binding MainContent}">
+                            Content="{Binding MainViewContent.Content}">
                         </ContentControl>
                     </StackPanel>
                     <StackPanel 
                         Width="{Binding RightExplorerViewWidth, Mode=OneWayToSource}"
-                        Grid.Row="1" Grid.Column="4" Grid.RowSpan="4">
+                        Grid.Row="2" Grid.Column="4" Grid.RowSpan="3">
                         <ContentControl
                             x:Name="RightExplorerContent"
-                            Content="{Binding RightExplorerContent}">
+                            Content="{Binding RightExplorerViewContent.Content}">
                         </ContentControl>
                     </StackPanel>
                     <StackPanel 
                         Height="{Binding HistoryViewHeight, Mode=OneWayToSource}"
-                        Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3">
+                        Grid.Row="4" Grid.Column="2">
                         <ContentControl
                             x:Name="HistoryContent"
-                            Content="{Binding HistoryContent}">
+                            Content="{Binding HistoryViewContent.Content}">
                         </ContentControl>
                     </StackPanel>
                     <GridSplitter
-                        IsEnabled="{Binding IsLeftExplorerContentMainContentGridSplitterEnabled}"
-                        Grid.Row="1" Grid.RowSpan="3"
+                        IsEnabled="{Binding IsLeftExplorerMainGridSplitterEnabled}"
+                        Grid.Row="1" Grid.RowSpan="4"
                         Grid.Column="1"                                         
+                        ResizeDirection="Columns"                
+                        ResizeBehavior="PreviousAndNext"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsRightExplorerMainGridSplitterEnabled}"
+                        Grid.Row="1" Grid.RowSpan="4"
+                        Grid.Column="3"
+                        ResizeDirection="Columns"
+                        ResizeBehavior="PreviousAndNext"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsMenuMainGridSplitterEnabled}"
+                        Grid.Row="1"
+                        Grid.Column="0" Grid.ColumnSpan="5"
                         ResizeDirection="Rows"                
                         ResizeBehavior="PreviousAndNext"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                     <GridSplitter
-                        IsEnabled="{Binding IsRightExplorerContentMainContentGridSplitterEnabled}"
-                        Grid.Row="1" Grid.RowSpan="3"
-                        Grid.Column="4"
-                        ResizeDirection="Rows"
-                        ResizeBehavior="PreviousAndNext"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />
-                    <GridSplitter
-                        IsEnabled="{Binding IsMenuContentMainContentGridSplitterEnabled}"
-                        Grid.Row="1"
+                        IsEnabled="{Binding IsMainHistoryGridSplitterEnabled}"
+                        Grid.Row="3"
                         Grid.Column="1" Grid.ColumnSpan="3"
-                        ResizeDirection="Columns"                
-                        ResizeBehavior="PreviousAndNext"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />
-                    <GridSplitter
-                        IsEnabled="{Binding IsMainContentHistoryContentGridSplitterEnabled}"
-                        Grid.Row="4"
-                        Grid.Column="1" Grid.ColumnSpan="3"
-                        ResizeDirection="Columns"                
+                        ResizeDirection="Rows"                
                         ResizeBehavior="PreviousAndNext"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />

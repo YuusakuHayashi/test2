@@ -44,31 +44,57 @@ Public Class ViewModel
         End Set
     End Property
 
-    Private _Content As FlexibleViewModel
-    Public Property Content As FlexibleViewModel
+    Private _Content As FrameViewModel
+    Public Property Content As FrameViewModel
         Get
             Return Me._Content
         End Get
-        Set(value As FlexibleViewModel)
+        Set(value As FrameViewModel)
             Me._Content = value
             RaisePropertyChanged("Content")
         End Set
     End Property
 
-    Private _SaveContent As FlexibleViewModel
+    Private _SaveContent As FrameViewModel
     <JsonIgnore>
-    Public Property SaveContent As FlexibleViewModel
+    Public Property SaveContent As FrameViewModel
         Get
             Return Me._SaveContent
         End Get
-        Set(value As FlexibleViewModel)
+        Set(value As FrameViewModel)
             Me._SaveContent = value
         End Set
     End Property
 
-    Public Sub VisualizeView(ByVal fvm As FlexibleViewModel)
+    'Private _Content As FlexibleViewModel
+    'Public Property Content As FlexibleViewModel
+    '    Get
+    '        Return Me._Content
+    '    End Get
+    '    Set(value As FlexibleViewModel)
+    '        Me._Content = value
+    '        RaisePropertyChanged("Content")
+    '    End Set
+    'End Property
+
+    'Private _SaveContent As FlexibleViewModel
+    '<JsonIgnore>
+    'Public Property SaveContent As FlexibleViewModel
+    '    Get
+    '        Return Me._SaveContent
+    '    End Get
+    '    Set(value As FlexibleViewModel)
+    '        Me._SaveContent = value
+    '    End Set
+    'End Property
+
+    'Public Sub VisualizeView(ByVal fvm As FlexibleViewModel)
+    '    Me.Views = Nothing
+    '    Me.Views = _CreateViews(fvm, Me.Views)
+    '    Me.Content = fvm
+    'End Sub
+    Public Sub VisualizeView(ByVal fvm As FrameViewModel)
         Me.Views = Nothing
-        Me.Views = _CreateViews(fvm, Me.Views)
         Me.Content = fvm
     End Sub
 
@@ -89,61 +115,61 @@ Public Class ViewModel
     '---------------------------------------------------------------------------------------------'
 
     Public Sub ReloadViews()
-        Me.Views = Nothing
-        Me.Views = _CreateViews(Me.Content, Me.Views)
+        'Me.Views = Nothing
+        'Me.Views = _CreateViews(Me.Content, Me.Views)
     End Sub
 
     Private Overloads Function _CreateViews(ByVal fvm As FlexibleViewModel,
                                             ByVal vims As ObservableCollection(Of ViewItemModel)) As ObservableCollection(Of ViewItemModel)
 
-        Dim fnc As Func(Of ViewItemModel, ObservableCollection(Of ViewItemModel), ObservableCollection(Of ViewItemModel))
-        fnc = Function(ByVal v As ViewItemModel, ByVal vs As ObservableCollection(Of ViewItemModel)) As ObservableCollection(Of ViewItemModel)
-                  Dim fvm2 As FlexibleViewModel
-                  Dim tvm As TabViewModel
-                  Select Case v.Content.GetType.Name
-                      Case "FlexibleViewModel"
-                          fvm2 = CType(v.Content, FlexibleViewModel)
-                          vs = _CreateViews(fvm2, vs)
-                      Case "TabViewModel"
-                          tvm = CType(v.Content, TabViewModel)
-                          vs = _CreateViews(tvm, vs)
-                      Case Else
-                          vs.Add(v)
-                  End Select
-                  Return vs
-              End Function
+        'Dim fnc As Func(Of ViewItemModel, ObservableCollection(Of ViewItemModel), ObservableCollection(Of ViewItemModel))
+        'fnc = Function(ByVal v As ViewItemModel, ByVal vs As ObservableCollection(Of ViewItemModel)) As ObservableCollection(Of ViewItemModel)
+        '          Dim fvm2 As FlexibleViewModel
+        '          Dim tvm As TabViewModel
+        '          Select Case v.Content.GetType.Name
+        '              Case "FlexibleViewModel"
+        '                  fvm2 = CType(v.Content, FlexibleViewModel)
+        '                  vs = _CreateViews(fvm2, vs)
+        '              Case "TabViewModel"
+        '                  tvm = CType(v.Content, TabViewModel)
+        '                  vs = _CreateViews(tvm, vs)
+        '              Case Else
+        '                  vs.Add(v)
+        '          End Select
+        '          Return vs
+        '      End Function
 
-        If fvm.MainContent IsNot Nothing Then
-            vims = fnc(fvm.MainViewContent, vims)
-        End If
-        If fvm.RightContent IsNot Nothing Then
-            vims = fnc(fvm.RightViewContent, vims)
-        End If
-        If fvm.BottomContent IsNot Nothing Then
-            vims = fnc(fvm.BottomViewContent, vims)
-        End If
-        _CreateViews = vims
+        'If fvm.MainContent IsNot Nothing Then
+        '    vims = fnc(fvm.MainViewContent, vims)
+        'End If
+        'If fvm.RightContent IsNot Nothing Then
+        '    vims = fnc(fvm.RightViewContent, vims)
+        'End If
+        'If fvm.BottomContent IsNot Nothing Then
+        '    vims = fnc(fvm.BottomViewContent, vims)
+        'End If
+        '_CreateViews = vims
     End Function
 
     Private Overloads Function _CreateViews(ByVal tvm As TabViewModel,
                                             ByVal vims As ObservableCollection(Of ViewItemModel)) As ObservableCollection(Of ViewItemModel)
-        Dim fvm As FlexibleViewModel
-        Dim tvm2 As TabViewModel
-        For Each vt In tvm.ViewContentTabs
-            Select Case vt.Content.GetType.Name
-                Case "FlexibleViewModel"
-                    fvm = CType(vt.Content, FlexibleViewModel)
-                    vims = _CreateViews(fvm, vims)
-                Case "TabViewModel"
-                    tvm2 = CType(vt.Content, TabViewModel)
-                    vims = _CreateViews(tvm2, vims)
-                Case Else
-                    vims.Add(vt)
-            End Select
-        Next
-        _CreateViews = vims
+        'Dim fvm As FlexibleViewModel
+        'Dim tvm2 As TabViewModel
+        'For Each vt In tvm.ViewContentTabs
+        '    Select Case vt.Content.GetType.Name
+        '        Case "FlexibleViewModel"
+        '            fvm = CType(vt.Content, FlexibleViewModel)
+        '            vims = _CreateViews(fvm, vims)
+        '        Case "TabViewModel"
+        '            tvm2 = CType(vt.Content, TabViewModel)
+        '            vims = _CreateViews(tvm2, vims)
+        '        Case Else
+        '            vims.Add(vt)
+        '    End Select
+        'Next
+        '_CreateViews = vims
     End Function
 
-    Public Const SINGLE_VIEW As String = "Single"
-    Public Const MULTI_VIEW As String = "Multi"
+    'Public Const SINGLE_VIEW As String = "Single"
+    'Public Const MULTI_VIEW As String = "Multi"
 End Class

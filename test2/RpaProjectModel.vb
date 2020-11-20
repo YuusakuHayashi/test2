@@ -20,26 +20,31 @@ Public Class RpaProjectModel : Inherits ProjectModel
             Me._Rpas = value
         End Set
     End Property
+
     Public ReadOnly Property RootSysDirectoryName As String
         Get
             Return Me.RootDirectoryName & "\sys"
         End Get
     End Property
+
     Public ReadOnly Property SysDirectoryName As String
         Get
             Return Me.SystemDirectoryName & "\sys"
         End Get
     End Property
+
     Public ReadOnly Property MyDirFileName As String
         Get
             Return Me.SystemDirectoryName & "\mydir"
         End Get
     End Property
+
     Public ReadOnly Property MyPythonFileName As String
         Get
             Return Me.SystemDirectoryName & "\mypython"
         End Get
     End Property
+
     Public ReadOnly Property RpaProjectFileName As String
         Get
             Return Me.SystemDirectoryName & "\rpa_project.yaml"

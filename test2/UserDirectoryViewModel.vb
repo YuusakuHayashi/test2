@@ -431,7 +431,7 @@ Public Class UserDirectoryViewModel
         Me.CurrentProjects = AppInfo.CurrentProjects
         Me.FixedProjects = AppInfo.FixedProjects
 
-        Dim fvm = New FlexibleViewModel With {
+        Dim fvm = New FrameViewModel With {
             .MainViewContent = New ViewItemModel With {
                 .Name = "プロジェクト選択",
                 .Content = Me

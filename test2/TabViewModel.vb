@@ -26,80 +26,123 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Set
     End Property
 
-    Private Property _SelectedItem As TabItemModel
-    Public Property SelectedItem As TabItemModel
+    ' 廃止検討中
+    'Private Property _SelectedItem As TabItemModel
+    'Public Property SelectedItem As TabItemModel
+    '    Get
+    '        Return Me._SelectedItem
+    '    End Get
+    '    Set(value As TabItemModel)
+    '        Me._SelectedItem = value
+    '        RaisePropertyChanged("SelectedItem")
+    '        Call _ChangeTabCloseButtonVisibilities(value)
+    '        Call _ChangeTabColors(value)
+    '    End Set
+    'End Property
+
+    Private Property _SelectedItem As ViewItemModel
+    Public Property SelectedItem As ViewItemModel
         Get
             Return Me._SelectedItem
         End Get
-        Set(value As TabItemModel)
+        Set(value As ViewItemModel)
             Me._SelectedItem = value
             RaisePropertyChanged("SelectedItem")
-            Call _ChangeTabCloseButtonVisibilities(value)
-            Call _ChangeTabColors(value)
+            'Call _ChangeTabCloseButtonVisibilities(value)
+            'Call _ChangeTabColors(value)
         End Set
     End Property
 
-    Private _Tabs As ObservableCollection(Of TabItemModel)
-    Public Property Tabs As ObservableCollection(Of TabItemModel)
+    Private _ViewTabs As ObservableCollection(Of ViewItemModel)
+    Public Property ViewTabs As ObservableCollection(Of ViewItemModel)
         Get
-            If Me._Tabs Is Nothing Then
-                Me._Tabs = New ObservableCollection(Of TabItemModel)
+            If Me._ViewTabs Is Nothing Then
+                Me._ViewTabs = New ObservableCollection(Of ViewItemModel)
             End If
-            Return Me._Tabs
-        End Get
-        Set(value As ObservableCollection(Of TabItemModel))
-            Me._Tabs = value
-        End Set
-    End Property
-
-    Private _PreservedTabs As ObservableCollection(Of TabItemModel)
-    Public Property PreservedTabs As ObservableCollection(Of TabItemModel)
-        Get
-            If Me._PreservedTabs Is Nothing Then
-                Me._PreservedTabs = New ObservableCollection(Of TabItemModel)
-            End If
-            Return Me._PreservedTabs
-        End Get
-        Set(value As ObservableCollection(Of TabItemModel))
-            Me._PreservedTabs = value
-        End Set
-    End Property
-
-    Private _ViewContentTabs As ObservableCollection(Of ViewItemModel)
-    Public Property ViewContentTabs As ObservableCollection(Of ViewItemModel)
-        Get
-            If Me._ViewContentTabs Is Nothing Then
-                Me._ViewContentTabs = New ObservableCollection(Of ViewItemModel)
-            End If
-            Return Me._ViewContentTabs
+            Return Me._ViewTabs
         End Get
         Set(value As ObservableCollection(Of ViewItemModel))
-            Me._ViewContentTabs = value
+            Me._ViewTabs = value
         End Set
     End Property
 
+    Private _PreservedViewTabs As ObservableCollection(Of ViewItemModel)
+    Public Property PreservedViewTabs As ObservableCollection(Of ViewItemModel)
+        Get
+            If Me._PreservedViewTabs Is Nothing Then
+                Me._PreservedViewTabs = New ObservableCollection(Of ViewItemModel)
+            End If
+            Return Me._PreservedViewTabs
+        End Get
+        Set(value As ObservableCollection(Of ViewItemModel))
+            Me._PreservedViewTabs = value
+        End Set
+    End Property
+
+    ' 廃止検討中
+    'Private _Tabs As ObservableCollection(Of TabItemModel)
+    'Public Property Tabs As ObservableCollection(Of TabItemModel)
+    '    Get
+    '        If Me._Tabs Is Nothing Then
+    '            Me._Tabs = New ObservableCollection(Of TabItemModel)
+    '        End If
+    '        Return Me._Tabs
+    '    End Get
+    '    Set(value As ObservableCollection(Of TabItemModel))
+    '        Me._Tabs = value
+    '    End Set
+    'End Property
+
+    ' 廃止検討中
+    'Private _PreservedTabs As ObservableCollection(Of TabItemModel)
+    'Public Property PreservedTabs As ObservableCollection(Of TabItemModel)
+    '    Get
+    '        If Me._PreservedTabs Is Nothing Then
+    '            Me._PreservedTabs = New ObservableCollection(Of TabItemModel)
+    '        End If
+    '        Return Me._PreservedTabs
+    '    End Get
+    '    Set(value As ObservableCollection(Of TabItemModel))
+    '        Me._PreservedTabs = value
+    '    End Set
+    'End Property
+
+    ' 廃止検討中
+    'Private _ViewContentTabs As ObservableCollection(Of ViewItemModel)
+    'Public Property ViewContentTabs As ObservableCollection(Of ViewItemModel)
+    '    Get
+    '        If Me._ViewContentTabs Is Nothing Then
+    '            Me._ViewContentTabs = New ObservableCollection(Of ViewItemModel)
+    '        End If
+    '        Return Me._ViewContentTabs
+    '    End Get
+    '    Set(value As ObservableCollection(Of ViewItemModel))
+    '        Me._ViewContentTabs = value
+    '    End Set
+    'End Property
+
     Private Sub _ChangeTabCloseButtonVisibilities(ByVal [tab] As TabItemModel)
-        If Me.Tabs IsNot Nothing Then
-            For Each t In Me.Tabs
-                If t.Equals([tab]) Then
-                    t.TabCloseButtonVisibility = Visibility.Visible
-                Else
-                    t.TabCloseButtonVisibility = Visibility.Collapsed
-                End If
-            Next
-        End If
+        'If Me.Tabs IsNot Nothing Then
+        '    For Each t In Me.Tabs
+        '        If t.Equals([tab]) Then
+        '            t.TabCloseButtonVisibility = Visibility.Visible
+        '        Else
+        '            t.TabCloseButtonVisibility = Visibility.Collapsed
+        '        End If
+        '    Next
+        'End If
     End Sub
 
     Private Sub _ChangeTabColors(ByVal [tab] As TabItemModel)
-        If Me.Tabs IsNot Nothing Then
-            For Each t In Me.Tabs
-                If t.Equals([tab]) Then
-                    t.Color = Colors.Goldenrod
-                Else
-                    t.Color = Colors.White
-                End If
-            Next
-        End If
+        'If Me.Tabs IsNot Nothing Then
+        '    For Each t In Me.Tabs
+        '        If t.Equals([tab]) Then
+        '            t.Color = Colors.Goldenrod
+        '        Else
+        '            t.Color = Colors.White
+        '        End If
+        '    Next
+        'End If
     End Sub
 
     'Public Overloads Sub AddTab(ByVal [tab] As TabItemModel)
@@ -129,61 +172,89 @@ Public Class TabViewModel : Inherits BaseViewModel
     '    End If
     'End Sub
 
+    'Public Overloads Sub AddTab(ByVal vim As ViewItemModel)
+    '    Dim idx = -1
+
+    '    vim.WrapperName = Me.Name
+
+    '    For Each vt In Me.ViewContentTabs
+    '        If vt.Name = vim.Name Then
+    '            idx = Me.ViewContentTabs.IndexOf(vt)
+    '            Exit For
+    '        End If
+    '    Next
+    '    If idx > -1 Then
+    '        Me.ViewContentTabs(idx) = vim
+    '    Else
+    '        Me.ViewContentTabs.Add(vim)
+    '    End If
+
+    '    Dim tim = New TabItemModel With {
+    '        .Name = vim.Name,
+    '        .ViewContent = vim
+    '    }
+
+    '    idx = -1
+    '    For Each t In Me.Tabs
+    '        If t.Name = vim.Name Then
+    '            idx = Me.Tabs.IndexOf(t)
+    '            Exit For
+    '        End If
+    '    Next
+    '    If idx > -1 Then
+    '        Me.Tabs(idx) = tim
+    '    Else
+    '        Me.Tabs.Add(tim)
+    '    End If
+    'End Sub
+
     Public Overloads Sub AddTab(ByVal vim As ViewItemModel)
         Dim idx = -1
-
-        vim.WrapperName = Me.Name
-
-        For Each vt In Me.ViewContentTabs
+        For Each vt In Me.ViewTabs
             If vt.Name = vim.Name Then
-                idx = Me.ViewContentTabs.IndexOf(vt)
+                idx = Me.ViewTabs.IndexOf(vt)
                 Exit For
             End If
         Next
         If idx > -1 Then
-            Me.ViewContentTabs(idx) = vim
+            Me.ViewTabs(idx) = vim
         Else
-            Me.ViewContentTabs.Add(vim)
+            Me.ViewTabs.Add(vim)
         End If
 
-        Dim tim = New TabItemModel With {
-            .Name = vim.Name,
-            .ViewContent = vim
-        }
-
         idx = -1
-        For Each t In Me.Tabs
-            If t.Name = vim.Name Then
-                idx = Me.Tabs.IndexOf(t)
+        For Each pvt In Me.PreservedViewTabs
+            If pvt.Name = vim.Name Then
+                idx = Me.PreservedViewTabs.IndexOf(pvt)
                 Exit For
             End If
         Next
         If idx > -1 Then
-            Me.Tabs(idx) = tim
+            Me.PreservedViewTabs(idx) = vim
         Else
-            Me.Tabs.Add(tim)
+            Me.PreservedViewTabs.Add(vim)
         End If
     End Sub
 
     '--- タブを閉じる関連 ------------------------------------------------------------------------'
     Private Sub _TabCloseRequestedReview(ByVal t As TabItemModel, ByVal e As System.EventArgs)
-        If Me.Tabs.Contains(t) Then
-            Call _TabCloseRequestAccept(t)
-        End If
+        'If Me.Tabs.Contains(t) Then
+        '    Call _TabCloseRequestAccept(t)
+        'End If
     End Sub
 
     Private Sub _TabCloseRequestAccept(ByVal [tab] As TabItemModel)
-        Me.Tabs.Remove([tab])
-        For Each vt In Me.ViewContentTabs
-            If vt.Name = [tab].ViewContent.Name Then
-                vt.IsVisible = False
-                Exit For
-            End If
-        Next
+        'Me.Tabs.Remove([tab])
+        'For Each vt In Me.ViewContentTabs
+        '    If vt.Name = [tab].ViewContent.Name Then
+        '        vt.IsVisible = False
+        '        Exit For
+        '    End If
+        'Next
 
-        If Me.Tabs.Count = 0 Then
-            Call DelegateEventListener.Instance.RaiseTabViewClosed()
-        End If
+        'If Me.Tabs.Count = 0 Then
+        '    Call DelegateEventListener.Instance.RaiseTabViewClosed()
+        'End If
     End Sub
 
     Private Sub _TabCloseAddHandler()

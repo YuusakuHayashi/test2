@@ -94,43 +94,43 @@
     End Sub
 
     Private Sub _TabViewClosedReview(ByVal sender As Object, ByVal e As System.EventArgs)
-        Call _TabViewClosedAccept(ViewModel.Content)
-        Call DelegateEventListener.Instance.RaiseFlexViewOptimizationRequested()
+        'Call _TabViewClosedAccept(ViewModel.Content)
+        'Call DelegateEventListener.Instance.RaiseFlexViewOptimizationRequested()
     End Sub
 
     Private Sub _TabViewClosedAccept(ByRef fvm As FlexibleViewModel)
-        Dim fnc As Func(Of Object, String, Boolean)
-        fnc = Function(ByVal obj As Object, [name] As String)
-                  Dim b = False
-                  Dim fvm2 As FlexibleViewModel
-                  Select Case [name]
-                      Case "FlexibleViewModel"
-                          fvm2 = CType(obj, FlexibleViewModel)
-                          Call _TabViewClosedAccept(fvm2)
-                      Case "TabViewModel"
-                          If obj.Tabs.Count = 0 Then
-                              b = True
-                          End If
-                      Case Else
-                  End Select
-                  Return b
-              End Function
+        'Dim fnc As Func(Of Object, String, Boolean)
+        'fnc = Function(ByVal obj As Object, [name] As String)
+        '          Dim b = False
+        '          Dim fvm2 As FlexibleViewModel
+        '          Select Case [name]
+        '              Case "FlexibleViewModel"
+        '                  fvm2 = CType(obj, FlexibleViewModel)
+        '                  Call _TabViewClosedAccept(fvm2)
+        '              Case "TabViewModel"
+        '                  If obj.Tabs.Count = 0 Then
+        '                      b = True
+        '                  End If
+        '              Case Else
+        '          End Select
+        '          Return b
+        '      End Function
 
-        If fvm.MainContent IsNot Nothing Then
-            If fnc(fvm.MainContent, fvm.MainViewContent.ModelName) Then
-                fvm.MainContent = Nothing
-            End If
-        End If
-        If fvm.RightContent IsNot Nothing Then
-            If fnc(fvm.RightContent, fvm.RightViewContent.ModelName) Then
-                fvm.RightContent = Nothing
-            End If
-        End If
-        If fvm.BottomContent IsNot Nothing Then
-            If fnc(fvm.BottomContent, fvm.BottomViewContent.ModelName) Then
-                fvm.BottomContent = Nothing
-            End If
-        End If
+        'If fvm.MainContent IsNot Nothing Then
+        '    If fnc(fvm.MainContent, fvm.MainViewContent.ModelName) Then
+        '        fvm.MainContent = Nothing
+        '    End If
+        'End If
+        'If fvm.RightContent IsNot Nothing Then
+        '    If fnc(fvm.RightContent, fvm.RightViewContent.ModelName) Then
+        '        fvm.RightContent = Nothing
+        '    End If
+        'End If
+        'If fvm.BottomContent IsNot Nothing Then
+        '    If fnc(fvm.BottomContent, fvm.BottomViewContent.ModelName) Then
+        '        fvm.BottomContent = Nothing
+        '    End If
+        'End If
     End Sub
     '---------------------------------------------------------------------------------------------'
 
@@ -164,9 +164,9 @@
     End Sub
 
     Private Sub _OpenViewRequestedReview(ByVal v As ViewItemModel, ByVal e As System.EventArgs)
-        Dim vims As New List(Of ViewItemModel)
-        vims = _CheckViewItemList(vims, v, ViewModel.Content)
-        Call _OpenViewRequestAccept(ViewModel.Content, vims)
+        'Dim vims As New List(Of ViewItemModel)
+        'vims = _CheckViewItemList(vims, v, ViewModel.Content)
+        'Call _OpenViewRequestAccept(ViewModel.Content, vims)
     End Sub
 
     Private Function _PopData(Of T As {New, IList})(ByVal [old] As T) As T
@@ -180,66 +180,66 @@
     End Function
 
     Private Overloads Sub _OpenViewSet(ByRef obj As Object, ByVal vim As ViewItemModel, ByVal vims As List(Of ViewItemModel))
-        Select Case vim.ModelName
-            Case "FlexibleViewModel"
-                Call _OpenFlexViewSet(obj, vim, vims)
-            Case "TabViewModel"
-                Call _OpenTabViewSet(obj, vim, vims)
-            Case Else
-                obj = vim.Content
-        End Select
+        'Select Case vim.ModelName
+        '    Case "FlexibleViewModel"
+        '        Call _OpenFlexViewSet(obj, vim, vims)
+        '    Case "TabViewModel"
+        '        Call _OpenTabViewSet(obj, vim, vims)
+        '    Case Else
+        '        obj = vim.Content
+        'End Select
     End Sub
 
     Private Overloads Sub _OpenFlexViewSet(ByRef obj As Object, ByVal vim As ViewItemModel, ByVal vims As List(Of ViewItemModel))
-        Dim fvm As FlexibleViewModel
-        obj = New FlexibleViewModel With {
-            .Name = vim.Content.Name,
-            .ContentViewWidth = IIf(vim.Content.ContentViewWidth > 0.0, vim.Content.ContentViewWidth, 0.0),
-            .ContentViewHeight = IIf(vim.Content.ContentViewHeight > 0.0, vim.Content.ContentViewHeight, 0.0)
-        }
-        fvm = CType(obj, FlexibleViewModel)
-        Call _OpenViewRequestAccept(fvm, vims)
+        'Dim fvm As FlexibleViewModel
+        'obj = New FlexibleViewModel With {
+        '    .Name = vim.Content.Name,
+        '    .ContentViewWidth = IIf(vim.Content.ContentViewWidth > 0.0, vim.Content.ContentViewWidth, 0.0),
+        '    .ContentViewHeight = IIf(vim.Content.ContentViewHeight > 0.0, vim.Content.ContentViewHeight, 0.0)
+        '}
+        'fvm = CType(obj, FlexibleViewModel)
+        'Call _OpenViewRequestAccept(fvm, vims)
     End Sub
 
     Private Overloads Sub _OpenTabViewSet(ByRef obj As Object, ByVal vim As ViewItemModel, ByVal vims As List(Of ViewItemModel))
-        Dim tvm As TabViewModel
-        obj = New TabViewModel
-        tvm = CType(obj, TabViewModel)
-        Call _OpenViewRequestAccept(tvm, vim, vims)
+        'Dim tvm As TabViewModel
+        'obj = New TabViewModel
+        'tvm = CType(obj, TabViewModel)
+        'Call _OpenViewRequestAccept(tvm, vim, vims)
     End Sub
 
     Private Overloads Sub _OpenViewRequestAccept(ByRef fvm As FlexibleViewModel,
                                                  ByVal vims As List(Of ViewItemModel))
-        If fvm.MainViewContent IsNot Nothing Then
-            If fvm.MainViewContent.Name = vims(0).Name Then
-                If fvm.MainContent Is Nothing Then
-                    Call _OpenViewSet(fvm.MainContent, fvm.MainViewContent, vims)
-                Else
-                    vims = IIf(fvm.MainViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
-                    Call _OpenViewRequestAccept(fvm.MainContent, fvm.MainViewContent, vims)
-                End If
-            End If
-        End If
-        If fvm.RightViewContent IsNot Nothing Then
-            If fvm.RightViewContent.Name = vims(0).Name Then
-                If fvm.RightContent Is Nothing Then
-                    Call _OpenViewSet(fvm.RightContent, fvm.RightViewContent, vims)
-                Else
-                    vims = IIf(fvm.RightViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
-                    Call _OpenViewRequestAccept(fvm.RightContent, fvm.RightViewContent, vims)
-                End If
-            End If
-        End If
-        If fvm.BottomViewContent IsNot Nothing Then
-            If fvm.BottomViewContent.Name = vims(0).Name Then
-                If fvm.BottomContent Is Nothing Then
-                    Call _OpenViewSet(fvm.BottomContent, fvm.BottomViewContent, vims)
-                Else
-                    vims = IIf(fvm.BottomViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
-                    Call _OpenViewRequestAccept(fvm.BottomContent, fvm.BottomViewContent, vims)
-                End If
-            End If
-        End If
+        'If fvm.MainViewContent IsNot Nothing Then
+        '    If fvm.MainViewContent.Name = vims(0).Name Then
+        '        If fvm.MainContent Is Nothing Then
+        '            Call _OpenViewSet(fvm.MainContent, fvm.MainViewContent, vims)
+        '        Else
+        '            vims = IIf(fvm.MainViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
+        '            Call _OpenViewRequestAccept(fvm.MainContent, fvm.MainViewContent, vims)
+        '        End If
+        '    End If
+        'End If
+        'If fvm.RightViewContent IsNot Nothing Then
+        '    If fvm.RightViewContent.Name = vims(0).Name Then
+        '        If fvm.RightContent Is Nothing Then
+        '            Call _OpenViewSet(fvm.RightContent, fvm.RightViewContent, vims)
+        '        Else
+        '            vims = IIf(fvm.RightViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
+        '            Call _OpenViewRequestAccept(fvm.RightContent, fvm.RightViewContent, vims)
+        '        End If
+        '    End If
+        'End If
+        'If fvm.BottomViewContent IsNot Nothing Then
+        '    If fvm.BottomViewContent.Name = vims(0).Name Then
+        '        If fvm.BottomContent Is Nothing Then
+        '            Call _OpenViewSet(fvm.BottomContent, fvm.BottomViewContent, vims)
+        '        Else
+        '            vims = IIf(fvm.BottomViewContent.ModelName = "TabViewModel", vims, _PopData(vims))
+        '            Call _OpenViewRequestAccept(fvm.BottomContent, fvm.BottomViewContent, vims)
+        '        End If
+        '    End If
+        'End If
     End Sub
 
     Private Overloads Sub _OpenViewRequestAccept(ByRef tvm As TabViewModel,
@@ -258,102 +258,102 @@
         ' _OpenViewSetで新たにTabViewModelを新規作成し、そのTabViewModelで、
         ' _OpenViewRequestAccept(TabViewModel, ViewItemModel, List(Of ViewItemModel))
         ' を実行する
-        If vim.Name = vims(0).Name Then
-            vims = _PopData(vims)
-            For Each vt In vim.Content.ViewContentTabs
-                If vt.Name = vims(0).Name Then
-                    tvm.AddTab(vt)
-                    Call _OpenViewRequestAccept(tvm.Tabs.Last, vt, vims)
-                    Exit For
-                End If
-            Next
-        End If
+        'If vim.Name = vims(0).Name Then
+        '    vims = _PopData(vims)
+        '    For Each vt In vim.Content.ViewContentTabs
+        '        If vt.Name = vims(0).Name Then
+        '            tvm.AddTab(vt)
+        '            Call _OpenViewRequestAccept(tvm.Tabs.Last, vt, vims)
+        '            Exit For
+        '        End If
+        '    Next
+        'End If
     End Sub
 
 
     Private Overloads Sub _OpenViewRequestAccept(ByRef obj As Object,
                                                  ByVal vim As ViewItemModel,
                                                  ByVal [old] As List(Of ViewItemModel))
-        Dim fvm As FlexibleViewModel
-        Dim tvm As TabViewModel
-        'Dim [new] = New List(Of ViewItemModel)
+        'Dim fvm As FlexibleViewModel
+        'Dim tvm As TabViewModel
+        ''Dim [new] = New List(Of ViewItemModel)
 
-        '[new] = _PopData([old])
+        ''[new] = _PopData([old])
 
-        Select Case vim.ModelName
-            Case "FlexibleViewModel"
-                fvm = CType(obj, FlexibleViewModel)
-                Call _OpenViewRequestAccept(fvm, [old])
-            Case "TabViewModel"
-                tvm = CType(obj, TabViewModel)
-                Call _OpenViewRequestAccept(tvm, vim, [old])
-            Case Else
-                '' UnExpected Case
-                'Throw New Exception("ViewController._OpenViewRequestAccept Error!!!")
-        End Select
+        'Select Case vim.ModelName
+        '    Case "FlexibleViewModel"
+        '        fvm = CType(obj, FlexibleViewModel)
+        '        Call _OpenViewRequestAccept(fvm, [old])
+        '    Case "TabViewModel"
+        '        tvm = CType(obj, TabViewModel)
+        '        Call _OpenViewRequestAccept(tvm, vim, [old])
+        '    Case Else
+        '        '' UnExpected Case
+        '        'Throw New Exception("ViewController._OpenViewRequestAccept Error!!!")
+        'End Select
     End Sub
 
 
     Private Overloads Function _CheckViewItemList(ByVal [new] As List(Of ViewItemModel),
                                                   ByVal v As ViewItemModel,
                                                   ByVal fvm As FlexibleViewModel) As List(Of ViewItemModel)
-        If fvm.MainViewContent IsNot Nothing Then
-            [new] = _CheckViewItemList([new], v, fvm.MainViewContent)
-        End If
-        If fvm.RightViewContent IsNot Nothing Then
-            [new] = _CheckViewItemList([new], v, fvm.RightViewContent)
-        End If
-        If fvm.BottomViewContent IsNot Nothing Then
-            [new] = _CheckViewItemList([new], v, fvm.BottomViewContent)
-        End If
-        _CheckViewItemList = [new]
+        'If fvm.MainViewContent IsNot Nothing Then
+        '    [new] = _CheckViewItemList([new], v, fvm.MainViewContent)
+        'End If
+        'If fvm.RightViewContent IsNot Nothing Then
+        '    [new] = _CheckViewItemList([new], v, fvm.RightViewContent)
+        'End If
+        'If fvm.BottomViewContent IsNot Nothing Then
+        '    [new] = _CheckViewItemList([new], v, fvm.BottomViewContent)
+        'End If
+        '_CheckViewItemList = [new]
     End Function
 
     Private Overloads Function _CheckViewItemList(ByVal [new] As List(Of ViewItemModel),
                                                   ByVal v As ViewItemModel,
                                                   ByVal vim As ViewItemModel) As List(Of ViewItemModel)
 
-        Dim fvm As FlexibleViewModel
-        Dim tvm As TabViewModel
+        'Dim fvm As FlexibleViewModel
+        'Dim tvm As TabViewModel
 
-        Dim [old] As New List(Of ViewItemModel)
-        For Each n In [new]
-            [old].Add(n)
-        Next
-        [new].Add(vim)
+        'Dim [old] As New List(Of ViewItemModel)
+        'For Each n In [new]
+        '    [old].Add(n)
+        'Next
+        '[new].Add(vim)
 
-        Dim [old2] As New List(Of ViewItemModel)
-        For Each n In [new]
-            [old2].Add(n)
-        Next
+        'Dim [old2] As New List(Of ViewItemModel)
+        'For Each n In [new]
+        '    [old2].Add(n)
+        'Next
 
-        Select Case vim.ModelName
-            Case "FlexibleViewModel"
-                fvm = CType(vim.Content, FlexibleViewModel)
-                [new] = _CheckViewItemList([new], v, fvm)
-            Case "TabViewModel"
-                tvm = CType(vim.Content, TabViewModel)
-                [new] = _CheckViewItemList([new], v, tvm)
-                If [new].Count = [old2].Count Then
-                    [new] = [old]
-                End If
-            Case v.ModelName
-                If Not v.Name = vim.Name Then
-                    [new] = [old]
-                End If
-            Case Else
-                [new] = [old]
-        End Select
-        _CheckViewItemList = [new]
+        'Select Case vim.ModelName
+        '    Case "FlexibleViewModel"
+        '        fvm = CType(vim.Content, FlexibleViewModel)
+        '        [new] = _CheckViewItemList([new], v, fvm)
+        '    Case "TabViewModel"
+        '        tvm = CType(vim.Content, TabViewModel)
+        '        [new] = _CheckViewItemList([new], v, tvm)
+        '        If [new].Count = [old2].Count Then
+        '            [new] = [old]
+        '        End If
+        '    Case v.ModelName
+        '        If Not v.Name = vim.Name Then
+        '            [new] = [old]
+        '        End If
+        '    Case Else
+        '        [new] = [old]
+        'End Select
+        '_CheckViewItemList = [new]
     End Function
 
     Private Overloads Function _CheckViewItemList(ByVal [new] As List(Of ViewItemModel),
                                                   ByVal v As ViewItemModel,
                                                   ByVal tvm As TabViewModel) As List(Of ViewItemModel)
-        For Each vt In tvm.ViewContentTabs
-            [new] = _CheckViewItemList([new], v, vt)
-        Next
-        _CheckViewItemList = [new]
+        'For Each vt In tvm.ViewContentTabs
+        '    [new] = _CheckViewItemList([new], v, vt)
+        'Next
+        '_CheckViewItemList = [new]
     End Function
 
     'Private Overloads Sub _OpenViewRequestAccept(ByVal vim As ViewItemModel, ByRef fvm As FlexibleViewModel)

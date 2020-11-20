@@ -52,41 +52,41 @@ Public Class MenuViewModel
     '---------------------------------------------------------------------------------------------'
 
     Private Sub _ShowProjectExplorer()
-        Dim act As Action
-        act = Sub()
-                  If ViewModel.Content.BottomContent IsNot Nothing Then
-                      If ViewModel.Content.BottomContent.MainContent IsNot Nothing Then
-                          For Each vt In ViewModel.Content.BottomContent.MainContent.ViewContentTabs
-                              If vt.Name = "ProjExp" Then
-                                  vt.IsVisible = True
-                                  Call ViewModel.Content.BottomContent.MainContent.AddTab(vt)
-                                  Exit For
-                              End If
-                          Next
-                      Else
-                          ViewModel.Content.BottomContent.MainViewContent = ViewModel.Content.BottomContent.MainViewContent
-                          Call act()
-                      End If
-                  Else
-                      ViewModel.Content.BottomViewContent = ViewModel.Content.BottomViewContent
-                      Call act()
-                  End If
-              End Sub
+        'Dim act As Action
+        'act = Sub()
+        '          If ViewModel.Content.BottomContent IsNot Nothing Then
+        '              If ViewModel.Content.BottomContent.MainContent IsNot Nothing Then
+        '                  For Each vt In ViewModel.Content.BottomContent.MainContent.ViewContentTabs
+        '                      If vt.Name = "ProjExp" Then
+        '                          vt.IsVisible = True
+        '                          Call ViewModel.Content.BottomContent.MainContent.AddTab(vt)
+        '                          Exit For
+        '                      End If
+        '                  Next
+        '              Else
+        '                  ViewModel.Content.BottomContent.MainViewContent = ViewModel.Content.BottomContent.MainViewContent
+        '                  Call act()
+        '              End If
+        '          Else
+        '              ViewModel.Content.BottomViewContent = ViewModel.Content.BottomViewContent
+        '              Call act()
+        '          End If
+        '      End Sub
 
-        If ViewModel.Content.BottomViewContent IsNot Nothing Then
-            If ViewModel.Content.BottomViewContent.ModelName = "FlexibleViewModel" Then
-                If ViewModel.Content.BottomViewContent.Content.MainViewContent IsNot Nothing Then
-                    If ViewModel.Content.BottomViewContent.Content.MainViewContent.Name = "ExpTabs" Then
-                        For Each vt In ViewModel.Content.BottomViewContent.Content.MainViewContent.Content.ViewContentTabs
-                            If vt.Name = "ProjExp" Then
-                                Call act()
-                                Exit For
-                            End If
-                        Next
-                    End If
-                End If
-            End If
-        End If
+        'If ViewModel.Content.BottomViewContent IsNot Nothing Then
+        '    If ViewModel.Content.BottomViewContent.ModelName = "FlexibleViewModel" Then
+        '        If ViewModel.Content.BottomViewContent.Content.MainViewContent IsNot Nothing Then
+        '            If ViewModel.Content.BottomViewContent.Content.MainViewContent.Name = "ExpTabs" Then
+        '                For Each vt In ViewModel.Content.BottomViewContent.Content.MainViewContent.Content.ViewContentTabs
+        '                    If vt.Name = "ProjExp" Then
+        '                        Call act()
+        '                        Exit For
+        '                    End If
+        '                Next
+        '            End If
+        '        End If
+        '    End If
+        'End If
     End Sub
 
     ' コマンドプロパティ（プロジェクトビュー表示）
@@ -134,41 +134,41 @@ Public Class MenuViewModel
     '---------------------------------------------------------------------------------------------'
 
     Private Sub _ShowViewExplorer()
-        Dim act As Action
-        act = Sub()
-                  If ViewModel.Content.BottomContent IsNot Nothing Then
-                      If ViewModel.Content.BottomContent.MainContent IsNot Nothing Then
-                          For Each vt In ViewModel.Content.BottomContent.MainContent.ViewContentTabs
-                              If vt.Name = "ViewExp" Then
-                                  vt.IsVisible = True
-                                  Call ViewModel.Content.BottomContent.MainContent.AddTab(vt)
-                                  Exit For
-                              End If
-                          Next
-                      Else
-                          ViewModel.Content.BottomContent.MainViewContent = ViewModel.Content.BottomContent.MainViewContent
-                          Call act()
-                      End If
-                  Else
-                      ViewModel.Content.BottomViewContent = ViewModel.Content.BottomViewContent
-                      Call act()
-                  End If
-              End Sub
+        'Dim act As Action
+        'act = Sub()
+        '          If ViewModel.Content.BottomContent IsNot Nothing Then
+        '              If ViewModel.Content.BottomContent.MainContent IsNot Nothing Then
+        '                  For Each vt In ViewModel.Content.BottomContent.MainContent.ViewContentTabs
+        '                      If vt.Name = "ViewExp" Then
+        '                          vt.IsVisible = True
+        '                          Call ViewModel.Content.BottomContent.MainContent.AddTab(vt)
+        '                          Exit For
+        '                      End If
+        '                  Next
+        '              Else
+        '                  ViewModel.Content.BottomContent.MainViewContent = ViewModel.Content.BottomContent.MainViewContent
+        '                  Call act()
+        '              End If
+        '          Else
+        '              ViewModel.Content.BottomViewContent = ViewModel.Content.BottomViewContent
+        '              Call act()
+        '          End If
+        '      End Sub
 
-        If ViewModel.Content.BottomViewContent IsNot Nothing Then
-            If ViewModel.Content.BottomViewContent.ModelName = "FlexibleViewModel" Then
-                If ViewModel.Content.BottomViewContent.Content.MainViewContent IsNot Nothing Then
-                    If ViewModel.Content.BottomViewContent.Content.MainViewContent.Name = "ExpTabs" Then
-                        For Each vt In ViewModel.Content.BottomViewContent.Content.MainViewContent.Content.ViewContentTabs
-                            If vt.Name = "ViewExp" Then
-                                Call act()
-                                Exit For
-                            End If
-                        Next
-                    End If
-                End If
-            End If
-        End If
+        'If ViewModel.Content.BottomViewContent IsNot Nothing Then
+        '    If ViewModel.Content.BottomViewContent.ModelName = "FlexibleViewModel" Then
+        '        If ViewModel.Content.BottomViewContent.Content.MainViewContent IsNot Nothing Then
+        '            If ViewModel.Content.BottomViewContent.Content.MainViewContent.Name = "ExpTabs" Then
+        '                For Each vt In ViewModel.Content.BottomViewContent.Content.MainViewContent.Content.ViewContentTabs
+        '                    If vt.Name = "ViewExp" Then
+        '                        Call act()
+        '                        Exit For
+        '                    End If
+        '                Next
+        '            End If
+        '        End If
+        '    End If
+        'End If
     End Sub
 
 
