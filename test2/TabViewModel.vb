@@ -48,7 +48,7 @@ Public Class TabViewModel : Inherits BaseViewModel
         Set(value As ViewItemModel)
             Me._SelectedItem = value
             RaisePropertyChanged("SelectedItem")
-            'Call _ChangeTabCloseButtonVisibilities(value)
+            Call _ChangeCloseViewButtonVisibilities(value)
             'Call _ChangeTabColors(value)
         End Set
     End Property
@@ -121,16 +121,16 @@ Public Class TabViewModel : Inherits BaseViewModel
     '    End Set
     'End Property
 
-    Private Sub _ChangeTabCloseButtonVisibilities(ByVal [tab] As TabItemModel)
-        'If Me.Tabs IsNot Nothing Then
-        '    For Each t In Me.Tabs
-        '        If t.Equals([tab]) Then
-        '            t.TabCloseButtonVisibility = Visibility.Visible
-        '        Else
-        '            t.TabCloseButtonVisibility = Visibility.Collapsed
-        '        End If
-        '    Next
-        'End If
+    Private Sub _ChangeCloseViewButtonVisibilities(ByVal vim As ViewItemModel)
+        If Me.ViewTabs IsNot Nothing Then
+            For Each vt In Me.ViewTabs
+                If vt.Equals(vim) Then
+                    vt.CloseViewButtonVisibility = Visibility.Visible
+                Else
+                    vt.CloseViewButtonVisibility = Visibility.Collapsed
+                End If
+            Next
+        End If
     End Sub
 
     Private Sub _ChangeTabColors(ByVal [tab] As TabItemModel)
@@ -244,7 +244,8 @@ Public Class TabViewModel : Inherits BaseViewModel
     End Sub
 
     Private Sub _TabCloseRequestAccept(ByVal [tab] As TabItemModel)
-        'Me.Tabs.Remove([tab])
+        'Me.ViewTabs.Remove([tab])
+
         'For Each vt In Me.ViewContentTabs
         '    If vt.Name = [tab].ViewContent.Name Then
         '        vt.IsVisible = False
@@ -253,7 +254,7 @@ Public Class TabViewModel : Inherits BaseViewModel
         'Next
 
         'If Me.Tabs.Count = 0 Then
-        '    Call DelegateEventListener.Instance.RaiseTabViewClosed()
+        '    Call DelegateEventListener.Instance.RaiseTabCloseViewd()
         'End If
     End Sub
 

@@ -1,11 +1,10 @@
 ﻿Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
+Imports System.Collections.ObjectModel
 
 Public Class ViewItemModel
     Inherits BaseViewModel
 
-    ' 初回セット時はViewModel.ReloadViews()しないようにするため
-    Private _IsVisibleFirstCheck As Boolean
     Private _IsVisible As Boolean
     Public Property IsVisible As Boolean
         Get
@@ -13,11 +12,6 @@ Public Class ViewItemModel
         End Get
         Set(value As Boolean)
             _IsVisible = value
-            If Me._IsVisibleFirstCheck Then
-                Call DelegateEventListener.Instance.RaiseReloadViewsRequested()
-            Else
-                Me._IsVisibleFirstCheck = True
-            End If
         End Set
     End Property
 
@@ -123,33 +117,13 @@ Public Class ViewItemModel
         End Set
     End Property
 
-    Private _ViewType As String
-    Public Property ViewType As String
+    Private _FrameName As String
+    Public Property FrameName As String
         Get
-            Return Me._ViewType
+            Return Me._FrameName
         End Get
         Set(value As String)
-            Me._ViewType = value
-        End Set
-    End Property
-
-    Private _FrameType As String
-    Public Property FrameType As String
-        Get
-            Return Me._FrameType
-        End Get
-        Set(value As String)
-            Me._FrameType = value
-        End Set
-    End Property
-
-    Private _LayoutType As String
-    Public Property LayoutType As String
-        Get
-            Return Me._LayoutType
-        End Get
-        Set(value As String)
-            Me._LayoutType = value
+            Me._FrameName = value
         End Set
     End Property
 
@@ -175,18 +149,60 @@ Public Class ViewItemModel
             Else
                 Me.ModelName = value.GetType.Name
             End If
+            RaisePropertyChanged("Content")
         End Set
     End Property
 
-    Private _WrapperName As String
-    Public Property WrapperName As String
+    Private _CloseViewButtonVisibility As Visibility
+    <JsonIgnore>
+    Public Property CloseViewButtonVisibility As Visibility
         Get
-            Return Me._WrapperName
+            Return Me._CloseViewButtonVisibility
         End Get
-        Set(value As String)
-            Me._WrapperName = value
+        Set(value As Visibility)
+            Me._CloseViewButtonVisibility = value
+            RaisePropertyChanged("CloseViewButtonVisibility")
         End Set
     End Property
+
+    ' タブ関連
+    '---------------------------------------------------------------------------------------------'
+    Private _Parent As ViewItemModel
+    <JsonIgnore>
+    Public Property Parent As ViewItemModel
+        Get
+            Return Me._Parent
+        End Get
+        Set(value As ViewItemModel)
+            Me._Parent = value
+        End Set
+    End Property
+
+    Private _Children As ObservableCollection(Of ViewItemModel)
+    Public Property Children As ObservableCollection(Of ViewItemModel)
+        Get
+            If Me._Children Is Nothing Then
+                Me._Children = New ObservableCollection(Of ViewItemModel)
+            End If
+            Return Me._Children
+        End Get
+        Set(value As ObservableCollection(Of ViewItemModel))
+            Me._Children = value
+        End Set
+    End Property
+
+    ' ContentがTabViewModelの時に利用可能
+    Public Sub RegisterChildren()
+        Dim idx = -1
+        If Me.ModelName = "TabViewModel" Then
+            For Each child In Me.Content.ViewTabs
+                ' 親の認知
+                child.Parent = Me
+                Me.Children.Add(child)
+            Next
+        End If
+    End Sub
+    '---------------------------------------------------------------------------------------------'
 
     'Private _IsExpand As Boolean
     'Public Property IsExpand As Boolean
@@ -206,9 +222,9 @@ Public Class ViewItemModel
         End Get
         Set(value As Boolean)
             Me._IsSelected = value
-            If value Then
-                Call DelegateEventListener.Instance.RaiseOpenViewRequested(Me)
-            End If
+            'If value Then
+            '    'Call DelegateEventListener.Instance.RaiseOpenViewRequested(Me)
+            'End If
         End Set
     End Property
 
@@ -222,6 +238,88 @@ Public Class ViewItemModel
     '        RaisePropertyChanged("IsReadOnly")
     '    End Set
     'End Property
+
+    ' コマンドプロパティ（タブ閉じる）
+    '---------------------------------------------------------------------------------------------'
+    Private _CloseViewCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property CloseViewCommand As ICommand
+        Get
+            If Me._CloseViewCommand Is Nothing Then
+                Me._CloseViewCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _CloseViewCommandExecute,
+                    .CanExecuteHandler = AddressOf _CloseViewCommandCanExecute
+                }
+                Return Me._CloseViewCommand
+            Else
+                Return Me._CloseViewCommand
+            End If
+        End Get
+    End Property
+
+    'コマンド実行可否のチェック（タブ閉じる）
+    Private Sub _CheckCloseViewCommandEnabled()
+        Dim b = True
+        Me._CloseViewCommandEnableFlag = b
+    End Sub
+
+    ' コマンド実行可否のフラグ（タブ閉じる）
+    Private __CloseViewCommandEnableFlag As Boolean
+    Private Property _CloseViewCommandEnableFlag As Boolean
+        Get
+            Return Me.__CloseViewCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__CloseViewCommandEnableFlag = value
+            RaisePropertyChanged("_CloseViewCommandEnableFlag")
+            CType(CloseViewCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    ' コマンド実行（タブ閉じる）
+    Private Sub _CloseViewCommandExecute(ByVal parameter As Object)
+        Me.IsVisible = False
+        Me.Parent.Content.ViewTabs.Remove(Me)
+        If Me.Parent.Content.ViewTabs.Count = 0 Then
+            Me.Parent.Content = Nothing
+            Me.Parent.IsVisible = False
+            Call DelegateEventListener.Instance.RaiseCloseViewRequested(Me.Parent)
+        End If
+        Call DelegateEventListener.Instance.RaiseReloadViewsRequested()
+    End Sub
+
+    Private Function _CloseViewCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._CloseViewCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    ' 閉じるコマンド受理
+    '---------------------------------------------------------------------------------------------'
+    'Private Sub _CloseViewRequestedAddHandler()
+    '    AddHandler _
+    '        DelegateEventListener.Instance.CloseViewRequested,
+    '        AddressOf Me._CloseViewRequestedReview
+    'End Sub
+
+    'Private Sub _CloseViewRequestedReview(ByVal child As ViewItemModel, System.EventArgs)
+    '    If child.Parent.Equals(Me) Then
+    '        Call _CloseViewRequestedAccept(child)
+    '    End If
+    'End Sub
+
+    'Private Sub _CloseViewRequestedAccept(ByVal sender As Object)
+    '    Select Case sender.Name
+    '        Case "ContentPanel"
+    '            sender.DataContext.ContentViewWidth = sender.ActualWidth
+    '            sender.DataContext.ContentViewHeight = sender.ActualHeight
+    '        Case "RightPanel"
+    '            sender.DataContext.RightViewWidth = sender.ActualWidth
+    '        Case "BottomPanel"
+    '            sender.DataContext.BottomViewHeight = sender.ActualHeight
+    '    End Select
+    'End Sub
+    '---------------------------------------------------------------------------------------------'
+
 
     '---------------------------------------------------------------------------------------------'
     ' コマンドプロパティ（接続確認）
@@ -271,61 +369,60 @@ Public Class ViewItemModel
     End Function
     '---------------------------------------------------------------------------------------------'
 
+    ' コマンドプロパティ（ビュー開く）
     '---------------------------------------------------------------------------------------------'
-    ' 廃止
-    ' コマンドプロパティ（ビュー削除）
-    'Private _DeleteViewCommand As ICommand
-    '<JsonIgnore>
-    'Public ReadOnly Property DeleteViewCommand As ICommand
-    '    Get
-    '        If Me._DeleteViewCommand Is Nothing Then
-    '            Me._DeleteViewCommand = New DelegateCommand With {
-    '                .ExecuteHandler = AddressOf _DeleteViewCommandExecute,
-    '                .CanExecuteHandler = AddressOf _DeleteViewCommandCanExecute
-    '            }
-    '            Return Me._DeleteViewCommand
-    '        Else
-    '            Return Me._DeleteViewCommand
-    '        End If
-    '    End Get
-    'End Property
+    Private _OpenViewCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property OpenViewCommand As ICommand
+        Get
+            If Me._OpenViewCommand Is Nothing Then
+                Me._OpenViewCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf _OpenViewCommandExecute,
+                    .CanExecuteHandler = AddressOf _OpenViewCommandCanExecute
+                }
+                Return Me._OpenViewCommand
+            Else
+                Return Me._OpenViewCommand
+            End If
+        End Get
+    End Property
 
-    ''コマンド実行可否のチェック（ビュー削除）
-    'Private Sub _CheckDeleteViewCommandEnabled()
-    '    Dim b As Boolean : b = True
-    '    Me._DeleteViewCommandEnableFlag = b
-    'End Sub
-
-    '' コマンド実行可否のフラグ（ビュー削除）
-    'Private __DeleteViewCommandEnableFlag As Boolean
-    '<JsonIgnore>
-    'Public Property _DeleteViewCommandEnableFlag As Boolean
-    '    Get
-    '        Return Me.__DeleteViewCommandEnableFlag
-    '    End Get
-    '    Set(value As Boolean)
-    '        Me.__DeleteViewCommandEnableFlag = value
-    '        RaisePropertyChanged("_DeleteViewCommandEnableFlag")
-    '        CType(DeleteViewCommand, DelegateCommand).RaiseCanExecuteChanged()
-    '    End Set
-    'End Property
-
-    '' コマンド実行（ビュー削除）
-    'Private Sub _DeleteViewCommandExecute(ByVal parameter As Object)
-    '    Call DelegateEventListener.Instance.RaiseDeleteViewRequested(Me)
-    'End Sub
-
-    'Private Function _DeleteViewCommandCanExecute(ByVal parameter As Object) As Boolean
-    '    Return Me._DeleteViewCommandEnableFlag
-    'End Function
-    '---------------------------------------------------------------------------------------------'
-
-    Public Sub Initialize()
-        Call _CheckChangeAliasCommandEnabled()
-        Me.BlockVisibility = Visibility.Visible
+    'コマンド実行可否のチェック（ビュー削除）
+    Private Sub _CheckOpenViewCommandEnabled()
+        Dim b = True
+        Me._OpenViewCommandEnableFlag = b
     End Sub
 
+    ' コマンド実行可否のフラグ（ビュー削除）
+    Private __OpenViewCommandEnableFlag As Boolean
+    <JsonIgnore>
+    Public Property _OpenViewCommandEnableFlag As Boolean
+        Get
+            Return Me.__OpenViewCommandEnableFlag
+        End Get
+        Set(value As Boolean)
+            Me.__OpenViewCommandEnableFlag = value
+            RaisePropertyChanged("_OpenViewCommandEnableFlag")
+            CType(OpenViewCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    ' コマンド実行（ビュー削除）
+    Private Sub _OpenViewCommandExecute(ByVal parameter As Object)
+        Call DelegateEventListener.Instance.RaiseOpenViewRequested(Me)
+        Call DelegateEventListener.Instance.RaiseReloadViewsRequested()
+    End Sub
+
+    Private Function _OpenViewCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me._OpenViewCommandEnableFlag
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
     Public Sub New()
-        Call Initialize()
+        Call _CheckOpenViewCommandEnabled()
+        Call _CheckCloseViewCommandEnabled()
+        Call _CheckChangeAliasCommandEnabled()
+        Me.BlockVisibility = Visibility.Visible
+        Me.IsVisible = True
     End Sub
 End Class

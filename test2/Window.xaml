@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:test2"
         mc:Ignorable="d"
         xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
-        Title="Window" 
+        Title="Window"      
         Height="{Binding WindowHeight, Mode=TwoWay}" Width="{Binding WindowWidth, Mode=TwoWay}">
     <Window.Resources>
         <Style TargetType="TreeViewItem" x:Key="TreeViewItemStyle">
@@ -584,14 +584,17 @@
                                         Text="{Binding Alias}" 
                                         TextTrimming="CharacterEllipsis"  />
                                     <Button 
-                                        Visibility="{Binding TabCloseButtonVisibility}"
-                                        FontSize="4"
-                                        Background="Black"
-                                        Foreground="White"
-                                        Height="8" Width="8"
-                                        Content="X"                                    
+                                        Visibility="{Binding CloseViewButtonVisibility}"
+                                        FontSize="10"
+                                        FontFamily="GlobalMonospace"
+                                        Background="Transparent"
+                                        Height="10" Width="10"
+                                        Content="×" 
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Padding="0"
                                         BorderThickness="0"
-                                        Command="{Binding TabCloseCommand}"/>
+                                        Command="{Binding CloseViewCommand}"/>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -1132,6 +1135,9 @@
                 <MenuItem 
                     Header="名前の変更"
                     Command="{Binding ChangeAliasCommand}"/>
+                <MenuItem 
+                    Header="開く"
+                    Command="{Binding OpenViewCommand}"/>
                 <!--<MenuItem 
                     Header="削除"
                     Command="{Binding DeleteViewCommand}"/>-->
@@ -1155,31 +1161,7 @@
                             Style="{StaticResource TreeViewItemStyle}"
                             FontSize="{Binding FontSize, Mode=OneWay}"
                             Header="Views"
-                            ItemsSource="{Binding Views}">
-                            <TreeViewItem.ItemTemplate>
-                                <HierarchicalDataTemplate>
-                                    <Grid HorizontalAlignment="Stretch">
-                                        <StackPanel 
-                                            Orientation="Horizontal"
-                                            Grid.Column="0">
-                                            <Image
-                                                Width="12" Height="12"
-                                                Grid.Column="0"
-                                                Source="{Binding VisibleIcon}" />
-                                            <TextBlock            
-                                                Margin="5,0,0,0"
-                                                Visibility="{Binding BlockVisibility}"
-                                                ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
-                                                Text="{Binding Alias}" />
-                                            <TextBox          
-                                                Margin="5,0,0,0"
-                                                Visibility="{Binding BoxVisibility}"
-                                                ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
-                                                Text="{Binding Alias}" />
-                                        </StackPanel>
-                                    </Grid>
-                                </HierarchicalDataTemplate>
-                            </TreeViewItem.ItemTemplate>
+                            ItemsSource="{Binding ViewModel.Views}">
                             <TreeViewItem.ItemContainerStyle>
                                 <Style TargetType="TreeViewItem">
                                     <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
@@ -1188,31 +1170,58 @@
                             </TreeViewItem.ItemContainerStyle>
                         </TreeViewItem>
                     </TreeView>
-                    <Expander 
-                        Header="Settings" 
-                        Grid.Row="1"
-                        Style="{StaticResource ExpanderStyle1}">
-                        <StackPanel 
-                            Orientation="Horizontal"
-                            Margin="5,0,0,0">
-                            <TextBlock 
-                                VerticalAlignment="Center"
-                                Text="Size: " />
-                            <Slider
-                                Width="100"
-                                Value="{Binding FontSize}"
-                                Minimum="6" Maximum="18"                        
-                                SmallChange="1" LargeChange="1" TickFrequency="1"
-                                Style="{StaticResource CustomSliderStyle}"
-                                Orientation="Horizontal" />
-                            <TextBlock 
-                                VerticalAlignment="Center"
-                                Margin="5,0,0,0"
-                                Text="{Binding FontSize, Mode=OneWay}" />
-                        </StackPanel>
-                    </Expander>
                 </Grid>
             </DataTemplate>
+
+            <HierarchicalDataTemplate
+                DataType="{x:Type local:ViewModel}"
+                ItemsSource="{Binding Views}">
+                <Grid HorizontalAlignment="Stretch">
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Grid.Column="0">
+                        <Image
+                            Width="12" Height="12"
+                            Grid.Column="0"
+                            Source="{Binding VisibleIcon}" />
+                        <TextBlock            
+                            Margin="5,0,0,0"
+                            Visibility="{Binding BlockVisibility}"
+                            ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                            Text="{Binding Alias}" />
+                        <TextBox          
+                            Margin="5,0,0,0"
+                            Visibility="{Binding BoxVisibility}"
+                            ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                            Text="{Binding Alias}" />
+                    </StackPanel>
+                </Grid>
+            </HierarchicalDataTemplate>
+            
+            <HierarchicalDataTemplate
+                DataType="{x:Type local:ViewItemModel}"
+                ItemsSource="{Binding Children}">
+                <Grid HorizontalAlignment="Stretch">
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Grid.Column="0">
+                        <Image
+                            Width="12" Height="12"
+                            Grid.Column="0"
+                            Source="{Binding VisibleIcon}" />
+                        <TextBlock            
+                            Margin="5,0,0,0"
+                            Visibility="{Binding BlockVisibility}"
+                            ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                            Text="{Binding Alias}" />
+                        <TextBox          
+                            Margin="5,0,0,0"
+                            Visibility="{Binding BoxVisibility}"
+                            ContextMenu="{Binding Source={StaticResource ResourceKey=ViewItemContextMenu}}"
+                            Text="{Binding Alias}" />
+                    </StackPanel>
+                </Grid>
+            </HierarchicalDataTemplate>
 
 
             <!--<DataTemplate                
@@ -1253,7 +1262,7 @@
                             Style="{StaticResource TreeViewItemStyle}"
                             FontSize="{Binding FontSize, Mode=OneWay}"
                             Header="Projects"
-                            ItemsSource="{Binding Projects}">
+                            ItemsSource="{Binding AppInfo.CurrentProjects}">
                             <TreeViewItem.ItemTemplate>
                                 <HierarchicalDataTemplate>
                                     <Grid HorizontalAlignment="Stretch">
@@ -1320,6 +1329,19 @@
                         <Image Source="{Binding DownloadIcon}" />
                     </Button>
                 </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate                
+                DataType="{x:Type local:RpaProjectFrameViewModel}">
+                <DockPanel 
+                    LastChildFill="True">
+                    <ContentControl
+                        DockPanel.Dock="Top"
+                        Content="{Binding Menu}" />
+                    <ContentControl
+                        DockPanel.Dock="Top"
+                        Content="{Binding Tabs}" />
+                </DockPanel>
             </DataTemplate>
 
             <DataTemplate                
@@ -1479,23 +1501,17 @@
                 DataType="{x:Type local:HistoryViewModel}">
                 <DockPanel
                     LastChildFill="True">
-                    <StackPanel                        
-                        Orientation="Horizontal"
-                        DockPanel.Dock="Top">
-                    </StackPanel>
-                    <TextBox
-                        x:Name="HistoryBox"
-                        DockPanel.Dock="Top"         
+                    <TextBox        
+                        DockPanel.Dock="Top"
                         Text="{Binding History.DisplayContents, Mode=OneWay}" 
-                        IsReadOnly="True"                        
-                        VerticalScrollBarVisibility="Visible"
-                        HorizontalScrollBarVisibility="Visible"
+                        IsReadOnly="True"  
                         VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"                        
+                        HorizontalAlignment="Stretch"
+                        VerticalScrollBarVisibility="Visible"
+                        HorizontalScrollBarVisibility="Visible"                
                         ScrollViewer.CanContentScroll="False" 
                         UseLayoutRounding="False" 
-                        AllowDrop="True" 
-                        Height="Auto"/>
+                        AllowDrop="True" />
                 </DockPanel>
             </DataTemplate>
 
@@ -1676,6 +1692,21 @@
                 </Grid>
             </DataTemplate>
 
+            <!--<DataTemplate DataType="{x:Type local:ExplorerViewModel}">
+                <DockPanel>
+                    <StackPanel 
+                        DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                        <Button 
+                            Command="{Binding SwitchToRightCommand}"
+                            Content=">>" />
+                    </StackPanel>
+                    <ContentControl
+                        DockPanel.Dock="Top"
+                        Content="{Binding LeftExplorerViewContent.Content}">
+                    </ContentControl>
+                </DockPanel>
+            </DataTemplate>-->
 
             <DataTemplate DataType="{x:Type local:FrameViewModel}">
                 <Grid>
@@ -1693,51 +1724,116 @@
                         <RowDefinition Height="{Binding MainHistoryGridSplitterHeight}" />
                         <RowDefinition Height="{Binding HistoryGridHeight}" />
                     </Grid.RowDefinitions>
-                    <StackPanel 
-                        Visibility="{Binding MenuContentVisibility}"
-                        Height="{Binding MenuViewHeight, Mode=OneWayToSource}"
-                        Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
+
+                    <ContentControl
+                        x:Name="MenuContent"
+                        Grid.Row="{Binding MenuRow}" 
+                        Grid.Column="{Binding MenuColumn}" 
+                        Grid.ColumnSpan="{Binding MenuColumnSpan}"
+                        SizeChanged="MenuContent_SizeChanged"
+                        Content="{Binding MenuViewContent.Content}">
+                    </ContentControl>
+                    <!--<ContentControl
+                        x:Name="LeftExplorerContent"
+                        Grid.Row="{Binding LeftExplorerRow}" 
+                        Grid.Column="{Binding LeftExplorerColumn}" 
+                        Grid.RowSpan="{Binding LeftExplorerRowSpan}"
+                        Content="{Binding LeftExplorerViewContent.Content}"
+                        SizeChanged="LeftExplorerContent_SizeChanged">
+                    </ContentControl>-->
+                    <DockPanel
+                        x:Name="LeftExplorerContent"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Grid.Row="{Binding LeftExplorerRow}" 
+                        Grid.Column="{Binding LeftExplorerColumn}" 
+                        Grid.RowSpan="{Binding LeftExplorerRowSpan}"
+                        LastChildFill="True"
+                        SizeChanged="LeftExplorerContent_SizeChanged">
+                        <StackPanel 
+                            DockPanel.Dock="Top"
+                            Orientation="Horizontal">
+                            <Button 
+                                Command="{Binding SwitchToRightCommand}"
+                                Content=">>" />
+                        </StackPanel>
                         <ContentControl
-                            x:Name="MenuContent"
-                            Content="{Binding MenuViewContent.Content}">
-                        </ContentControl>
-                    </StackPanel>
-                    <StackPanel 
-                        Width="{Binding LeftExplorerViewWidth, Mode=OneWayToSource}"
-                        Grid.Row="2" Grid.Column="0" Grid.RowSpan="3">
-                        <ContentControl
-                            x:Name="LeftExplorerContent"
+                            DockPanel.Dock="Top"
                             Content="{Binding LeftExplorerViewContent.Content}">
                         </ContentControl>
-                    </StackPanel>
-                    <StackPanel 
-                        Height="{Binding MainViewHeight, Mode=OneWayToSource}"
-                        Width="{Binding MainViewWidth, Mode=OneWayToSource}"
-                        Grid.Row="2" Grid.Column="2">
+                    </DockPanel>
+                    <ContentControl
+                        x:Name="MainContent"
+                        Grid.Row="{Binding MainRow}" 
+                        Grid.RowSpan="{Binding MainRowSpan}" 
+                        Grid.Column="{Binding MainColumn}"
+                        SizeChanged="MainContent_SizeChanged"
+                        Content="{Binding MainViewContent.Content}">
+                    </ContentControl>
+                    <DockPanel
+                        x:Name="RightExplorerContent"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Grid.Row="{Binding RightExplorerRow}" 
+                        Grid.Column="{Binding RightExplorerColumn}" 
+                        Grid.RowSpan="{Binding RightExplorerRowSpan}" 
+                        LastChildFill="True"
+                        SizeChanged="RightExplorerContent_SizeChanged">
+                        <StackPanel 
+                            DockPanel.Dock="Top"
+                            Orientation="Horizontal">
+                            <Button 
+                                Command="{Binding SwitchToLeftCommand}"
+                                Content="&lt;&lt;" />
+                        </StackPanel>
                         <ContentControl
-                            x:Name="MainContent"
-                            Content="{Binding MainViewContent.Content}">
-                        </ContentControl>
-                    </StackPanel>
-                    <StackPanel 
-                        Width="{Binding RightExplorerViewWidth, Mode=OneWayToSource}"
-                        Grid.Row="2" Grid.Column="4" Grid.RowSpan="3">
-                        <ContentControl
-                            x:Name="RightExplorerContent"
+                            DockPanel.Dock="Top"
                             Content="{Binding RightExplorerViewContent.Content}">
                         </ContentControl>
-                    </StackPanel>
-                    <StackPanel 
-                        Height="{Binding HistoryViewHeight, Mode=OneWayToSource}"
-                        Grid.Row="4" Grid.Column="2">
-                        <ContentControl
-                            x:Name="HistoryContent"
-                            Content="{Binding HistoryViewContent.Content}">
-                        </ContentControl>
-                    </StackPanel>
+                    </DockPanel>
+                    <ContentControl
+                        x:Name="HistoryContent"
+                        Grid.Row="4" Grid.Column="2"                        
+                        SizeChanged="HistoryContent_SizeChanged"
+                        Content="{Binding HistoryViewContent.Content}">
+                    </ContentControl>
                     <GridSplitter
                         IsEnabled="{Binding IsLeftExplorerMainGridSplitterEnabled}"
+                        Grid.Row="1" 
+                        Grid.RowSpan="4"
+                        Grid.Column="1"                                         
+                        ResizeDirection="Columns"                
+                        ResizeBehavior="{Binding LeftExplorerMainSplitterResizeBehavior}"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsMainRightExplorerGridSplitterEnabled}"
                         Grid.Row="1" Grid.RowSpan="4"
+                        Grid.Column="3"
+                        ResizeDirection="Columns"
+                        ResizeBehavior="{Binding MainRightExplorerSplitterResizeBehavior}"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsMenuMainGridSplitterEnabled}"
+                        Grid.Row="1"
+                        Grid.Column="0" Grid.ColumnSpan="5"
+                        ResizeDirection="Rows"                
+                        ResizeBehavior="{Binding MenuMainSplitterResizeBehavior}"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsMainHistoryGridSplitterEnabled}"
+                        Grid.Row="3"
+                        Grid.Column="1" Grid.ColumnSpan="3"
+                        ResizeDirection="Rows"                
+                        ResizeBehavior="{Binding MainHistorySplitterResizeBehavior}"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch" />
+                    <!--<GridSplitter
+                        IsEnabled="{Binding IsLeftExplorerMainGridSplitterEnabled}"
+                        Grid.Row="1" 
+                        Grid.RowSpan="4"
                         Grid.Column="1"                                         
                         ResizeDirection="Columns"                
                         ResizeBehavior="PreviousAndNext"
@@ -1766,7 +1862,7 @@
                         ResizeDirection="Rows"                
                         ResizeBehavior="PreviousAndNext"
                         VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />
+                        HorizontalAlignment="Stretch" />-->
                 </Grid>
             </DataTemplate>
 
@@ -1790,7 +1886,6 @@
                     </Grid.RowDefinitions>
                     <StackPanel 
                         x:Name="ContentPanel"
-                        SizeChanged="ContentPanel_SizeChanged"
                         Height="{Binding ContentViewHeight, Mode=OneWayToSource}"
                         Width="{Binding ContentViewWidth, Mode=OneWayToSource}"
                         Grid.Row="0" Grid.Column="0">
@@ -1807,7 +1902,6 @@
                     </StackPanel>
                     <StackPanel
                         x:Name="RightPanel"
-                        SizeChanged="RightPanel_SizeChanged"
                         Grid.Row="0" Grid.Column="2">
                         <!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="RightWidth=" />
@@ -1819,7 +1913,6 @@
                     </StackPanel>
                     <StackPanel
                         x:Name="BottomPanel"
-                        SizeChanged="BottomPanel_SizeChanged"
                         Grid.Row="2" Grid.Column="0">
                         <!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="BottomHeight=" />

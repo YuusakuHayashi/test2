@@ -81,23 +81,13 @@ Public Class RpaProjectModel : Inherits ProjectModel
 
     Public Overrides Function ViewSetupExecute(ByRef app As AppDirectoryModel, ByRef vm As ViewModel) As ViewItemModel
         Dim vim As ViewItemModel
-        Dim rpapvm = New RpaProjectViewModel
-        Dim rpapmvm = New RpaProjectMenuViewModel
-        Call rpapvm.Initialize(app, vm)
-        Call rpapmvm.Initialize(app, vm)
+        Dim rpapfvm = New RpaProjectFrameViewModel
+
+        Call rpapfvm.Initialize(app, vm)
+
         vim = New ViewItemModel With {
-            .Name = "MainFlexView",
-            .Content = New FlexibleViewModel With {
-                .ContentViewHeight = 25.0,
-                .MainViewContent = New ViewItemModel With {
-                    .Name = "Rpaプロジェクトメニュー",
-                    .Content = rpapmvm
-                },
-                .BottomViewContent = New ViewItemModel With {
-                    .Name = "Rpaプロジェクト",
-                    .Content = rpapvm
-                }
-            }
+            .Name = "Main",
+            .Content = rpapfvm
         }
         ViewSetupExecute = vim
     End Function
@@ -105,20 +95,14 @@ Public Class RpaProjectModel : Inherits ProjectModel
     Public Overrides Function ViewDefineExecute(ByVal mname As String) As Object
         Dim obj As Object
         Select Case mname
-            Case (New HistoryViewModel).GetType.Name
-                obj = New HistoryViewModel
-            Case (New MenuViewModel).GetType.Name
-                obj = New MenuViewModel
-            Case (New RpaProjectMenuViewModel).GetType.Name
+            Case "RpaProjectFrameViewModel"
+                obj = New RpaProjectFrameViewModel
+            Case "RpaProjectMenuViewModel"
                 obj = New RpaProjectMenuViewModel
-            Case (New RpaProjectViewModel).GetType.Name
+            Case "RpaProjectViewModel"
                 obj = New RpaProjectViewModel
-            Case (New RpaViewModel).GetType.Name
+            Case "RpaViewModel"
                 obj = New RpaViewModel
-            Case "ViewExplorerViewModel"
-                obj = New ViewExplorerViewModel
-            Case "ProjectExplorerViewModel"
-                obj = New ProjectExplorerViewModel
             Case Else
                 obj = Nothing
         End Select

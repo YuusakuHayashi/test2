@@ -7,11 +7,11 @@
         End Get
     End Property
 
-
-    ' フレキシブルビューの最適化要求イベント
-    Public Event FlexViewOptimizationRequested As EventHandler
+    Public Event FrameOptimizeRequested As EventHandler
+    Public Event ResetViewRequested As EventHandler
 
     ' ビューエクスプローラーの更新イベント
+    Public Event CloseViewRequested As EventHandler
     Public Event ReloadViewsRequested As EventHandler                '
     Public Event ViewsChanged As EventHandler                        'ViewModel.Views, ViewExplorerViewMode.Viewsを同期
     Public Event ViewResized As EventHandler
@@ -30,8 +30,20 @@
     Public Event MigrateConditionDeleteRequested As EventHandler
     Public Event DataTableCheckChanged As EventHandler
 
-    Public Overloads Sub RaiseFlexViewOptimizationRequested()
-        RaiseEvent FlexViewOptimizationRequested(Nothing, EventArgs.Empty)
+    Public Overloads Sub RaiseResetViewRequested()
+        RaiseEvent ResetViewRequested(Nothing, EventArgs.Empty)
+    End Sub
+
+    Public Overloads Sub RaiseResetViewRequested(ByVal fvm As FrameViewModel)
+        RaiseEvent ResetViewRequested(fvm, EventArgs.Empty)
+    End Sub
+
+    Public Overloads Sub RaiseCloseViewRequested(ByVal vim As ViewItemModel)
+        RaiseEvent CloseViewRequested(vim, EventArgs.Empty)
+    End Sub
+
+    Public Overloads Sub RaiseFrameOptimizeRequested(ByVal order As String)
+        RaiseEvent FrameOptimizeRequested(order, EventArgs.Empty)
     End Sub
 
     Public Overloads Sub RaiseReloadViewsRequested()
@@ -62,13 +74,6 @@
         RaiseEvent OpenProjectRequested(project, EventArgs.Empty)
     End Sub
 
-    'Public Sub RaiseMultiViewSizeChanged(ByVal sender As Object)
-    '    RaiseEvent MultiViewSizeChanged(sender, EventArgs.Empty)
-    'End Sub
-    'Public Sub RaiseOpenViewRequested(ByVal child As ViewItemModel)
-    '    RaiseEvent OpenViewRequested(child, EventArgs.Empty)
-    'End Sub
-
     Public Sub RaiseRemoveFixedProjectRequested(ByVal p As ProjectInfoModel)
         RaiseEvent RemoveFixedProjectRequested(p, EventArgs.Empty)
     End Sub
@@ -77,11 +82,14 @@
         RaiseEvent FixProjectRequested(p, EventArgs.Empty)
     End Sub
 
-    Public Sub RaiseOpenViewRequested(ByVal v As ViewItemModel)
-        RaiseEvent OpenViewRequested(v, EventArgs.Empty)
+    Public Sub RaiseOpenViewRequested(ByRef vim As ViewItemModel)
+        RaiseEvent OpenViewRequested(vim, EventArgs.Empty)
     End Sub
 
-    Public Sub RaiseTabCloseRequested(ByVal child As TabItemModel)
+    'Public Sub RaiseTabCloseRequested(ByVal child As TabItemModel)
+    '    RaiseEvent TabCloseRequested(child, EventArgs.Empty)
+    'End Sub
+    Public Sub RaiseTabCloseRequested(ByVal child As ViewItemModel)
         RaiseEvent TabCloseRequested(child, EventArgs.Empty)
     End Sub
 

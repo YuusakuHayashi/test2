@@ -7,101 +7,81 @@
         mc:Ignorable="d"
         Title="Window1" Height="500" Width="800">
     <Grid>
-        <Grid.Resources>
-            <StackPanel x:Key="MainContentTemplate">
-                <TextBlock Text="MainContent" />
-            </StackPanel>
-            <StackPanel x:Key="RightContentTemplate">
-                <TextBlock Text="RightContent" />
-            </StackPanel>
-            <StackPanel x:Key="BottomContentTemplate">
-                <TextBlock Text="BottomContent" />
-            </StackPanel>
-        </Grid.Resources>
+        <!--<Grid.Resources>
+            <DataTemplate 
+                DataType="{x:Type Row0}">
+                <TextBlock Text="Row0" />
+            </DataTemplate>
+            <DataTemplate 
+                DataType="{x:Type Row1}">
+                <TextBlock Text="Row1" />
+            </DataTemplate>
+            <DataTemplate 
+                DataType="{x:Type Row2}">
+                <TextBlock Text="Row2" />
+            </DataTemplate>
+            <DataTemplate 
+                DataType="{x:Type Col0}">
+                <TextBlock Text="Col0" />
+            </DataTemplate>
+            <DataTemplate 
+                DataType="{x:Type Col1}">
+                <TextBlock Text="Col1" />
+            </DataTemplate>
+            <DataTemplate 
+                DataType="{x:Type Col2}">
+                <TextBlock Text="Col2" />
+            </DataTemplate>
+        </Grid.Resources>-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="100" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="100" />
             <RowDefinition Height="5" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="100" />
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <StackPanel 
-            Name="MainPanel"
-            Grid.Row="0" Grid.Column="0">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Hight=" />
-                    <TextBlock Text="{Binding ElementName=MainPanel, Path=ActualHeight}" />
-                    <TextBlock Text=", " />
-                    <TextBlock Text="Width=" />
-                    <TextBlock Text="{Binding ElementName=MainPanel, Path=ActualWidth}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Hight=" />
-                    <TextBlock Text="{Binding ElementName=MainContent, Path=ActualHeight}" />
-                    <TextBlock Text=", " />
-                    <TextBlock Text="Width=" />
-                    <TextBlock Text="{Binding ElementName=MainContent, Path=ActualWidth}" />
-                </StackPanel>
-            </StackPanel>
-            <ContentControl
-                x:Name="MainContent"
-                Content="{Binding Source={StaticResource MainContentTemplate}}"/>
-        </StackPanel>
-        <StackPanel           
-            Name="RightPanel"
-            Grid.Row="0" Grid.Column="2">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="RightWidth=" />
-                    <TextBlock Text="{Binding ElementName=RightPanel, Path=ActualWidth}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="RightWidth=" />
-                    <TextBlock Text="{Binding ElementName=RightContent, Path=ActualWidth}" />
-                </StackPanel>
-            </StackPanel>
-            <ContentControl
-                x:Name="RightContent"
-                Content="{Binding Source={StaticResource RightContentTemplate}}"/>
-        </StackPanel>
-        <StackPanel 
-            Name="BottomPanel"
-            Grid.Row="2" Grid.Column="0">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="BottomHeight=" />
-                    <TextBlock Text="{Binding ElementName=BottomPanel, Path=ActualHeight}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="BottomHeight=" />
-                    <TextBlock Text="{Binding ElementName=BottomContent, Path=ActualHeight}" />
-                </StackPanel>
-            </StackPanel>
-            <ContentControl
-                x:Name="BottomContent"
-                Content="{Binding Source={StaticResource BottomContentTemplate}}"/>
-        </StackPanel>
+        <ContentControl
+            BorderThickness="1"
+            Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5"
+            Content="{Binding ContentA}" />
+        <ContentControl
+            BorderThickness="1"
+            Grid.Row="2" Grid.Column="0" Grid.RowSpan="3"
+            Content="{Binding ContentB}" />
+        <ContentControl
+            BorderThickness="1"
+            Grid.Row="2" Grid.Column="2"
+            Content="{Binding ContentC}" />
+        <ContentControl
+            BorderThickness="1"
+            Grid.Row="2" Grid.Column="4" Grid.RowSpan="3"
+            Content="{Binding ContentD}" />
+        <ContentControl
+            BorderThickness="1"
+            Grid.Row="4" Grid.Column="2"
+            Content="{Binding ContentE}" />
         <GridSplitter
-            x:Name="HorizontalSplitter"
-            IsEnabled="{Binding IsHorizontalSplitterEnabled}"
-            Grid.Row="0" Grid.RowSpan="2"
-            Grid.Column="1"                                         
-            ResizeDirection="Columns"                
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5"
             ResizeBehavior="PreviousAndNext"
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Stretch" />
+            ResizeDirection="Rows"/>
         <GridSplitter
-            x:Name="VerticalSplitter"                        
-            IsEnabled="{Binding IsVerticalSplitterEnabled}"
-            Grid.Column="0" Grid.ColumnSpan="2"
-            Grid.Row="1"
-            ResizeDirection="Rows"
+            Grid.Row="1" Grid.Column="1" Grid.RowSpan="4"
             ResizeBehavior="PreviousAndNext"
-            VerticalAlignment="Stretch"
-            HorizontalAlignment="Stretch" />
+            ResizeDirection="Columns"/>
+        <GridSplitter
+            Grid.Row="1" Grid.Column="3" Grid.RowSpan="4"
+            ResizeBehavior="PreviousAndNext"
+            ResizeDirection="Columns"/>
+        <GridSplitter
+            Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+            ResizeBehavior="PreviousAndNext"
+            ResizeDirection="Rows"/>
     </Grid>
 </Window>

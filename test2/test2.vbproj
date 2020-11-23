@@ -91,6 +91,7 @@
     <Compile Include="Converters\DoubleGridLengthConverter.vb" />
     <Compile Include="Converters\MinusConverter.vb" />
     <Compile Include="DelegateAction.vb" />
+    <Compile Include="ExplorerViewModel.vb" />
     <Compile Include="FlexibleViewModel.vb" />
     <Compile Include="FlexibleStructureModel.vb" />
     <Compile Include="FrameViewModel.vb" />
@@ -102,6 +103,7 @@
     <Compile Include="Projects.vb" />
     <Compile Include="ProjectViewModel.vb" />
     <Compile Include="RpaModel.vb" />
+    <Compile Include="RpaProjectFrameViewModel.vb" />
     <Compile Include="RpaProjectMenuViewModel.vb" />
     <Compile Include="RpaProjectModel.vb" />
     <Compile Include="RpaProjectViewModel.vb" />
@@ -109,6 +111,7 @@
     <Compile Include="SingleViewModel.vb" />
     <Compile Include="TabItemModel.vb" />
     <Compile Include="TabViewModel.vb" />
+    <Compile Include="Test.vb" />
     <Compile Include="ViewController.vb" />
     <Compile Include="ViewExplorerViewModel.vb" />
     <Compile Include="ViewItemModel.vb" />

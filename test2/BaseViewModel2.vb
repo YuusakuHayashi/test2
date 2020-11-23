@@ -241,7 +241,6 @@ Public MustInherit Class BaseViewModel2
     <JsonIgnore>
     Protected Property [AddHandler] As Action
 
-
     Protected Sub BaseInitialize(ByVal app As AppDirectoryModel,
                                  ByRef vm As ViewModel)
         Dim ih = Me.InitializeHandler
@@ -295,19 +294,20 @@ Public MustInherit Class BaseViewModel2
     End Sub
 
     Public Overloads Sub ViewModelSetup()
-        Dim sv As FrameViewModel
+        Dim fvm As FrameViewModel
         Call InitializeViewContent()
 
         If ViewModel.SaveContent Is Nothing Then
-            Call _FrameViewSetup()
+            fvm = _FrameViewSetup()
         Else
-            sv = ViewModel.SaveContent
-            Call _FrameViewLoad(sv)
-            Call ViewModel.VisualizeView(sv)
+            fvm = ViewModel.SaveContent
+            fvm = _FrameContentLoad(fvm)
         End If
+        Call fvm.OptimizeView()
+        ViewModel.VisualizeView(fvm)
     End Sub
 
-    Private Overloads Sub _FrameViewLoad(ByRef sv As FrameViewModel)
+    Private Function _FrameContentLoad(ByRef sv As FrameViewModel) As FrameViewModel
         If sv.MenuViewContent IsNot Nothing Then
             Call _FrameViewLoad(sv.MenuViewContent)
         End If
@@ -323,12 +323,15 @@ Public MustInherit Class BaseViewModel2
         If sv.HistoryViewContent IsNot Nothing Then
             Call _FrameViewLoad(sv.HistoryViewContent)
         End If
-    End Sub
+        _FrameContentLoad = sv
+    End Function
 
     Private Overloads Sub _FrameViewLoad(ByRef vim As ViewItemModel)
         Dim [define] As Func(Of String, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
-        Dim obj, mvm, hvm, pevm, vevm
+        Dim [load] As Func(Of Object, AppDirectoryModel, ViewModel, Object) _
+            = AddressOf AppInfo.ProjectInfo.Model.Data.ViewLoadExecute
+        Dim obj, mvm, hvm, pevm, vevm, tvm
         Select Case vim.ModelName
             Case "MenuViewModel"
                 mvm = New MenuViewModel
@@ -347,27 +350,41 @@ Public MustInherit Class BaseViewModel2
                 vevm.Initialize(AppInfo, ViewModel)
                 vim.Content = vevm
             Case "TabViewModel"
-                For Each vt In vim.Content.ViewTabs
-                    Call _FrameViewLoad(vt)
+                tvm = New TabViewModel
+                ' 循環の関係で、ParentはIgnoreにしているので、ここでセットする
+                For Each child In vim.Children
+                    child.Parent = vim
+                    Call _FrameViewLoad(child)
+                    If child.IsVisible Then
+                        tvm.AddTab(child)
+                    End If
                 Next
+                vim.Content = IIf(tvm.ViewTabs.Count > 0, tvm, Nothing)
             Case Else
                 obj = [define](vim.ModelName)
-                obj.Initialize(AppInfo, ViewModel)
+                Call obj.Initialize(AppInfo, ViewModel)
                 vim.Content = obj
         End Select
     End Sub
 
-    Private Sub _FrameViewSetup()
+    Private Function _FrameViewSetup() As FrameViewModel
         Dim [setup] As ViewSetupDelegater _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewSetupExecute
-        'Dim fvm As FlexibleViewModel
+
+        Dim menuvc As ViewItemModel
+        Dim mainvc As ViewItemModel
+        Dim levc As ViewItemModel
+        Dim revc As ViewItemModel
+        Dim hvc As ViewItemModel
+
         Dim fvm As FrameViewModel
         Dim mvm = New MenuViewModel
         Dim pevm = New ProjectExplorerViewModel
         Dim vevm = New ViewExplorerViewModel
         Dim hvm = New HistoryViewModel
 
-        Dim etvm = New TabViewModel
+        Dim letvm = New TabViewModel
+        Dim retvm = New TabViewModel
         Dim htvm = New TabViewModel
 
         Call hvm.Initialize(AppInfo, ViewModel)
@@ -375,69 +392,73 @@ Public MustInherit Class BaseViewModel2
         Call pevm.Initialize(AppInfo, ViewModel)
         Call vevm.Initialize(AppInfo, ViewModel)
 
-        Call etvm.AddTab(New ViewItemModel With {
+        ' MenuViewContent
+        '-------------------------------------------------'
+        menuvc = New ViewItemModel With {
+            .Name = "Menu",
+            .IsVisible = True,
+            .Content = mvm
+        }
+        '-------------------------------------------------'
+
+        ' LeftExplorerViewContent
+        '-------------------------------------------------'
+        Call letvm.AddTab(New ViewItemModel With {
             .Name = "ViewExp",
+            .IsVisible = True,
             .Content = vevm
         })
-        Call etvm.AddTab(New ViewItemModel With {
+        Call letvm.AddTab(New ViewItemModel With {
             .Name = "ProjExp",
+            .IsVisible = True,
             .Content = pevm
         })
+        levc = New ViewItemModel With {
+            .Name = "ViewExp(Left)",
+            .IsVisible = True,
+            .Content = letvm
+        }
+        Call levc.RegisterChildren()
+        '-------------------------------------------------'
 
+        ' HistoryViewContent
+        '-------------------------------------------------'
         Call htvm.AddTab(New ViewItemModel With {
             .Name = "History",
+            .IsVisible = True,
             .Content = hvm
         })
+        hvc = New ViewItemModel With {
+            .Name = "HistoryFrame",
+            .IsVisible = True,
+            .Content = htvm
+        }
+        Call hvc.RegisterChildren()
+        '-------------------------------------------------'
+
+        ' MainViewContent
+        '-------------------------------------------------'
+        mainvc = [setup](AppInfo, ViewModel)
+        mainvc.IsVisible = True
+        '-------------------------------------------------'
+
+        ' RightExplorerViewContent
+        ''-------------------------------------------------'
+        'revc = New ViewItemModel With {
+        '    .Name = "RightExplorer",
+        '    .IsVisible = False,
+        '    .Content = retvm
+        '}
+        ''-------------------------------------------------'
 
         fvm = New FrameViewModel With {
-            .LeftExplorerViewContent = New ViewItemModel With {
-                .Name = "ViewExp(Left)",
-                .Content = etvm
-            },
-            .MenuViewContent = New ViewItemModel With {
-                .Name = "Menu",
-                .Content = mvm
-            },
-            .MainViewContent = New ViewItemModel With {
-                .Name = "Main",
-                .Content = [setup](AppInfo, ViewModel)
-            },
-            .HistoryViewContent = New ViewItemModel With {
-                .Name = "Hist",
-                .Content = htvm
-            }
+            .MenuViewContent = menuvc,
+            .LeftExplorerViewContent = levc,
+            .MainViewContent = mainvc,
+            .HistoryViewContent = hvc
         }
-
-        'fvm = New FlexibleViewModel With {
-        '    .ContentViewHeight = 25.0,
-        '    .MainViewContent = New ViewItemModel With {
-        '        .Name = "Menu",
-        '        .Content = mvm
-        '    },
-        '    .BottomViewContent = New ViewItemModel With {
-        '        .Name = "LeftView",
-        '        .Content = New FlexibleViewModel With {
-        '            .ContentViewWidth = 200.0,
-        '            .MainViewContent = New ViewItemModel With {
-        '                .Name = "ExpTabs",
-        '                .Content = etvm
-        '            },
-        '            .RightViewContent = New ViewItemModel With {
-        '                .Name = "RightView",
-        '                .Content = New FlexibleViewModel With {
-        '                    .MainViewContent = [setup](AppInfo, ViewModel),
-        '                    .BottomViewContent = New ViewItemModel With {
-        '                        .Name = "HistTabs",
-        '                        .Content = htvm
-        '                    }
-        '                }
-        '            }
-        '        }
-        '    }
-        '}
-        'Call _ViewItemSetup(fvm)
-        Call ViewModel.VisualizeView(fvm)
-    End Sub
+        _FrameViewSetup = fvm
+    End Function
 
 
     ' 廃止検討中

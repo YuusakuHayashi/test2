@@ -437,6 +437,7 @@ Public Class UserDirectoryViewModel
                 .Content = Me
             }
         }
+        Call fvm.OptimizeView()
         Call ViewModel.VisualizeView(fvm)
     End Sub
 
