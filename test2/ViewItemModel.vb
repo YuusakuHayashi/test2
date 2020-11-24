@@ -153,6 +153,17 @@ Public Class ViewItemModel
         End Set
     End Property
 
+    Private _RestoreContent As Object
+    <JsonIgnore>
+    Public Property RestoreContent As Object
+        Get
+            Return Me._RestoreContent
+        End Get
+        Set(value As Object)
+            Me._RestoreContent = value
+        End Set
+    End Property
+
     Private _CloseViewButtonVisibility As Visibility
     <JsonIgnore>
     Public Property CloseViewButtonVisibility As Visibility

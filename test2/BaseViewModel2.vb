@@ -336,34 +336,46 @@ Public MustInherit Class BaseViewModel2
             Case "MenuViewModel"
                 mvm = New MenuViewModel
                 mvm.Initialize(AppInfo, ViewModel)
+                vim.RestoreContent = mvm
                 vim.Content = mvm
             Case "HistoryViewModel"
                 hvm = New HistoryViewModel
                 hvm.Initialize(AppInfo, ViewModel)
+                vim.RestoreContent = hvm
                 vim.Content = hvm
             Case "ProjectExplorerViewModel"
                 pevm = New ProjectExplorerViewModel
                 pevm.Initialize(AppInfo, ViewModel)
+                vim.RestoreContent = pevm
                 vim.Content = pevm
             Case "ViewExplorerViewModel"
                 vevm = New ViewExplorerViewModel
                 vevm.Initialize(AppInfo, ViewModel)
+                vim.RestoreContent = vevm
                 vim.Content = vevm
             Case "TabViewModel"
                 tvm = New TabViewModel
-                ' 循環の関係で、ParentはIgnoreにしているので、ここでセットする
                 For Each child In vim.Children
+                    ' 親の認知
+                    ' 循環の関係で、ParentはIgnoreにしているため
                     child.Parent = vim
                     Call _FrameViewLoad(child)
                     If child.IsVisible Then
                         tvm.AddTab(child)
                     End If
                 Next
-                vim.Content = IIf(tvm.ViewTabs.Count > 0, tvm, Nothing)
+                vim.RestoreContent = tvm
+                If (vim.IsVisible) And (tvm.ViewTabs.Count > 0) Then
+                    vim.Content = tvm
+                Else
+                    vim.IsVisible = False
+                    vim.Content = Nothing
+                End If
             Case Else
                 obj = [define](vim.ModelName)
                 Call obj.Initialize(AppInfo, ViewModel)
-                vim.Content = obj
+                vim.RestoreContent = obj
+                vim.Content = IIf(vim.IsVisible, obj, Nothing)
         End Select
     End Sub
 

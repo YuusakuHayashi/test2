@@ -68,36 +68,56 @@
         _OpenViewDataSet = Nothing
         If dst IsNot Nothing Then
             If dst.Name = src.Name Then
+                dst.IsVisible = True
                 If dst.Content Is Nothing Then
-                    src.IsVisible = True
-                    dst.Content = src.Content
+                    dst.Content = dst.RestoreContent
+                End If
+                If dst.ModelName = "TabViewModel" Then
+                    Call _OpenTabViewDataSet(src, dst)
                 End If
             Else
                 If dst.ModelName = "TabViewModel" Then
-                    Call _OpenTabViewDataSet(src, dst)
+                    If src.Parent IsNot Nothing Then
+                        If dst.Name = src.Parent.Name Then
+                            Call _OpenTabViewDataSetFromChild(src, dst)
+                        End If
+                    End If
                 End If
             End If
             _OpenViewDataSet = dst
         End If
     End Function
 
-    Private Sub _OpenTabViewDataSet(ByRef src As ViewItemModel, ByRef dst As ViewItemModel)
-        Dim tvm As TabViewModel
-        If src.Parent.Name = dst.Name Then
-            src.Parent.IsVisible = True
-            If dst.Content Is Nothing Then
-                tvm = New TabViewModel
-                dst.Content = tvm
-                Call _OpenTabViewDataSet(src, dst)
-            Else
-                For Each child In dst.Children
-                    If src.Name = child.Name Then
-                        src.IsVisible = True
-                        Call dst.Content.AddTab(src)
-                    End If
-                Next
+    ' タブ子要素をすべて開く
+    Private Sub _OpenTabViewDataSet(ByRef src As ViewItemModel,
+                                    ByRef dst As ViewItemModel)
+        For Each child In dst.Children
+            child.IsVisible = True
+            If child.Content Is Nothing Then
+                child.Content = child.RestoreContent
             End If
+            Call dst.Content.AddTab(child)
+        Next
+    End Sub
+
+    ' タブ子要素を（から）開く
+    Private Sub _OpenTabViewDataSetFromChild(ByRef src As ViewItemModel,
+                                             ByRef dst As ViewItemModel)
+        Dim tvm As TabViewModel
+        dst.IsVisible = True
+        If dst.Content Is Nothing Then
+            dst.Content = dst.RestoreContent
         End If
+        For Each child In dst.Children
+            If src.Name = child.Name Then
+                child.IsVisible = True
+                If child.Content Is Nothing Then
+                    child.Content = child.RestoreContent
+                End If
+                Call dst.Content.AddTab(child)
+                Exit For
+            End If
+        Next
     End Sub
     '---------------------------------------------------------------------------------------------'
 

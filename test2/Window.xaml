@@ -1708,39 +1708,27 @@
                 </DockPanel>
             </DataTemplate>-->
 
-            <DataTemplate DataType="{x:Type local:FrameViewModel}">
+            <!--<DataTemplate DataType="{x:Type local:FrameViewModel}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{Binding LeftExplorerGridWidth}" />
-                        <ColumnDefinition Width="{Binding LeftExplorerMainGridSplitterWidth}" />
                         <ColumnDefinition Width="{Binding MainGridWidth}" />
-                        <ColumnDefinition Width="{Binding MainRightExplorerGridSplitterWidth}" />
                         <ColumnDefinition Width="{Binding RightExplorerGridWidth}" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{Binding MenuGridHeight}" />
-                        <RowDefinition Height="{Binding MenuMainGridSplitterHeight}" />
                         <RowDefinition Height="{Binding MainGridHeight}" />
-                        <RowDefinition Height="{Binding MainHistoryGridSplitterHeight}" />
                         <RowDefinition Height="{Binding HistoryGridHeight}" />
                     </Grid.RowDefinitions>
-
                     <ContentControl
                         x:Name="MenuContent"
                         Grid.Row="{Binding MenuRow}" 
                         Grid.Column="{Binding MenuColumn}" 
                         Grid.ColumnSpan="{Binding MenuColumnSpan}"
+                        Visibility="{Binding MenuVisibility}"
                         SizeChanged="MenuContent_SizeChanged"
                         Content="{Binding MenuViewContent.Content}">
                     </ContentControl>
-                    <!--<ContentControl
-                        x:Name="LeftExplorerContent"
-                        Grid.Row="{Binding LeftExplorerRow}" 
-                        Grid.Column="{Binding LeftExplorerColumn}" 
-                        Grid.RowSpan="{Binding LeftExplorerRowSpan}"
-                        Content="{Binding LeftExplorerViewContent.Content}"
-                        SizeChanged="LeftExplorerContent_SizeChanged">
-                    </ContentControl>-->
                     <DockPanel
                         x:Name="LeftExplorerContent"
                         VerticalAlignment="Stretch"
@@ -1748,6 +1736,7 @@
                         Grid.Row="{Binding LeftExplorerRow}" 
                         Grid.Column="{Binding LeftExplorerColumn}" 
                         Grid.RowSpan="{Binding LeftExplorerRowSpan}"
+                        Visibility="{Binding LeftExplorerVisibility}"
                         LastChildFill="True"
                         SizeChanged="LeftExplorerContent_SizeChanged">
                         <StackPanel 
@@ -1767,6 +1756,7 @@
                         Grid.Row="{Binding MainRow}" 
                         Grid.RowSpan="{Binding MainRowSpan}" 
                         Grid.Column="{Binding MainColumn}"
+                        Visibility="{Binding MainVisibility}"
                         SizeChanged="MainContent_SizeChanged"
                         Content="{Binding MainViewContent.Content}">
                     </ContentControl>
@@ -1777,6 +1767,7 @@
                         Grid.Row="{Binding RightExplorerRow}" 
                         Grid.Column="{Binding RightExplorerColumn}" 
                         Grid.RowSpan="{Binding RightExplorerRowSpan}" 
+                        Visibility="{Binding RightExplorerVisibility}"
                         LastChildFill="True"
                         SizeChanged="RightExplorerContent_SizeChanged">
                         <StackPanel 
@@ -1793,109 +1784,210 @@
                     </DockPanel>
                     <ContentControl
                         x:Name="HistoryContent"
-                        Grid.Row="4" Grid.Column="2"                        
+                        Visibility="{Binding HistoryVisibility}"
+                        Grid.Row="{Binding HistoryRow}" Grid.Column="{Binding HistoryColumn}"                        
                         SizeChanged="HistoryContent_SizeChanged"
                         Content="{Binding HistoryViewContent.Content}">
                     </ContentControl>
                     <GridSplitter
                         IsEnabled="{Binding IsLeftExplorerMainGridSplitterEnabled}"
+                        Width="{Binding LeftExplorerMainGridSplitterWidth}"
+                        Grid.Column="0"                    
                         Grid.Row="1" 
-                        Grid.RowSpan="4"
-                        Grid.Column="1"                                         
+                        Grid.RowSpan="2"
                         ResizeDirection="Columns"                
                         ResizeBehavior="{Binding LeftExplorerMainSplitterResizeBehavior}"
                         VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />
+                        HorizontalAlignment="Right" />
                     <GridSplitter
                         IsEnabled="{Binding IsMainRightExplorerGridSplitterEnabled}"
-                        Grid.Row="1" Grid.RowSpan="4"
-                        Grid.Column="3"
+                        Width="{Binding MainRightExplorerGridSplitterWidth}"
+                        Grid.Row="1"
+                        Grid.RowSpan="2"
+                        Grid.Column="1"                        
                         ResizeDirection="Columns"
                         ResizeBehavior="{Binding MainRightExplorerSplitterResizeBehavior}"
                         VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />
+                        HorizontalAlignment="Right" />
                     <GridSplitter
                         IsEnabled="{Binding IsMenuMainGridSplitterEnabled}"
-                        Grid.Row="1"
-                        Grid.Column="0" Grid.ColumnSpan="5"
-                        ResizeDirection="Rows"                
+                        Height="{Binding MenuMainGridSplitterHeight}"
+                        Grid.Row="0"
+                        Grid.Column="0" 
+                        Grid.ColumnSpan="3"
+                        ResizeDirection="Rows"                              
                         ResizeBehavior="{Binding MenuMainSplitterResizeBehavior}"
-                        VerticalAlignment="Stretch"
+                        VerticalAlignment="Bottom"
                         HorizontalAlignment="Stretch" />
                     <GridSplitter
                         IsEnabled="{Binding IsMainHistoryGridSplitterEnabled}"
-                        Grid.Row="3"
-                        Grid.Column="1" Grid.ColumnSpan="3"
+                        Height="{Binding MainHistoryGridSplitterHeight}"
+                        Grid.Row="1"
+                        Grid.Column="1" 
                         ResizeDirection="Rows"                
                         ResizeBehavior="{Binding MainHistorySplitterResizeBehavior}"
-                        VerticalAlignment="Stretch"
+                        VerticalAlignment="Bottom"
                         HorizontalAlignment="Stretch" />
-                    <!--<GridSplitter
-                        IsEnabled="{Binding IsLeftExplorerMainGridSplitterEnabled}"
-                        Grid.Row="1" 
-                        Grid.RowSpan="4"
-                        Grid.Column="1"                                         
-                        ResizeDirection="Columns"                
-                        ResizeBehavior="PreviousAndNext"
+                </Grid>
+            </DataTemplate>-->
+
+            <DataTemplate DataType="{x:Type local:FrameViewModel}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="{Binding LeftExplorerGridWidth}" />
+                        <ColumnDefinition Width="{Binding MainGridWidth}" />
+                        <ColumnDefinition Width="{Binding RightExplorerGridWidth}" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="{Binding MenuGridHeight}" />
+                        <RowDefinition Height="{Binding MainGridHeight}" />
+                        <RowDefinition Height="{Binding HistoryGridHeight}" />
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ContentControl
+                        x:Name="MenuContent"
+                        Grid.Row="{Binding MenuRow}" 
+                        Grid.Column="{Binding MenuColumn}" 
+                        Grid.ColumnSpan="{Binding MenuColumnSpan}"
+                        Visibility="{Binding MenuVisibility}"
+                        SizeChanged="MenuContent_SizeChanged"
+                        Content="{Binding MenuViewContent.Content}">
+                    </ContentControl>
+                    <DockPanel
+                        x:Name="LeftExplorerContent"
                         VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />
+                        HorizontalAlignment="Stretch"
+                        Grid.Row="{Binding LeftExplorerRow}" 
+                        Grid.Column="{Binding LeftExplorerColumn}" 
+                        Grid.RowSpan="{Binding LeftExplorerRowSpan}"
+                        Visibility="{Binding LeftExplorerVisibility}"
+                        LastChildFill="True"
+                        SizeChanged="LeftExplorerContent_SizeChanged">
+                        <StackPanel 
+                            DockPanel.Dock="Top"
+                            Orientation="Horizontal">
+                            <Button 
+                                Command="{Binding SwitchToRightCommand}"
+                                Content=">>" />
+                        </StackPanel>
+                        <ContentControl
+                            DockPanel.Dock="Top"
+                            Content="{Binding LeftExplorerViewContent.Content}">
+                        </ContentControl>
+                    </DockPanel>
+                    <ContentControl
+                        x:Name="MainContent"
+                        Grid.Row="{Binding MainRow}" 
+                        Grid.RowSpan="{Binding MainRowSpan}" 
+                        Grid.Column="{Binding MainColumn}"
+                        Visibility="{Binding MainVisibility}"
+                        SizeChanged="MainContent_SizeChanged"
+                        Content="{Binding MainViewContent.Content}">
+                    </ContentControl>
+                    <DockPanel
+                        x:Name="RightExplorerContent"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Grid.Row="{Binding RightExplorerRow}" 
+                        Grid.Column="{Binding RightExplorerColumn}" 
+                        Grid.RowSpan="{Binding RightExplorerRowSpan}" 
+                        Visibility="{Binding RightExplorerVisibility}"
+                        LastChildFill="True"
+                        SizeChanged="RightExplorerContent_SizeChanged">
+                        <StackPanel 
+                            DockPanel.Dock="Top"
+                            Orientation="Horizontal">
+                            <Button 
+                                Command="{Binding SwitchToLeftCommand}"
+                                Content="&lt;&lt;" />
+                        </StackPanel>
+                        <ContentControl
+                            DockPanel.Dock="Top"
+                            Content="{Binding RightExplorerViewContent.Content}">
+                        </ContentControl>
+                    </DockPanel>
+                    <ContentControl
+                        x:Name="HistoryContent"
+                        Visibility="{Binding HistoryVisibility}"
+                        Grid.Row="{Binding HistoryRow}" Grid.Column="{Binding HistoryColumn}"                        
+                        SizeChanged="HistoryContent_SizeChanged"
+                        Content="{Binding HistoryViewContent.Content}">
+                    </ContentControl>
                     <GridSplitter
-                        IsEnabled="{Binding IsRightExplorerMainGridSplitterEnabled}"
-                        Grid.Row="1" Grid.RowSpan="4"
-                        Grid.Column="3"
-                        ResizeDirection="Columns"
-                        ResizeBehavior="PreviousAndNext"
+                        IsEnabled="{Binding IsLeftExplorerMainGridSplitterEnabled}"
+                        Width="{Binding LeftExplorerMainGridSplitterWidth}"
+                        Grid.Column="1"                    
+                        Grid.Row="2" 
+                        Grid.RowSpan="2"
+                        ResizeDirection="Columns"                
+                        ResizeBehavior="{Binding LeftExplorerMainSplitterResizeBehavior}"
                         VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />
+                        HorizontalAlignment="Right" />
+                    <GridSplitter
+                        IsEnabled="{Binding IsMainRightExplorerGridSplitterEnabled}"
+                        Width="{Binding MainRightExplorerGridSplitterWidth}"
+                        Grid.Row="2"
+                        Grid.RowSpan="2"
+                        Grid.Column="2"                        
+                        ResizeDirection="Columns"
+                        ResizeBehavior="{Binding MainRightExplorerSplitterResizeBehavior}"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Right" />
                     <GridSplitter
                         IsEnabled="{Binding IsMenuMainGridSplitterEnabled}"
+                        Height="{Binding MenuMainGridSplitterHeight}"
                         Grid.Row="1"
-                        Grid.Column="0" Grid.ColumnSpan="5"
-                        ResizeDirection="Rows"                
-                        ResizeBehavior="PreviousAndNext"
-                        VerticalAlignment="Stretch"
+                        Grid.Column="1" 
+                        Grid.ColumnSpan="3"
+                        ResizeDirection="Rows"                              
+                        ResizeBehavior="{Binding MenuMainSplitterResizeBehavior}"
+                        VerticalAlignment="Bottom"
                         HorizontalAlignment="Stretch" />
                     <GridSplitter
                         IsEnabled="{Binding IsMainHistoryGridSplitterEnabled}"
-                        Grid.Row="3"
-                        Grid.Column="1" Grid.ColumnSpan="3"
+                        Height="{Binding MainHistoryGridSplitterHeight}"
+                        Grid.Row="2"
+                        Grid.Column="2" 
                         ResizeDirection="Rows"                
-                        ResizeBehavior="PreviousAndNext"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch" />-->
+                        ResizeBehavior="{Binding MainHistorySplitterResizeBehavior}"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Stretch" />
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type local:FlexibleViewModel}">
+            <!--<DataTemplate DataType="{x:Type local:FlexibleViewModel}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{Binding ContentGridWidth}" />
                         <ColumnDefinition Width="{Binding HorizontalSplitterWidth}" />
                         <ColumnDefinition Width="{Binding RightGridWidth}" />
-                        <!--<ColumnDefinition Width="*" />
+                        --><!--<ColumnDefinition Width="*" />
                         <ColumnDefinition Width="5" />
-                        <ColumnDefinition Width="*" />-->
+                        <ColumnDefinition Width="*" />--><!--
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="{Binding ContentGridHeight}" />
                         <RowDefinition Height="{Binding VerticalSplitterHeight}" />
                         <RowDefinition Height="{Binding BottomGridHeight}" />
-                        <!--<RowDefinition Height="*" />
+                        --><!--<RowDefinition Height="*" />
                         <RowDefinition Height="5" />
-                        <RowDefinition Height="*" />-->
+                        <RowDefinition Height="*" />--><!--
                     </Grid.RowDefinitions>
                     <StackPanel 
                         x:Name="ContentPanel"
                         Height="{Binding ContentViewHeight, Mode=OneWayToSource}"
                         Width="{Binding ContentViewWidth, Mode=OneWayToSource}"
                         Grid.Row="0" Grid.Column="0">
-                        <!--<StackPanel Orientation="Horizontal">
+                        --><!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="Hight=" />
                             <TextBlock Text="{Binding ContentViewHeight}" />
                             <TextBlock Text=", " />
                             <TextBlock Text="Width=" />
                             <TextBlock Text="{Binding ContentViewWidth}" />
-                        </StackPanel>-->
+                        </StackPanel>--><!--
                         <ContentControl
                             x:Name="MainView" 
                             Content="{Binding MainContent}" />
@@ -1903,10 +1995,10 @@
                     <StackPanel
                         x:Name="RightPanel"
                         Grid.Row="0" Grid.Column="2">
-                        <!--<StackPanel Orientation="Horizontal">
+                        --><!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="RightWidth=" />
                             <TextBlock Text="{Binding RightViewWidth}" />
-                        </StackPanel>-->
+                        </StackPanel>--><!--
                         <ContentControl
                             x:Name="RightView"                                    
                             Content="{Binding RightContent}" />
@@ -1914,10 +2006,10 @@
                     <StackPanel
                         x:Name="BottomPanel"
                         Grid.Row="2" Grid.Column="0">
-                        <!--<StackPanel Orientation="Horizontal">
+                        --><!--<StackPanel Orientation="Horizontal">
                             <TextBlock Text="BottomHeight=" />
                             <TextBlock Text="{Binding BottomViewHeight}" />
-                        </StackPanel>-->
+                        </StackPanel>--><!--
                         <ContentControl
                             x:Name="BottomView"
                             Content="{Binding BottomContent}" />
@@ -1941,7 +2033,7 @@
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch" />
                 </Grid>
-            </DataTemplate>
+            </DataTemplate>-->
         </Grid.Resources>
         
         <ContentControl Content="{Binding Content}" />

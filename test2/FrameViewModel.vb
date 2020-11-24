@@ -305,45 +305,45 @@ Public Class FrameViewModel
 
     ' GRID SPLITTER LENGTH
     '---------------------------------------------------------------'
-    Private _MenuMainGridSplitterHeight As GridLength
-    Public Property MenuMainGridSplitterHeight As GridLength
+    Private _MenuMainGridSplitterHeight As Double
+    Public Property MenuMainGridSplitterHeight As Double
         Get
             Return Me._MenuMainGridSplitterHeight
         End Get
-        Set(value As GridLength)
+        Set(value As Double)
             Me._MenuMainGridSplitterHeight = value
             RaisePropertyChanged("MenuMainGridSplitterHeight")
         End Set
     End Property
 
-    Private _MainHistoryGridSplitterHeight As GridLength
-    Public Property MainHistoryGridSplitterHeight As GridLength
+    Private _MainHistoryGridSplitterHeight As Double
+    Public Property MainHistoryGridSplitterHeight As Double
         Get
             Return Me._MainHistoryGridSplitterHeight
         End Get
-        Set(value As GridLength)
+        Set(value As Double)
             Me._MainHistoryGridSplitterHeight = value
             RaisePropertyChanged("MainHistoryGridSplitterHeight")
         End Set
     End Property
 
-    Private _LeftExplorerMainGridSplitterWidth As GridLength
-    Public Property LeftExplorerMainGridSplitterWidth As GridLength
+    Private _LeftExplorerMainGridSplitterWidth As Double
+    Public Property LeftExplorerMainGridSplitterWidth As Double
         Get
             Return Me._LeftExplorerMainGridSplitterWidth
         End Get
-        Set(value As GridLength)
+        Set(value As Double)
             Me._LeftExplorerMainGridSplitterWidth = value
             RaisePropertyChanged("LeftExplorerMainGridSplitterWidth")
         End Set
     End Property
 
-    Private _MainRightExplorerGridSplitterWidth As GridLength
-    Public Property MainRightExplorerGridSplitterWidth As GridLength
+    Private _MainRightExplorerGridSplitterWidth As Double
+    Public Property MainRightExplorerGridSplitterWidth As Double
         Get
             Return Me._MainRightExplorerGridSplitterWidth
         End Get
-        Set(value As GridLength)
+        Set(value As Double)
             Me._MainRightExplorerGridSplitterWidth = value
             RaisePropertyChanged("MainRightExplorerGridSplitterWidth")
         End Set
@@ -506,53 +506,6 @@ Public Class FrameViewModel
         End Set
     End Property
     '---------------------------------------------------------------'
-
-    ' GRID SPLITTER FLOW DIRECTION
-    ''---------------------------------------------------------------'
-    'Private _MenuMainSplitterFlowDirection As Integer
-    'Public Property MenuMainSplitterFlowDirection As Integer
-    '    Get
-    '        Return Me._MenuMainSplitterFlowDirection
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._MenuMainSplitterFlowDirection = value
-    '        RaisePropertyChanged("MenuMainSplitterFlowDirection")
-    '    End Set
-    'End Property
-
-    'Private _MainHistorySplitterFlowDirection As Integer
-    'Public Property MainHistorySplitterFlowDirection As Integer
-    '    Get
-    '        Return Me._MainHistorySplitterFlowDirection
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._MainHistorySplitterFlowDirection = value
-    '        RaisePropertyChanged("MainHistorySplitterFlowDirection")
-    '    End Set
-    'End Property
-
-    'Private _LeftExplorerMainSplitterFlowDirection As Integer
-    'Public Property LeftExplorerMainSplitterFlowDirection As Integer
-    '    Get
-    '        Return Me._LeftExplorerMainSplitterFlowDirection
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._LeftExplorerMainSplitterFlowDirection = value
-    '        RaisePropertyChanged("LeftExplorerMainSplitterFlowDirection")
-    '    End Set
-    'End Property
-
-    'Private _MainRightExplorerSplitterFlowDirection As Integer
-    'Public Property MainRightExplorerSplitterFlowDirection As Integer
-    '    Get
-    '        Return Me._MainRightExplorerSplitterFlowDirection
-    '    End Get
-    '    Set(value As Integer)
-    '        Me._MainRightExplorerSplitterFlowDirection = value
-    '        RaisePropertyChanged("MainRightExplorerSplitterFlowDirection")
-    '    End Set
-    'End Property
-    ''---------------------------------------------------------------'
 
     ' GRID SPLITTER RESIZE BEHAVIOR
     '---------------------------------------------------------------'
@@ -730,7 +683,6 @@ Public Class FrameViewModel
         Set(value As ViewItemModel)
             Me._MainViewContent = value
             RaisePropertyChanged("MainViewContent")
-            'RaisePropertyChanged("MainViewContent.Content")
         End Set
     End Property
 
@@ -742,7 +694,6 @@ Public Class FrameViewModel
         Set(value As ViewItemModel)
             Me._LeftExplorerViewContent = value
             RaisePropertyChanged("LeftExplorerViewContent")
-            'RaisePropertyChanged("LeftExplorerViewContent.Content")
         End Set
     End Property
 
@@ -754,7 +705,6 @@ Public Class FrameViewModel
         Set(value As ViewItemModel)
             Me._HistoryViewContent = value
             RaisePropertyChanged("HistoryViewContent")
-            'RaisePropertyChanged("HistoryViewContent.Content")
         End Set
     End Property
 
@@ -766,7 +716,6 @@ Public Class FrameViewModel
         Set(value As ViewItemModel)
             Me._RightExplorerViewContent = value
             RaisePropertyChanged("RightExplorerViewContent")
-            'RaisePropertyChanged("RightExplorerViewContent.Content")
         End Set
     End Property
     '---------------------------------------------------------------'
@@ -778,24 +727,23 @@ Public Class FrameViewModel
         End If
         If vim.Equals(Me.LeftExplorerViewContent) Then
             Me.LeftExplorerGridWidth = GridLength.Auto
-            Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            'Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsLeftExplorerMainGridSplitterEnabled = True
-            Me.LeftExplorerMainGridSplitterWidth = New GridLength(5.0)
+            Me.LeftExplorerMainGridSplitterWidth = 5.0
         End If
         If vim.Equals(Me.RightExplorerViewContent) Then
-            Me.MainGridWidth = GridLength.Auto
-            Me.RightExplorerGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.RightExplorerGridWidth = GridLength.Auto
+            'Me.RightExplorerGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsMainRightExplorerGridSplitterEnabled = True
-            Me.MainRightExplorerGridSplitterWidth = New GridLength(5.0)
+            Me.MainRightExplorerGridSplitterWidth = 5.0
         End If
         If vim.Equals(Me.HistoryViewContent) Then
-            Me.MainGridHeight = GridLength.Auto
-            Me.HistoryGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            'Me.HistoryGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.HistoryGridHeight = GridLength.Auto
             Me.IsMainHistoryGridSplitterEnabled = True
-            Me.MainHistoryGridSplitterHeight = New GridLength(5.0)
+            Me.MainHistoryGridSplitterHeight = 5.0
         End If
     End Sub
-
 
     Public Sub CloseView(ByRef vim As ViewItemModel)
         If vim.Equals(Me.MenuViewContent) Then
@@ -803,22 +751,20 @@ Public Class FrameViewModel
         If vim.Equals(Me.MainViewContent) Then
         End If
         If vim.Equals(Me.LeftExplorerViewContent) Then
-            Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-            Me.LeftExplorerGridWidth = New GridLength(0.0)
+            'Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsLeftExplorerMainGridSplitterEnabled = False
-            Me.LeftExplorerMainGridSplitterWidth = New GridLength(0.0)
+            Me.LeftExplorerMainGridSplitterWidth = 0.0
         End If
         If vim.Equals(Me.RightExplorerViewContent) Then
-            Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
-            Me.RightExplorerGridWidth = New GridLength(0.0)
+            'Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsMainRightExplorerGridSplitterEnabled = False
-            Me.MainRightExplorerGridSplitterWidth = New GridLength(0.0)
+            Me.MainRightExplorerGridSplitterWidth = 0.0
         End If
         If vim.Equals(Me.HistoryViewContent) Then
             Me.HistoryGridHeight = New GridLength(0.0)
-            Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            'Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsMainHistoryGridSplitterEnabled = False
-            Me.MainHistoryGridSplitterHeight = New GridLength(0.0)
+            Me.MainHistoryGridSplitterHeight = 0.0
         End If
     End Sub
 
@@ -832,10 +778,10 @@ Public Class FrameViewModel
         Me.MainRightExplorerSplitterResizeBehavior = GridResizeBehavior.PreviousAndNext
 
         ' GRID SPLITTER LENGTH, GRID SPLITTER ISENABLED
-        Me.MenuMainGridSplitterHeight = New GridLength(5.0)
-        Me.MainHistoryGridSplitterHeight = New GridLength(5.0)
-        Me.LeftExplorerMainGridSplitterWidth = New GridLength(5.0)
-        Me.MainRightExplorerGridSplitterWidth = New GridLength(5.0)
+        Me.MenuMainGridSplitterHeight = 5.0
+        Me.MainHistoryGridSplitterHeight = 5.0
+        Me.LeftExplorerMainGridSplitterWidth = 5.0
+        Me.MainRightExplorerGridSplitterWidth = 5.0
         Me.IsMenuMainGridSplitterEnabled = True
         Me.IsLeftExplorerMainGridSplitterEnabled = True
         Me.IsMainRightExplorerGridSplitterEnabled = True
@@ -853,7 +799,7 @@ Public Class FrameViewModel
         End If
         If Not ck1 Then
             Me.IsMenuMainGridSplitterEnabled = False
-            Me.MenuMainGridSplitterHeight = New GridLength(0.0)
+            Me.MenuMainGridSplitterHeight = 0.0
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -885,7 +831,7 @@ Public Class FrameViewModel
         End If
         If (ck2 = False) And (ck3 = False) And (ck4 = False) Then
             Me.IsMenuMainGridSplitterEnabled = False
-            Me.MenuMainGridSplitterHeight = New GridLength(0.0)
+            Me.MenuMainGridSplitterHeight = 0.0
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -901,7 +847,7 @@ Public Class FrameViewModel
         End If
         If Not ck5 Then
             Me.IsLeftExplorerMainGridSplitterEnabled = False
-            Me.LeftExplorerMainGridSplitterWidth = New GridLength(0.0)
+            Me.LeftExplorerMainGridSplitterWidth = 0.0
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -917,7 +863,7 @@ Public Class FrameViewModel
         End If
         If Not ck6 Then
             Me.IsMainRightExplorerGridSplitterEnabled = False
-            Me.MainRightExplorerGridSplitterWidth = New GridLength(0.0)
+            Me.MainRightExplorerGridSplitterWidth = 0.0
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -941,9 +887,9 @@ Public Class FrameViewModel
         End If
         If (ck7 = False) And (ck8 = False) Then
             Me.IsLeftExplorerMainGridSplitterEnabled = False
-            Me.LeftExplorerMainGridSplitterWidth = New GridLength(0.0)
+            Me.LeftExplorerMainGridSplitterWidth = 0.0
             Me.IsMainRightExplorerGridSplitterEnabled = False
-            Me.MainRightExplorerGridSplitterWidth = New GridLength(0.0)
+            Me.MainRightExplorerGridSplitterWidth = 0.0
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -959,7 +905,7 @@ Public Class FrameViewModel
         End If
         If Not ck9 Then
             Me.IsMainHistoryGridSplitterEnabled = False
-            Me.MainHistoryGridSplitterHeight = New GridLength(0.0)
+            Me.MainHistoryGridSplitterHeight = 0.0
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -975,41 +921,69 @@ Public Class FrameViewModel
         End If
         If Not ck10 Then
             Me.IsMainHistoryGridSplitterEnabled = False
-            Me.MainHistoryGridSplitterHeight = New GridLength(0.0)
+            Me.MainHistoryGridSplitterHeight = 0.0
         End If
         '-----------------------------------------------------------------------------------------'
 
         ' GRID LENGTH
+        'If Me.MenuViewHeightFlag Then
+        '    Me.MenuGridHeight = New GridLength(Me.MenuViewPreservedHeight)
+        'Else
+        '    Me.MenuGridHeight = GridLength.Auto
+        'End If
+        'If Me.MainViewHeightFlag Then
+        '    Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+        'Else
+        '    Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+        'End If
+        'If Me.HistoryViewHeightFlag Then
+        '    Me.HistoryGridHeight = New GridLength(Me.HistoryViewPreservedHeight)
+        'Else
+        '    Me.HistoryGridHeight = GridLength.Auto
+        'End If
+        'If Me.LeftExplorerViewWidthFlag Then
+        '    Me.LeftExplorerGridWidth = New GridLength(Me.LeftExplorerViewPreservedWidth)
+        'Else
+        '    Me.LeftExplorerGridWidth = GridLength.Auto
+        'End If
+        'If Me.MainViewWidthFlag Then
+        '    Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+        'Else
+        '    Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+        'End If
+        'If Me.RightExplorerViewWidthFlag Then
+        '    Me.RightExplorerGridWidth = New GridLength(Me.RightExplorerViewPreservedWidth)
+        'Else
+        '    Me.RightExplorerGridWidth = GridLength.Auto
+        'End If
         If Me.MenuViewHeightFlag Then
             Me.MenuGridHeight = New GridLength(Me.MenuViewPreservedHeight)
         Else
             Me.MenuGridHeight = GridLength.Auto
         End If
-        If Me.MainViewHeightFlag Then
-            Me.MainGridHeight = New GridLength(Me.MainViewPreservedHeight)
-        Else
-            Me.MainGridHeight = GridLength.Auto
-        End If
+        Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
         If Me.HistoryViewHeightFlag Then
-            Me.HistoryGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.HistoryGridHeight = New GridLength(Me.HistoryViewPreservedHeight)
         Else
-            Me.HistoryGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.HistoryGridHeight = GridLength.Auto
         End If
         If Me.LeftExplorerViewWidthFlag Then
             Me.LeftExplorerGridWidth = New GridLength(Me.LeftExplorerViewPreservedWidth)
         Else
             Me.LeftExplorerGridWidth = GridLength.Auto
         End If
-        If Me.MainViewWidthFlag Then
-            Me.MainGridWidth = New GridLength(Me.MainViewPreservedWidth)
-        Else
-            Me.MainGridWidth = GridLength.Auto
-        End If
+        Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
         If Me.RightExplorerViewWidthFlag Then
-            Me.RightExplorerGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.RightExplorerGridWidth = New GridLength(Me.RightExplorerViewPreservedWidth)
         Else
-            Me.RightExplorerGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.RightExplorerGridWidth = GridLength.Auto
         End If
+        'Me.MenuGridHeight = GridLength.Auto
+        'Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+        'Me.HistoryGridHeight = GridLength.Auto
+        'Me.LeftExplorerGridWidth = GridLength.Auto
+        'Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+        'Me.RightExplorerGridWidth = GridLength.Auto
 
         ' ck11
         '-----------------------------------------------------------------------------------------'
@@ -1022,7 +996,7 @@ Public Class FrameViewModel
             End If
         End If
         If Not ck11 Then
-            Me.MenuGridHeight = New GridLength(0.0)
+            Me.MenuGridHeight = New GridLength(0.0, GridUnitType.Star)
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -1037,7 +1011,7 @@ Public Class FrameViewModel
             End If
         End If
         If Not ck12 Then
-            Me.LeftExplorerGridWidth = New GridLength(0.0)
+            Me.LeftExplorerGridWidth = New GridLength(0.0, GridUnitType.Star)
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -1052,8 +1026,7 @@ Public Class FrameViewModel
             End If
         End If
         If Not ck13 Then
-            Me.RightExplorerGridWidth = New GridLength(0.0)
-            Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.RightExplorerGridWidth = New GridLength(0.0, GridUnitType.Star)
         End If
         '-----------------------------------------------------------------------------------------'
 
@@ -1068,28 +1041,42 @@ Public Class FrameViewModel
             End If
         End If
         If Not ck14 Then
-            Me.HistoryGridHeight = New GridLength(0.0)
-            Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.HistoryGridHeight = New GridLength(0.0, GridUnitType.Star)
         End If
         '-----------------------------------------------------------------------------------------'
 
-        Me.MenuRow = 0
-        Me.MenuColumn = 0
-        Me.MenuColumnSpan = 5
+        ' GRID ROW, GRID COLUMN
+        Me.MenuRow = 0 + 1
+        Me.MenuColumn = 0 + 1
+        Me.MenuColumnSpan = 3
 
-        Me.LeftExplorerRow = 2
-        Me.LeftExplorerColumn = 0
-        Me.LeftExplorerRowSpan = 3
+        Me.LeftExplorerRow = 1 + 1
+        Me.LeftExplorerRowSpan = 2
+        Me.LeftExplorerColumn = 0 + 1
 
-        Me.MainRow = 2
-        Me.MainColumn = 2
+        Me.MainRow = 1 + 1
+        Me.MainColumn = 1 + 1
 
-        Me.RightExplorerRow = 2
-        Me.RightExplorerColumn = 4
-        Me.RightExplorerRowSpan = 3
+        Me.RightExplorerRow = 1 + 1
+        Me.RightExplorerRowSpan = 2
+        Me.RightExplorerColumn = 2 + 1
 
-        Me.HistoryRow = 4
-        Me.HistoryColumn = 2
+        Me.HistoryRow = 2 + 1
+        Me.HistoryColumn = 1 + 1
+
+        ' TEST
+        '-----------------------------------------------------------------------------------------'
+        Console.WriteLine("LeftExplorerGridWidth  = " & Str(Me.LeftExplorerGridWidth.Value))
+        Console.WriteLine("MainGridWidth          = " & Str(Me.MainGridWidth.Value))
+        Console.WriteLine("RightExplorerGridWidth = " & Str(Me.RightExplorerGridWidth.Value))
+        Console.WriteLine("MenuGridHeight         = " & Str(Me.MenuGridHeight.Value))
+        Console.WriteLine("MainGridHeight         = " & Str(Me.MainGridHeight.Value))
+        Console.WriteLine("HistoryGridHeight      = " & Str(Me.HistoryGridHeight.Value))
+        Console.WriteLine("LeftExplorerMainGridSplitterWidth  = " & Str(Me.LeftExplorerMainGridSplitterWidth))
+        Console.WriteLine("MainRightExplorerGridSplitterWidth = " & Str(Me.MainRightExplorerGridSplitterWidth))
+        Console.WriteLine("MenuMainGridSplitterHeight         = " & Str(Me.MenuMainGridSplitterHeight))
+        Console.WriteLine("MainHistoryGridSplitterHeight      = " & Str(Me.MainHistoryGridSplitterHeight))
+        '-----------------------------------------------------------------------------------------'
     End Sub
 
     ' コマンドプロパティ（エクスプローラービューの右切り替え）

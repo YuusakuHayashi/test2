@@ -26,18 +26,6 @@ Public Class Window
         Me.DataContext = vm
     End Sub
 
-    'Private Sub ContentPanel_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseViewResized(sender, e)
-    'End Sub
-
-    'Private Sub RightPanel_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseViewResized(sender, e)
-    'End Sub
-
-    'Private Sub BottomPanel_SizeChanged(sender As Object, e As SizeChangedEventArgs)
-    '    DelegateEventListener.Instance.RaiseViewResized(sender, e)
-    'End Sub
-
     Private Sub MenuContent_SizeChanged(sender As Object, e As SizeChangedEventArgs)
         DelegateEventListener.Instance.RaiseViewResized(sender, e)
     End Sub
