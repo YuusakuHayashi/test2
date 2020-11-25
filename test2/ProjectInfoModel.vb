@@ -8,7 +8,8 @@ Public Class ProjectInfoModel
     Inherits JsonHandler(Of ProjectInfoModel)
     Implements INotifyPropertyChanged
 
-    '--- INortify -------------------------------------------------------------------------------------'
+    ' INortify
+    '-------------------------------------------------------------------------'
     Public Event PropertyChanged As PropertyChangedEventHandler _
         Implements INotifyPropertyChanged.PropertyChanged
 
@@ -17,7 +18,7 @@ Public Class ProjectInfoModel
             Me, New PropertyChangedEventArgs(PropertyName)
         )
     End Sub
-    '--------------------------------------------------------------------------------------------------'
+    '-------------------------------------------------------------------------'
 
     Private Const SHIFT_JIS As String = "Shift-JIS"
 
@@ -32,6 +33,24 @@ Public Class ProjectInfoModel
         End Get
         Set(value As Model)
             _Model = value
+        End Set
+    End Property
+
+    Private _DirectoryInfo As DirectoryInfoModel
+    <JsonIgnore>
+    Public Property DirectoryInfo As DirectoryInfoModel
+        Get
+            If Me._DirectoryInfo Is Nothing Then
+                If Not String.IsNullOrEmpty(Me.DirectoryName) Then
+                    Me._DirectoryInfo = New DirectoryInfoModel With {
+                        .Name = Me.DirectoryName
+                    }
+                End If
+            End If
+            Return Me._DirectoryInfo
+        End Get
+        Set(value As DirectoryInfoModel)
+            Me._DirectoryInfo = value
         End Set
     End Property
 

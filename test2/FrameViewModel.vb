@@ -727,18 +727,15 @@ Public Class FrameViewModel
         End If
         If vim.Equals(Me.LeftExplorerViewContent) Then
             Me.LeftExplorerGridWidth = GridLength.Auto
-            'Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsLeftExplorerMainGridSplitterEnabled = True
             Me.LeftExplorerMainGridSplitterWidth = 5.0
         End If
         If vim.Equals(Me.RightExplorerViewContent) Then
             Me.RightExplorerGridWidth = GridLength.Auto
-            'Me.RightExplorerGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsMainRightExplorerGridSplitterEnabled = True
             Me.MainRightExplorerGridSplitterWidth = 5.0
         End If
         If vim.Equals(Me.HistoryViewContent) Then
-            'Me.HistoryGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.HistoryGridHeight = GridLength.Auto
             Me.IsMainHistoryGridSplitterEnabled = True
             Me.MainHistoryGridSplitterHeight = 5.0
@@ -751,18 +748,17 @@ Public Class FrameViewModel
         If vim.Equals(Me.MainViewContent) Then
         End If
         If vim.Equals(Me.LeftExplorerViewContent) Then
-            'Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.LeftExplorerGridWidth = New GridLength(0.0)
             Me.IsLeftExplorerMainGridSplitterEnabled = False
             Me.LeftExplorerMainGridSplitterWidth = 0.0
         End If
         If vim.Equals(Me.RightExplorerViewContent) Then
-            'Me.MainGridWidth = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
+            Me.RightExplorerGridWidth = New GridLength(0.0)
             Me.IsMainRightExplorerGridSplitterEnabled = False
             Me.MainRightExplorerGridSplitterWidth = 0.0
         End If
         If vim.Equals(Me.HistoryViewContent) Then
             Me.HistoryGridHeight = New GridLength(0.0)
-            'Me.MainGridHeight = New GridLength(GridLength.Auto.Value, GridUnitType.Star)
             Me.IsMainHistoryGridSplitterEnabled = False
             Me.MainHistoryGridSplitterHeight = 0.0
         End If

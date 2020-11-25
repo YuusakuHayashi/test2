@@ -91,6 +91,8 @@
     <Compile Include="Converters\DoubleGridLengthConverter.vb" />
     <Compile Include="Converters\MinusConverter.vb" />
     <Compile Include="DelegateAction.vb" />
+    <Compile Include="DirectoryExplorerViewModel.vb" />
+    <Compile Include="DirectoryInfoModel.vb" />
     <Compile Include="ExplorerViewModel.vb" />
     <Compile Include="FlexibleViewModel.vb" />
     <Compile Include="FlexibleStructureModel.vb" />

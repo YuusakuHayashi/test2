@@ -1835,16 +1835,16 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="{Binding LeftExplorerGridWidth}" />
-                        <ColumnDefinition Width="{Binding MainGridWidth}" />
-                        <ColumnDefinition Width="{Binding RightExplorerGridWidth}" />
+                        <ColumnDefinition Width="{Binding LeftExplorerGridWidth, Mode=TwoWay}" />
+                        <ColumnDefinition Width="{Binding MainGridWidth, Mode=TwoWay}" />
+                        <ColumnDefinition Width="{Binding RightExplorerGridWidth, Mode=TwoWay}" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="{Binding MenuGridHeight}" />
-                        <RowDefinition Height="{Binding MainGridHeight}" />
-                        <RowDefinition Height="{Binding HistoryGridHeight}" />
+                        <RowDefinition Height="{Binding MenuGridHeight, Mode=TwoWay}" />
+                        <RowDefinition Height="{Binding MainGridHeight, Mode=TwoWay}" />
+                        <RowDefinition Height="{Binding HistoryGridHeight, Mode=TwoWay}" />
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <ContentControl

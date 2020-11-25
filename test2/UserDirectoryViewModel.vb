@@ -352,8 +352,6 @@ Public Class UserDirectoryViewModel
     ' Ａｄｄした時点で、一度セーブを行う
     Private Sub _AddProjectCommandExecute(ByVal parameter As Object)
         Dim i = -1
-        Dim jh As New JsonHandler(Of Object)
-
         Dim project = AppInfo.ProjectInfo
 
         Dim launcher As New DelegateAction With {
