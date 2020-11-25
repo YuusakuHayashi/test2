@@ -1,7 +1,6 @@
 ﻿Imports System.Globalization
 
 Public Class MinusConverter : Implements IValueConverter
-
     Public Function Convert(value As Object, targetType As Type, parameter As Object, culture As CultureInfo) As Object Implements IValueConverter.Convert
         Return (CType(value, Double)) - 15.0
     End Function

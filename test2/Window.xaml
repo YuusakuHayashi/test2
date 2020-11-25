@@ -1247,6 +1247,9 @@
             <DataTemplate                
                 DataType="{x:Type local:ProjectExplorerViewModel}">
                 <Grid>
+                    <Grid.Resources>
+                        <local:ActiveStatusConverter x:Key="ActiveStatusConverter" />
+                    </Grid.Resources>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
@@ -1282,7 +1285,7 @@
                                             <TextBlock 
                                                 Text="{Binding Name}" />
                                             <TextBlock 
-                                                Text="{Binding ActiveStatus}" />
+                                                Text="{Binding IsActivated, Converter={StaticResource ActiveStatusConverter}}" />
                                         </StackPanel>
                                     </Grid>
                                 </HierarchicalDataTemplate>

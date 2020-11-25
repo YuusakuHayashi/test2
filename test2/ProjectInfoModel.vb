@@ -40,17 +40,11 @@ Public Class ProjectInfoModel
     <JsonIgnore>
     Public Property DirectoryInfo As DirectoryInfoModel
         Get
-            If Me._DirectoryInfo Is Nothing Then
-                If Not String.IsNullOrEmpty(Me.DirectoryName) Then
-                    Me._DirectoryInfo = New DirectoryInfoModel With {
-                        .Name = Me.DirectoryName
-                    }
-                End If
-            End If
             Return Me._DirectoryInfo
         End Get
         Set(value As DirectoryInfoModel)
             Me._DirectoryInfo = value
+            RaisePropertyChanged("DirectoryInfo")
         End Set
     End Property
 
@@ -170,15 +164,32 @@ Public Class ProjectInfoModel
         End Set
     End Property
 
-    Private _ActiveStatus As String
+    'Private _ActiveStatus As String
+    '<JsonIgnore>
+    'Public Property ActiveStatus As String
+    '    Get
+    '        Return _ActiveStatus
+    '    End Get
+    '    Set(value As String)
+    '        _ActiveStatus = value
+    '        RaisePropertyChanged("ActiveStatus")
+    '    End Set
+    'End Property
+
+    Private _IsActivated As Boolean
     <JsonIgnore>
-    Public Property ActiveStatus As String
+    Public Property IsActivated As Boolean
         Get
-            Return _ActiveStatus
+            Return _IsActivated
         End Get
-        Set(value As String)
-            _ActiveStatus = value
-            RaisePropertyChanged("ActiveStatus")
+        Set(value As Boolean)
+            _IsActivated = value
+            If Me._IsActivated Then
+                Me.DirectoryInfo = New DirectoryInfoModel With {
+                    .Name = Me.DirectoryName
+                }
+            End If
+            RaisePropertyChanged("IsActivated")
         End Set
     End Property
 

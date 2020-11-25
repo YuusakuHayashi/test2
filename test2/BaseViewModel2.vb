@@ -169,9 +169,9 @@ Public MustInherit Class BaseViewModel2
     ' プロジェクト起動時にステータスを変更
     Protected Overloads Sub ProjectSetup()
         For Each p In AppInfo.CurrentProjects
-            p.ActiveStatus = vbNullString
+            p.IsActivated = False
         Next
-        AppInfo.ProjectInfo.ActiveStatus = "(Active)"
+        AppInfo.ProjectInfo.IsActivated = True
     End Sub
 
     ' ＶｉｅｗＭｏｄｅｌはロードするとＭＶＶＭが機能しなくなるので、
@@ -181,14 +181,9 @@ Public MustInherit Class BaseViewModel2
         Dim vm = jh.ModelLoad(AppInfo.ProjectInfo.ViewModelFileName)
 
         ' ロードしたいメンバーをここに追加していく
-        ' ViewModel.Views = vm.Views
         ViewModel.SaveContent = vm.Content
         ViewModel.WindowHeight = vm.WindowHeight
         ViewModel.WindowWidth = vm.WindowWidth
-        'ViewModel.MultiView.MainGridHeight _
-        '    = New GridLength(vm.MultiView.MainViewHeight)
-        'ViewModel.MultiView.RightGridWidth _
-        '    = New GridLength(vm.MultiView.RightViewWidth)
     End Sub
 
 
