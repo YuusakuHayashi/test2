@@ -567,10 +567,12 @@
     </Window.Resources>
     <Grid x:Name="RootLayout">
         <Grid.Resources>
+            <local:RotateAngleConverter x:Key="RotateAngleConverter" />
             <!-- タブで表示するタイプ -->
             <DataTemplate
                 DataType="{x:Type local:TabViewModel}">
-                <TabControl    
+                <TabControl
+                    TabStripPlacement="{Binding TabStripPlacement}"
                     SelectedIndex="{Binding SelectedIndex}"
                     SelectedItem="{Binding SelectedItem}"
                     ItemsSource="{Binding ViewTabs}">
@@ -605,6 +607,17 @@
                                 Content="{Binding Content}"  />
                         </DataTemplate>
                     </TabControl.ContentTemplate>
+                    <TabControl.Resources>
+                        <Style TargetType="{x:Type TabItem}">
+                            <Setter Property="LayoutTransform">
+                                <Setter.Value>
+                                    <TransformGroup>
+                                        <RotateTransform Angle="{Binding RotateAngle, Mode=OneWay}" />
+                                    </TransformGroup>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
                 </TabControl>
             </DataTemplate>
 
@@ -1172,6 +1185,63 @@
                     </TreeView>
                 </Grid>
             </DataTemplate>
+
+            <DataTemplate                
+                DataType="{x:Type local:DirectoryExplorerViewModel}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TreeView                         
+                        DockPanel.Dock="Top"
+                        Grid.Row="0"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                        <TreeViewItem
+                            Style="{StaticResource TreeViewItemStyle}"
+                            FontSize="{Binding FontSize, Mode=OneWay}"
+                            Header="{Binding AppInfo.ProjectInfo.DirectoryInfo.Name}"
+                            ItemsSource="{Binding AppInfo.ProjectInfo.DirectoryInfo.Children}">
+                            <TreeViewItem.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                                </Style>
+                            </TreeViewItem.ItemContainerStyle>
+                        </TreeViewItem>
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem">
+                                <Setter 
+                                    Property="IsExpanded" 
+                                    Value="{Binding AppInfo.ProjectInfo.DirectoryInfo.IsExpanded, Mode=TwoWay}" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                    </TreeView>
+                </Grid>
+            </DataTemplate>
+
+            <HierarchicalDataTemplate
+                DataType="{x:Type local:DirectoryInfoModel}"
+                ItemsSource="{Binding Children}">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.Resources>
+                        <local:FileTypeIconConverter x:Key="FileTypeIconConverter" />
+                    </Grid.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <Image
+                            Height="12" Width="12"
+                            Source="{Binding FileType, Converter={StaticResource FileTypeIconConverter}}"
+                            Stretch="UniformToFill" />
+                        <TextBlock 
+                            Margin="5,0,0,0"
+                            Text="{Binding Name}" />
+                    </StackPanel>
+                </Grid>
+            </HierarchicalDataTemplate>
+
 
             <HierarchicalDataTemplate
                 DataType="{x:Type local:ViewModel}"

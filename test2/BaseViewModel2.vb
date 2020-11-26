@@ -326,28 +326,33 @@ Public MustInherit Class BaseViewModel2
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
         Dim [load] As Func(Of Object, AppDirectoryModel, ViewModel, Object) _
             = AddressOf AppInfo.ProjectInfo.Model.Data.ViewLoadExecute
-        Dim obj, mvm, hvm, pevm, vevm, tvm
+        Dim obj, mvm, hvm, pevm, vevm, tvm, devm
         Select Case vim.ModelName
             Case "MenuViewModel"
                 mvm = New MenuViewModel
                 mvm.Initialize(AppInfo, ViewModel)
                 vim.RestoreContent = mvm
-                vim.Content = mvm
+                vim.Content = IIf(vim.IsVisible, mvm, Nothing)
             Case "HistoryViewModel"
                 hvm = New HistoryViewModel
                 hvm.Initialize(AppInfo, ViewModel)
                 vim.RestoreContent = hvm
-                vim.Content = hvm
+                vim.Content = IIf(vim.IsVisible, hvm, Nothing)
             Case "ProjectExplorerViewModel"
                 pevm = New ProjectExplorerViewModel
                 pevm.Initialize(AppInfo, ViewModel)
                 vim.RestoreContent = pevm
-                vim.Content = pevm
+                vim.Content = IIf(vim.IsVisible, pevm, Nothing)
             Case "ViewExplorerViewModel"
                 vevm = New ViewExplorerViewModel
                 vevm.Initialize(AppInfo, ViewModel)
                 vim.RestoreContent = vevm
-                vim.Content = vevm
+                vim.Content = IIf(vim.IsVisible, vevm, Nothing)
+            Case "DirectoryExplorerViewModel"
+                devm = New DirectoryExplorerViewModel
+                devm.Initialize(AppInfo, ViewModel)
+                vim.RestoreContent = devm
+                vim.Content = IIf(vim.IsVisible, devm, Nothing)
             Case "TabViewModel"
                 tvm = New TabViewModel
                 For Each child In vim.Children
@@ -388,16 +393,17 @@ Public MustInherit Class BaseViewModel2
         Dim mvm = New MenuViewModel
         Dim pevm = New ProjectExplorerViewModel
         Dim vevm = New ViewExplorerViewModel
+        Dim devm = New DirectoryExplorerViewModel
         Dim hvm = New HistoryViewModel
 
-        Dim letvm = New TabViewModel
-        Dim retvm = New TabViewModel
-        Dim htvm = New TabViewModel
+        Dim letvm As TabViewModel
+        Dim htvm As TabViewModel
 
         Call hvm.Initialize(AppInfo, ViewModel)
         Call mvm.Initialize(AppInfo, ViewModel)
         Call pevm.Initialize(AppInfo, ViewModel)
         Call vevm.Initialize(AppInfo, ViewModel)
+        Call devm.Initialize(AppInfo, ViewModel)
 
         ' MenuViewContent
         '-------------------------------------------------'
@@ -410,18 +416,26 @@ Public MustInherit Class BaseViewModel2
 
         ' LeftExplorerViewContent
         '-------------------------------------------------'
+        letvm = New TabViewModel With {
+            .TabStripPlacement = "Left"
+        }
         Call letvm.AddTab(New ViewItemModel With {
-            .Name = "ViewExp",
+            .Name = "ビューエクスプローラー",
             .IsVisible = True,
             .Content = vevm
         })
         Call letvm.AddTab(New ViewItemModel With {
-            .Name = "ProjExp",
+            .Name = "プロジェクトエクスプローラー",
             .IsVisible = True,
             .Content = pevm
         })
+        Call letvm.AddTab(New ViewItemModel With {
+            .Name = "ディレクトリエクスプローラー",
+            .IsVisible = True,
+            .Content = devm
+        })
         levc = New ViewItemModel With {
-            .Name = "ViewExp(Left)",
+            .Name = "エクスプローラー関連（左）",
             .IsVisible = True,
             .Content = letvm
         }
@@ -430,13 +444,16 @@ Public MustInherit Class BaseViewModel2
 
         ' HistoryViewContent
         '-------------------------------------------------'
+        htvm = New TabViewModel With {
+            .TabStripPlacement = "Bottom"
+        }
         Call htvm.AddTab(New ViewItemModel With {
-            .Name = "History",
+            .Name = "履歴",
             .IsVisible = True,
             .Content = hvm
         })
         hvc = New ViewItemModel With {
-            .Name = "HistoryFrame",
+            .Name = "メッセージ関連",
             .IsVisible = True,
             .Content = htvm
         }

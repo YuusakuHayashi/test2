@@ -186,7 +186,7 @@ Public Class ProjectInfoModel
             _IsActivated = value
             If Me._IsActivated Then
                 Me.DirectoryInfo = New DirectoryInfoModel With {
-                    .Name = Me.DirectoryName
+                    .FullName = Me.DirectoryName
                 }
             End If
             RaisePropertyChanged("IsActivated")

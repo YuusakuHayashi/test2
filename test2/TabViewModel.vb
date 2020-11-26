@@ -26,6 +26,35 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Set
     End Property
 
+    ' 0...Left, 1...Top, 2...Right, 3...Bottom 
+    Private _TabStripPlacement As String
+    Public Property TabStripPlacement As String
+        Get
+            Return Me._TabStripPlacement
+        End Get
+        Set(value As String)
+            Me._TabStripPlacement = value
+            RaisePropertyChanged("TabStripPlacement")
+        End Set
+    End Property
+
+    Public ReadOnly Property RotateAngle As Double
+        Get
+            Select Case Me.TabStripPlacement
+                Case "Bottom"
+                    Return 0.0
+                Case "Left"
+                    Return 90.0
+                Case "Right"
+                    Return 90.0
+                Case "Top"
+                    Return 0.0
+                Case Else
+                    Return 0.0
+            End Select
+        End Get
+    End Property
+
     ' 廃止検討中
     'Private Property _SelectedItem As TabItemModel
     'Public Property SelectedItem As TabItemModel
