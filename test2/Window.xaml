@@ -576,6 +576,19 @@
                     SelectedIndex="{Binding SelectedIndex}"
                     SelectedItem="{Binding SelectedItem}"
                     ItemsSource="{Binding ViewTabs}">
+                    <TabControl.Resources>
+                        <local:RotateAngleConverter x:Key="RotateAngleConverter" />
+                        <RotateTransform x:Key="RotateAngle" Angle="{Binding RotateAngle, Converter={StaticResource RotateAngleConverter}}" />
+                        <Style TargetType="{x:Type TabItem}">
+                            <Setter Property="LayoutTransform">
+                                <Setter.Value>
+                                    <TransformGroup>
+                                        <RotateTransform Angle="{Binding Source={StaticResource RotateAngle}}" />
+                                    </TransformGroup>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
                     <TabControl.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="{Binding Color}">
@@ -607,17 +620,6 @@
                                 Content="{Binding Content}"  />
                         </DataTemplate>
                     </TabControl.ContentTemplate>
-                    <TabControl.Resources>
-                        <Style TargetType="{x:Type TabItem}">
-                            <Setter Property="LayoutTransform">
-                                <Setter.Value>
-                                    <TransformGroup>
-                                        <RotateTransform Angle="{Binding RotateAngle, Mode=OneWay}" />
-                                    </TransformGroup>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </TabControl.Resources>
                 </TabControl>
             </DataTemplate>
 
