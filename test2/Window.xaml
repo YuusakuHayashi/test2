@@ -567,23 +567,32 @@
     </Window.Resources>
     <Grid x:Name="RootLayout">
         <Grid.Resources>
-            <local:RotateAngleConverter x:Key="RotateAngleConverter" />
             <!-- タブで表示するタイプ -->
+            <!--<local:RotateAngleConverter x:Key="RotateAngleConverter" />-->
+            <!--<RotateTransform 
+                x:Key="MyRotateAngle" 
+                Angle="{Binding RotateAngle, RelativeSource={RelativeSource TemplatedParent}}" />-->
+            <!--<local:RotateAngleConverter x:Key="RotateAngleConverter" />-->
             <DataTemplate
                 DataType="{x:Type local:TabViewModel}">
-                <TabControl
+                <TabControl                    
                     TabStripPlacement="{Binding TabStripPlacement}"
                     SelectedIndex="{Binding SelectedIndex}"
                     SelectedItem="{Binding SelectedItem}"
                     ItemsSource="{Binding ViewTabs}">
                     <TabControl.Resources>
+                        <RotateTransform 
+                            x:Key="MyRotateAngle" 
+                            Angle="{Binding RotateAngle}" />
                         <local:RotateAngleConverter x:Key="RotateAngleConverter" />
-                        <RotateTransform x:Key="RotateAngle" Angle="{Binding RotateAngle, Converter={StaticResource RotateAngleConverter}}" />
                         <Style TargetType="{x:Type TabItem}">
                             <Setter Property="LayoutTransform">
                                 <Setter.Value>
                                     <TransformGroup>
-                                        <RotateTransform Angle="{Binding Source={StaticResource RotateAngle}}" />
+                                        <RotateTransform 
+                                            Angle="{Binding 
+                                                Source={StaticResource MyRotateAngle}, 
+                                                Converter={StaticResource RotateAngleConverter}}" />
                                     </TransformGroup>
                                 </Setter.Value>
                             </Setter>

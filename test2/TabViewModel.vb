@@ -38,21 +38,48 @@ Public Class TabViewModel : Inherits BaseViewModel
         End Set
     End Property
 
-    Public ReadOnly Property RotateAngle As Double
+    'Public ReadOnly Property RotateAngle As Double
+    '    Get
+    '        Select Case Me.TabStripPlacement
+    '            Case "Bottom"
+    '                Return 0.0
+    '            Case "Left"
+    '                Return 90.0
+    '            Case "Right"
+    '                Return 90.0
+    '            Case "Top"
+    '                Return 0.0
+    '            Case Else
+    '                Return 0.0
+    '        End Select
+    '    End Get
+    'End Property
+
+
+    Private _RotateAngleFirstCheck As Double
+    Private _RotateAngle As Double
+    Public Property RotateAngle As Double
         Get
-            Select Case Me.TabStripPlacement
-                Case "Bottom"
-                    Return 0.0
-                Case "Left"
-                    Return 90.0
-                Case "Right"
-                    Return 90.0
-                Case "Top"
-                    Return 0.0
-                Case Else
-                    Return 0.0
-            End Select
+            If Not Me._RotateAngleFirstCheck Then
+                Select Case Me.TabStripPlacement
+                    Case "Bottom"
+                        Me._RotateAngle = 0.0
+                    Case "Left"
+                        Me._RotateAngle = 90.0
+                    Case "Right"
+                        Me._RotateAngle = 90.0
+                    Case "Top"
+                        Me._RotateAngle = 0.0
+                    Case Else
+                        Me._RotateAngle = 0.0
+                End Select
+                Me._RotateAngleFirstCheck = True
+            End If
+            Return Me._RotateAngle
         End Get
+        Set(value As Double)
+            Me._RotateAngle = value
+        End Set
     End Property
 
     ' 廃止検討中
