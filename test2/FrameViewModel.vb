@@ -1114,24 +1114,25 @@ Public Class FrameViewModel
     Private Sub _SwitchToRightCommandExecute(ByVal parameter As Object)
         If Me.RightExplorerViewContent Is Nothing Then
             Me.RightExplorerViewContent = New ViewItemModel With {
-                .Name = "RightExplorer",
+                .Name = "エクスプローラ関連（右）",
                 .IsVisible = True
             }
         End If
-        If Me.RightExplorerViewContent.Content Is Nothing Then
-            Me.RightExplorerViewContent.Content = New TabViewModel
-        End If
-        For Each vt In Me.LeftExplorerViewContent.Content.ViewTabs
-            Me.RightExplorerViewContent.Content.AddTab(vt)
-        Next
+        Me.RightExplorerViewContent.Content = Me.LeftExplorerViewContent.Content
+        ' タブ関連
+        '-------------------------------------------------------------------------------'
+        Me.RightExplorerViewContent.Content.TabStripPlacement = "Right"
         For Each child In Me.LeftExplorerViewContent.Children
             Me.RightExplorerViewContent.Children.Add(child)
         Next
+        '-------------------------------------------------------------------------------'
         Call OpenView(Me.RightExplorerViewContent)
         Call CloseView(Me.LeftExplorerViewContent)
 
         ' 完全に消す
         Me.LeftExplorerViewContent = Nothing
+
+        Call DelegateEventListener.Instance.RaiseReloadViewsRequested()
     End Sub
 
     Private Function _SwitchToRightCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -1178,24 +1179,25 @@ Public Class FrameViewModel
     Private Sub _SwitchToLeftCommandExecute(ByVal parameter As Object)
         If Me.LeftExplorerViewContent Is Nothing Then
             Me.LeftExplorerViewContent = New ViewItemModel With {
-                .Name = "LeftExplorer",
+                .Name = "エクスプローラ関連（左）",
                 .IsVisible = True
             }
         End If
-        If Me.LeftExplorerViewContent.Content Is Nothing Then
-            Me.LeftExplorerViewContent.Content = New TabViewModel
-        End If
-        For Each vt In Me.RightExplorerViewContent.Content.ViewTabs
-            Me.LeftExplorerViewContent.Content.AddTab(vt)
-        Next
+        Me.LeftExplorerViewContent.Content = Me.RightExplorerViewContent.Content
+        ' タブ関連
+        '-------------------------------------------------------------------------------'
+        Me.LeftExplorerViewContent.Content.TabStripPlacement = "Left"
         For Each child In Me.RightExplorerViewContent.Children
             Me.LeftExplorerViewContent.Children.Add(child)
         Next
+        '-------------------------------------------------------------------------------'
         Call OpenView(Me.LeftExplorerViewContent)
         Call CloseView(Me.RightExplorerViewContent)
 
         ' 完全に消す
         Me.RightExplorerViewContent = Nothing
+
+        Call DelegateEventListener.Instance.RaiseReloadViewsRequested()
     End Sub
 
     Private Function _SwitchToLeftCommandCanExecute(ByVal parameter As Object) As Boolean

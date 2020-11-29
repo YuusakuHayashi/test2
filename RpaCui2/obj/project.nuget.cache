@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "NN/Z8JrNb5xCIFX+N+oZc3dGUAhWM3Q3pLi8//GMudA9qiRuGZHHZoa9lSuia+r8StXfFMfHVM6TV+Z2UZPxTg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\yuusa\\project\\test2\\RpaCui2\\RpaCui2.vbproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\yuusa\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
+    "C:\\Users\\yuusa\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\yuusa\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\5.0.0\\system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512",
+    "C:\\Users\\yuusa\\.nuget\\packages\\system.text.encoding.codepages\\5.0.0\\system.text.encoding.codepages.5.0.0.nupkg.sha512",
+    "C:\\Users\\yuusa\\.nuget\\packages\\yamldotnet\\9.1.0\\yamldotnet.9.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}

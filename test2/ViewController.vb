@@ -88,7 +88,7 @@
         End If
     End Function
 
-    ' タブ子要素をすべて開く
+    ' タブ全体を開く
     Private Sub _OpenTabViewDataSet(ByRef src As ViewItemModel,
                                     ByRef dst As ViewItemModel)
         For Each child In dst.Children
@@ -100,7 +100,7 @@
         Next
     End Sub
 
-    ' タブ子要素を（から）開く
+    ' タブ子要素を開く（タブ自体が閉じていれば、それも開く）
     Private Sub _OpenTabViewDataSetFromChild(ByRef src As ViewItemModel,
                                              ByRef dst As ViewItemModel)
         Dim tvm As TabViewModel

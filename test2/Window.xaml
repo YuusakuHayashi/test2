@@ -581,18 +581,19 @@
                     SelectedItem="{Binding SelectedItem}"
                     ItemsSource="{Binding ViewTabs}">
                     <TabControl.Resources>
-                        <RotateTransform 
+                        <!--<RotateTransform 
                             x:Key="MyRotateAngle" 
                             Angle="{Binding RotateAngle}" />
-                        <local:RotateAngleConverter x:Key="RotateAngleConverter" />
+                        <local:RotateAngleConverter x:Key="RotateAngleConverter" />-->
                         <Style TargetType="{x:Type TabItem}">
                             <Setter Property="LayoutTransform">
                                 <Setter.Value>
                                     <TransformGroup>
-                                        <RotateTransform 
+                                        <RotateTransform Angle="{Binding RotateAngle}" />
+                                        <!--<RotateTransform 
                                             Angle="{Binding 
                                                 Source={StaticResource MyRotateAngle}, 
-                                                Converter={StaticResource RotateAngleConverter}}" />
+                                                Converter={StaticResource RotateAngleConverter}}" />-->
                                     </TransformGroup>
                                 </Setter.Value>
                             </Setter>
@@ -1953,6 +1954,8 @@
                         <StackPanel 
                             DockPanel.Dock="Top"
                             Orientation="Horizontal">
+                            <TextBlock
+                                Text="{Binding LeftExplorerViewContent.Content.SelectedItem.Name}" />
                             <Button 
                                 Command="{Binding SwitchToRightCommand}"
                                 Content=">>" />
@@ -1984,6 +1987,8 @@
                         <StackPanel 
                             DockPanel.Dock="Top"
                             Orientation="Horizontal">
+                            <TextBlock
+                                Text="{Binding RightExplorerViewContent.Content.SelectedItem.Name}" />
                             <Button 
                                 Command="{Binding SwitchToLeftCommand}"
                                 Content="&lt;&lt;" />

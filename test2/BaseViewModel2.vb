@@ -355,6 +355,14 @@ Public MustInherit Class BaseViewModel2
                 vim.Content = IIf(vim.IsVisible, devm, Nothing)
             Case "TabViewModel"
                 tvm = New TabViewModel
+
+                ' タブ関連でロードが必要なデータ
+                '-----------------------------------------'
+                vim.Content = ConvertJObjToObj(Of TabViewModel)(vim.Content)
+
+                tvm.TabStripPlacement = vim.Content.TabStripPlacement
+                '-----------------------------------------'
+
                 For Each child In vim.Children
                     ' 親の認知
                     ' 循環の関係で、ParentはIgnoreにしているため
@@ -408,7 +416,7 @@ Public MustInherit Class BaseViewModel2
         ' MenuViewContent
         '-------------------------------------------------'
         menuvc = New ViewItemModel With {
-            .Name = "Menu",
+            .Name = "メニュー",
             .IsVisible = True,
             .Content = mvm
         }
@@ -483,104 +491,6 @@ Public MustInherit Class BaseViewModel2
         }
         _FrameViewSetup = fvm
     End Function
-
-
-    ' 廃止検討中
-    ' 初回時(FrameViewSetup時のみ実行され、各ViewItemに必要情報を付加する)
-    '---------------------------------------------------------------------------------------------'
-    'Private Overloads Sub _ViewItemSetup(ByRef fvm As FlexibleViewModel)
-    '    If fvm.MainViewContent IsNot Nothing Then
-    '        Call _ViewItemSetup(fvm.MainViewContent)
-    '    End If
-    '    If fvm.RightViewContent IsNot Nothing Then
-    '        Call _ViewItemSetup(fvm.RightViewContent)
-    '    End If
-    '    If fvm.BottomViewContent IsNot Nothing Then
-    '        Call _ViewItemSetup(fvm.BottomViewContent)
-    '    End If
-    'End Sub
-
-    'Private Overloads Sub _ViewItemSetup(ByRef vim As ViewItemModel)
-    '    Dim fvm As FlexibleViewModel
-    '    Dim tvm As TabViewModel
-
-    '    ' ここに初回時にセットさせたい項目を記述
-    '    '---------------------------------------'
-    '    vim.IsVisible = True
-    '    '---------------------------------------'
-
-    '    Select Case vim.Content.GetType.Name
-    '        Case "FlexibleViewModel"
-    '            fvm = CType(vim.Content, FlexibleViewModel)
-    '            Call _ViewItemSetup(fvm)
-    '        Case "TabViewModel"
-    '            tvm = CType(vim.Content, TabViewModel)
-    '            Call _ViewItemSetup(tvm)
-    '        Case Else
-    '    End Select
-    'End Sub
-
-    'Private Overloads Sub _ViewItemSetup(ByRef tvm As TabViewModel)
-    '    For Each vt In tvm.ViewContentTabs
-    '        Call _ViewItemSetup(vt)
-    '    Next
-    'End Sub
-    '---------------------------------------------------------------------------------------------'
-
-
-    ' 廃止検討中
-    ' ロード時
-    '---------------------------------------------------------------------------------------------'
-    'Private Function FlexibleViewLoad(ByVal [save] As FlexibleViewModel) As FlexibleViewModel
-    '    If [save].MainViewContent IsNot Nothing Then
-    '        [save].MainViewContent = _ViewItemLoad([save].MainViewContent)
-    '    End If
-    '    If [save].RightViewContent IsNot Nothing Then
-    '        [save].RightViewContent = _ViewItemLoad([save].RightViewContent)
-    '    End If
-    '    If [save].BottomViewContent IsNot Nothing Then
-    '        [save].BottomViewContent = _ViewItemLoad([save].BottomViewContent)
-    '    End If
-    '    FlexibleViewLoad = [save]
-    'End Function
-
-    'Private Function _ViewItemLoad(ByVal [save] As ViewItemModel)
-    '    Dim obj As Object
-    '    Dim [define] As Func(Of String, Object) _
-    '        = AddressOf AppInfo.ProjectInfo.Model.Data.ViewDefineExecute
-    '    Select Case [save].ModelName
-    '        Case "FlexibleViewModel"
-    '            obj = _ConvertJObjToObj(Of FlexibleViewModel)([save].Content)
-    '            [save].Content = FlexibleViewLoad(obj)
-    '        Case "TabViewModel"
-    '            obj = _ConvertJObjToObj(Of TabViewModel)([save].Content)
-    '            obj = _TabViewLoad(obj)
-    '            obj = _ViewContentTabViewLoad(obj)
-    '            [save].Content = obj
-    '        Case Else
-    '            obj = [define]([save].ModelName)
-    '            obj.Initialize(AppInfo, ViewModel)
-    '            [save].Content = obj
-    '    End Select
-    '    _ViewItemLoad = [save]
-    'End Function
-
-    'Private Function _TabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
-    '    Dim vim As ViewItemModel
-    '    For Each t In [save].Tabs
-    '        vim = _ViewItemLoad(t.ViewContent)
-    '        t.ViewContent = vim
-    '    Next
-    '    _TabViewLoad = [save]
-    'End Function
-
-    'Private Function _ViewContentTabViewLoad(ByRef [save] As TabViewModel) As TabViewModel
-    '    For Each vt In [save].ViewContentTabs
-    '        vt = _ViewItemLoad(vt)
-    '    Next
-    '    _ViewContentTabViewLoad = [save]
-    'End Function
-    '---------------------------------------------------------------------------------------------'
 
     Private Function _ConvertJObjToObj(Of T As {New})(ByVal jobj As Object) As T
         Dim obj As Object

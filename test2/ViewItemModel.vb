@@ -37,6 +37,16 @@ Public Class ViewItemModel
         End Set
     End Property
 
+    Private _RotateAngle As Double
+    Public Property RotateAngle As Double
+        Get
+            Return Me._RotateAngle
+        End Get
+        Set(value As Double)
+            Me._RotateAngle = value
+        End Set
+    End Property
+
     Private _Icon As BitmapImage
     <JsonIgnore>
     Public Property [Icon] As BitmapImage

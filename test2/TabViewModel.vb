@@ -56,31 +56,31 @@ Public Class TabViewModel : Inherits BaseViewModel
     'End Property
 
 
-    Private _RotateAngleFirstCheck As Double
-    Private _RotateAngle As Double
-    Public Property RotateAngle As Double
-        Get
-            If Not Me._RotateAngleFirstCheck Then
-                Select Case Me.TabStripPlacement
-                    Case "Bottom"
-                        Me._RotateAngle = 0.0
-                    Case "Left"
-                        Me._RotateAngle = 90.0
-                    Case "Right"
-                        Me._RotateAngle = 90.0
-                    Case "Top"
-                        Me._RotateAngle = 0.0
-                    Case Else
-                        Me._RotateAngle = 0.0
-                End Select
-                Me._RotateAngleFirstCheck = True
-            End If
-            Return Me._RotateAngle
-        End Get
-        Set(value As Double)
-            Me._RotateAngle = value
-        End Set
-    End Property
+    'Private _RotateAngleFirstCheck As Double
+    'Private _RotateAngle As Double
+    'Public Property RotateAngle As Double
+    '    Get
+    '        If Not Me._RotateAngleFirstCheck Then
+    '            Select Case Me.TabStripPlacement
+    '                Case "Bottom"
+    '                    Me._RotateAngle = 0.0
+    '                Case "Left"
+    '                    Me._RotateAngle = 90.0
+    '                Case "Right"
+    '                    Me._RotateAngle = 90.0
+    '                Case "Top"
+    '                    Me._RotateAngle = 0.0
+    '                Case Else
+    '                    Me._RotateAngle = 0.0
+    '            End Select
+    '            Me._RotateAngleFirstCheck = True
+    '        End If
+    '        Return Me._RotateAngle
+    '    End Get
+    '    Set(value As Double)
+    '        Me._RotateAngle = value
+    '    End Set
+    'End Property
 
     ' 廃止検討中
     'Private Property _SelectedItem As TabItemModel
@@ -266,6 +266,20 @@ Public Class TabViewModel : Inherits BaseViewModel
 
     Public Overloads Sub AddTab(ByVal vim As ViewItemModel)
         Dim idx = -1
+
+        Select Case Me.TabStripPlacement
+            Case "Bottom"
+                vim.RotateAngle = 0.0
+            Case "Left"
+                vim.RotateAngle = 90.0
+            Case "Right"
+                vim.RotateAngle = 90.0
+            Case "Top"
+                vim.RotateAngle = 0.0
+            Case Else
+                vim.RotateAngle = 0.0
+        End Select
+
         For Each vt In Me.ViewTabs
             If vt.Name = vim.Name Then
                 idx = Me.ViewTabs.IndexOf(vt)
@@ -278,18 +292,18 @@ Public Class TabViewModel : Inherits BaseViewModel
             Me.ViewTabs.Add(vim)
         End If
 
-        idx = -1
-        For Each pvt In Me.PreservedViewTabs
-            If pvt.Name = vim.Name Then
-                idx = Me.PreservedViewTabs.IndexOf(pvt)
-                Exit For
-            End If
-        Next
-        If idx > -1 Then
-            Me.PreservedViewTabs(idx) = vim
-        Else
-            Me.PreservedViewTabs.Add(vim)
-        End If
+        'idx = -1
+        'For Each pvt In Me.PreservedViewTabs
+        '    If pvt.Name = vim.Name Then
+        '        idx = Me.PreservedViewTabs.IndexOf(pvt)
+        '        Exit For
+        '    End If
+        'Next
+        'If idx > -1 Then
+        '    Me.PreservedViewTabs(idx) = vim
+        'Else
+        '    Me.PreservedViewTabs.Add(vim)
+        'End If
     End Sub
 
     '--- タブを閉じる関連 ------------------------------------------------------------------------'

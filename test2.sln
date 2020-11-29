@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 14 for Windows Desktop
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "test2", "test2\test2.vbproj", "{176BEE86-D9E1-4237-BF9E-D16F81E80F0C}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "RpaCui2", "RpaCui2\RpaCui2.vbproj", "{2DF597B3-DEFE-46C8-AC06-7207C58FB816}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{176BEE86-D9E1-4237-BF9E-D16F81E80F0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{176BEE86-D9E1-4237-BF9E-D16F81E80F0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{176BEE86-D9E1-4237-BF9E-D16F81E80F0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF597B3-DEFE-46C8-AC06-7207C58FB816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF597B3-DEFE-46C8-AC06-7207C58FB816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF597B3-DEFE-46C8-AC06-7207C58FB816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF597B3-DEFE-46C8-AC06-7207C58FB816}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C89D47FC-027F-48D0-9BF6-18D5F0596E79}
 	EndGlobalSection
 EndGlobal
