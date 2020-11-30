@@ -6,22 +6,63 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     Private Const UTF8 As String = "utf-8"
     Public Shared MYENCODING As String = UTF8
 
-    Public Shared ROOT_DIRECTORY As String = "\\Coral\受託_計算Ｃ本部\連絡・管理・トラ・教育他\教育\RPAプロジェクト"
-    Public Shared SYSTEM_DIRECTORY As String = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
-    Public Shared SYSTEM_WORK_DIRECTORY As String = SYSTEM_DIRECTORY & "\work"
-    Public Shared SYSTEM_SYSTEM_DIRECTORY As String = SYSTEM_DIRECTORY & "\sys"
-    Public Shared SYSTEM_JSON_FILENAME As String = SYSTEM_DIRECTORY & "\rpa_project.json"
-    Public Shared SYSTEM_WORK_JSON_FILENAME As String = SYSTEM_WORK_DIRECTORY & "\rpa_project.json"
-    Public Shared SYSTEM_SCRIPT_DIRECTORY As String = SYSTEM_DIRECTORY & "\script"
-    Public Shared MYDIRECTORY_FILE As String = SYSTEM_DIRECTORY & "\mydir"
-
-    Private _MyDirectory As String
-    Public Property MyDirectory As String
+    Private Shared _RootDirectory As String
+    Public Property RootDirectory As String
         Get
-            Return Me._MyDirectory
+            Return RpaProject._RootDirectory
         End Get
         Set(value As String)
-            Me._MyDirectory = value
+            If String.IsNullOrEmpty(RpaProject._RootDirectory) Then
+                RpaProject._RootDirectory = value
+                If Not Directory.Exists(RpaProject._RootDirectory) Then
+                    Console.WriteLine("RootDirectory が存在しません")
+                    Console.WriteLine("ファイル: " & Me.SystemJsonFileName & "の'RootDirectory' に任意のパスを書いてください")
+                    Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+                End If
+            End If
+        End Set
+    End Property
+
+    Private Shared _SYSTEM_DIRECTORY As String
+    Public Shared ReadOnly Property SYSTEM_DIRECTORY As String
+        Get
+            If String.IsNullOrEmpty(RpaProject._SYSTEM_DIRECTORY) Then
+                RpaProject._SYSTEM_DIRECTORY = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
+                If Not Directory.Exists(RpaProject._SYSTEM_DIRECTORY) Then
+                    Directory.CreateDirectory(RpaProject._SYSTEM_DIRECTORY)
+                End If
+            End If
+            Return RpaProject._SYSTEM_DIRECTORY
+        End Get
+    End Property
+
+    Private Shared _SYSTEM_JSON_FILENAME As String
+    Public ReadOnly Property SystemJsonFileName As String
+        Get
+            If String.IsNullOrEmpty(RpaProject._SYSTEM_JSON_FILENAME) Then
+                RpaProject._SYSTEM_JSON_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\rpa_project.json"
+                If Not File.Exists(RpaProject._SYSTEM_JSON_FILENAME) Then
+                    Call Me.ModelSave(RpaProject._SYSTEM_JSON_FILENAME, Me)
+                End If
+            End If
+            Return RpaProject._SYSTEM_JSON_FILENAME
+        End Get
+    End Property
+
+    Private Shared _MyDirectory As String
+    Public Property MyDirectory As String
+        Get
+            Return RpaProject._MyDirectory
+        End Get
+        Set(value As String)
+            If String.IsNullOrEmpty(RpaProject._MyDirectory) Then
+                RpaProject._MyDirectory = value
+                If Not Directory.Exists(RpaProject._MyDirectory) Then
+                    Console.WriteLine("MyDirectory が存在しません")
+                    Console.WriteLine("ファイル: " & Me.SystemJsonFileName & "の'MyDirectory' に任意のパスを書いてください")
+                    Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+                End If
+            End If
         End Set
     End Property
 
@@ -33,9 +74,7 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         Set(value As String)
             Me._ProjectName = value
             If Not String.IsNullOrEmpty(value) Then
-                Call _GetAlias(value)
-                Console.WriteLine("プロジェクト選択 => " & Me.ProjectName & "(" & Me.ProjectAlias & ")")
-                Call _CheckMyProject()
+                Call _CheckProject()
             End If
         End Set
     End Property
@@ -54,22 +93,32 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     End Property
 
     Private _ProjectAlias As String
-    Public Property ProjectAlias As String
+    Public ReadOnly Property ProjectAlias As String
         Get
+            If String.IsNullOrEmpty(Me._ProjectAlias) Then
+                If String.IsNullOrEmpty(Me.ProjectName) Then
+                    Me._ProjectAlias = vbNullString
+                Else
+                    If Me.AliasDictionary.ContainsKey(Me.ProjectName) Then
+                        Me._ProjectAlias = Me.AliasDictionary(Me.ProjectName)
+                    Else
+                        Me._ProjectAlias = Me.ProjectName
+                    End If
+                End If
+            End If
             Return Me._ProjectAlias
         End Get
-        Set(value As String)
-            Me._ProjectAlias = value
-        End Set
     End Property
 
-    Private _ServerDirectory As String
-    Public Property ServerDirectory As String
+    Private Shared _ServerDirectory As String
+    Public Shared Property ServerDirectory As String
         Get
-            Return Me._ServerDirectory
+            Return RpaProject._ServerDirectory
         End Get
         Set(value As String)
-            Me._ServerDirectory = value
+            If Not String.IsNullOrEmpty(value) Then
+                RpaProject._ServerDirectory = value
+            End If
         End Set
     End Property
 
@@ -89,10 +138,7 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     Public ReadOnly Property RootProjectDirectory As String
         Get
             If String.IsNullOrEmpty(Me._RootProjectDirectory) Then
-                Me._RootProjectDirectory = RpaProject.ROOT_DIRECTORY & "\" & Me.ProjectName
-                If Not Directory.Exists(Me._RootProjectDirectory) Then
-                    Console.WriteLine("警告：ルートプロジェクト:  " & Me._RootProjectDirectory & " は存在しません")
-                End If
+                Me._RootProjectDirectory = Me.RootDirectory & "\" & Me.ProjectName
             End If
             Return Me._RootProjectDirectory
         End Get
@@ -135,14 +181,9 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     Private _RootProjectIgnoreList As List(Of String)
     Public ReadOnly Property RootProjectIgnoreList As List(Of String)
         Get
-            Dim lines As String()
             If Me._RootProjectIgnoreList Is Nothing Then
                 Me._RootProjectIgnoreList = New List(Of String)
                 If File.Exists(Me.RootProjectIgnoreFileName) Then
-                    'lines = _GetFileLines(Me.RootProjectIgnoreFileName)
-                    'For Each line In lines
-                    '    Me._RootProjectIgnoreList.Add(line)
-                    'Next
                     Me._RootProjectIgnoreList = _GetFileLines(Me.RootProjectIgnoreFileName)
                 End If
             End If
@@ -155,21 +196,6 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             Return Me.RootProjectDirectory & "\updates"
         End Get
     End Property
-
-    'Private _RootProjectUpdatePackages As List(Of String)
-    'Public ReadOnly Property RootProjectUpdatePackages As List(Of String)
-    '    Get
-    '        If Me._RootProjectUpdatePackages Is Nothing Then
-    '            Me._RootProjectUpdatePackages = New List(Of String)
-    '            If Directory.Exists(Me.RootProjectUpdateDirectory) Then
-    '                For Each d In Directory.GetDirectories(Me.RootProjectUpdateDirectory)
-    '                    Me._RootProjectUpdatePackages.Add(d)
-    '                Next
-    '            End If
-    '        End If
-    '        Return Me._RootProjectUpdatePackages
-    '    End Get
-    'End Property
 
     Private _RootProjectUpdatePackages As List(Of RpaPackage)
     Public ReadOnly Property RootProjectUpdatePackages As List(Of RpaPackage)
@@ -206,20 +232,11 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    'Public ReadOnly Property MyProjectDirectory As String
-    '    Get
-    '        Return Me.MyDirectory & "\" & Me.ProjectAlias
-    '    End Get
-    'End Property
-
     Private _MyProjectDirectory As String
     Public ReadOnly Property MyProjectDirectory As String
         Get
             If String.IsNullOrEmpty(Me._MyProjectDirectory) Then
                 Me._MyProjectDirectory = Me.MyDirectory & "\" & Me.ProjectAlias
-                If Not Directory.Exists(Me._MyProjectDirectory) Then
-                    Console.WriteLine("プロジェクトディレクトリ:  " & Me._MyProjectDirectory & " は存在しません")
-                End If
             End If
             Return Me._MyProjectDirectory
         End Get
@@ -284,10 +301,6 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             If Me._MyProjectIgnoreList Is Nothing Then
                 Me._MyProjectIgnoreList = New List(Of String)
                 If File.Exists(Me.MyProjectIgnoreFileName) Then
-                    'lines = _GetFileLines(Me.MyProjectIgnoreFileName)
-                    'For Each line In lines
-                    '    Me._MyProjectIgnoreList.Add(line)
-                    'Next
                     Me._MyProjectIgnoreList = _GetFileLines(Me.MyProjectIgnoreFileName)
                 End If
             End If
@@ -300,24 +313,6 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             Return Me.MyProjectDirectory & "\updated"
         End Get
     End Property
-
-    'Private _MyProjectUpdatedPackages As List(Of String)
-    'Public ReadOnly Property MyProjectUpdatedPackages As List(Of String)
-    '    Get
-    '        Dim lines As String()
-    '        If Me._MyProjectUpdatedPackages Is Nothing Then
-    '            Me._MyProjectUpdatedPackages = New List(Of String)
-    '            If File.Exists(Me.MyProjectUpdatedFileName) Then
-    '                'lines = _GetFileLines(Me.MyProjectUpdatedFileName)
-    '                'For Each line In lines
-    '                '    Me._MyProjectUpdatedPackages.Add(line)
-    '                'Next
-    '                Me._MyProjectUpdatedPackages = _GetFileLines(Me.MyProjectUpdatedFileName)
-    '            End If
-    '        End If
-    '        Return Me._MyProjectUpdatedPackages
-    '    End Get
-    'End Property
 
     Private _MyProjectUpdatedPackages As List(Of RpaPackage)
     Public ReadOnly Property MyProjectUpdatedPackages As List(Of RpaPackage)
@@ -342,91 +337,44 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     End Property
     '-----------------------------------------------------------------------------------'
 
-    Private Sub _GetAlias(ByVal project As String)
-        If Me.AliasDictionary.ContainsKey(project) Then
-            Me.ProjectAlias = Me.AliasDictionary(project)
-        Else
-            Me.ProjectAlias = project
-        End If
-    End Sub
-
-    Private Sub _CheckMyProject()
+    Private Sub _CheckProject()
         Dim rpack As RpaPackage = Nothing
         Dim mpack As RpaPackage = Nothing
+        Console.WriteLine("プロジェクトの検査中...")
+        Console.WriteLine("プロジェクト名                 : " & Me.ProjectName)
+        Console.WriteLine("プロジェクト別名               : " & Me.ProjectAlias)
+        Console.WriteLine("ルートプロジェクトディレクトリ : " & Me.RootProjectDirectory)
+        If Not Me.IsRootProjectExists Then
+            Console.WriteLine("(警告) ルートプロジェクトディレクトリは存在しません")
+        End If
+        Console.WriteLine("ユーザプロジェクトディレクトリ : " & Me.MyProjectDirectory)
+        If Not Me.IsMyProjectExists Then
+            Console.WriteLine("       ユーザプロジェクトディレクトリは存在しません")
+        End If
 
-        Console.WriteLine("パッケージリストを検索しています...")
+        Dim installed = False
+        Console.WriteLine("アップデートパッケージを検索しています...")
         For Each rp In Me.RootProjectUpdatePackages
-            If rp.Latest Then
-                rpack = rp
+            installed = False
+            For Each mp In Me.MyProjectUpdatedPackages
+                If rp.Name = mp.Name Then
+                    installed = True
+                    Exit For
+                End If
+            Next
+            If Not installed Then
+                Console.WriteLine("パッケージ : " & rp.Name & " をインストールしていません")
             End If
         Next
-        For Each mp In Me.MyProjectUpdatedPackages
-            If mp.Latest Then
-                mpack = mp
-            End If
-        Next
-        If rpack Is Nothing Then
-            Exit Sub
-        End If
-        If mpack Is Nothing Then
-            Console.WriteLine("ルートプロジェクトに新しいパッケージ: " & rpack.Name & " が存在します")
-        Else
-            If mpack.Name <> rpack.Name Then
-                Console.WriteLine("ルートプロジェクトに新しいパッケージ: " & rpack.Name & " が存在します")
-            End If
-        End If
+        Console.WriteLine("プロジェクトの検査完了")
     End Sub
 
-    Public Sub CheckSystemConstitution()
-        Call _CheckMyDirectory()
-        Call _CheckServerDirectory()
-    End Sub
-
-    ' ServerDirectory指定がある場合、ROOT_DIRECTORYを切り替える
-    Private Sub _CheckServerDirectory()
-        If Directory.Exists(Me.ServerDirectory) Then
-            Console.WriteLine("ServerDirectory: " & Me.ServerDirectory)
-            Console.WriteLine("Switch ROOT_DIRECTORY: " & RpaProject.ROOT_DIRECTORY)
-            RpaProject.ROOT_DIRECTORY = Me.ServerDirectory
-            Console.WriteLine(" => To ROOT_DIRECTORY: " & RpaProject.ROOT_DIRECTORY)
-        End If
-    End Sub
-
-    Private Sub _CheckMyDirectory()
-        Dim rpa As RpaProject
-        Dim answer As String
-
-        Console.WriteLine("MyDirectory Checking...")
-
-        Do Until Directory.Exists(Me.MyDirectory)
-            File.Copy(RpaProject.SYSTEM_JSON_FILENAME, RpaProject.SYSTEM_WORK_JSON_FILENAME, True)
-
-            Console.WriteLine("MyDirectory が存在しません")
-            Console.WriteLine("ファイル: " & RpaProject.SYSTEM_WORK_JSON_FILENAME & "の'MyDirectory' に任意のパスを書いてください")
-            Console.WriteLine("書いた後ファイルを保存し、[Enter]を入力してください")
-            Console.ReadLine()
-
-            rpa = Me.ModelLoad(RpaProject.SYSTEM_WORK_JSON_FILENAME)
-            Me.MyDirectory = rpa.MyDirectory
-
-            Console.WriteLine("よろしいですか？(y/n) MyDirectory => " & Me.MyDirectory)
-            answer = Console.ReadLine()
-            If Not answer = "y" Then
-                Me.MyDirectory = vbNullString
-            End If
-
-            File.Copy(RpaProject.SYSTEM_WORK_JSON_FILENAME, RpaProject.SYSTEM_JSON_FILENAME, True)
-        Loop
-
-        Console.WriteLine("MyDirectory Check OK!")
-    End Sub
 
     Private Function _GetFileLines(ByVal f As String) As List(Of String)
         Dim txt As String
         Dim olines As String()
         Dim nlines = New List(Of String)
 
-        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
         Dim sr = New StreamReader(f, Encoding.GetEncoding(MYENCODING))
 
         txt = sr.ReadToEnd()
@@ -443,27 +391,6 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
 
         Return nlines
     End Function
-
-    Public Sub MakeStaff()
-
-        Dim mkfil As Action(Of String)
-        mkfil = Sub(ByVal f As String)
-                    If Not File.Exists(f) Then
-                        File.Create(f)
-                    End If
-                End Sub
-        Dim mkdir As Action(Of String)
-        mkdir = Sub(ByVal d As String)
-                    If Not Directory.Exists(d) Then
-                        Directory.CreateDirectory(d)
-                    End If
-                End Sub
-
-        Call mkdir(RpaProject.SYSTEM_DIRECTORY)
-        Call mkdir(RpaProject.SYSTEM_SYSTEM_DIRECTORY)
-        Call mkdir(RpaProject.SYSTEM_WORK_DIRECTORY)
-        Call mkfil(RpaProject.SYSTEM_JSON_FILENAME)
-    End Sub
 
     Public Sub New()
     End Sub

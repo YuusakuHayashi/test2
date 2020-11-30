@@ -8,6 +8,8 @@ Module RpaSystem
     Private ReadOnly Property ExecuteHandler(ByVal cmd As String) As ExecuteDelegater
         Get
             Select Case cmd
+                Case "run"
+                    Return AddressOf RunRobot 
                 Case "update"
                     Return AddressOf UpdateProject
                 Case "download"
@@ -21,6 +23,14 @@ Module RpaSystem
             End Select
         End Get
     End Property
+    '---------------------------------------------------------------------------------------------'
+
+    ' ロボットの起動
+    '---------------------------------------------------------------------------------------------'
+    Private Function RunRobot(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Dim i = rpa.MyProjectObject.Main(trn, rpa)
+        Return i
+    End Function
     '---------------------------------------------------------------------------------------------'
 
 
@@ -41,10 +51,6 @@ Module RpaSystem
             Console.WriteLine("ダウンロード先が存在しません")
             Return 1000
         End If
-
-        'If Not Directory.Exists(rpa.RootProjectUpdateDirectory) Then
-        '    Return 1000
-        'End If
 
         If rpa.RootProjectUpdatePackages.Count = 0 Then
             Console.WriteLine("'" & rpa.RootProjectUpdateDirectory & "' にパッケージリストが存在しません")

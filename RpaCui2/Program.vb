@@ -6,14 +6,14 @@ Module Program
         Dim rpa = New RpaProject
         Dim rc = -1
 
-        rpa = rpa.ModelLoad(RpaProject.SYSTEM_JSON_FILENAME)
+        rpa = rpa.ModelLoad(rpa.SystemJsonFileName)
         If rpa Is Nothing Then
             rpa = New RpaProject
-            rpa.ModelSave(RpaProject.SYSTEM_JSON_FILENAME, rpa)
+            rpa.ModelSave(rpa.SystemJsonFileName, rpa)
         End If
 
-        Call rpa.MakeStaff()
-        Call rpa.CheckSystemConstitution()
+        'Call rpa.MakeStaff()
+        'Call rpa.CheckSystemConstitution()
 
         Do Until trn.ExitFlag
             trn.CommandText = Console.ReadLine()
