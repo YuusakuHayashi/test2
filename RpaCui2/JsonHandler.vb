@@ -5,11 +5,8 @@ Imports System.Text
 
 Public Class JsonHandler(Of T As New)
     Private Const SHIFT_JIS As String = "Shift-JIS"
-
-    Public Delegate Function LoadProxy(ByVal f As String) As T
-    Public Delegate Function LoadProxy(Of T2)(ByVal f As String) As T2
-    Public Delegate Sub SaveProxy(ByVal f As String, ByVal m As T)
-    Public Delegate Sub SaveProxy(Of T2)(ByVal f As String, ByVal m As T2)
+    Private Const UTF8 As String = "utf-8"
+    Public Shared MyEncoding As String = UTF8
 
     'Private Property ModelFileName As String
 
@@ -35,13 +32,13 @@ Public Class JsonHandler(Of T As New)
         Dim txt As String
         Dim sr As StreamReader
 
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
+        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
         ModelLoad = Nothing
 
         Try
             sr = New System.IO.StreamReader(
-                f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+                f, System.Text.Encoding.GetEncoding(MyEncoding))
             txt = sr.ReadToEnd()
 
             ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
@@ -65,12 +62,12 @@ Public Class JsonHandler(Of T As New)
         Dim txt As String
         Dim sr As IO.StreamReader
 
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
+        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
         ModelLoad = Nothing
         Try
             sr = New System.IO.StreamReader(
-                f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+                f, System.Text.Encoding.GetEncoding(MyEncoding))
             txt = sr.ReadToEnd()
 
             ModelLoad = JsonConvert.DeserializeObject(Of T2)(txt)
@@ -96,11 +93,11 @@ Public Class JsonHandler(Of T As New)
         Dim txt As String
         Dim sw As System.IO.StreamWriter
 
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
+        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
         Try
             sw = New System.IO.StreamWriter(
-                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+                f, False, System.Text.Encoding.GetEncoding(MyEncoding)
             )
 
             txt = JsonConvert.SerializeObject(m, Formatting.Indented)
@@ -126,11 +123,11 @@ Public Class JsonHandler(Of T As New)
         Dim txt As String
         Dim sw As System.IO.StreamWriter
 
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
+        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
         Try
             sw = New System.IO.StreamWriter(
-                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
+                f, False, System.Text.Encoding.GetEncoding(MyEncoding)
             )
 
             txt = JsonConvert.SerializeObject(m, Formatting.Indented)

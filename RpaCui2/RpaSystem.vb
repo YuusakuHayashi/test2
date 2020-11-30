@@ -28,36 +28,104 @@ Module RpaSystem
     '---------------------------------------------------------------------------------------------'
     Private Function UpdateProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
         Dim i = -1
+        Dim answer = vbNullString
+        Dim pack As RpaPackage = Nothing
 
-        If rpa.IsRootProjectExists Then
-            If trn.Parameters.Count > 0 Then
-                If rpa.MyProjectObject.UpdatePackages.Contains > 0 Then
-                End If
+        If trn.Parameters.Count = 0 Then
+            Console.WriteLine("パラメータが指定されていません: " & trn.CommandText)
+            Return 1000
+        End If
+
+        If Not rpa.IsRootProjectExists Then
+            Console.WriteLine("プロジェクト: '" & rpa.ProjectName & "' のルートプロジェクトが存在しません")
+            Console.WriteLine("ダウンロード先が存在しません")
+            Return 1000
+        End If
+
+        'If Not Directory.Exists(rpa.RootProjectUpdateDirectory) Then
+        '    Return 1000
+        'End If
+
+        If rpa.RootProjectUpdatePackages.Count = 0 Then
+            Console.WriteLine("'" & rpa.RootProjectUpdateDirectory & "' にパッケージリストが存在しません")
+            Return 1000
+        End If
+
+        Console.WriteLine("パッケージを検索しています...")
+        For Each p In rpa.RootProjectUpdatePackages
+            If p.Name = trn.Parameters(0) Then
+                pack = p
             End If
+        Next
+        If pack Is Nothing Then
+            Console.WriteLine("指定のパッケージ '" & trn.Parameters(0) & "' はパッケージリストに登録されていません")
+            Return 1000
+        End If
+
+        If pack.Latest Then
+            answer = "y"
+        Else
+            Console.WriteLine("指定のパッケージ '" & pack.Name & "' は最新のパッケージではありません。")
+            Console.WriteLine("既に前方互換性を持つパッケージをダウンロードしているか確認をしてください")
+            Console.WriteLine(vbNullString)
+            Console.WriteLine("ダウンロード済みパッケージ")
+            Console.WriteLine("-----------------------------------------------------------")
+            For Each p In rpa.MyProjectUpdatedPackages
+                Console.WriteLine(p.Name)
+            Next
+            If rpa.MyProjectUpdatedPackages.Count = 0 Then
+                Console.WriteLine("ダウンロード済みパッケージ　なし")
+            End If
+            Console.WriteLine("パッケージをダウンロードしますか？ (y/n)")
+            Do
+                Console.ReadLine()
+            Loop Until answer = "y" Or "n"
+        End If
+
+        If answer = "n" Then
+            Return 0
+        End If
+
+        Dim src = vbNullString
+        Dim dsd = vbNullString
+        Dim dst = vbNullString
+        For Each ui In pack.UpdateInfos
+            src = ui.SourceFile
+            dsd = ui.DistinationSubDirectory
+            If Not String.IsNullOrEmpty(dsd) Then
+                dst = rpa.MyProjectDirectory & "\" & ui.DistinationSubDirectory & "\" & Path.GetFileName(src)
             Else
-                Console.WriteLine("プロジェクト: '" & rpa.ProjectName & "' のルートプロジェクトが存在しません")
-                Console.WriteLine("ダウンロード先が存在しません")
+                dst = vbNullString
             End If
-            Return i
+
+            If Not File.Exists(ui.SourceFile) Then
+                Console.WriteLine("ソースファイル: " & src & " がありません")
+                Console.WriteLine("詳しくは作成者に問い合わせてください... Author: " & ui.Author)
+                Continue For
+            End If
+
+            If Not Directory.Exists(dsd) Then
+                Console.WriteLine("アップデート先ディレクトリ: " & dsd & " がありません")
+                Continue For
+            End If
+
+            File.Copy(src, dst, True)
+        Next
+
+        Return 0
     End Function
     '---------------------------------------------------------------------------------------------'
 
     ' プロジェクトのダウンロード
     '---------------------------------------------------------------------------------------------'
     Private Function DownloadProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
-        Dim i = -1
-
-        If rpa.IsRootProjectExists Then
-            If trn.Parameters.Count > 0 Then
-                Call SelectedDownload(trn, rpa)
-            Else
-                Call AllDownload(trn, rpa, rpa.RootProjectDirectory, rpa.MyProjectDirectory)
-            End If
+        If trn.Parameters.Count > 0 Then
+            Call SelectedDownload(trn, rpa)
         Else
-            Console.WriteLine("プロジェクト: '" & rpa.ProjectName & "' のルートプロジェクトが存在しません")
-            Console.WriteLine("ダウンロード先が存在しません")
+            Call AllDownload(trn, rpa, rpa.RootProjectDirectory, rpa.MyProjectDirectory)
         End If
-        Return i
+
+        Return 0
     End Function
 
     Private Sub SelectedDownload(ByRef trn As RpaTransaction, ByRef rpa As RpaProject)
@@ -124,18 +192,12 @@ Module RpaSystem
     ' プロジェクトの切り替え
     '---------------------------------------------------------------------------------------------'
     Private Function SetProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
-        Dim i = -1
         If trn.Parameters.Count = 0 Then
-            i = 10
+            Return 1000
         Else
-            rpa.ProjectName = trn.Parameters(0)
-            If Not rpa.IsRootProjectExists Then
-                Console.WriteLine("プロジェクト: '" & rpa.ProjectName & "' のルートプロジェクトが存在しません")
-                Console.WriteLine("プロジェクト名が不適切な可能性があります")
-            End If
-            i = 0
+            rpa = New RpaProject With {.ProjectName = trn.Parameters(0)}
+            Return 0
         End If
-        Return i
     End Function
     '---------------------------------------------------------------------------------------------'
 

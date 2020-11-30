@@ -85,16 +85,9 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private _RootProjectDirectory As String
     Public ReadOnly Property RootProjectDirectory As String
         Get
-            If String.IsNullOrEmpty(Me._RootProjectDirectory) Then
-                Me._RootProjectDirectory = RpaProject.ROOT_DIRECTORY & "\" & Me.ProjectName
-                If Not Directory.Exists(Me._RootProjectDirectory) Then
-                    Console.WriteLine("警告：ルートプロジェクト:  " & Me._RootProjectDirectory & " は存在しません")
-                End If
-            End If
-            Return Me._RootProjectDirectory
+            Return RpaProject.ROOT_DIRECTORY & "\" & Me.ProjectName
         End Get
     End Property
 
@@ -206,22 +199,9 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    'Public ReadOnly Property MyProjectDirectory As String
-    '    Get
-    '        Return Me.MyDirectory & "\" & Me.ProjectAlias
-    '    End Get
-    'End Property
-
-    Private _MyProjectDirectory As String
     Public ReadOnly Property MyProjectDirectory As String
         Get
-            If String.IsNullOrEmpty(Me._MyProjectDirectory) Then
-                Me._MyProjectDirectory = Me.MyDirectory & "\" & Me.ProjectAlias
-                If Not Directory.Exists(Me._MyProjectDirectory) Then
-                    Console.WriteLine("プロジェクトディレクトリ:  " & Me._MyProjectDirectory & " は存在しません")
-                End If
-            End If
-            Return Me._MyProjectDirectory
+            Return Me.MyDirectory & "\" & Me.ProjectAlias
         End Get
     End Property
 
@@ -353,8 +333,16 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     Private Sub _CheckMyProject()
         Dim rpack As RpaPackage = Nothing
         Dim mpack As RpaPackage = Nothing
+        If Not Me.IsRootProjectExists Then
+            Console.WriteLine("プロジェクト: '" & Me.ProjectName & "' のルートプロジェクトが存在しません")
+            Exit Sub
+        End If
+        If Not Me..IsMyProjectExists Then
+            Console.WriteLine("プロジェクト: '" & Me.ProjectName & "' のディレクトリが存在しません")
+        End If
 
         Console.WriteLine("パッケージリストを検索しています...")
+
         For Each rp In Me.RootProjectUpdatePackages
             If rp.Latest Then
                 rpack = rp
@@ -372,8 +360,6 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             Console.WriteLine("ルートプロジェクトに新しいパッケージ: " & rpack.Name & " が存在します")
         Else
             If mpack.Name <> rpack.Name Then
-                Console.WriteLine("ルートプロジェクトに新しいパッケージ: " & rpack.Name & " が存在します")
-            End If
         End If
     End Sub
 
