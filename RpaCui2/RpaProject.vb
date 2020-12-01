@@ -36,16 +36,16 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private Shared _SYSTEM_JSON_FILENAME As String
+    Public Shared SYSTEM_JSON_FILENAME As String
     Public ReadOnly Property SystemJsonFileName As String
         Get
-            If String.IsNullOrEmpty(RpaProject._SYSTEM_JSON_FILENAME) Then
-                RpaProject._SYSTEM_JSON_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\rpa_project.json"
-                If Not File.Exists(RpaProject._SYSTEM_JSON_FILENAME) Then
-                    Call Me.ModelSave(RpaProject._SYSTEM_JSON_FILENAME, Me)
+            If String.IsNullOrEmpty(RpaProject.SYSTEM_JSON_FILENAME) Then
+                RpaProject.SYSTEM_JSON_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\rpa_project.json"
+                If Not File.Exists(RpaProject.SYSTEM_JSON_FILENAME) Then
+                    Call Me.ModelSave(RpaProject.SYSTEM_JSON_FILENAME, Me)
                 End If
             End If
-            Return RpaProject._SYSTEM_JSON_FILENAME
+            Return RpaProject.SYSTEM_JSON_FILENAME
         End Get
     End Property
 

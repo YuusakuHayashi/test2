@@ -1,19 +1,18 @@
 Imports System
+Imports System.IO
 
 Module Program
     Sub Main(args As String())
         Dim trn = New RpaTransaction
         Dim rpa = New RpaProject
-        Dim rc = -1
 
         rpa = rpa.ModelLoad(rpa.SystemJsonFileName)
         If rpa Is Nothing Then
-            rpa = New RpaProject
-            rpa.ModelSave(rpa.SystemJsonFileName, rpa)
+            Console.WriteLine(RpaProject.SYSTEM_JSON_FILENAME & " ÇÃì«Ç›çûÇ›Ç…é∏îsÇµÇ‹ÇµÇΩ")
+            Console.WriteLine("RPAÇÃé¿çsèIóπÇµÇ‹ÇµÇΩ")
+            Console.ReadLine()
+            Exit Sub
         End If
-
-        'Call rpa.MakeStaff()
-        'Call rpa.CheckSystemConstitution()
 
         Do Until trn.ExitFlag
             trn.CommandText = Console.ReadLine()
