@@ -28,7 +28,8 @@ Module RpaSystem
     ' ロボットの起動
     '---------------------------------------------------------------------------------------------'
     Private Function RunRobot(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
-        Dim i = rpa.MyProjectObject.Main(trn, rpa)
+        Call rpa.MyProjectObject.SetData(trn, rpa)
+        Dim i = rpa.MyProjectObject.Main()
         Return i
     End Function
     '---------------------------------------------------------------------------------------------'

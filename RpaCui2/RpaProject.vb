@@ -248,9 +248,29 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
+    Private _MyProjectWorkDirectory As String
     Public ReadOnly Property MyProjectWorkDirectory As String
         Get
-            Return Me.MyProjectDirectory & "\work"
+            If String.IsNullOrEmpty(Me._MyProjectWorkDirectory) Then
+                Me._MyProjectWorkDirectory = Me.MyProjectDirectory & "\work"
+                If Directory.Exists(Me._MyProjectWorkDirectory) Then
+                    Directory.CreateDirectory(Me._MyProjectWorkDirectory)
+                End If
+            End If
+            Return Me._MyProjectWorkDirectory
+        End Get
+    End Property
+
+    Private _MyProjectScriptDirectory As String
+    Public ReadOnly Property MyProjectScriptDirectory As String
+        Get
+            If String.IsNullOrEmpty(Me._MyProjectScriptDirectory) Then
+                Me._MyProjectScriptDirectory = Me.MyProjectDirectory & "\script"
+                If Directory.Exists(Me._MyProjectScriptDirectory) Then
+                    Directory.CreateDirectory(Me._MyProjectScriptDirectory)
+                End If
+            End If
+            Return Me._MyProjectScriptDirectory
         End Get
     End Property
 
