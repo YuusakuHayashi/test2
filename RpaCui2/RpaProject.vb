@@ -23,6 +23,18 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Set
     End Property
 
+    Private ReadOnly Property _RootSystemDirectory As String
+        Get
+            Return Me.RootDirectory & "\system"
+        End Get
+    End Property
+
+    Private ReadOnly Property _RootSystemMacroFileName As String
+        Get
+            Return Me._RootSystemDirectory & "\macro.xlsm"
+        End Get
+    End Property
+
     Private Shared _SYSTEM_DIRECTORY As String
     Public Shared ReadOnly Property SYSTEM_DIRECTORY As String
         Get
@@ -33,6 +45,19 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
                 End If
             End If
             Return RpaProject._SYSTEM_DIRECTORY
+        End Get
+    End Property
+
+    Private Shared _SYSTEM_MACRO_FILENAME As String
+    Public Shared ReadOnly Property SYSTEM_MACRO_FILENAME As String
+        Get
+            If String.IsNullOrEmpty(RpaProject._SYSTEM_MACRO_FILENAME) Then
+                RpaProject._SYSTEM_MACRO_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\macro.xlsm"
+                If Not File.Exists(RpaProject._SYSTEM_MACRO_FILENAME) Then
+                    File.Copy(Me.RootSystemMacroFileName, RpaProject._SYSTEM_MACRO_FILENAME, True)
+                End If
+            End If
+            Return RpaProject._SYSTEM_MACRO_FILENAME
         End Get
     End Property
 

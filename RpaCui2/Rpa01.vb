@@ -123,10 +123,10 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             Console.WriteLine("エラー：解凍後ファイル '${infile}' がありません")
             Return 1000
         End If
-        File.Copy(infile, wkfile, True) 
+        File.Copy(infile, wkfile, True)
 
         Call _RunCmd("/c " _
-                   & "${CSCRIPT} ${Rpa.MyProjectScriptDirectory}\")
+                   & "${CSCRIPT} ${Rpa.MyProjectScriptDirectory}\${")
     End Function
 
     Private Sub _RunCmd(ByVal arg As String)
