@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Text
 
+
 Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     Private Const SHIFT_JIS As String = "Shift-JIS"
     Private Const UTF8 As String = "utf-8"
