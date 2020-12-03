@@ -8,8 +8,10 @@ Module RpaSystem
     Private ReadOnly Property ExecuteHandler(ByVal cmd As String) As ExecuteDelegater
         Get
             Select Case cmd
+                Case "macroupdate"
+                    Return AddressOf UpdateMacro
                 Case "run"
-                    Return AddressOf RunRobot 
+                    Return AddressOf RunRobot
                 Case "update"
                     Return AddressOf UpdateProject
                 Case "download"
@@ -23,6 +25,28 @@ Module RpaSystem
             End Select
         End Get
     End Property
+    '---------------------------------------------------------------------------------------------'
+
+    ' マクロの更新
+    '---------------------------------------------------------------------------------------------'
+    Private Function UpdateMacro(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Dim bas As String
+        If trn.Parameters.Count = 0 Then
+            Console.WriteLine("パラメータが指定されていません: " & trn.CommandText)
+            Return 1000
+        End If
+
+        For Each p In trn.Parameters
+            bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
+            If File.Exists(bas) Then
+                Call rpa.InvokeMacro("mac_importer.main", bas)
+            Else
+                Console.WriteLine($"指定マクロ '{p}' は存在しません")
+            End If
+        Next
+        Return 0
+    End Function
+
     '---------------------------------------------------------------------------------------------'
 
     ' ロボットの起動

@@ -48,13 +48,26 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
+    Private Shared _SYSTEM_SCRIPT_DIRECTORY As String
+    Public Shared ReadOnly Property SYSTEM_SCRIPT_DIRECTORY As String
+        Get
+            If String.IsNullOrEmpty(RpaProject._SYSTEM_SCRIPT_DIRECTORY) Then
+                RpaProject._SYSTEM_SCRIPT_DIRECTORY = RpaProject.SYSTEM_DIRECTORY & "\script"
+                If Not Directory.Exists(RpaProject._SYSTEM_SCRIPT_DIRECTORY) Then
+                    Directory.CreateDirectory(RpaProject._SYSTEM_SCRIPT_DIRECTORY)
+                End If
+            End If
+            Return RpaProject._SYSTEM_SCRIPT_DIRECTORY
+        End Get
+    End Property
+
     Private Shared _SYSTEM_MACRO_FILENAME As String
-    Public Shared ReadOnly Property SYSTEM_MACRO_FILENAME As String
+    Public ReadOnly Property SystemMacroFileName As String
         Get
             If String.IsNullOrEmpty(RpaProject._SYSTEM_MACRO_FILENAME) Then
                 RpaProject._SYSTEM_MACRO_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\macro.xlsm"
                 If Not File.Exists(RpaProject._SYSTEM_MACRO_FILENAME) Then
-                    File.Copy(Me.RootSystemMacroFileName, RpaProject._SYSTEM_MACRO_FILENAME, True)
+                    File.Copy(Me._RootSystemMacroFileName, RpaProject._SYSTEM_MACRO_FILENAME, True)
                 End If
             End If
             Return RpaProject._SYSTEM_MACRO_FILENAME
@@ -299,11 +312,11 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Public ReadOnly Property MyProjectScriptDirectory As String
-        Get
-            Return Me.MyProjectDirectory & "\script"
-        End Get
-    End Property
+    'Public ReadOnly Property MyProjectScriptDirectory As String
+    '    Get
+    '        Return Me.MyProjectDirectory & "\script"
+    '    End Get
+    'End Property
 
     Public ReadOnly Property MyProjectJsonFileName As String
         Get
@@ -414,6 +427,18 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         Console.WriteLine("プロジェクトの検査完了")
     End Sub
 
+    Public Sub InvokeMacro(ByVal method As String, ParamArray args() As String)
+        Dim ex = CreateObject("Excel.Application")
+        Dim book = ex.Workbooks
+        Dim macrofile = Path.GetFileName(Me.SystemMacroFileName)
+
+        book.Open(Me.SystemMacroFileName, 0)
+        ex.Run($"{macrofile}!{method}", args)
+        book.Close()
+        ex.Quit()
+        book = Nothing
+        ex = Nothing
+    End Sub
 
     Private Function _GetFileLines(ByVal f As String) As List(Of String)
         Dim txt As String

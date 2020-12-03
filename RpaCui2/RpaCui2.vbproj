@@ -91,6 +91,7 @@
     <Compile Include="Rpa01.vb" />
     <Compile Include="RpaBase.vb" />
     <Compile Include="RpaCodes.vb" />
+    <Compile Include="RpaModule.vb" />
     <Compile Include="RpaPackage.vb" />
     <Compile Include="RpaProject.vb" />
     <Compile Include="RpaSystem.vb" />

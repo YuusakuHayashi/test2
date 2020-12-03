@@ -10,9 +10,4 @@
         Me.Transaction = trn
     End Sub
 
-    Protected Sub InvokeMacro()
-        Dim ex = CreateObject("Excel.Application")
-        Dim book = ex.Workbooks
-        ex.Workbooks.Open(Rpa.
-    End Sub
 End Class
