@@ -39,7 +39,7 @@ Module RpaSystem
         For Each p In trn.Parameters
             bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
             If File.Exists(bas) Then
-                Call rpa.InvokeMacro("mac_importer.main", bas)
+                Call rpa.InvokeMacro("mac_importer.NewImporter", bas)
             Else
                 Console.WriteLine($"指定マクロ '{p}' は存在しません")
             End If

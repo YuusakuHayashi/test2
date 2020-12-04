@@ -4,6 +4,8 @@ Option Explicit
 
 'README
 
+Private Sub Main(ByVal target As String)
+End Sub
 
 Private Sub main(ParamArray pa() As Variant)
     Dim imp_mod As String: imp_mod = pa(0)

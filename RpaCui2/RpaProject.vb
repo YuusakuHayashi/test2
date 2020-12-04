@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports System.Text
-
+Imports System.Runtime.InteropServices
 
 Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     Private Const SHIFT_JIS As String = "Shift-JIS"
@@ -428,17 +428,31 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         Console.WriteLine("プロジェクトの検査完了")
     End Sub
 
-    Public Sub InvokeMacro(ByVal method As String, ParamArray args() As String)
-        Dim ex = CreateObject("Excel.Application")
-        Dim book = ex.Workbooks
-        Dim macrofile = Path.GetFileName(Me.SystemMacroFileName)
+    Public Sub InvokeMacro(ByVal method As String, ParamArray args As String())
+        Dim exapp, exbooks, exbook
+        Dim macrofile As String
+        Try
+            exapp = CreateObject("Excel.Application")
+            Try
+                exbooks = exapp.Workbooks
+            Finally
+                Try
+                    exbook = exbooks.Open(Me.SystemMacroFileName, 0)
+                    Try
+                        macrofile = Path.GetFileName(Me.SystemMacroFileName)
+                        exapp.Run($"{macrofile}!{method}", args)
+                    Finally
+                    End Try
+                Finally
+                    Marshal.ReleaseComObject(exbooks)
+                End Try
+            End Try
+        Finally
+            Marshal.ReleaseComObject(exapp)
+        End Try
 
-        book.Open(Me.SystemMacroFileName, 0)
-        ex.Run($"{macrofile}!{method}", args)
-        book.Close()
-        ex.Quit()
-        book = Nothing
-        ex = Nothing
+        'book.Close()
+        'ex.Quit()
     End Sub
 
     Private Function _GetFileLines(ByVal f As String) As List(Of String)
