@@ -428,31 +428,38 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         Console.WriteLine("プロジェクトの検査完了")
     End Sub
 
-    Public Sub InvokeMacro(ByVal method As String, ParamArray args As String())
+    Public Sub InvokeMacro(ByVal method As String, ParamArray args As Object())
         Dim exapp, exbooks, exbook
         Dim macrofile As String
         Try
             exapp = CreateObject("Excel.Application")
             Try
                 exbooks = exapp.Workbooks
-            Finally
                 Try
                     exbook = exbooks.Open(Me.SystemMacroFileName, 0)
-                    Try
-                        macrofile = Path.GetFileName(Me.SystemMacroFileName)
-                        exapp.Run($"{macrofile}!{method}", args)
-                    Finally
-                    End Try
+                    macrofile = Path.GetFileName(Me.SystemMacroFileName)
+                    Select Case args.Length
+                        Case 1
+                            exapp.Run($"{macrofile}!{method}", args)
+                        Case 2
+                            exapp.Run($"{macrofile}!{method}", args(0), args(1))
+                    End Select
+
                 Finally
-                    Marshal.ReleaseComObject(exbooks)
+                    If exbook IsNot Nothing Then
+                        exbook.Close()
+                    End If
+                    Marshal.ReleaseComObject(exbook)
                 End Try
+            Finally
+                Marshal.ReleaseComObject(exbooks)
             End Try
         Finally
+            If exapp IsNot Nothing Then
+                exapp.Quit()
+            End If
             Marshal.ReleaseComObject(exapp)
         End Try
-
-        'book.Close()
-        'ex.Quit()
     End Sub
 
     Private Function _GetFileLines(ByVal f As String) As List(Of String)
