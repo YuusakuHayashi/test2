@@ -1,6 +1,8 @@
 ﻿Imports System.IO
 Imports System.Text
 Imports System.Runtime.InteropServices
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
     Private Const SHIFT_JIS As String = "Shift-JIS"
@@ -217,8 +219,24 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
+    'Private _RootProjectIgnoreList As List(Of String)
+    'Public ReadOnly Property RootProjectIgnoreList As List(Of String)
+    '    Get
+    '        If Me._RootProjectIgnoreList Is Nothing Then
+    '            Me._RootProjectIgnoreList = New List(Of String)
+    '            If File.Exists(Me.RootProjectIgnoreFileName) Then
+    '                Me._RootProjectIgnoreList = _GetFileLines(Me.RootProjectIgnoreFileName)
+    '            End If
+    '        End If
+    '        Return Me._RootProjectIgnoreList
+    '    End Get
+    'End Property
+
+    ' セーブ？ロード？するたびに、リストが重複するためＩＧＮＯＲＥするようにした。
+    ' 原因が分かったら、ＩＧＮＯＲＥは解除する？しなくてもいいか・・・
     Private _RootProjectIgnoreList As List(Of String)
-    Public ReadOnly Property RootProjectIgnoreList As List(Of String)
+    <JsonIgnore>
+    Public Property RootProjectIgnoreList As List(Of String)
         Get
             If Me._RootProjectIgnoreList Is Nothing Then
                 Me._RootProjectIgnoreList = New List(Of String)
@@ -228,6 +246,9 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             End If
             Return Me._RootProjectIgnoreList
         End Get
+        Set(value As List(Of String))
+            Me._RootProjectIgnoreList = value
+        End Set
     End Property
 
     Public ReadOnly Property RootProjectUpdateDirectory As String
@@ -353,10 +374,23 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
+    'Private _MyProjectIgnoreList As List(Of String)
+    'Public ReadOnly Property MyProjectIgnoreList As List(Of String)
+    '    Get
+    '        Dim lines As String()
+    '        If Me._MyProjectIgnoreList Is Nothing Then
+    '            Me._MyProjectIgnoreList = New List(Of String)
+    '            If File.Exists(Me.MyProjectIgnoreFileName) Then
+    '                Me._MyProjectIgnoreList = _GetFileLines(Me.MyProjectIgnoreFileName)
+    '            End If
+    '        End If
+    '        Return Me._MyProjectIgnoreList
+    '    End Get
+    'End Property
     Private _MyProjectIgnoreList As List(Of String)
-    Public ReadOnly Property MyProjectIgnoreList As List(Of String)
+    <JsonIgnore>
+    Public Property MyProjectIgnoreList As List(Of String)
         Get
-            Dim lines As String()
             If Me._MyProjectIgnoreList Is Nothing Then
                 Me._MyProjectIgnoreList = New List(Of String)
                 If File.Exists(Me.MyProjectIgnoreFileName) Then
@@ -365,6 +399,9 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             End If
             Return Me._MyProjectIgnoreList
         End Get
+        Set(value As List(Of String))
+            Me._MyProjectIgnoreList = value
+        End Set
     End Property
 
     Public ReadOnly Property MyProjectUpdatedDirectory As String
@@ -426,6 +463,40 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             End If
         Next
         Console.WriteLine("プロジェクトの検査完了")
+    End Sub
+
+    Public Sub InvokeOutlookMacro(ByVal method As String, ParamArray args As Object())
+        Dim olapp, exbooks, exbook
+        Dim macrofile As String
+        Try
+            olapp = CreateObject("Outlook.Application")
+            Try
+                exbooks = olapp.Workbooks
+                Try
+                    exbook = exbooks.Open(Me.SystemMacroFileName, 0)
+                    macrofile = Path.GetFileName(Me.SystemMacroFileName)
+                    Select Case args.Length
+                        Case 1
+                            olapp.Run($"{macrofile}!{method}", args)
+                        Case 2
+                            olapp.Run($"{macrofile}!{method}", args(0), args(1))
+                    End Select
+
+                Finally
+                    If exbook IsNot Nothing Then
+                        exbook.Close()
+                    End If
+                    Marshal.ReleaseComObject(exbook)
+                End Try
+            Finally
+                Marshal.ReleaseComObject(exbooks)
+            End Try
+        Finally
+            If olapp IsNot Nothing Then
+                olapp.Quit()
+            End If
+            Marshal.ReleaseComObject(olapp)
+        End Try
     End Sub
 
     Public Sub InvokeMacro(ByVal method As String, ParamArray args As Object())

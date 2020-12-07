@@ -1,6 +1,8 @@
 ﻿Imports System.IO
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
+Imports System.Runtime.InteropServices
+Imports Outlook = Microsoft.Office.Interop.Outlook
 
 Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
     Private Const EXCEL_APP As String = "Excel.Application"
@@ -169,8 +171,6 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
     End Function
 
     Public Overrides Function Main() As Integer
-        Call Rpa.ModelSave(Rpa.SystemJsonFileName, Rpa)
-
         ' マスターファイルのチェック・コピー
         '-----------------------------------------------------------------------------------------'
         Dim inmaster = Rpa.MyProjectDirectory & "\" & Me.MasterCsvFileName
@@ -189,13 +189,13 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
 
         ' 添付ファイルの取得・解凍・ＣＳＶデータ生成
         '-----------------------------------------------------------------------------------------'
-        'Dim atcfile = vbNullString                                        '添付ファイル
-        'Dim bname = Path.GetFileNameWithoutExtension(atcfile)             '添付ファイルのファイル名(拡張子なし)
-        'Dim infile = Rpa.MyProjectWorkDirectory & "\" & bname & ".xls"    '解凍後ファイル
+        Dim atcfile = vbNullString                                        '添付ファイル
+        Dim bname = Path.GetFileNameWithoutExtension(atcfile)             '添付ファイルのファイル名(拡張子なし)
+        Dim infile = Rpa.MyProjectWorkDirectory & "\" & bname & ".xls"    '解凍後ファイル
         Dim incsv = Rpa.MyProjectWorkDirectory & "\input.csv"
 
-        'Console.WriteLine("添付ファイルを検索しています...")
-        'Call _GetAttachmentFile()
+        Console.WriteLine("添付ファイルを検索しています...")
+        Call _GetAttachmentFile()
         'For Each f In Directory.GetFiles(Rpa.MyProjectWorkDirectory)
         '    If Path.GetExtension(f) = "atc" Then
         '        atcfile = f
@@ -490,27 +490,37 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
 
     Private Sub _GetAttachmentFile()
         Const MAPI = "MAPI"
-        Const HIZUKE = "日付"
-        Dim ol = CreateObject("Outlook.Application")
+        'Dim ol = CreateObject("Outlook.Application")
+        Dim ol = New Outlook.Application
         Dim ns = ol.GetNamespace(MAPI)
         Dim inbox = ns.GetDefaultFolder(6)
         Dim sfolder = inbox.Folders.Item(Me.OutlookSourceInboxName)
         Dim bfolder = inbox.Folders.Item(Me.OutlookBackupInboxName)
         Dim afile As String
 
-        sfolder.Items.Sort(HIZUKE, True)
-        For Each [item] In sfolder.Items
-            If [item].Attachments.Count = 0 Then
-                Continue For
+        Dim [item] As Object
+        For Each i In sfolder.Items
+            If [item] Is Nothing Then
+                [item] = i
+            Else
+                If [item].CreationTime < i.CreationTime Then
+                    [item] = i
+                End If
             End If
-            For Each attachment In [item].Attachments
+        Next
+
+        For Each attachment In item.Attachments
+            If attachment.FileName = "" Then
                 afile = Rpa.MyProjectWorkDirectory & "\" & attachment
-                attachment.SaveAsFile(afile)
-            Next
+                Call attachment.SaveAsFile(afile)
+            End If
         Next
 
         Do Until sfolder.Items.Count = 0
-            sfolder.Items(0).Move(bfolder)
+            For Each i In sfolder.Items
+                i.Move(bfolder)
+                Exit For
+            Next
         Loop
     End Sub
 End Class
