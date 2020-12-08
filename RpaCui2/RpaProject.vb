@@ -185,19 +185,27 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
+    Private _RootProjectJsonFileName As String
     Public ReadOnly Property RootProjectJsonFileName As String
         Get
-            Return Me.RootProjectDirectory & "\rpa_project.json"
+            If String.IsNullOrEmpty(Me._RootProjectJsonFileName) Then
+                Me._RootProjectJsonFileName = $"{Me.RootProjectDirectory}\rpa_project.json"
+                If Not File.Exists(Me._RootProjectJsonFileName) Then
+                    Me.RootProjectObject.ModelSave(Me._RootProjectJsonFileName, Me.RootProjectObject)
+                End If
+            End If
+            Return Me._RootProjectJsonFileName
         End Get
     End Property
 
     Private Property _RootProjectObject As Object
+    <JsonIgnore>
     Public Property RootProjectObject As Object
         Get
             If Me._RootProjectObject Is Nothing Then
                 Dim obj = RpaCodes.RpaObject(Me.ProjectName)
                 Dim obj2 = Nothing
-                If Directory.Exists(Me.RootProjectJsonFileName) Then
+                If File.Exists(Me.RootProjectJsonFileName) Then
                     obj2 = obj.ModelLoad(Me.RootProjectJsonFileName)
                 End If
                 If obj2 IsNot Nothing Then
@@ -218,19 +226,6 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             Return Me.RootProjectDirectory & "\ignore"
         End Get
     End Property
-
-    'Private _RootProjectIgnoreList As List(Of String)
-    'Public ReadOnly Property RootProjectIgnoreList As List(Of String)
-    '    Get
-    '        If Me._RootProjectIgnoreList Is Nothing Then
-    '            Me._RootProjectIgnoreList = New List(Of String)
-    '            If File.Exists(Me.RootProjectIgnoreFileName) Then
-    '                Me._RootProjectIgnoreList = _GetFileLines(Me.RootProjectIgnoreFileName)
-    '            End If
-    '        End If
-    '        Return Me._RootProjectIgnoreList
-    '    End Get
-    'End Property
 
     ' セーブ？ロード？するたびに、リストが重複するためＩＧＮＯＲＥするようにした。
     ' 原因が分かったら、ＩＧＮＯＲＥは解除する？しなくてもいいか・・・
@@ -334,25 +329,27 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    'Public ReadOnly Property MyProjectScriptDirectory As String
-    '    Get
-    '        Return Me.MyProjectDirectory & "\script"
-    '    End Get
-    'End Property
-
+    Private _MyProjectJsonFileName As String
     Public ReadOnly Property MyProjectJsonFileName As String
         Get
-            Return Me.MyProjectDirectory & "\rpa_project.json"
+            If String.IsNullOrEmpty(Me._MyProjectJsonFileName) Then
+                Me._MyProjectJsonFileName = $"{Me.MyProjectDirectory}\rpa_project.json"
+                If Not File.Exists(Me._MyProjectJsonFileName) Then
+                    Me.MyProjectObject.ModelSave(Me._MyProjectJsonFileName, Me.MyProjectObject)
+                End If
+            End If
+            Return Me._MyProjectJsonFileName
         End Get
     End Property
 
     Private Property _MyProjectObject As Object
+    <JsonIgnore>
     Public Property MyProjectObject As Object
         Get
             If Me._MyProjectObject Is Nothing Then
                 Dim obj = RpaCodes.RpaObject(Me.ProjectName)
                 Dim obj2 = Nothing
-                If Directory.Exists(Me.MyProjectJsonFileName) Then
+                If File.Exists(Me.MyProjectJsonFileName) Then
                     obj2 = obj.ModelLoad(Me.MyProjectJsonFileName)
                 End If
                 If obj2 IsNot Nothing Then
@@ -374,19 +371,6 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    'Private _MyProjectIgnoreList As List(Of String)
-    'Public ReadOnly Property MyProjectIgnoreList As List(Of String)
-    '    Get
-    '        Dim lines As String()
-    '        If Me._MyProjectIgnoreList Is Nothing Then
-    '            Me._MyProjectIgnoreList = New List(Of String)
-    '            If File.Exists(Me.MyProjectIgnoreFileName) Then
-    '                Me._MyProjectIgnoreList = _GetFileLines(Me.MyProjectIgnoreFileName)
-    '            End If
-    '        End If
-    '        Return Me._MyProjectIgnoreList
-    '    End Get
-    'End Property
     Private _MyProjectIgnoreList As List(Of String)
     <JsonIgnore>
     Public Property MyProjectIgnoreList As List(Of String)
@@ -499,7 +483,7 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Try
     End Sub
 
-    Public Sub InvokeMacro(ByVal method As String, ParamArray args As Object())
+    Public Sub InvokeMacro(ByVal method As String, args() As Object)
         Dim exapp, exbooks, exbook
         Dim macrofile As String
         Try
@@ -509,13 +493,7 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
                 Try
                     exbook = exbooks.Open(Me.SystemMacroFileName, 0)
                     macrofile = Path.GetFileName(Me.SystemMacroFileName)
-                    Select Case args.Length
-                        Case 1
-                            exapp.Run($"{macrofile}!{method}", args)
-                        Case 2
-                            exapp.Run($"{macrofile}!{method}", args(0), args(1))
-                    End Select
-
+                    exapp.Run($"{macrofile}!{method}", args)
                 Finally
                     If exbook IsNot Nothing Then
                         exbook.Close()
@@ -531,6 +509,20 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
             End If
             Marshal.ReleaseComObject(exapp)
         End Try
+    End Sub
+
+    Public Sub RunShell(ByVal exe As String, ByVal arg As String)
+        Dim proc = New System.Diagnostics.Process()
+        'proc.StartInfo.FileName = System.Environment.GetEnvironmentVariable("ComSpec")
+        proc.StartInfo.FileName = exe
+        proc.StartInfo.UseShellExecute = False
+        proc.StartInfo.RedirectStandardOutput = True
+        proc.StartInfo.RedirectStandardInput = False
+        proc.StartInfo.CreateNoWindow = True
+        proc.StartInfo.Arguments = arg
+        proc.Start()
+        proc.WaitForExit()
+        proc.Close()
     End Sub
 
     Private Function _GetFileLines(ByVal f As String) As List(Of String)

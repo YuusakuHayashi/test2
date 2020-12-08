@@ -40,7 +40,7 @@ Module RpaSystem
             bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
             If File.Exists(bas) Then
                 Console.WriteLine($"指定マクロ '{p}' をインストールします")
-                Call rpa.InvokeMacro("MacroImporter.Main", bas)
+                Call rpa.InvokeMacro("MacroImporter.Main", {bas})
             Else
                 Console.WriteLine($"指定マクロ '{p}' は存在しません")
             End If

@@ -51,25 +51,29 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         End Get
     End Property
 
+    ' 依頼書定義
     Public Class Iraisho
         Public BookName As String
-        Public LayoutType As Integer
         Public MaxCount As Integer
-        Public ResheetType As Integer
+        Public TargetPattern As List(Of String)
+        Public ResheetType As String
         Public BankNameCell As String
         Public TantouCell As String
         Public ItakusyacodeCell As String
         Public ZieisinkincodeCell As String
-        Public HikiotoshikinyukikanbangoCell As String
+        Public HikiotoshikinyukikanbangouCell As String
+        Public MeisaiTableTopRow As Integer
+        Public MeisaiTableBottomRow As Integer
         Public SitenmeiColumns As Integer
         Public SitencodeColumns As Integer
         Public KokyakucodeColumns As Integer
         Public FunocodeColumns As Integer      ' 足利専用プロパティ
         Public ShubetColumns As Integer
-        Public KouzabangoColumns As Integer
+        Public KouzabangouColumns As Integer
         Public KouzameigiColumns As Integer
-        Public SeikyugakColumns As Integer
-        Public TuchokigoColumns As Integer     ' ゆうちょ専用プロパティ
+        Public SeikyugakuColumns As Integer
+        Public TuchoukigouColumns As Integer     ' ゆうちょ専用プロパティ
+        Public TuchoubangouColumns As Integer    ' ゆうちょ専用プロパティ
         Public BikouColumns As Integer
         Private _TargetBanks As List(Of BankInfo)
         Public Property TargetBanks As List(Of BankInfo)
@@ -100,6 +104,44 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         End Get
         Set(value As List(Of Iraisho))
             Me._IraishoDatas = value
+        End Set
+    End Property
+
+    ' 送付明細定義    
+    Public Class SofuMeisai
+        Public Kokyakucode As String
+        Public Kouzameigi As String
+        Public Furikaekingaku As String
+        Public Ginkoucode As String
+        Public Sitencode As String
+        Public Ginkoumei As String
+        Public MeisaiString As String
+        Public HeaderFlag As Boolean
+        Public ResheetFlag As Boolean
+    End Class
+
+    Private _SofuMeisaiDatas As List(Of SofuMeisai)
+    <JsonIgnore>
+    Public Property SofuMeisaiDatas As List(Of SofuMeisai)
+        Get
+            If Me._SofuMeisaiDatas Is Nothing Then
+                Me._SofuMeisaiDatas = New List(Of SofuMeisai)
+            End If
+            Return Me._SofuMeisaiDatas
+        End Get
+        Set(value As List(Of SofuMeisai))
+            Me._SofuMeisaiDatas = value
+        End Set
+    End Property
+
+    Private __AttachmentFileName As String
+    Private _AttachmentFileName As String
+    Public Property AttachmentFileName As String
+        Get
+            Return Me._AttachmentFileName
+        End Get
+        Set(value As String)
+            Me._AttachmentFileName = value
         End Set
     End Property
 
@@ -189,38 +231,41 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
 
         ' 添付ファイルの取得・解凍・ＣＳＶデータ生成
         '-----------------------------------------------------------------------------------------'
-        Dim atcfile = vbNullString                                        '添付ファイル
-        Dim bname = Path.GetFileNameWithoutExtension(atcfile)             '添付ファイルのファイル名(拡張子なし)
-        Dim infile = Rpa.MyProjectWorkDirectory & "\" & bname & ".xls"    '解凍後ファイル
+        Dim atcfile = vbNullString    '添付ファイル（フルパス）
+        Dim bname = vbNullString      '添付ファイル（ファイル名（拡張子除く）のみ）
+        Dim infile = vbNullString     '解凍後ファイル名
         Dim incsv = Rpa.MyProjectWorkDirectory & "\input.csv"
 
         Console.WriteLine("添付ファイルを検索しています...")
-        Call _GetAttachmentFile()
-        'For Each f In Directory.GetFiles(Rpa.MyProjectWorkDirectory)
-        '    If Path.GetExtension(f) = "atc" Then
-        '        atcfile = f
-        '    End If
-        'Next
-        'If String.IsNullOrEmpty(atcfile) Then
-        '    Console.WriteLine("エラー：添付ファイルが見つかりません")
-        '    Return 1000
-        'End If
-        'Console.WriteLine("添付ファイルを解凍します...")
-        'If File.Exists(Me.AttacheCase) Then
-        '    Console.WriteLine($"エラー：アタッシュケース '{Me.AttacheCase}' がありません")
-        '    Return 1000
-        'End If
-        'Call _RunCmd("/c " _
-        '           & "/p=${Me.AttacheCase} " _
-        '           & "/de=1 /ow=0 /opf=0 /exit=1")
 
-        'If Not File.Exists(infile) Then
-        '    Console.WriteLine("エラー：解凍後ファイル '${infile}' がありません")
-        '    Return 1000
-        'End If
+        ' 添付ファイルを保存し、その名前を取得
+        Me.__AttachmentFileName = _GetAttachmentFile()
+        For Each f In Directory.GetFiles(Rpa.MyProjectWorkDirectory)
+            If Path.GetFileName(f) = Me.__AttachmentFileName Then
+                atcfile = f
+            End If
+        Next
+        If String.IsNullOrEmpty(atcfile) Then
+            Console.WriteLine("エラー：添付ファイルが見つかりません")
+            Return 1000
+        End If
+        bname = Path.GetFileNameWithoutExtension(atcfile)
+        infile = Rpa.MyProjectWorkDirectory & "\" & bname & ".xls"
 
-        'Dim args() = {infile, incsv}
-        'Rpa.InvokeMacro("Rpa01.CreateInputTextData", args)
+        ' 添付ファイルを解凍
+        Console.WriteLine("添付ファイルを解凍します...")
+        If Not File.Exists(Me.AttacheCase) Then
+            Console.WriteLine($"エラー：アタッシュケース '{Me.AttacheCase}' がありません")
+            Return 1000
+        End If
+        Call Rpa.RunShell(Me.AttacheCase, $"/c {atcfile} /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
+        If Not File.Exists(infile) Then
+            Console.WriteLine($"エラー：解凍後ファイル '{infile}' がありません")
+            Return 1000
+        End If
+
+        ' ＣＳＶデータ生成
+        Rpa.InvokeMacro("Rpa01.CreateInputTextData", {infile, incsv})
         '-----------------------------------------------------------------------------------------'
 
 
@@ -235,17 +280,17 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Call _CreateTmpCsv(inmaster2, target, tmpcsv)
         Call _CompareInputCsvToTmpCsv(incsv, tmpcsv, tincsv)
 
-        Call _AddTeishiIraishoMetaDatas(tincsv, tincsv2)
+        Call _CreateSofuMeisaiDatas(tincsv, tincsv2)
         '-----------------------------------------------------------------------------------------'
 
 
         ' 各停止依頼書を作成
         '-----------------------------------------------------------------------------------------'
-        Dim fname As String
-        For Each f In Directory.GetFiles(Me.IraishoDirectory)
-            fname = Path.GetFileName(f)
-            File.Copy(f, $"{Me.Work2Directory}\{fname}", True)
-        Next
+        'Dim fname As String
+        'For Each f In Directory.GetFiles(Me.IraishoDirectory)
+        '    fname = Path.GetFileName(f)
+        '    File.Copy(f, $"{Me.Work2Directory}\{fname}", True)
+        'Next
         '-----------------------------------------------------------------------------------------'
 
 
@@ -255,7 +300,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
     End Function
 
 
-    Private Sub _AddTeishiIraishoMetaDatas(ByVal infile As String, ByVal otfile As String)
+    Private Sub _CreateSofuMeisaiDatas(ByVal infile As String, ByVal otfile As String)
         Dim slist As New List(Of String)
         Dim sr As StreamReader
         Dim sw As StreamWriter
@@ -264,34 +309,116 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Dim work As String
         Dim v1 As String
         Dim v2 As String
+        Dim vs1() As String
+        Dim vs2() As String
         Dim bank As String
+        Dim line As String
+        Dim meisai As SofuMeisai
+        Dim zsmd As SofuMeisai
+        Dim miraisho As Iraisho
+        Dim R_iraishos = CType(Rpa.RootProjectObject.IraishoDatas, List(Of Iraisho))
         sr = New StreamReader(infile, System.Text.Encoding.GetEncoding(MyEncoding))
         sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(MyEncoding))
 
-        ' ヘッダー
+        ' ヘッダーは読み飛ばし
         sr.ReadLine()
 
         Do Until sr.EndOfStream
-            slist.Add(sr.ReadLine())
+            line = sr.ReadLine()
+            vs1 = line.Split(",")
+            meisai = New SofuMeisai With {
+                .MeisaiString = line,
+                .Kokyakucode = vs1(4),
+                .Ginkoucode = vs1(7),
+                .Sitencode = vs1(8),
+                .Ginkoumei = vs1(9),
+                .Kouzameigi = vs1(13),
+                .Furikaekingaku = vs1(14)
+            }
+            Me.SofuMeisaiDatas.Add(meisai)
         Loop
 
-        ' 簡易的に銀行コードでバブルソート
-        ' コードはあまりきれいじゃないので時間があるときに見直したい・・・
-        cnt = slist.IndexOf(slist.Last)
-        For idx1 = 0 To (cnt - 1)
-            For idx2 = 0 To (cnt - (idx1 + 1))
-                v1 = (slist(idx2).Split(","))(7)
-                v2 = (slist(idx2 + 1).Split(","))(7)
-                If v1 > v2 Then
-                    work = slist(idx2)
-                    slist(idx2) = slist(idx2 + 1)
-                    slist(idx2 + 1) = work
+        ' 銀行コード－＞支店コードでソート
+        Me.SofuMeisaiDatas.Sort(
+            Function(a, b)
+                If a.Ginkoucode <> b.Ginkoucode Then
+                    Return (a.Ginkoucode - b.Ginkoucode)
+                Else
+                    Return (a.Sitencode - b.Sitencode)
                 End If
-            Next
-        Next
+            End Function
+        )
 
-        For Each s In slist
-            sw.WriteLine(s)
+        ' 依頼書の対象銀行コードが合致する場合、その依頼書データを取得
+        Dim smdcount = 0
+        zsmd = New SofuMeisai
+        For Each smd In Me.SofuMeisaiDatas
+            If zsmd.Ginkoucode <> smd.Ginkoucode Then
+                smdcount = 0
+                miraisho = Nothing
+                miraisho = R_iraishos.Find(
+                    Function(ri)
+                        Dim hit = ri.TargetBanks.Find(
+                            Function(tb)
+                                Return (tb.Code = smd.Ginkoucode)
+                            End Function
+                        )
+                        Return IIf(hit IsNot Nothing, True, False)
+                    End Function
+                )
+                If miraisho Is Nothing Then
+                    miraisho = R_iraishos.Find(
+                        Function(ri)
+                            If ri.TargetPattern IsNot Nothing Then
+                                Dim hit = ri.TargetPattern.Find(
+                                    Function(tp)
+                                        Return smd.Ginkoumei.Contains(tp)
+                                    End Function
+                                )
+                                Return IIf(hit IsNot Nothing, True, False)
+                            Else
+                                Return False
+                            End If
+                        End Function
+                    )
+                End If
+                If miraisho Is Nothing Then
+                    miraisho = R_iraishos(0)
+                End If
+                smd.HeaderFlag = True
+            End If
+
+            smdcount += 1
+            smd.ResheetFlag = IIf(smdcount > miraisho.MaxCount, True, False)
+            smdcount = IIf(smd.ResheetFlag, 1, smdcount)
+
+            ' 各種依頼書情報付加
+            smd.MeisaiString &= IIf(smd.HeaderFlag, "1", "0")                        ' idx21
+            smd.MeisaiString &= "," & IIf(smd.ResheetFlag, "1", "0")                 ' idx22
+            smd.MeisaiString &= "," & miraisho.BookName                              ' idx23
+            smd.MeisaiString &= "," & miraisho.ResheetType                           ' idx24
+            smd.MeisaiString &= "," & miraisho.BankNameCell                          ' idx25
+            smd.MeisaiString &= "," & miraisho.TantouCell                            ' idx26
+            smd.MeisaiString &= "," & miraisho.ItakusyacodeCell                      ' idx27
+            smd.MeisaiString &= "," & miraisho.ZieisinkincodeCell                    ' idx28
+            smd.MeisaiString &= "," & miraisho.HikiotoshikinyukikanbangouCell        ' idx29
+            smd.MeisaiString &= "," & miraisho.MeisaiTableTopRow                     ' idx30
+            smd.MeisaiString &= "," & miraisho.MeisaiTableBottomRow                  ' idx31
+            smd.MeisaiString &= "," & (miraisho.MeisaiTableTopRow + smdcount - 1)    ' idx32
+            smd.MeisaiString &= "," & miraisho.SitenmeiColumns                       ' idx33
+            smd.MeisaiString &= "," & miraisho.SitencodeColumns                      ' idx34
+            smd.MeisaiString &= "," & miraisho.KokyakucodeColumns                    ' idx35
+            smd.MeisaiString &= "," & miraisho.FunocodeColumns                       ' idx36
+            smd.MeisaiString &= "," & miraisho.ShubetColumns                         ' idx37
+            smd.MeisaiString &= "," & miraisho.KouzabangouColumns                    ' idx38
+            smd.MeisaiString &= "," & miraisho.KouzameigiColumns                     ' idx39
+            smd.MeisaiString &= "," & miraisho.SeikyugakuColumns                     ' idx30
+            smd.MeisaiString &= "," & miraisho.TuchoukigouColumns                    ' idx41
+            smd.MeisaiString &= "," & miraisho.TuchoubangouColumns                   ' idx42
+            smd.MeisaiString &= "," & miraisho.BikouColumns                          ' idx43
+
+            sw.WriteLine(smd.MeisaiString)
+            zsmd = smd
         Next
 
         If sr IsNot Nothing Then
@@ -305,7 +432,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
     End Sub
 
 
-    'Private Sub _AddTeishiIraishoMetaDatas(ByVal infile As String, ByVal otfile As String)
+    'Private Sub _CreateSofuMeisaiDatas(ByVal infile As String, ByVal otfile As String)
     '    Dim sr As StreamReader
     '    Dim sw As StreamWriter
     '    Dim line As String
@@ -475,52 +602,66 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
     End Sub
 
 
-    Private Sub _RunCmd(ByVal arg As String)
-        Dim proc = New System.Diagnostics.Process()
-        proc.StartInfo.FileName = System.Environment.GetEnvironmentVariable("ComSpec")
-        proc.StartInfo.UseShellExecute = False
-        proc.StartInfo.RedirectStandardOutput = True
-        proc.StartInfo.RedirectStandardInput = False
-        proc.StartInfo.CreateNoWindow = True
-        proc.StartInfo.Arguments = arg
-        proc.Start()
-        proc.WaitForExit()
-        proc.Close()
-    End Sub
+    'Private Sub _RunCmd(ByVal arg As String)
+    '    Dim proc = New System.Diagnostics.Process()
+    '    proc.StartInfo.FileName = System.Environment.GetEnvironmentVariable("ComSpec")
+    '    proc.StartInfo.UseShellExecute = False
+    '    proc.StartInfo.RedirectStandardOutput = True
+    '    proc.StartInfo.RedirectStandardInput = False
+    '    proc.StartInfo.CreateNoWindow = True
+    '    proc.StartInfo.Arguments = arg
+    '    proc.Start()
+    '    proc.WaitForExit()
+    '    proc.Close()
+    'End Sub
 
-    Private Sub _GetAttachmentFile()
+    Private Function _GetAttachmentFile() As String
         Const MAPI = "MAPI"
-        'Dim ol = CreateObject("Outlook.Application")
-        Dim ol = New Outlook.Application
-        Dim ns = ol.GetNamespace(MAPI)
-        Dim inbox = ns.GetDefaultFolder(6)
-        Dim sfolder = inbox.Folders.Item(Me.OutlookSourceInboxName)
-        Dim bfolder = inbox.Folders.Item(Me.OutlookBackupInboxName)
-        Dim afile As String
-
-        Dim [item] As Object
-        For Each i In sfolder.Items
-            If [item] Is Nothing Then
-                [item] = i
-            Else
-                If [item].CreationTime < i.CreationTime Then
-                    [item] = i
-                End If
-            End If
-        Next
-
-        For Each attachment In item.Attachments
-            If attachment.FileName = "" Then
-                afile = Rpa.MyProjectWorkDirectory & "\" & attachment
-                Call attachment.SaveAsFile(afile)
-            End If
-        Next
-
-        Do Until sfolder.Items.Count = 0
+        Dim olapp, ns, inbox, sfolder, bfolder, [item]
+        Dim fnc As Func(Of Object, String)
+        Dim rtn = vbNullString
+        Try
+            olapp = CreateObject("Outlook.Application")
+            ns = olapp.GetNamespace(MAPI)
+            inbox = ns.GetDefaultFolder(6)
+            sfolder = inbox.Folders.Item(Me.OutlookSourceInboxName)
+            bfolder = inbox.Folders.Item(Me.OutlookBackupInboxName)
             For Each i In sfolder.Items
-                i.Move(bfolder)
-                Exit For
+                If [item] Is Nothing Then
+                    [item] = i
+                Else
+                    If [item].CreationTime < i.CreationTime Then
+                        [item] = i
+                    End If
+                End If
             Next
-        Loop
-    End Sub
+
+            ' 添付ファイルを保存し、その名前を得る
+            fnc = Function(atc As Object)
+                      Call atc.SaveAsFile($"{Rpa.MyProjectWorkDirectory}\{atc.FileName}")
+                      Return atc.FileName
+                  End Function
+            If [item] IsNot Nothing Then
+                For Each attachment In item.Attachments
+                    If String.IsNullOrEmpty(Me.AttachmentFileName) Then
+                        rtn = fnc(attachment)
+                    Else
+                        If attachment.FileName = Me.AttachmentFileName Then
+                            rtn = fnc(attachment)
+                        End If
+                    End If
+                Next
+            End If
+
+            Do Until sfolder.Items.Count = 0
+                For Each i In sfolder.Items
+                    Call i.Move(bfolder)
+                    Exit For
+                Next
+            Loop
+        Finally
+            Marshal.ReleaseComObject(olapp)
+        End Try
+        Return rtn
+    End Function
 End Class
