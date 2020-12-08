@@ -1,0 +1,541 @@
+﻿{
+  "ItakusyaCodeDictionary": {
+    "Moteki": "0029005"
+  },
+  "IraishoDatas": [
+    {
+      "BookName": "停止依頼書.xls",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCount",
+      "BankNameCell": "B4",
+      "TantouCell": "Q8",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 14,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": null,
+          "Name": null,
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(G-NET1).xls",
+      "MaxCount": 9,
+      "ResheetType": "WhenReachMaxCount",
+      "BankNameCell": null,
+      "TantouCell": null,
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 29,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 0,
+      "SitencodeColumns": 2,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 5,
+      "KouzabangouColumns": 8,
+      "KouzameigiColumns": 0,
+      "SeikyugakuColumns": 15,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 23,
+      "TargetBanks": [
+        {
+          "Code": "0128",
+          "Name": "群馬銀行",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "0516",
+          "Name": "東和銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(G-NET2).xls",
+      "MaxCount": 9,
+      "ResheetType": "WhenReachMaxCount",
+      "BankNameCell": null,
+      "TantouCell": null,
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 29,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 0,
+      "SitencodeColumns": 2,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 5,
+      "KouzabangouColumns": 8,
+      "KouzameigiColumns": 0,
+      "SeikyugakuColumns": 15,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 23,
+      "TargetBanks": [
+        {
+          "Code": "2149",
+          "Name": "ぐんまみらい信用組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "2143",
+          "Name": "あかぎ信用組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "2963",
+          "Name": "中央労働金庫",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(G-NET3).xls",
+      "MaxCount": 9,
+      "ResheetType": "WhenReachMaxCount",
+      "BankNameCell": null,
+      "TantouCell": null,
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 29,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 0,
+      "SitencodeColumns": 2,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 5,
+      "KouzabangouColumns": 8,
+      "KouzameigiColumns": 0,
+      "SeikyugakuColumns": 15,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 23,
+      "TargetBanks": [
+        {
+          "Code": "4632",
+          "Name": "利根沼田農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4544",
+          "Name": "前橋市農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4593",
+          "Name": "北群渋川農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4652",
+          "Name": "佐波伊勢崎農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4608",
+          "Name": "甘楽富岡農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "2146",
+          "Name": "群馬県信用組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4563",
+          "Name": "高崎市農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4540",
+          "Name": "赤城橘農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4664",
+          "Name": "新田みどり農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4665",
+          "Name": "太田市農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4594",
+          "Name": "多野藤岡農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4567",
+          "Name": "はぐくみ農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4632",
+          "Name": "利根沼田農業協同組合",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4677",
+          "Name": "邑楽舘林農協",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4613",
+          "Name": "碓井安中農協",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4626",
+          "Name": "あがつま農協",
+          "ZieiSinkinCode": null
+        },
+        {
+          "Code": "4628",
+          "Name": "嬬恋村農協",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(SIS).xlsx",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCount",
+      "TargetPattern": [
+        "信用金庫",
+        "信金"
+      ],
+      "BankNameCell": "B4",
+      "TantouCell": "Q8",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 14,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": null,
+          "Name": null,
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(SIS自営信金).xlsx",
+      "MaxCount": 9,
+      "ResheetType": "WhenReachMaxCount",
+      "BankNameCell": "B4",
+      "TantouCell": "Q9",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": "Q8",
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 15,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": "1204",
+          "Name": "水戸信用金庫",
+          "ZieiSinkinCode": "0000003495"
+        },
+        {
+          "Code": "1250",
+          "Name": "埼玉縣信用金庫",
+          "ZieiSinkinCode": "4980000011"
+        },
+        {
+          "Code": "1252",
+          "Name": "青木信用金庫",
+          "ZieiSinkinCode": "0000566077"
+        },
+        {
+          "Code": "1280",
+          "Name": "横浜信用金庫",
+          "ZieiSinkinCode": "0000000764"
+        },
+        {
+          "Code": "1282",
+          "Name": "湘南信用金庫",
+          "ZieiSinkinCode": "0004860000"
+        },
+        {
+          "Code": "1283",
+          "Name": "川崎信用金庫",
+          "ZieiSinkinCode": "8990000000"
+        },
+        {
+          "Code": "1286",
+          "Name": "平塚信用金庫",
+          "ZieiSinkinCode": "8040000000"
+        },
+        {
+          "Code": "1303",
+          "Name": "朝日信用金庫",
+          "ZieiSinkinCode": "0041120000"
+        },
+        {
+          "Code": "1320",
+          "Name": "東京信用金庫",
+          "ZieiSinkinCode": "0000000858"
+        },
+        {
+          "Code": "1341",
+          "Name": "西部信用金庫",
+          "ZieiSinkinCode": "0013417184"
+        },
+        {
+          "Code": "1360",
+          "Name": "多摩信用金庫",
+          "ZieiSinkinCode": "0000002455"
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(みずほ銀行).xls",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCountAndSitenChanged",
+      "BankNameCell": null,
+      "TantouCell": "Q8",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 14,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": "0001",
+          "Name": "みずほ銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(ゆうちょ銀行).xls",
+      "MaxCount": 9,
+      "ResheetType": "WhenReachMaxCount",
+      "BankNameCell": null,
+      "TantouCell": "Q8",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 30,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 5,
+      "SeikyugakuColumns": 9,
+      "TuchoukigouColumns": 1,
+      "TuchoubangouColumns": 3,
+      "BikouColumns": 10,
+      "TargetBanks": [
+        {
+          "Code": "9900",
+          "Name": "ゆうちょ銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(三井住友銀行).xls",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCountAndSitenChanged",
+      "BankNameCell": null,
+      "TantouCell": "Q9",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 15,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": "0009",
+          "Name": "三井住友銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(秋田銀行).xls",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCountAndSitenChanged",
+      "BankNameCell": null,
+      "TantouCell": "Q8",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 14,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": "0119",
+          "Name": "秋田銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(常陽銀行).xls",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCountAndSitenChanged",
+      "BankNameCell": null,
+      "TantouCell": "Q9",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 15,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": "0130",
+          "Name": "常陽銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(足利銀行).xls",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCount",
+      "BankNameCell": null,
+      "TantouCell": null,
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 11,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 3,
+      "KokyakucodeColumns": 6,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 4,
+      "KouzabangouColumns": 5,
+      "KouzameigiColumns": 10,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 0,
+      "TargetBanks": [
+        {
+          "Code": "0129",
+          "Name": "足利銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    },
+    {
+      "BookName": "停止依頼書(大光銀行).xls",
+      "MaxCount": 10,
+      "ResheetType": "WhenReachMaxCountAndSitenChanged",
+      "BankNameCell": null,
+      "TantouCell": "Q8",
+      "ItakusyacodeCell": null,
+      "ZieisinkincodeCell": null,
+      "HikiotoshikinyukikanbangouCell": null,
+      "MeisaiTableTopRow": 14,
+      "MeisaiTableBottomRow": 0,
+      "SitenmeiColumns": 2,
+      "SitencodeColumns": 0,
+      "KokyakucodeColumns": 0,
+      "FunocodeColumns": 0,
+      "ShubetColumns": 3,
+      "KouzabangouColumns": 4,
+      "KouzameigiColumns": 6,
+      "SeikyugakuColumns": 16,
+      "TuchoukigouColumns": 0,
+      "BikouColumns": 18,
+      "TargetBanks": [
+        {
+          "Code": "0532",
+          "Name": "大光銀行",
+          "ZieiSinkinCode": null
+        }
+      ]
+    }
+  ],
+  "AttachmentFileName": null,
+  "PasswordOfAttacheCase": null,
+  "OutlookSourceInboxName": null,
+  "OutlookBackupInboxName": null,
+  "MasterCsvFileName": "master.csv",
+  "AttacheCase": null,
+  "RestartCode": null
+}

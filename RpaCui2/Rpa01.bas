@@ -1239,7 +1239,7 @@ Private Function get_grandparent_folder() As String
 End Function
 
 
-Private Sub CreateInputTextData(ParamArray v() As Variant)
+Private Sub CreateInputTextData(ByRef v() As Variant)
     ' インプット設定
     '-------------------------------------------------------------------------'
     Dim inf As String: inf = v(0)
