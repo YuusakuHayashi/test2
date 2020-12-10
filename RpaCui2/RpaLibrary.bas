@@ -12,11 +12,11 @@ End Type
 
 Private Sub set_group_underline(ByRef BGN_CEL As Range)
     Dim cel_val As Variant
-    Dim lastrow As Long: lastrow = Cells(ActiveSheet.Rows.Count, BGN_CEL.Column).End(xlUp).Row
-    Dim lastcol As Long: lastcol = Cells(BGN_CEL.Row, ActiveSheet.Columns.Count).End(xlToLeft).Column
+    Dim lastrow As Long: lastrow = Cells(ActiveSheet.Rows.Count, BGN_CEL.Column).End(xlUp).row
+    Dim lastcol As Long: lastcol = Cells(BGN_CEL.row, ActiveSheet.Columns.Count).End(xlToLeft).Column
 
     cel_val = BGN_CEL.Value
-    Dim i As Long: i = BGN_CEL.Row
+    Dim i As Long: i = BGN_CEL.row
     Dim j As Long: j = BGN_CEL.Column
 
     Do
@@ -25,7 +25,7 @@ Private Sub set_group_underline(ByRef BGN_CEL As Range)
             cel_val = Cells(i, j).Value
         End If
         i = i + 1
-    Loop Until Cells(i, j).Row = lastrow
+    Loop Until Cells(i, j).row = lastrow
 End Sub
 
 Private Sub sample()
@@ -38,11 +38,11 @@ Private Sub set_highlights(ByRef BGN_CEL As Range, ByVal TGT_VAL As Variant, ByV
     '   https://www.sejuku.net/blog/32288
 
     Dim cel_val As Variant
-    Dim lastrow As Long: lastrow = Cells(ActiveSheet.Rows.Count, BGN_CEL.Column).End(xlUp).Row
-    Dim lastcol As Long: lastcol = Cells(BGN_CEL.Row, ActiveSheet.Columns.Count).End(xlToLeft).Column
+    Dim lastrow As Long: lastrow = Cells(ActiveSheet.Rows.Count, BGN_CEL.Column).End(xlUp).row
+    Dim lastcol As Long: lastcol = Cells(BGN_CEL.row, ActiveSheet.Columns.Count).End(xlToLeft).Column
 
     cel_val = TGT_VAL
-    Dim i As Long: i = BGN_CEL.Row
+    Dim i As Long: i = BGN_CEL.row
     Dim j As Long: j = BGN_CEL.Column
 
     Do
@@ -50,7 +50,7 @@ Private Sub set_highlights(ByRef BGN_CEL As Range, ByVal TGT_VAL As Variant, ByV
             Range(Cells(i, 1), Cells(i, lastcol)).Interior.ColorIndex = i_idx
         End If
         i = i + 1
-    Loop Until Cells(i, j).Row = lastrow
+    Loop Until Cells(i, j).row = lastrow
 End Sub
 
 Public Function GetStringArrayOfFile(ByVal fn As String) As String()
@@ -78,13 +78,13 @@ Public Function IsWorksheetExists(ByRef wb As Workbook, ByVal sheetname As Strin
     Dim ws As Worksheet
     Dim b As Boolean: b = False
     For Each ws In wb.Worksheets
-        If ws.Name = sheetname then
+        If ws.Name = sheetname Then
             b = True
             Exit For
         End If
     Next
     IsWorksheetExists = b
-End If
+End Function
 
 Public Function GetStringArrayOfFile2(ByVal fn As String) As String()
     Dim fso As Object: Set fso = Nothing
@@ -195,17 +195,17 @@ Private Function CheckValidRange(ByRef hz As HankakuZenkaku) As HankakuZenkaku
     If hz.rng.Address = hz.rng.Worksheet.Cells.Address Then
         hz.rng = Nothing
     Else
-        min_row = hz.rng.Row
+        min_row = hz.rng.row
         min_col = hz.rng.Column
-        max_row = hz.rng.Row + hz.rng.Rows.Count - 1
+        max_row = hz.rng.row + hz.rng.Rows.Count - 1
         max_col = hz.rng.Column + hz.rng.Columns.Count - 1
     
         If hz.rng.Address = hz.rng.EntireColumn.Address Then
             max_row = 1
             Dim x As Integer
             For x = 1 To hz.rng.Columns.Count
-                If max_row < hz.rng.Cells(hz.rng.Rows.Count, x).End(xlUp).Row Then
-                    max_row = hz.rng.Cells(hz.rng.Rows.Count, x).End(xlUp).Row
+                If max_row < hz.rng.Cells(hz.rng.Rows.Count, x).End(xlUp).row Then
+                    max_row = hz.rng.Cells(hz.rng.Rows.Count, x).End(xlUp).row
                 End If
             Next
         End If

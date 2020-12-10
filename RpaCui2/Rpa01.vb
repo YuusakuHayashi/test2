@@ -129,27 +129,27 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         ' 停止対象
         Public MeisaiTableTopRow As Integer
 
-        Public KokyakucodeColumn As Integer               ' 顧客コード
-        Public K_GinkoucodeColumn As Integer              ' 銀行コード
-        Public SitencodeColumn As Integer                 ' 支店コード
-        Public K_GinkoumeiColumn As Integer               ' 銀行名
-        Public K_GinkouColumn As Integer                  ' 銀行名（銀行名から「銀行」などを除いた名称）
-        Public SitenmeiColumn As Integer                  ' 支店名
-        Public SitenColumn As Integer                     ' 支店名（支店名から「支店」を除いた名称）
-        Public YokinshubetuColumn As Integer              ' 預金種別
-        Public KouzabangouColumn As Integer               ' 口座番号
-        Public TuchoukigouColumn As Integer               ' 通帳記号
-        Public TuchoubangouColumn As Integer              ' 通帳番号
-        Public KouzameigiColumn As Integer                ' 口座名義（半角）
-        Public JISKouzameigiColumn As Integer             ' 口座名義（全角）
-        Public FurikaekingakuColumn As Integer            ' 振替金額
+        Public KokyakucodeColumn As String                ' 顧客コード
+        Public K_GinkoucodeColumn As String               ' 銀行コード
+        Public SitencodeColumn As String                  ' 支店コード
+        Public K_GinkoumeiColumn As String                ' 銀行名
+        Public K_GinkouColumn As String                   ' 銀行名（銀行名から「銀行」などを除いた名称）
+        Public SitenmeiColumn As String                   ' 支店名
+        Public SitenColumn As String                      ' 支店名（支店名から「支店」を除いた名称）
+        Public YokinshubetuColumn As String               ' 預金種別
+        Public KouzabangouColumn As String                ' 口座番号
+        Public TuchoukigouColumn As String                ' 通帳記号
+        Public TuchoubangouColumn As String               ' 通帳番号
+        Public KouzameigiColumn As String                 ' 口座名義（半角）
+        Public JISKouzameigiColumn As String              ' 口座名義（全角）
+        Public FurikaekingakuColumn As String             ' 振替金額
 
-        Public BikouColumn As Integer                     ' 備考
-        Public TekiyouColumn As Integer                   ' 摘要
-        Public FunoucodeColumn As Integer                 ' 不能コード
         Public Bikou As String                            ' 備考データ
+        Public BikouColumn As String                      ' 備考
         Public Tekiyou As String                          ' 摘要データ
+        Public TekiyouColumn As String                    ' 摘要
         Public Funoucode As String                        ' 不能コードデータ
+        Public FunoucodeColumn As String                  ' 不能コード
 
         Private _TargetBanks As List(Of BankInfo)
         Public Property TargetBanks As List(Of BankInfo)
@@ -364,16 +364,13 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
 
         ' 各停止依頼書を作成
         '-----------------------------------------------------------------------------------------'
-        'Dim fname As String
-        'For Each f In Directory.GetFiles(Me.IraishoDirectory)
-        '    fname = Path.GetFileName(f)
-        '    File.Copy(f, $"{Me.Work2Directory}\{fname}", True)
-        'Next
-        '-----------------------------------------------------------------------------------------'
+        Dim fname As String
+        For Each f In Directory.GetFiles(Me.IraishoDirectory)
+            fname = Path.GetFileName(f)
+            File.Copy(f, $"{Me.Work2Directory}\{fname}", True)
+        Next
 
-
-        ' 各停止依頼書ファイルをコピーする
-        '-----------------------------------------------------------------------------------------'
+        Call Rpa.InvokeMacro("Rpa01.CreateIraisho", {tincsv2})
         '-----------------------------------------------------------------------------------------'
     End Function
 
@@ -434,7 +431,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
 
         Dim header                                           ' ヘッダーフラグ
         Dim resheet                                          ' 改ページフラグ
-        Dim row = 0                                          ' 行位置
+        Dim row                                              ' 行位置
         Dim srcsheetname                                     ' 作成元シート名
         Dim dstsheetname                                     ' 作成先シート名
         Dim tno, tkno, tbno                                  ' 通帳記号番号関連
@@ -569,7 +566,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             End If
 
             ' 行数
-            row = R_iraisho.MeisaiTableTopRow - 1 + imdcount
+            row = (R_iraisho.MeisaiTableTopRow - 1 + imdcount).ToString()
 
             vs2 = imd.MeisaiString.Split(",")
 
@@ -600,131 +597,127 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             '---------------------------------------------------------------------------'
 
             ' 各種依頼書情報付加
-            wline &= $"{Me.Work2Directory}\{R_iraisho.BookName}"           ' idx000 Ｅｘｃｅｌ名
-            wline &= "," & dstsheetname                                    ' idx001
-            wline &= "," & dstsheetname                                    ' idx001
-            wline &= "," & header                                          ' idx002 ヘッダーフラグ
-            wline &= "," & resheet                                         ' idx003 改ページフラグ
-            wline &= "," & row.ToString()                                  ' idx004 出力行位置
-            wline &= "," & R_obj.Syunoukigyoucode                          ' idx005
-            wline &= "," & R_iraisho.SyunoukigyoucodeCell                  ' idx006
-            wline &= "," & R_obj.Syunoukigyoumei                           ' idx007
-            wline &= "," & R_iraisho.SyunoukigyoumeiCell                   ' idx008
-            wline &= "," & R_obj.Syunoukigyouaddress                       ' idx009
-            wline &= "," & R_iraisho.SyunoukigyouaddressCell               ' idx010
-            wline &= "," & R_obj.Syunoukigyouaddress                       ' idx011
-            wline &= "," & R_iraisho.SyunoukigyouaddressCell               ' idx012
-            wline &= "," & R_obj.Syunoukigyoutel                           ' idx013
-            wline &= "," & R_iraisho.SyunoukigyoutelCell                   ' idx014
-            wline &= "," & R_obj.Syunoukigyoutantousya                     ' idx015
-            wline &= "," & R_iraisho.SyunoukigyoutantousyaCell             ' idx016
-            wline &= "," & R_obj.Haraikomisakikouzabangou                  ' idx017
-            wline &= "," & R_iraisho.HaraikomisakikouzabangouCell          ' idx018
-            wline &= "," & R_obj.Haraikomikinshubetu                       ' idx019
-            wline &= "," & R_iraisho.HaraikomikinshubetuCell               ' idx020
-            wline &= "," & sYYYYMMDD                                       ' idx021 依頼日
-            wline &= "," & R_iraisho.IraibiCell                            ' idx022
-            wline &= "," & sYYYYMMDD                                       ' idx023 作成日
-            wline &= "," & R_iraisho.SakuseibiCell                         ' idx024
-            wline &= "," & Strings.Left(sYYYYMMDD, 4)                      ' idx025 作成年（４桁）
-            wline &= "," & R_iraisho.SakuseibiYYYYCell                     ' idx026
-            wline &= "," & Strings.Mid(sYYYYMMDD, 3, 2)                    ' idx027 作成年（下２桁）
-            wline &= "," & R_iraisho.SakuseibiYYCell                       ' idx028
-            wline &= "," & wYY                                             ' idx029 作成年（和暦）
-            wline &= "," & R_iraisho.SakuseibiWaYYCell                     ' idx030
-            wline &= "," & IIf(wYY > "09", wYY, Strings.Right(wYY, 1))     ' idx031 作成年（和暦、ゼロサプレス）
-            wline &= "," & R_iraisho.SakuseibiWaZYCell                     ' idx032
-            wline &= "," & sMM                                             ' idx033 作成月
-            wline &= "," & R_iraisho.SakuseibiMMCell                       ' idx034
-            wline &= "," & IIf(sMM > "09", sMM, Strings.Right(sMM, 1))     ' idx035 作成月（ゼロサプレス）
-            wline &= "," & R_iraisho.SakuseibiZMCell                       ' idx036
-            wline &= "," & sDD                                             ' idx037 作成日
-            wline &= "," & R_iraisho.SakuseibiDDCell                       ' idx038
-            wline &= "," & IIf(sDD > "09", sDD, Strings.Right(sDD, 1))     ' idx039 作成日（ゼロサプレス）
-            wline &= "," & R_iraisho.SakuseibiZDCell                       ' idx040
-            wline &= "," & vbNullString                                    ' idx041 振替指定日
-            wline &= "," & R_iraisho.FurikaesiteibiCell                    ' idx042 （現在未使用）
-            wline &= "," & vs2(2)                                          ' idx043 委託者コード
-            wline &= "," & R_iraisho.ItakusyacodeCell                      ' idx044
-            wline &= "," & vs2(3)                                          ' idx045 委託者名
-            wline &= "," & R_iraisho.ItakusyameiCell                       ' idx046
-            wline &= "," & R_iraisho.Iraisaki                              ' idx047 依頼先
-            wline &= "," & R_iraisho.IraisakiCell                          ' idx048
-            wline &= "," & R_iraisho.I_Ginkoucode                          ' idx049 銀行コード
-            wline &= "," & R_iraisho.I_GinkoucodeCell                      ' idx050
-            wline &= "," & R_iraisho.I_Ginkoucode1                         ' idx051 銀行コード（左から１桁目）
-            wline &= "," & R_iraisho.I_Ginkoucode1Cell                     ' idx052
-            wline &= "," & R_iraisho.I_Ginkoucode2                         ' idx053 銀行コード（左から２桁目）
-            wline &= "," & R_iraisho.I_Ginkoucode2Cell                     ' idx054
-            wline &= "," & R_iraisho.I_Ginkoucode3                         ' idx055 銀行コード（左から３桁目）
-            wline &= "," & R_iraisho.I_Ginkoucode3Cell                     ' idx056
-            wline &= "," & R_iraisho.I_Ginkoucode4                         ' idx057 銀行コード（左から４桁目）
-            wline &= "," & R_iraisho.I_Ginkoucode4Cell                     ' idx058
-            wline &= "," & R_iraisho.I_Ginkoumei                           ' idx059 銀行名
-            wline &= "," & R_iraisho.I_GinkoumeiCell                       ' idx060
-            wline &= "," & R_iraisho.I_Ginkou                              ' idx061 銀行名（銀行名から「銀行」などを除いた名称）
-            wline &= "," & R_iraisho.I_GinkouCell                          ' idx062
-            wline &= "," & R_iraisho.I_GinkouSaffix                        ' idx063 「銀行」・「信用金庫」など
-            wline &= "," & R_iraisho.I_GinkouSaffixCell                    ' idx064
-            wline &= "," & R_iraisho.I_Zieisinkincode                      ' idx065 自営信金コード
-            wline &= "," & R_iraisho.I_ZieisinkincodeCell                  ' idx066
-            wline &= "," & R_iraisho.Baitaimei                             ' idx067 媒体名
-            wline &= "," & R_iraisho.BaitaimeiCell                         ' idx068
-            wline &= "," & gc                                              ' idx069 銀行コード
-            wline &= "," & R_iraisho.T_GinkoucodeCell                      ' idx070
-            wline &= "," & gc(0).ToString()                                ' idx071 銀行コード（左から１桁目）
-            wline &= "," & R_iraisho.T_Ginkoucode1Cell                     ' idx072
-            wline &= "," & gc(1).ToString()                                ' idx073 銀行コード（左から２桁目）
-            wline &= "," & R_iraisho.T_Ginkoucode2Cell                     ' idx074
-            wline &= "," & gc(2).ToString()                                ' idx075 銀行コード（左から３桁目）
-            wline &= "," & R_iraisho.T_Ginkoucode3Cell                     ' idx076
-            wline &= "," & gc(3).ToString()                                ' idx077 銀行コード（左から４桁目）
-            wline &= "," & R_iraisho.T_Ginkoucode4Cell                     ' idx078
-            wline &= "," & gm                                              ' idx079 銀行名
-            wline &= "," & R_iraisho.T_GinkoumeiCell                       ' idx080
-            wline &= "," & _GetGinkou(gm)                                  ' idx081 銀行名（銀行名から「銀行」などを除いた名称）
-            wline &= "," & R_iraisho.T_GinkouCell                          ' idx082
-            wline &= "," & _GetGinkouSaffix(gm)                            ' idx083 「銀行」・「信用金庫」など
-            wline &= "," & R_iraisho.T_GinkouSaffixCell                    ' idx084
-            wline &= "," & zsc                                             ' idx085 自営信金コード
-            wline &= "," & R_iraisho.T_ZieisinkincodeCell                  ' idx086
-            wline &= "," & vs2(4)                                          ' idx087 顧客コード
-            wline &= "," & R_iraisho.KokyakucodeColumn                     ' idx088
-            wline &= "," & gc                                              ' idx089 銀行コード
-            wline &= "," & R_iraisho.K_GinkoucodeColumn                    ' idx090
-            wline &= "," & vs2(8)                                          ' idx091 支店コード
-            wline &= "," & R_iraisho.SitencodeColumn                       ' idx092
-            wline &= "," & gm                                              ' idx093 銀行名
-            wline &= "," & R_iraisho.K_GinkoumeiColumn                     ' idx094
-            wline &= "," & _GetGinkou(gm)                                  ' idx095 銀行名（銀行名から「銀行」などを除いた名称）
-            wline &= "," & R_iraisho.K_GinkouColumn                        ' idx096
-            wline &= "," & sm                                              ' idx097 支店名
-            wline &= "," & R_iraisho.SitenmeiColumn                        ' idx098
-            wline &= "," & sm.Replace("支店", vbNullString)                ' idx099 支店名（支店名から「支店」を除いた名称）
-            wline &= "," & R_iraisho.SitenColumn                           ' idx100
-            wline &= "," & vs2(11)                                         ' idx101 預金種別
-            wline &= "," & R_iraisho.YokinshubetuColumn                    ' idx102
-            wline &= "," & vs2(12)                                         ' idx103 口座番号
-            wline &= "," & R_iraisho.KouzabangouColumn                     ' idx104
-            wline &= "," & tkno                                            ' idx105 通帳記号
-            wline &= "," & R_iraisho.TuchoukigouColumn                     ' idx106
-            wline &= "," & tbno                                            ' idx107 通帳番号
-            wline &= "," & R_iraisho.TuchoubangouColumn                    ' idx108
-            wline &= "," & vs2(13)                                         ' idx109 口座名義（半角）
-            wline &= "," & R_iraisho.KouzameigiColumn                      ' idx110
-            wline &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)        ' idx111 口座名義（全角）
-            wline &= "," & R_iraisho.JISKouzameigiColumn                   ' idx112
-            wline &= "," & vs2(14)                                         ' idx113 振替金額
-            wline &= "," & R_iraisho.FurikaekingakuColumn                  ' idx114
-            wline &= "," & R_iraisho.Bikou                                 ' idx115 備考
-            wline &= "," & R_iraisho.BikouColumn                           ' idx116
-            wline &= "," & R_iraisho.Tekiyou                               ' idx117 適用
-            wline &= "," & R_iraisho.TekiyouColumn                         ' idx118
-            wline &= "," & R_iraisho.Funoucode                             ' idx119 不能コード
-            wline &= "," & R_iraisho.FunoucodeColumn                       ' idx120
-            wline &= "," & vs2(19)                                         ' idx121 エラーコード
-
+            wline &= $"{Me.Work2Directory}\{R_iraisho.BookName}"                                                                            ' idx000 Ｅｘｃｅｌ名
+            wline &= "," & srcsheetname                                                                                                     ' idx001
+            wline &= "," & dstsheetname                                                                                                     ' idx002
+            wline &= "," & R_obj.Syunoukigyoucode                                                                                           ' idx003
+            wline &= "," & R_iraisho.SyunoukigyoucodeCell                                                                                   ' idx004
+            wline &= "," & R_obj.Syunoukigyoumei                                                                                            ' idx005
+            wline &= "," & R_iraisho.SyunoukigyoumeiCell                                                                                    ' idx006
+            wline &= "," & R_obj.Syunoukigyouaddress                                                                                        ' idx007
+            wline &= "," & R_iraisho.SyunoukigyouaddressCell                                                                                ' idx008
+            wline &= "," & R_obj.Syunoukigyoutel                                                                                            ' idx009
+            wline &= "," & R_iraisho.SyunoukigyoutelCell                                                                                    ' idx010
+            wline &= "," & R_obj.Syunoukigyoutantousya                                                                                      ' idx011
+            wline &= "," & R_iraisho.SyunoukigyoutantousyaCell                                                                              ' idx012
+            wline &= "," & R_obj.Haraikomisakikouzabangou                                                                                   ' idx013
+            wline &= "," & R_iraisho.HaraikomisakikouzabangouCell                                                                           ' idx014
+            wline &= "," & R_obj.Haraikomikinshubetu                                                                                        ' idx015
+            wline &= "," & R_iraisho.HaraikomikinshubetuCell                                                                                ' idx016
+            wline &= "," & sYYYYMMDD                                                                                                        ' idx017 依頼日
+            wline &= "," & R_iraisho.IraibiCell                                                                                             ' idx018
+            wline &= "," & sYYYYMMDD                                                                                                        ' idx019 作成日
+            wline &= "," & R_iraisho.SakuseibiCell                                                                                          ' idx020
+            wline &= "," & Strings.Left(sYYYYMMDD, 4)                                                                                       ' idx021 作成年（４桁）
+            wline &= "," & R_iraisho.SakuseibiYYYYCell                                                                                      ' idx022
+            wline &= "," & Strings.Mid(sYYYYMMDD, 3, 2)                                                                                     ' idx023 作成年（下２桁）
+            wline &= "," & R_iraisho.SakuseibiYYCell                                                                                        ' idx024
+            wline &= "," & wYY                                                                                                              ' idx025 作成年（和暦）
+            wline &= "," & R_iraisho.SakuseibiWaYYCell                                                                                      ' idx026
+            wline &= "," & IIf(wYY > "09", wYY, Strings.Right(wYY, 1))                                                                      ' idx027 作成年（和暦、ゼロサプレス）
+            wline &= "," & R_iraisho.SakuseibiWaZYCell                                                                                      ' idx028
+            wline &= "," & sMM                                                                                                              ' idx029 作成月
+            wline &= "," & R_iraisho.SakuseibiMMCell                                                                                        ' idx030
+            wline &= "," & IIf(sMM > "09", sMM, Strings.Right(sMM, 1))                                                                      ' idx031 作成月（ゼロサプレス）
+            wline &= "," & R_iraisho.SakuseibiZMCell                                                                                        ' idx032
+            wline &= "," & sDD                                                                                                              ' idx033 作成日
+            wline &= "," & R_iraisho.SakuseibiDDCell                                                                                        ' idx034
+            wline &= "," & IIf(sDD > "09", sDD, Strings.Right(sDD, 1))                                                                      ' idx035 作成日（ゼロサプレス）
+            wline &= "," & R_iraisho.SakuseibiZDCell                                                                                        ' idx036
+            wline &= "," & vbNullString                                                                                                     ' idx037 振替指定日
+            wline &= "," & R_iraisho.FurikaesiteibiCell                                                                                     ' idx038 （現在未使用）
+            wline &= "," & vs2(2)                                                                                                           ' idx039 委託者コード
+            wline &= "," & R_iraisho.ItakusyacodeCell                                                                                       ' idx040
+            wline &= "," & vs2(3)                                                                                                           ' idx041 委託者名
+            wline &= "," & R_iraisho.ItakusyameiCell                                                                                        ' idx042
+            wline &= "," & R_iraisho.Iraisaki                                                                                               ' idx043 依頼先
+            wline &= "," & R_iraisho.IraisakiCell                                                                                           ' idx044
+            wline &= "," & R_iraisho.I_Ginkoucode                                                                                           ' idx045 銀行コード
+            wline &= "," & R_iraisho.I_GinkoucodeCell                                                                                       ' idx046
+            wline &= "," & R_iraisho.I_Ginkoucode1                                                                                          ' idx047 銀行コード（左から１桁目）
+            wline &= "," & R_iraisho.I_Ginkoucode1Cell                                                                                      ' idx048
+            wline &= "," & R_iraisho.I_Ginkoucode2                                                                                          ' idx049 銀行コード（左から２桁目）
+            wline &= "," & R_iraisho.I_Ginkoucode2Cell                                                                                      ' idx050
+            wline &= "," & R_iraisho.I_Ginkoucode3                                                                                          ' idx051 銀行コード（左から３桁目）
+            wline &= "," & R_iraisho.I_Ginkoucode3Cell                                                                                      ' idx052
+            wline &= "," & R_iraisho.I_Ginkoucode4                                                                                          ' idx053 銀行コード（左から４桁目）
+            wline &= "," & R_iraisho.I_Ginkoucode4Cell                                                                                      ' idx054
+            wline &= "," & R_iraisho.I_Ginkoumei                                                                                            ' idx055 銀行名
+            wline &= "," & R_iraisho.I_GinkoumeiCell                                                                                        ' idx056
+            wline &= "," & R_iraisho.I_Ginkou                                                                                               ' idx057 銀行名（銀行名から「銀行」などを除いた名称）
+            wline &= "," & R_iraisho.I_GinkouCell                                                                                           ' idx058
+            wline &= "," & R_iraisho.I_GinkouSaffix                                                                                         ' idx059 「銀行」・「信用金庫」など
+            wline &= "," & R_iraisho.I_GinkouSaffixCell                                                                                     ' idx060
+            wline &= "," & R_iraisho.I_Zieisinkincode                                                                                       ' idx061 自営信金コード
+            wline &= "," & R_iraisho.I_ZieisinkincodeCell                                                                                   ' idx062
+            wline &= "," & R_iraisho.Baitaimei                                                                                              ' idx063 媒体名
+            wline &= "," & R_iraisho.BaitaimeiCell                                                                                          ' idx064
+            wline &= "," & gc                                                                                                               ' idx065 銀行コード
+            wline &= "," & R_iraisho.T_GinkoucodeCell                                                                                       ' idx066
+            wline &= "," & gc(0).ToString()                                                                                                 ' idx067 銀行コード（左から１桁目）
+            wline &= "," & R_iraisho.T_Ginkoucode1Cell                                                                                      ' idx068
+            wline &= "," & gc(1).ToString()                                                                                                 ' idx069 銀行コード（左から２桁目）
+            wline &= "," & R_iraisho.T_Ginkoucode2Cell                                                                                      ' idx070
+            wline &= "," & gc(2).ToString()                                                                                                 ' idx071 銀行コード（左から３桁目）
+            wline &= "," & R_iraisho.T_Ginkoucode3Cell                                                                                      ' idx072
+            wline &= "," & gc(3).ToString()                                                                                                 ' idx073 銀行コード（左から４桁目）
+            wline &= "," & R_iraisho.T_Ginkoucode4Cell                                                                                      ' idx074
+            wline &= "," & gm                                                                                                               ' idx075 銀行名
+            wline &= "," & R_iraisho.T_GinkoumeiCell                                                                                        ' idx076
+            wline &= "," & _GetGinkou(gm)                                                                                                   ' idx077 銀行名（銀行名から「銀行」などを除いた名称）
+            wline &= "," & R_iraisho.T_GinkouCell                                                                                           ' idx078
+            wline &= "," & _GetGinkouSaffix(gm)                                                                                             ' idx079 「銀行」・「信用金庫」など
+            wline &= "," & R_iraisho.T_GinkouSaffixCell                                                                                     ' idx080
+            wline &= "," & zsc                                                                                                              ' idx081 自営信金コード
+            wline &= "," & R_iraisho.T_ZieisinkincodeCell                                                                                   ' idx082
+            wline &= "," & vs2(4)                                                                                                           ' idx083 顧客コード
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.KokyakucodeColumn), vbNullString, R_iraisho.KokyakucodeColumn & row)          ' idx084
+            wline &= "," & gc                                                                                                               ' idx085 銀行コード
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.K_GinkoucodeColumn), vbNullString, R_iraisho.K_GinkoucodeColumn & row)        ' idx086
+            wline &= "," & vs2(8)                                                                                                           ' idx087 支店コード
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.SitencodeColumn), vbNullString, R_iraisho.SitencodeColumn & row)              ' idx088
+            wline &= "," & gm                                                                                                               ' idx089 銀行名
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.K_GinkoumeiColumn), vbNullString, R_iraisho.K_GinkouColumn & row)             ' idx090
+            wline &= "," & _GetGinkou(gm)                                                                                                   ' idx091 銀行名（銀行名から「銀行」などを除いた名称）
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.K_GinkouColumn), vbNullString, R_Iraisho.K_GinkouColumn & row)                ' idx092
+            wline &= "," & sm                                                                                                               ' idx093 支店名
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.SitenmeiColumn), vbNullString, R_iraisho.SitenmeiColumn & row)                ' idx094
+            wline &= "," & sm.Replace("支店", vbNullString)                                                                                 ' idx095 支店名（支店名から「支店」を除いた名称）
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.SitenColumn), vbNullString, R_iraisho.SitenColumn & row)                      ' idx096
+            wline &= "," & vs2(11)                                                                                                          ' idx097 預金種別
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.YokinshubetuColumn), vbNullString, R_iraisho.YokinshubetuColumn & row)        ' idx098
+            wline &= "," & vs2(12)                                                                                                          ' idx099 口座番号
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.KouzabangouColumn), vbNullString, R_iraisho.KouzabangouColumn & row)          ' idx100
+            wline &= "," & tkno                                                                                                             ' idx101 通帳記号
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.TuchoukigouColumn), vbNullString, R_iraisho.TuchoukigouColumn & row)          ' idx102
+            wline &= "," & tbno                                                                                                             ' idx103 通帳番号
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.TuchoubangouColumn), vbNullString, R_iraisho.TuchoukigouColumn & row)         ' idx104
+            wline &= "," & vs2(13)                                                                                                          ' idx105 口座名義（半角）
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.KouzameigiColumn), vbNullString, R_iraisho.KouzameigiColumn & row)            ' idx106
+            wline &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)                                                                         ' idx107 口座名義（全角）
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.JISKouzameigiColumn), vbNullString, R_iraisho.JISKouzameigiColumn & row)      ' idx108
+            wline &= "," & vs2(14)                                                                                                          ' idx109 振替金額
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.FurikaekingakuColumn), vbNullString, R_iraisho.FurikaekingakuColumn & row)    ' idx110
+            wline &= "," & R_iraisho.Bikou                                                                                                  ' idx111 備考
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.BikouColumn), vbNullString, R_iraisho.BikouColumn & row)                      ' idx112
+            wline &= "," & R_iraisho.Tekiyou                                                                                                ' idx113 適用
+            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.TekiyouColumn), vbNullString, R_iraisho.TekiyouColumn & row)                  ' idx114
+            wline &= "," & R_iraisho.Funoucode                                                                                              ' idx115 不能コード
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.FunoucodeColumn), vbNullString, R_iraisho.FunoucodeColumn & row)              ' idx116
+            wline &= "," & vs2(19)                                                                                                          ' idx117 エラーコード
+                                                                                
             sw.WriteLine(wline)
+            wline = vbNullString
             zimd = imd
         Next
 

@@ -44,7 +44,7 @@ End Type
 Private Type list_data
     book_name           As String
     book_obj            As Workbook
-    sheet_obj           As WorkSheet
+    sheet_obj           As Worksheet
     primary_data_column As Integer
     last_data_row       As Integer
     ginkou_name         As String
@@ -113,9 +113,9 @@ Private Type iraisho_data
     config_file_name    As String
     sheet_layout        As Integer
     genpon_sheet_name   As String
-    genpon_sheet_obj    As WorkSheet
+    genpon_sheet_obj    As Worksheet
     write_sheet_name    As String
-    write_sheet_obj     As WorkSheet
+    write_sheet_obj     As Worksheet
     book_name           As String
     book_obj            As Workbook
     sheet_m             As String
@@ -313,7 +313,7 @@ Private Sub save_csv_as_xlsx(ByRef mode As Integer)
 End Sub
 
 Private Sub check_list(ByRef wb As Workbook)
-    Dim ws As WorkSheet
+    Dim ws As Worksheet
     Set ws = wb.ActiveSheet
     Dim rngs As Range
     Dim rng As Range
@@ -334,7 +334,7 @@ Private Sub sort_teishi_list()
 '   HISTORY
 '      2020/03/16: 新規作成
     Dim wrk_bok As Workbook
-    Dim wsh     As WorkSheet
+    Dim wsh     As Worksheet
     Dim lst_row As Integer
     Dim jsn As Object: Set jsn = GetProjectJson()
     Set wrk_bok = Workbooks.Open(jsn("USR_PRJ_WRK") + "\" + "input.xls", 0)
@@ -489,7 +489,7 @@ End Sub
 'Private Function write_check_list() As String()
 Private Sub write_check_list_csv()
     Dim wss As Sheets: Set wss = ThisWorkbook.Worksheets
-    Dim ws As WorkSheet
+    Dim ws As Worksheet
     Dim rngs As Range
     Dim rng As Range
     Dim r As Range
@@ -913,7 +913,7 @@ Function gbn(ByVal n As String)
 End Function
 
 Function check_end_flag() As Boolean: check_end_flag = False
-    Dim ws As WorkSheet
+    Dim ws As Worksheet
     Set ws = ThisWorkbook.ActiveSheet
     
     Dim re As Object
@@ -1045,22 +1045,22 @@ End Sub
 Function get_errmsg(ByRef rng As Range) As String: get_errmsg = ""
     '現在、顧客コード、請求額いずれかがない場合、True
     'リテラルで顧客コードと、請求額セル位置を判別。修正余地あり
-    Dim ws As WorkSheet
+    Dim ws As Worksheet
     Set ws = ThisWorkbook.ActiveSheet
     Dim ed As struct_indata: ed.errmsg = ""
     Dim r As Range
     For Each r In rng
         With r
             If .Text = "" Then
-                ed.errmsg = ed.errmsg + "セル位置(" + Str(.row) + "," + Str(.Column) + "): 空白" + vbCrLf
+                ed.errmsg = ed.errmsg + "セル位置(" + Str(.row) + "," + Str(.Column) + "): 空白" + vbCrlf
             Else
                 If .Column = 4 + 1 Or .Column = 5 + 1 Then
                     If Not IsNumeric(.Text) Then
-                        ed.errmsg = ed.errmsg + "セル位置(" + Str(.row) + "," + Str(.Column) + "): 非数字" + vbCrLf
+                        ed.errmsg = ed.errmsg + "セル位置(" + Str(.row) + "," + Str(.Column) + "): 非数字" + vbCrlf
                     End If
                 Else
                     If IsNumeric(.Text) Then
-                        ed.errmsg = ed.errmsg + "セル位置(" + Str(.row) + "," + Str(.Column) + "): 数字" + vbCrLf
+                        ed.errmsg = ed.errmsg + "セル位置(" + Str(.row) + "," + Str(.Column) + "): 数字" + vbCrlf
                     End If
                 End If
             End If
@@ -1138,7 +1138,7 @@ End Function
 Function check_indata(ByVal row As Integer, ByVal lastcol As Integer) As Boolean: check_indata = False
     '現在、顧客コード、請求額いずれかがない場合、True
     'リテラルで顧客コードと、請求額セル位置を判別。修正余地あり
-    Dim ws As WorkSheet
+    Dim ws As Worksheet
     Set ws = ThisWorkbook.ActiveSheet
     Dim rng As Range
     Set rng = Range(Cells(row, 1), Cells(row, lastcol))
@@ -1180,7 +1180,7 @@ Private Sub get_indata_list()
 End Sub
 
 Function get_indata(ByVal row As Integer, ByVal lastcol As Integer) As String()
-    Dim ws As WorkSheet
+    Dim ws As Worksheet
     Set ws = ThisWorkbook.ActiveSheet
     
     Dim s() As String
@@ -1196,7 +1196,7 @@ Function get_indata(ByVal row As Integer, ByVal lastcol As Integer) As String()
 End Function
 
 Function get_last_cell() As Long()
-    Dim ws As WorkSheet
+    Dim ws As Worksheet
     Set ws = ThisWorkbook.ActiveSheet
     
     Dim row As Integer
@@ -1244,7 +1244,7 @@ Private Sub CreateInputTextData(ByRef v() As Variant)
     '-------------------------------------------------------------------------'
     Dim inf As String: inf = v(0)
     Dim ibook As Workbook
-    Dim isheet As WorkSheet
+    Dim isheet As Worksheet
     Set ibook = Workbooks.Open(inf, 0)
     ibook.Application.EnableEvents = False
     ibook.Application.DisplayAlerts = False
@@ -2122,17 +2122,18 @@ Private Sub CreateIraisho(ByRef v() As Variant)
     Dim bookname As String: bookname = vbNullString
     Dim line As String
     Dim vs() As String
+    Dim idx As Integer
 
     Application.EnableEvents = False
     Application.DisplayAlerts = False
 
     Do Until ts.AtEndOfStream
         line = ts.ReadLine()
-        vs = line.Split(",")
+        vs = Split(line, ",")
 
         ' ブックの変更
         If bookname <> vs(0) Then
-            If wbook IsNot Nothing Then
+            If Not wbook Is Nothing Then
                 wbook.Save
                 wbook.Application.EnableEvents = True
                 wbook.Application.DisplayAlerts = True
@@ -2149,20 +2150,35 @@ Private Sub CreateIraisho(ByRef v() As Variant)
         End If
 
         ' シートの変更
-        If sheetname <> vs(1) Then
-            If wsheet IsNot Nothing Then
+        If sheetname <> vs(2) Then
+            If Not wsheet Is Nothing Then
                 Set wsheet = Nothing
             End If
 
-            sheetname = vs(1)
+            sheetname = vs(2)
             If RpaLibrary.IsWorksheetExists(wbook, sheetname) Then
                 Set wsheet = wbook.Worksheets(sheetname)
             Else
+                wbook.Worksheets(vs(1)).Copy after:=Worksheets(vs(1))
+                Set wsheet = wbook.ActiveSheet
+                wsheet.Name = sheetname
             End If
         End If
+
+        For idx = 4 To 116 Step 2
+            If vs(idx) <> vbNullString Then
+                wsheet.Range(vs(idx)).Value = vs(idx - 1)
+            End If
+        Next
     Loop
 
-    If wbook IsNot Nothing Then
+    ' 最後のシート
+    If Not wsheet Is Nothing Then
+        Set wsheet = Nothing
+    End If
+
+    ' 最後のブック
+    If Not wbook Is Nothing Then
         wbook.Save
         wbook.Application.EnableEvents = True
         wbook.Application.DisplayAlerts = True
