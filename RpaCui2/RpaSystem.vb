@@ -8,6 +8,8 @@ Module RpaSystem
     Private ReadOnly Property ExecuteHandler(ByVal cmd As String) As ExecuteDelegater
         Get
             Select Case cmd
+                Case "savejson"
+                    Return AddressOf SaveJson
                 Case "macroupdate"
                     Return AddressOf UpdateMacro
                 Case "run"
@@ -25,6 +27,36 @@ Module RpaSystem
             End Select
         End Get
     End Property
+    '---------------------------------------------------------------------------------------------'
+
+    ' Ｊｓｏｎのセーブ
+    '---------------------------------------------------------------------------------------------'
+    Private Delegate Sub SaveJsonDelegater(ByVal json As String, ByVal obj As Object)
+    Private Function SaveJson(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Dim act As Action(Of String, Object)
+        act = Sub(json, obj)
+                  Call obj.ModelSave(json, obj)
+                  obj = obj.ModelLoad(json)
+                  If obj IsNot Nothing Then
+                      Console.WriteLine($"'{json}' のセーブに成功しました")
+                      obj = obj
+                  End If
+              End Sub
+        If trn.Parameters.Count = 0 Then
+            Call act(rpa.RootProjectJsonFileName, rpa.RootProjectObject)
+            Call act(rpa.MyProjectJsonFileName, rpa.MyProjectObject)
+        Else
+            If trn.Parameters(0) = "root" Then
+                Call act(rpa.RootProjectJsonFileName, rpa.RootProjectObject)
+            ElseIf trn.Parameters(0) = "myproject" Then
+                Call act(rpa.MyProjectJsonFileName, rpa.MyProjectObject)
+            End If
+        End If
+        Return 0
+    End Function
+
+    Private Sub _SaveAndCheckJson(ByVal file As String, ByVal obj As Object)
+    End Sub
     '---------------------------------------------------------------------------------------------'
 
     ' マクロの更新

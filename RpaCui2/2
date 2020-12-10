@@ -65,7 +65,6 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Public MaxCount As Integer
         Public TargetPattern As List(Of String)
         Public ResheetType As String
-        Public SourceSheetName As String
 
         ' 停止依頼元
         Public SyunoukigyoucodeCell As String             ' 収納企業コード
@@ -140,8 +139,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Public KouzabangouColumn As Integer               ' 口座番号
         Public TuchoukigouColumn As Integer               ' 通帳記号
         Public TuchoubangouColumn As Integer              ' 通帳番号
-        Public KouzameigiColumn As Integer                ' 口座名義（半角）
-        Public JISKouzameigiColumn As Integer             ' 口座名義（全角）
+        Public KouzameigiColumn As Integer                ' 口座名義
         Public FurikaekingakuColumn As Integer            ' 振替金額
 
         Public BikouColumn As Integer                     ' 備考
@@ -168,7 +166,6 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             Public Code As String
             Public Name As String
             Public ZieiSinkinCode As String
-            Public SourceSheetName As String
         End Class
     End Class
 
@@ -435,8 +432,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Dim header                                           ' ヘッダーフラグ
         Dim resheet                                          ' 改ページフラグ
         Dim row = 0                                          ' 行位置
-        Dim srcsheetname                                     ' 作成元シート名
-        Dim dstsheetname                                     ' 作成先シート名
+        Dim sname                                            ' シート名
         Dim tno, tkno, tbno                                  ' 通帳記号番号関連
         Dim zsc                                              ' 自営信金コード
         Dim gc, gm, sm                                       ' 銀行コード、銀行名、支店名
@@ -534,7 +530,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
                 )
 
                 header = "1"
-                dstsheetname = vbNullString
+                sname = vbNullString
             End If
 
             imdcount += 1
@@ -550,21 +546,12 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             End Select
             imdcount = IIf(resheet = "1", 1, imdcount)
 
-
-            ' 作成元シート名
-            srcsheetname = R_iraisho.SourceSheetName
-            If R_tb IsNot Nothing Then
-                If Not String.IsNullOrEmpty(R_tb.SourceSheetName) Then
-                    srcsheetname = R_tb.SourceSheetName
-                End If
-            End If
-
-            ' 作成先シート名
+            ' シート名
             If resheet = "1" Then
-                If String.IsNullOrEmpty(dstsheetname) Then
-                    dstsheetname = imd.T_Ginkoumei
+                If String.IsNullOrEmpty(sname) Then
+                    sname = imd.T_Ginkoumei
                 Else
-                    dstsheetname &= "i"
+                    sname &= "i"
                 End If
             End If
 
@@ -600,9 +587,8 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             '---------------------------------------------------------------------------'
 
             ' 各種依頼書情報付加
-            wline &= $"{Me.Work2Directory}\{R_iraisho.BookName}"           ' idx000 Ｅｘｃｅｌ名
-            wline &= "," & dstsheetname                                    ' idx001
-            wline &= "," & dstsheetname                                    ' idx001
+            wline = R_iraisho.BookName                                     ' idx000
+            wline &= "," & sname                                           ' idx001
             wline &= "," & header                                          ' idx002 ヘッダーフラグ
             wline &= "," & resheet                                         ' idx003 改ページフラグ
             wline &= "," & row.ToString()                                  ' idx004 出力行位置
@@ -710,19 +696,17 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             wline &= "," & R_iraisho.TuchoukigouColumn                     ' idx106
             wline &= "," & tbno                                            ' idx107 通帳番号
             wline &= "," & R_iraisho.TuchoubangouColumn                    ' idx108
-            wline &= "," & vs2(13)                                         ' idx109 口座名義（半角）
+            wline &= "," & vs2(13)                                         ' idx109 口座名義（小文字）
             wline &= "," & R_iraisho.KouzameigiColumn                      ' idx110
-            wline &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)        ' idx111 口座名義（全角）
-            wline &= "," & R_iraisho.JISKouzameigiColumn                   ' idx112
-            wline &= "," & vs2(14)                                         ' idx113 振替金額
-            wline &= "," & R_iraisho.FurikaekingakuColumn                  ' idx114
-            wline &= "," & R_iraisho.Bikou                                 ' idx115 備考
-            wline &= "," & R_iraisho.BikouColumn                           ' idx116
-            wline &= "," & R_iraisho.Tekiyou                               ' idx117 適用
-            wline &= "," & R_iraisho.TekiyouColumn                         ' idx118
-            wline &= "," & R_iraisho.Funoucode                             ' idx119 不能コード
-            wline &= "," & R_iraisho.FunoucodeColumn                       ' idx120
-            wline &= "," & vs2(19)                                         ' idx121 エラーコード
+            wline &= "," & vs2(14)                                         ' idx111 振替金額
+            wline &= "," & R_iraisho.FurikaekingakuColumn                  ' idx112
+            wline &= "," & R_iraisho.Bikou                                 ' idx113 備考
+            wline &= "," & R_iraisho.BikouColumn                           ' idx114
+            wline &= "," & R_iraisho.Tekiyou                               ' idx115 適用
+            wline &= "," & R_iraisho.TekiyouColumn                         ' idx116
+            wline &= "," & R_iraisho.Funoucode                             ' idx117 不能コード
+            wline &= "," & R_iraisho.FunoucodeColumn                       ' idx118
+            wline &= "," & vs2(19)                                         ' idx119 エラーコード
 
             sw.WriteLine(wline)
             zimd = imd

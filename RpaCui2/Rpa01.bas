@@ -2112,6 +2112,70 @@ Sub testxx()
     Call out_main(s)
 End Sub
 
+Private Sub CreateIraisho(ByRef v() As Variant)
+    Dim inf As String: inf = v(0)
+    Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+    Dim ts As Object: Set ts = fso.OpenTextFile(inf, 1, -2)
+    Dim wbook As Workbook: Set wbook = Nothing
+    Dim wsheet As Worksheet: Set wsheet = Nothing
+    Dim ws As Worksheet
+    Dim bookname As String: bookname = vbNullString
+    Dim line As String
+    Dim vs() As String
+
+    Application.EnableEvents = False
+    Application.DisplayAlerts = False
+
+    Do Until ts.AtEndOfStream
+        line = ts.ReadLine()
+        vs = line.Split(",")
+
+        ' ブックの変更
+        If bookname <> vs(0) Then
+            If wbook IsNot Nothing Then
+                wbook.Save
+                wbook.Application.EnableEvents = True
+                wbook.Application.DisplayAlerts = True
+                wbook.Application.ScreenUpdating = True
+                wbook.Close
+                Set wbook = Nothing
+            End If
+
+            bookname = vs(0)
+            Set wbook = Workbooks.Open(bookname, 0)
+            wbook.Application.EnableEvents = False
+            wbook.Application.DisplayAlerts = False
+            wbook.Application.ScreenUpdating = False
+        End If
+
+        ' シートの変更
+        If sheetname <> vs(1) Then
+            If wsheet IsNot Nothing Then
+                Set wsheet = Nothing
+            End If
+
+            sheetname = vs(1)
+            If RpaLibrary.IsWorksheetExists(wbook, sheetname) Then
+                Set wsheet = wbook.Worksheets(sheetname)
+            Else
+            End If
+        End If
+    Loop
+
+    If wbook IsNot Nothing Then
+        wbook.Save
+        wbook.Application.EnableEvents = True
+        wbook.Application.DisplayAlerts = True
+        wbook.Application.ScreenUpdating = True
+        wbook.Close
+        Set wbook = Nothing
+    End If
+
+    ts.Close
+    Set ts = Nothing
+    Set fso = Nothing
+End Sub
+
 'Sub test()
 '    Dim s(8) As String
 '    s(0) = "東和銀行"

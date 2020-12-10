@@ -74,6 +74,18 @@ Public Function GetStringArrayOfFile(ByVal fn As String) As String()
     Set fso = Nothing
 End Function
 
+Public Function IsWorksheetExists(ByRef wb As Workbook, ByVal sheetname As String) As Boolean
+    Dim ws As Worksheet
+    Dim b As Boolean: b = False
+    For Each ws In wb.Worksheets
+        If ws.Name = sheetname then
+            b = True
+            Exit For
+        End If
+    Next
+    IsWorksheetExists = b
+End If
+
 Public Function GetStringArrayOfFile2(ByVal fn As String) As String()
     Dim fso As Object: Set fso = Nothing
     Dim ts As Object: Set ts = Nothing
