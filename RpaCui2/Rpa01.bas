@@ -1239,6 +1239,158 @@ Private Function get_grandparent_folder() As String
 End Function
 
 
+' 正直新規の場合と追加の場合でサブルーチン分けたほうが良かったかも・・・
+Private Sub CreateSofuMeisai(ByRef v() As Variant)
+    Dim fso As Object: Set fso = CreateObject("Scripting.FileSystemObject")
+    Dim obook As Workbook: Set obook = Nothing
+    Dim qt As QueryTable
+    Dim b As Boolean
+    Dim incsvname As String: incsvname = v(0)
+    Dim obookname As String: obookname = v(1)
+    Dim sheetname As String: sheetname = v(2)
+    Dim fenc As Long
+    Dim osheet As Worksheet
+    Dim lastrow As Integer
+    Dim lastcol As Integer
+    Dim cr As Range
+    Dim vs() As String
+    Dim idx As Integer
+
+    Select Case v(3)
+        Case "Shift-JIS"
+            fenc = 932
+        Case "utf-8"
+            fenc = 65001
+    End Select
+
+    Application.EnableEvents = False
+    Application.DisplayAlerts = False
+
+    If fso.FileExists(obookname) Then
+        b = True
+    Else
+        b = False
+    End If
+
+    ' ブックが新規か追加か
+    If b Then
+        Set obook = Workbooks.Open(obookname, 0)
+    Else
+        Set obook = Workbooks.Add
+    End If
+
+    obook.Application.EnableEvents = False
+    obook.Application.DisplayAlerts = False
+    obook.Application.ScreenUpdating = False
+
+    ' シート追加有無
+    If b Then
+        Call obook.Worksheets.Add(After:=obook.Worksheets(Worksheets.Count))
+    End If
+
+    obook.Worksheets(obook.Worksheets.Count).Name = sheetname
+    Set osheet = obook.Worksheets(sheetname)
+
+    Set qt = osheet.QueryTables.Add( _
+        Connection:="TEXT;" & incsvname, _
+        Destination:=osheet.Range("A1") _
+    )
+    qt.TextFilePlatform = fenc
+    qt.TextFileParseType = xlDelimited
+    qt.TextFileCommaDelimiter = True
+    qt.RefreshStyle = xlOverwriteCells
+    qt.Refresh
+    qt.Delete
+
+    If b Then
+        Set cr = osheet.Cells(1, 1).CurrentRegion
+        For Each r In cr.Rows
+            If r.Columns(cr.Columns.Count - 1) = 15 Then
+                rng.Interior.ColorIndex = 6
+            End If
+        Next
+        vs = Split(v(4), ",")
+        For idx = Lbound(vs) To Ubound(vs)
+            If vs(idx) = "0" Then
+                osheet.Columns(idx + 1).Hidden = True
+            Else
+                osheet.Columns(idx + 1).ColumnWidth = CDbl(vs(idx))
+            End If
+        Next
+    End If
+
+    ' セーブの挙動
+    If b Then
+        obook.Save
+    Else
+        obook.SaveAs Filename:=obookname
+    End If
+
+    obook.Application.ScreenUpdating = True
+    obook.Application.DisplayAlerts = True
+    obook.Application.EnableEvents = True
+    obook.Close
+
+    Application.DisplayAlerts = True
+    Application.EnableEvents = True
+
+    Set cr = Nothing
+    Set qt = Nothing
+    Set osheet = Nothing
+    Set obook = Nothing
+    Set fso = Nothing
+End Sub
+
+'Private Sub CreateSofuMeisai(ByRef v() As Variant)
+'    Dim obook As Workbook: Set obook = Nothing
+'    Dim qt1 As QueryTable
+'    Dim qt2 As QueryTable
+'    Application.EnableEvents = False
+'    Application.DisplayAlerts = False
+'
+'    Set obook = Workbooks.Add
+'    obook.Application.EnableEvents = False
+'    obook.Application.DisplayAlerts = False
+'    obook.Application.ScreenUpdating = False
+'
+'    obook.Worksheets(Worksheets.Count).Name = MASTER
+'    Set qt1 = obook.Worksheets(MASTER).QueryTables.Add( _
+'        Connection:="TEXT;" & v(0), _
+'        Destination:=obook.Worksheets(MASTER).Range("A1") _
+'    )
+'    qt1.TextFilePlatform = 932
+'    qt1.TextFileParseType = xlDelimited
+'    qt1.TextFileCommaDelimiter = True
+'    qt1.RefreshStyle = xlOverwriteCells
+'    qt1.Refresh
+'    qt1.Delete
+'    Set qt1 = Nothing
+'
+'    obook.Worksheets.Add(After:=obook.Worksheets(Worksheets.Count)).Name = TEISHI
+'    Set qt2 = obook.Worksheets(TEISHI).QueryTables.Add( _
+'        Connection:="TEXT;" & v(1), _
+'        Destination:=obook.Worksheets(TEISHI).Range("A1") _
+'    )
+'    qt2.TextFilePlatform = 932
+'    qt2.TextFileParseType = xlDelimited
+'    qt2.TextFileCommaDelimiter = True
+'    qt2.RefreshStyle = xlOverwriteCells
+'    qt2.Refresh
+'    qt2.Delete
+'
+'    obook.SaveAs Filename:=v(2)
+'    obook.Application.ScreenUpdating = True
+'    obook.Application.DisplayAlerts = True
+'    obook.Application.EnableEvents = True
+'
+'    obook.Close
+'    Set qt2 = Nothing
+'    Set obook = Nothing
+'
+'    Application.DisplayAlerts = True
+'    Application.EnableEvents = True
+'End Sub
+
 Private Sub CreateInputTextData(ByRef v() As Variant)
     ' インプット設定
     '-------------------------------------------------------------------------'

@@ -316,6 +316,7 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
         End Get
     End Property
 
+    ' 現状不要 2020-12-11
     Private _MyProjectScriptDirectory As String
     Public ReadOnly Property MyProjectScriptDirectory As String
         Get
@@ -326,6 +327,20 @@ Public Class RpaProject : Inherits JsonHandler(Of RpaProject)
                 End If
             End If
             Return Me._MyProjectScriptDirectory
+        End Get
+    End Property
+
+    ' 成果物保管用
+    Private _MyProjectBackupDirectory As String
+    Public ReadOnly Property MyProjectBackupDirectory As String
+        Get
+            If String.IsNullOrEmpty(Me._MyProjectBackupDirectory) Then
+                Me._MyProjectBackupDirectory = Me.MyProjectDirectory & "\backup"
+                If Directory.Exists(Me._MyProjectBackupDirectory) Then
+                    Directory.CreateDirectory(Me._MyProjectBackupDirectory)
+                End If
+            End If
+            Return Me._MyProjectBackupDirectory
         End Get
     End Property
 

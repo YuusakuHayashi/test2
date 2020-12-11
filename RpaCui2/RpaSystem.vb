@@ -88,6 +88,8 @@ Module RpaSystem
         Call rpa.ModelSave(rpa.SystemJsonFileName, rpa)
         Call rpa.MyProjectObject.SetData(trn, rpa)
         Dim i = rpa.MyProjectObject.Main()
+        Call rpa.RootProjectObject.ModelSave(rpa.RootProjectJsonFileName, rpa.RootProjectObject)
+        Call rpa.MyProjectObject.ModelSave(rpa.MyProjectJsonFileName, rpa.MyProjectObject)
         Return i
     End Function
     '---------------------------------------------------------------------------------------------'

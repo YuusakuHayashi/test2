@@ -9,13 +9,36 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
     Private Const CSCRIPT As String = "cscript"
     Private Const SHIFT_JIS = "Shift-JIS"
 
-    Public Property Syunoukigyoucode As String              ' 収納企業コード
-    Public Property Syunoukigyoumei As String               ' 収納企業名
-    Public Property Syunoukigyouaddress As String           ' 収納企業住所
-    Public Property Syunoukigyoutel As String               ' 収納企業電話番号
-    Public Property Syunoukigyoutantousya As String         ' 収納企業担当者
-    Public Property Haraikomisakikouzabangou As String     ' 払込先口座番号
-    Public Property Haraikomikinshubetu As String          ' 払込金種別
+    Public Syunoukigyoucode As String              ' 収納企業コード
+    Public Syunoukigyoumei As String               ' 収納企業名
+    Public Syunoukigyouaddress As String           ' 収納企業住所
+    Public Syunoukigyoutel As String               ' 収納企業電話番号
+    Public Syunoukigyoutantousya As String         ' 収納企業担当者
+    Public Haraikomisakikouzabangou As String      ' 払込先口座番号
+    Public Haraikomikinshubetu As String           ' 払込金種別
+
+    ' 加工済送付明細のカラムサイズ
+    Public SofuMeisaiColumnALength As Double
+    Public SofuMeisaiColumnBLength As Double
+    Public SofuMeisaiColumnCLength As Double
+    Public SofuMeisaiColumnDLength As Double
+    Public SofuMeisaiColumnELength As Double
+    Public SofuMeisaiColumnFLength As Double
+    Public SofuMeisaiColumnGLength As Double
+    Public SofuMeisaiColumnHLength As Double
+    Public SofuMeisaiColumnILength As Double
+    Public SofuMeisaiColumnJLength As Double
+    Public SofuMeisaiColumnKLength As Double
+    Public SofuMeisaiColumnLLength As Double
+    Public SofuMeisaiColumnMLength As Double
+    Public SofuMeisaiColumnNLength As Double
+    Public SofuMeisaiColumnOLength As Double
+    Public SofuMeisaiColumnPLength As Double
+    Public SofuMeisaiColumnQLength As Double
+    Public SofuMeisaiColumnRLength As Double
+    Public SofuMeisaiColumnSLength As Double
+    Public SofuMeisaiColumnTLength As Double
+    Public SofuMeisaiColumnULength As Double
 
     Private _ItakusyaCodeDictionary As Dictionary(Of String, String)
     Public Property ItakusyaCodeDictionary As Dictionary(Of String, String)
@@ -281,11 +304,22 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         End Set
     End Property
 
+    Private _RestartCount As Integer
+    Public Property RestartCount As Integer
+        Get
+            Return Me._RestartCount
+        End Get
+        Set(value As Integer)
+            Me._RestartCount = value
+        End Set
+    End Property
+
     Public Overrides Function SetupProjectObject(project As String) As Object
         Throw New NotImplementedException()
     End Function
 
     Public Overrides Function Main() As Integer
+        Me.RestartCount = IIf(Me.RestartCount = 0, 1, Me.RestartCount)
         ' マスターファイルのチェック・コピー
         '-----------------------------------------------------------------------------------------'
         Dim inmaster = Rpa.MyProjectDirectory & "\" & Me.MasterCsvFileName
@@ -299,8 +333,6 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         End If
         File.Copy(inmaster, wkmaster, True)
         '-----------------------------------------------------------------------------------------'
-
-
 
         ' 添付ファイルの取得・解凍・ＣＳＶデータ生成
         '-----------------------------------------------------------------------------------------'
@@ -349,29 +381,85 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
 
         ' ＣＳＶから対象得意先（モテキ）のみ抜き出し・入力ＣＳＶとのマッチング
         '-----------------------------------------------------------------------------------------'
-        Dim inmaster2 = inmaster
-        Dim tmpcsv = Rpa.MyProjectWorkDirectory & "\tmp.csv"
         Dim target = Me.ItakusyaCodeDictionary("Moteki")
+        Dim inmaster2 = inmaster
+        Dim tmpcsv = $"{Rpa.MyProjectWorkDirectory}\tmp.csv"
         Dim incsv2 = incsv
-        Dim tincsv = Rpa.MyProjectWorkDirectory & "\t_input.csv"
-        Dim tincsv2 = Rpa.MyProjectWorkDirectory & "\t_input2.csv"
+        Dim tincsv = $"{Rpa.MyProjectWorkDirectory}\t_input.csv"
+        Dim tincsv2 = $"{Rpa.MyProjectWorkDirectory}\t_input2.csv"
         Call _CreateTmpCsv(inmaster2, target, tmpcsv)
         Call _CompareInputCsvToTmpCsv(incsv, tmpcsv, tincsv)
-
         Call _CreateIraishoMeisaiDatas(tincsv, tincsv2)
         '-----------------------------------------------------------------------------------------'
 
-
         ' 各停止依頼書を作成
         '-----------------------------------------------------------------------------------------'
+        Console.WriteLine("停止依頼書を作成中・・・")
+        Dim tincsv3 = tincsv2
         Dim fname As String
         For Each f In Directory.GetFiles(Me.IraishoDirectory)
             fname = Path.GetFileName(f)
             File.Copy(f, $"{Me.Work2Directory}\{fname}", True)
         Next
 
-        Call Rpa.InvokeMacro("Rpa01.CreateIraisho", {tincsv2})
+        Call Rpa.InvokeMacro("Rpa01.CreateIraisho", {tincsv3})
+        Console.WriteLine("停止依頼書作成完了！")
         '-----------------------------------------------------------------------------------------'
+
+        ' 加工済送付明細の作成
+        '-----------------------------------------------------------------------------------------'
+        Console.WriteLine("加工済み送付明細を作成中・・・")
+        Dim wkmaster_v2 = $"{Rpa.MyProjectWorkDirectory}\{Me.MasterCsvFileName}"
+        Dim tincsv_v2 = $"{Rpa.MyProjectWorkDirectory}\t_input.csv"
+        Dim outxlsx_1 = $"{Rpa.MyProjectBackupDirectory}\加工済送付明細.xlsx"
+        Dim setting_v1 As String
+        setting_v1 = Rpa.RootProjectObject.SofuMeisaiColumnALength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnBLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnCLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnDLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnELength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnFLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnGLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnHLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnILength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnJLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnKLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnLLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnMLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnNLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnOLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnPLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnQLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnRLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnSLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnTLength.ToString()
+        setting_v1 &= "," & Rpa.RootProjectObject.SofuMeisaiColumnULength.ToString()
+        If Me.RestartCount = 1 Then
+            File.Delete(outxlsx_1)
+            Call Rpa.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", "Shift-JIS"})
+        End If
+        Call Rpa.InvokeMacro("Rpa01.CreateSofuMeisai", {tincsv_v2, outxlsx_1, $"停止{Me.RestartCount.ToString}回目", "utf-8", setting_v1})
+        Console.WriteLine("加工済送付明細作成完了！")
+        '-----------------------------------------------------------------------------------------'
+
+
+        '-----------------------------------------------------------------------------------------'
+        Dim outtxt_1 = $"{Rpa.MyProjectBackupDirectory}\件数集計.txt"
+        Console.WriteLine("件数集計ファイルを作成中・・・")
+        Call _CreateSummaryFile(outtxt_1)
+        Console.WriteLine("件数集計ファイル作成完了！")
+        '-----------------------------------------------------------------------------------------'
+
+        If Transaction.Parameters.Count > 0 Then
+            If Transaction.Parameters.Last = "end" Then
+                Me.RestartCode = vbNullString
+                Me.RestartCount = 1
+            End If
+        Else
+            Me.RestartCount += 1
+        End If
+
+        Return 0
     End Function
 
     Private Function _GetGinkouSaffix(ByRef koumei As String) As String
@@ -399,7 +487,6 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Return koumei
     End Function
 
-
     Private Function _GetTuchoKigouBangou(ByVal kouza As String) As String
         Dim bno As String
         Dim kno As String
@@ -407,8 +494,49 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         kno = Strings.Replace(kouza, bno, vbNullString,,, CompareMethod.Text)
         bno &= "1"
         kno = "1" & kno.PadLeft(4, "0")
-        Return (bno & kno)
+        Return (kno & bno)
     End Function
+
+
+    Private Sub _CreateSummaryFile(ByVal otfile As String)
+        Dim sw As StreamWriter
+        Dim bankcount = 0
+        Dim sumcount = 0
+        Dim cimds As List(Of IraishoMeisai)
+        Dim wline = vbNullString
+        Dim zimd = New IraishoMeisai
+
+        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+
+        For Each imd In Me.IraishoMeisaiDatas
+            If imd.T_Ginkoucode <> zimd.T_Ginkoucode Then
+                cimds = Me.IraishoMeisaiDatas.FindAll(
+                    Function(cimd)
+                        Return (cimd.T_Ginkoucode = imd.T_Ginkoucode)
+                    End Function
+                )
+                bankcount = cimds.Count
+                wline = imd.T_Ginkoumei.PadRight(18, "　")
+                wline &= bankcount.ToString().PadLeft(3, " ")
+                sw.WriteLine(wline)
+                wline = vbNullString
+                zimd = imd
+            End If
+        Next
+
+        ' 合計
+        sumcount = Me.IraishoMeisaiDatas.Count
+        wline = "合計件数".PadRight(18, "　")
+        wline &= sumcount.ToString().PadLeft(3, " ")
+        sw.WriteLine(wline)
+        wline = vbNullString
+
+        If sw IsNot Nothing Then
+            sw.Close()
+            sw.Dispose()
+        End If
+    End Sub
+
 
     Private Sub _CreateIraishoMeisaiDatas(ByVal infile As String, ByVal otfile As String)
         Dim sr As StreamReader
@@ -417,6 +545,7 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Dim vs1(), vs2()                                     ' ＣＳＶ各要素
         Dim line As String                                   ' 入力テキスト
 
+        Dim imds = New List(Of IraishoMeisai)
         Dim simd As IraishoMeisai = Nothing
         Dim zimd As IraishoMeisai = Nothing
 
@@ -438,7 +567,10 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         Dim zsc                                              ' 自営信金コード
         Dim gc, gm, sm                                       ' 銀行コード、銀行名、支店名
 
+        Dim imdcount = 0                                     ' 依頼書の件数
+
         Dim wline As String                                  ' 出力テキスト
+
 
         ' ストリームリーダ、ライター
         sr = New StreamReader(infile, System.Text.Encoding.GetEncoding(MyEncoding))
@@ -452,8 +584,6 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
         culture = New CultureInfo("ja-JP", True)
         culture.DateTimeFormat.Calendar = New JapaneseCalendar
         wYYYYMMDD = dt.ToString("ggyyMMdd", culture)
-        wYY = Strings.Mid(wYYYYMMDD, 3, 2)
-
 
         ' ヘッダーは読み飛ばし
         sr.ReadLine()
@@ -469,11 +599,11 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
                 .T_Ginkoumei = vs1(9)
             }
 
-            Me.IraishoMeisaiDatas.Add(simd)
+            imds.Add(simd)
         Loop
 
         ' 銀行コード－＞支店コードでソート
-        Me.IraishoMeisaiDatas.Sort(
+        imds.Sort(
             Function(a, b)
                 If a.T_Ginkoucode <> b.T_Ginkoucode Then
                     Return (a.T_Ginkoucode - b.T_Ginkoucode)
@@ -483,9 +613,8 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             End Function
         )
 
-        Dim imdcount = 0
         zimd = New IraishoMeisai
-        For Each imd In Me.IraishoMeisaiDatas
+        For Each imd In imds
             header = "0"
 
             ' 銀行が変わったとき
@@ -546,7 +675,6 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
                     resheet = IIf(imd.Sitencode <> zimd.Sitencode, "1", resheet)
             End Select
             imdcount = IIf(resheet = "1", 1, imdcount)
-
 
             ' 作成元シート名
             srcsheetname = R_iraisho.SourceSheetName
@@ -683,43 +811,46 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
             wline &= "," & vs2(4)                                                                                                           ' idx083 顧客コード
             wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.KokyakucodeColumn), vbNullString, R_iraisho.KokyakucodeColumn & row)          ' idx084
             wline &= "," & gc                                                                                                               ' idx085 銀行コード
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.K_GinkoucodeColumn), vbNullString, R_iraisho.K_GinkoucodeColumn & row)        ' idx086
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.K_GinkoucodeColumn), vbNullString, R_iraisho.K_GinkoucodeColumn & row)        ' idx086
             wline &= "," & vs2(8)                                                                                                           ' idx087 支店コード
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.SitencodeColumn), vbNullString, R_iraisho.SitencodeColumn & row)              ' idx088
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.SitencodeColumn), vbNullString, R_iraisho.SitencodeColumn & row)              ' idx088
             wline &= "," & gm                                                                                                               ' idx089 銀行名
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.K_GinkoumeiColumn), vbNullString, R_iraisho.K_GinkouColumn & row)             ' idx090
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.K_GinkoumeiColumn), vbNullString, R_iraisho.K_GinkoumeiColumn & row)          ' idx090
             wline &= "," & _GetGinkou(gm)                                                                                                   ' idx091 銀行名（銀行名から「銀行」などを除いた名称）
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.K_GinkouColumn), vbNullString, R_Iraisho.K_GinkouColumn & row)                ' idx092
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.K_GinkouColumn), vbNullString, R_iraisho.K_GinkouColumn & row)                ' idx092
             wline &= "," & sm                                                                                                               ' idx093 支店名
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.SitenmeiColumn), vbNullString, R_iraisho.SitenmeiColumn & row)                ' idx094
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.SitenmeiColumn), vbNullString, R_iraisho.SitenmeiColumn & row)                ' idx094
             wline &= "," & sm.Replace("支店", vbNullString)                                                                                 ' idx095 支店名（支店名から「支店」を除いた名称）
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.SitenColumn), vbNullString, R_iraisho.SitenColumn & row)                      ' idx096
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.SitenColumn), vbNullString, R_iraisho.SitenColumn & row)                      ' idx096
             wline &= "," & vs2(11)                                                                                                          ' idx097 預金種別
             wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.YokinshubetuColumn), vbNullString, R_iraisho.YokinshubetuColumn & row)        ' idx098
             wline &= "," & vs2(12)                                                                                                          ' idx099 口座番号
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.KouzabangouColumn), vbNullString, R_iraisho.KouzabangouColumn & row)          ' idx100
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.KouzabangouColumn), vbNullString, R_iraisho.KouzabangouColumn & row)          ' idx100
             wline &= "," & tkno                                                                                                             ' idx101 通帳記号
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.TuchoukigouColumn), vbNullString, R_iraisho.TuchoukigouColumn & row)          ' idx102
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.TuchoukigouColumn), vbNullString, R_iraisho.TuchoukigouColumn & row)          ' idx102
             wline &= "," & tbno                                                                                                             ' idx103 通帳番号
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.TuchoubangouColumn), vbNullString, R_iraisho.TuchoukigouColumn & row)         ' idx104
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.TuchoubangouColumn), vbNullString, R_iraisho.TuchoubangouColumn & row)        ' idx104
             wline &= "," & vs2(13)                                                                                                          ' idx105 口座名義（半角）
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.KouzameigiColumn), vbNullString, R_iraisho.KouzameigiColumn & row)            ' idx106
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.KouzameigiColumn), vbNullString, R_iraisho.KouzameigiColumn & row)            ' idx106
             wline &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)                                                                         ' idx107 口座名義（全角）
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.JISKouzameigiColumn), vbNullString, R_iraisho.JISKouzameigiColumn & row)      ' idx108
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.JISKouzameigiColumn), vbNullString, R_iraisho.JISKouzameigiColumn & row)      ' idx108
             wline &= "," & vs2(14)                                                                                                          ' idx109 振替金額
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.FurikaekingakuColumn), vbNullString, R_iraisho.FurikaekingakuColumn & row)    ' idx110
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.FurikaekingakuColumn), vbNullString, R_iraisho.FurikaekingakuColumn & row)    ' idx110
             wline &= "," & R_iraisho.Bikou                                                                                                  ' idx111 備考
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.BikouColumn), vbNullString, R_iraisho.BikouColumn & row)                      ' idx112
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.BikouColumn), vbNullString, R_iraisho.BikouColumn & row)                      ' idx112
             wline &= "," & R_iraisho.Tekiyou                                                                                                ' idx113 適用
-            wline &= "," & IIf(String.IsNullOrEmpty(R_Iraisho.TekiyouColumn), vbNullString, R_iraisho.TekiyouColumn & row)                  ' idx114
+            wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.TekiyouColumn), vbNullString, R_iraisho.TekiyouColumn & row)                  ' idx114
             wline &= "," & R_iraisho.Funoucode                                                                                              ' idx115 不能コード
             wline &= "," & IIf(String.IsNullOrEmpty(R_iraisho.FunoucodeColumn), vbNullString, R_iraisho.FunoucodeColumn & row)              ' idx116
             wline &= "," & vs2(19)                                                                                                          ' idx117 エラーコード
-                                                                                
+
             sw.WriteLine(wline)
             wline = vbNullString
             zimd = imd
         Next
+
+        ' 件数集計用に保持
+        Me.IraishoMeisaiDatas = imds
 
         If sr IsNot Nothing Then
             sr.Close()
@@ -819,6 +950,9 @@ Public Class Rpa01 : Inherits RpaBase(Of Rpa01)
                 Console.WriteLine("以下のデータは送付明細上に存在しません")
                 Console.WriteLine($"データ: {iline.TrimEnd}")
             End If
+
+            ' リスタートの設定
+            Me.RestartCode = iv(4)
 
             tsr.BaseStream.Seek(0, SeekOrigin.Begin)
             tsr.ReadLine()
