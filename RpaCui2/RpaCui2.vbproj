@@ -53,6 +53,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -88,14 +89,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Program.vb" />
-    <Compile Include="Rpa01.vb" />
-    <Compile Include="RpaBase.vb" />
-    <Compile Include="RpaCodes.vb" />
-    <Compile Include="RpaModule.vb" />
-    <Compile Include="RpaPackage.vb" />
-    <Compile Include="RpaProject.vb" />
-    <Compile Include="RpaSystem.vb" />
-    <Compile Include="RpaTransaction.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

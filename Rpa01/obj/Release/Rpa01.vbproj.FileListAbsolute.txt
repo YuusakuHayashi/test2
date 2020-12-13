@@ -1,0 +1,17 @@
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\Rpa01.dll
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\Rpa01.pdb
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\Rpa01.xml
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\Newtonsoft.Json.dll
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\RpaCui2.exe
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\RpaCui2.pdb
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\RpaCui2.xml
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\RpaCui2.exe.config
+C:\Users\yuusa\project\test2\Rpa01\bin\Release\Newtonsoft.Json.xml
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.vbprojAssemblyReference.cache
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.Resources.resources
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.vbproj.GenerateResource.cache
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.vbproj.CoreCompileInputs.cache
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.vbproj.CopyComplete
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.dll
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.xml
+C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.pdb

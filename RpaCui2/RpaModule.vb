@@ -1,3 +1,0 @@
-﻿Module RpaModule
-
-End Module

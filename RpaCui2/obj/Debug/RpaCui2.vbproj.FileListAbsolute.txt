@@ -16,7 +16,6 @@ C:\Users\yuusa\project\test2\RpaCui2\bin\Debug\RpaCui2.pdb
 C:\Users\yuusa\project\test2\RpaCui2\bin\Debug\RpaCui2.xml
 C:\Users\yuusa\project\test2\RpaCui2\bin\Debug\Newtonsoft.Json.dll
 C:\Users\yuusa\project\test2\RpaCui2\bin\Debug\Newtonsoft.Json.xml
-C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.vbprojAssemblyReference.cache
 C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.Resources.resources
 C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.vbproj.GenerateResource.cache
 C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.vbproj.CoreCompileInputs.cache
