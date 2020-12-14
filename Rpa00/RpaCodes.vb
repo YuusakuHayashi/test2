@@ -20,4 +20,16 @@ Module RpaCodes
             End Select
         End Get
     End Property
+
+
+    Public ReadOnly Property RpaUtility(util As String) As Object
+        Get
+            Select Case util
+                Case "MacroUtility"
+                    Return New RpaMacroUtility
+                Case Else
+                    Return Nothing
+            End Select
+        End Get
+    End Property
 End Module

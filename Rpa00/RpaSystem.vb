@@ -6,24 +6,31 @@ Public Class RpaSystem
     '---------------------------------------------------------------------------------------------'
     Private ReadOnly Property ExecuteHandler(ByVal cmd As String) As ExecuteDelegater
         Get
+            Dim dlg As ExecuteDelegater
             Select Case cmd
                 Case "SaveJson"
-                    Return AddressOf SaveJson
+                    dlg = AddressOf SaveJson
                 Case "MacroUpdate"
-                    Return AddressOf UpdateMacro
+                    dlg = AddressOf UpdateMacro
                 Case "Run"
-                    Return AddressOf RunRobot
+                    dlg = AddressOf RunRobot
                 Case "Update"
-                    Return AddressOf UpdateProject
+                    dlg = AddressOf UpdateProject
                 Case "CopyProject"
-                    Return AddressOf DownloadProject
+                    dlg = AddressOf DownloadProject
                 Case "Project"
-                    Return AddressOf SetProject
+                    dlg = AddressOf SetProject
                 Case "Exit"
-                    Return AddressOf RpaExit
+                    dlg = AddressOf RpaExit
                 Case Else
-                    Return Nothing
+                    dlg = Nothing
             End Select
+
+            If dlg IsNot Nothing Then
+                Return dlg
+            End If
+
+
         End Get
     End Property
     '---------------------------------------------------------------------------------------------'

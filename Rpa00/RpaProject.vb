@@ -32,11 +32,11 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private ReadOnly Property _RootSystemMacroFileName As String
-        Get
-            Return Me._RootSystemDirectory & "\macro.xlsm"
-        End Get
-    End Property
+    'Private ReadOnly Property _RootSystemMacroFileName As String
+    '    Get
+    '        Return Me._RootSystemDirectory & "\macro.xlsm"
+    '    End Get
+    'End Property
 
     Private Shared _SYSTEM_DIRECTORY As String
     Public Shared ReadOnly Property SYSTEM_DIRECTORY As String
@@ -64,18 +64,44 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private Shared _SYSTEM_MACRO_FILENAME As String
-    Public ReadOnly Property SystemMacroFileName As String
+    Private Shared _SYSTEM_UTILITIES_DIRECTORY As String
+    Public Shared ReadOnly Property SYSTEM_UTILITIES_DIRECTORY As String
         Get
-            If String.IsNullOrEmpty(RpaProject._SYSTEM_MACRO_FILENAME) Then
-                RpaProject._SYSTEM_MACRO_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\macro.xlsm"
-                If Not File.Exists(RpaProject._SYSTEM_MACRO_FILENAME) Then
-                    File.Copy(Me._RootSystemMacroFileName, RpaProject._SYSTEM_MACRO_FILENAME, True)
+            If String.IsNullOrEmpty(RpaProject._SYSTEM_UTILITIES_DIRECTORY) Then
+                RpaProject._SYSTEM_UTILITIES_DIRECTORY = RpaProject.SYSTEM_DIRECTORY & "\utils"
+                If Not Directory.Exists(RpaProject._SYSTEM_UTILITIES_DIRECTORY) Then
+                    Directory.CreateDirectory(RpaProject._SYSTEM_UTILITIES_DIRECTORY)
                 End If
             End If
-            Return RpaProject._SYSTEM_MACRO_FILENAME
+            Return RpaProject._SYSTEM_UTILITIES_DIRECTORY
         End Get
     End Property
+
+    Private _SystemUtilities As Dictionary(Of String, Object)
+    Public Property SystemUtilities As Dictionary(Of String, Object)
+        Get
+            If Me._SystemUtilities Is Nothing Then
+                Me._SystemUtilities = New Dictionary(Of String, Object)
+            End If
+            Return Me._SystemUtilities
+        End Get
+        Set(value As Dictionary(Of String, Object))
+            Me._SystemUtilities = value
+        End Set
+    End Property
+
+    'Private Shared _SYSTEM_MACRO_FILENAME As String
+    'Public ReadOnly Property SystemMacroFileName As String
+    '    Get
+    '        If String.IsNullOrEmpty(RpaProject._SYSTEM_MACRO_FILENAME) Then
+    '            RpaProject._SYSTEM_MACRO_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\macro.xlsm"
+    '            If Not File.Exists(RpaProject._SYSTEM_MACRO_FILENAME) Then
+    '                File.Copy(Me._RootSystemMacroFileName, RpaProject._SYSTEM_MACRO_FILENAME, True)
+    '            End If
+    '        End If
+    '        Return RpaProject._SYSTEM_MACRO_FILENAME
+    '    End Get
+    'End Property
 
     Public Shared SYSTEM_JSON_FILENAME As String
     Public ReadOnly Property SystemJsonFileName As String
@@ -511,67 +537,67 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         Console.WriteLine("プロジェクトの検査完了")
     End Sub
 
-    Public Sub InvokeOutlookMacro(ByVal method As String, ParamArray args As Object())
-        Dim olapp, exbooks, exbook
-        Dim macrofile As String
-        Try
-            olapp = CreateObject("Outlook.Application")
-            Try
-                exbooks = olapp.Workbooks
-                Try
-                    exbook = exbooks.Open(Me.SystemMacroFileName, 0)
-                    macrofile = Path.GetFileName(Me.SystemMacroFileName)
-                    Select Case args.Length
-                        Case 1
-                            olapp.Run($"{macrofile}!{method}", args)
-                        Case 2
-                            olapp.Run($"{macrofile}!{method}", args(0), args(1))
-                    End Select
+    'Public Sub InvokeOutlookMacro(ByVal method As String, ParamArray args As Object())
+    '    Dim olapp, exbooks, exbook
+    '    Dim macrofile As String
+    '    Try
+    '        olapp = CreateObject("Outlook.Application")
+    '        Try
+    '            exbooks = olapp.Workbooks
+    '            Try
+    '                exbook = exbooks.Open(Me.SystemMacroFileName, 0)
+    '                macrofile = Path.GetFileName(Me.SystemMacroFileName)
+    '                Select Case args.Length
+    '                    Case 1
+    '                        olapp.Run($"{macrofile}!{method}", args)
+    '                    Case 2
+    '                        olapp.Run($"{macrofile}!{method}", args(0), args(1))
+    '                End Select
 
-                Finally
-                    If exbook IsNot Nothing Then
-                        exbook.Close()
-                    End If
-                    Marshal.ReleaseComObject(exbook)
-                End Try
-            Finally
-                Marshal.ReleaseComObject(exbooks)
-            End Try
-        Finally
-            If olapp IsNot Nothing Then
-                olapp.Quit()
-            End If
-            Marshal.ReleaseComObject(olapp)
-        End Try
-    End Sub
+    '            Finally
+    '                If exbook IsNot Nothing Then
+    '                    exbook.Close()
+    '                End If
+    '                Marshal.ReleaseComObject(exbook)
+    '            End Try
+    '        Finally
+    '            Marshal.ReleaseComObject(exbooks)
+    '        End Try
+    '    Finally
+    '        If olapp IsNot Nothing Then
+    '            olapp.Quit()
+    '        End If
+    '        Marshal.ReleaseComObject(olapp)
+    '    End Try
+    'End Sub
 
-    Public Sub InvokeMacro(ByVal method As String, args() As Object)
-        Dim exapp, exbooks, exbook
-        Dim macrofile As String
-        Try
-            exapp = CreateObject("Excel.Application")
-            Try
-                exbooks = exapp.Workbooks
-                Try
-                    exbook = exbooks.Open(Me.SystemMacroFileName, 0)
-                    macrofile = Path.GetFileName(Me.SystemMacroFileName)
-                    exapp.Run($"{macrofile}!{method}", args)
-                Finally
-                    If exbook IsNot Nothing Then
-                        exbook.Close()
-                    End If
-                    Marshal.ReleaseComObject(exbook)
-                End Try
-            Finally
-                Marshal.ReleaseComObject(exbooks)
-            End Try
-        Finally
-            If exapp IsNot Nothing Then
-                exapp.Quit()
-            End If
-            Marshal.ReleaseComObject(exapp)
-        End Try
-    End Sub
+    'Public Sub InvokeMacro(ByVal method As String, args() As Object)
+    '    Dim exapp, exbooks, exbook
+    '    Dim macrofile As String
+    '    Try
+    '        exapp = CreateObject("Excel.Application")
+    '        Try
+    '            exbooks = exapp.Workbooks
+    '            Try
+    '                exbook = exbooks.Open(Me.SystemMacroFileName, 0)
+    '                macrofile = Path.GetFileName(Me.SystemMacroFileName)
+    '                exapp.Run($"{macrofile}!{method}", args)
+    '            Finally
+    '                If exbook IsNot Nothing Then
+    '                    exbook.Close()
+    '                End If
+    '                Marshal.ReleaseComObject(exbook)
+    '            End Try
+    '        Finally
+    '            Marshal.ReleaseComObject(exbooks)
+    '        End Try
+    '    Finally
+    '        If exapp IsNot Nothing Then
+    '            exapp.Quit()
+    '        End If
+    '        Marshal.ReleaseComObject(exapp)
+    '    End Try
+    'End Sub
 
     Public Sub RunShell(ByVal exe As String, ByVal arg As String)
         Dim proc = New System.Diagnostics.Process()

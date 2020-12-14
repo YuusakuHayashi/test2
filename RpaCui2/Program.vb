@@ -8,9 +8,18 @@ Module Program
         Dim [mod] As [Module]
         Dim rpa_type As Type : Dim trn_type As Type : Dim sys_type As Type
         Dim rpa, trn, sys
-        Dim rpadir = Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
-        Dim dlldir = IIf(args(0) = "Debug", args(1), $"{rpadir}\dll")
-        Dim rpa00dll = $"{dlldir}\Rpa00.dll"
+        Dim rpadir As String
+        Dim dlldir As String
+        Dim rpa00dll As String
+
+        rpadir = Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
+        dlldir = $"{rpadir}\dll"
+        If args.Count > 1 Then
+            If args(0) = "Debug" Then
+                dlldir = args(1)
+            End If
+        End If
+        rpa00dll = $"{dlldir}\Rpa00.dll"
 
         If Not Directory.Exists(rpadir) Then
             Directory.CreateDirectory(rpadir)

@@ -87,11 +87,14 @@
     </Compile>
     <Compile Include="RpaBase.vb" />
     <Compile Include="RpaCodes.vb" />
+    <Compile Include="RpaMacroUtility.vb" />
+    <Compile Include="RpaModule.vb" />
     <Compile Include="RpaPackage.vb" />
     <Compile Include="RpaPrinter.vb" />
     <Compile Include="RpaProject.vb" />
     <Compile Include="RpaSystem.vb" />
     <Compile Include="RpaTransaction.vb" />
+    <Compile Include="RpaUtilities.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
