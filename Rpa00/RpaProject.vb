@@ -90,6 +90,29 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
+    Private Shared _SYSTEM_DLL_DIRECTORY As String
+    Public Shared ReadOnly Property SYSTEM_DLL_DIRECTORY As String
+        Get
+            If String.IsNullOrEmpty(RpaProject._SYSTEM_DLL_DIRECTORY) Then
+                RpaProject._SYSTEM_DLL_DIRECTORY = RpaProject.SYSTEM_DIRECTORY & "\dll"
+                If Not Directory.Exists(RpaProject._SYSTEM_DLL_DIRECTORY) Then
+                    Directory.CreateDirectory(RpaProject._SYSTEM_DLL_DIRECTORY)
+                End If
+            End If
+            Return RpaProject._SYSTEM_DLL_DIRECTORY
+        End Get
+    End Property
+
+    Private _DebugDllDirectory As String
+    Public Property DebugDllDirectory As String
+        Get
+            Return Me._DebugDllDirectory
+        End Get
+        Set(value As String)
+            Me._DebugDllDirectory = value
+        End Set
+    End Property
+
     Private Shared _MyDirectory As String
     Public Property MyDirectory As String
         Get
@@ -203,7 +226,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     Public Property RootProjectObject As Object
         Get
             If Me._RootProjectObject Is Nothing Then
-                Dim obj = RpaCodes.RpaObject(Me.ProjectName)
+                Dim obj = RpaCodes.RpaObject(Me)
                 Dim obj2 = Nothing
                 If File.Exists(Me.RootProjectJsonFileName) Then
                     obj2 = obj.ModelLoad(Me.RootProjectJsonFileName)
@@ -274,6 +297,8 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
     '-----------------------------------------------------------------------------------'
+
+
 
     ' MyProject Directory 関係
     '-----------------------------------------------------------------------------------'
@@ -362,7 +387,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     Public Property MyProjectObject As Object
         Get
             If Me._MyProjectObject Is Nothing Then
-                Dim obj = RpaCodes.RpaObject(Me.ProjectName)
+                Dim obj = RpaCodes.RpaObject(Me)
                 Dim obj2 = Nothing
                 If File.Exists(Me.MyProjectJsonFileName) Then
                     obj2 = obj.ModelLoad(Me.MyProjectJsonFileName)

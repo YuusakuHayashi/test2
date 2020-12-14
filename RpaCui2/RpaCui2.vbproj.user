@@ -3,4 +3,7 @@
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <StartArguments>Debug \\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug</StartArguments>
+  </PropertyGroup>
 </Project>

@@ -2,14 +2,14 @@
 Imports System.Reflection
 
 Module RpaCodes
-    Public ReadOnly Property RpaObject(ByVal code As String) As Object
+    Public ReadOnly Property RpaObject(rpa As RpaProject) As Object
         Get
             Dim asm As Assembly
             Dim [mod] As [Module]
             Dim [type] As Object
-            Select Case code
+            Select Case rpa.ProjectName
                 Case "rpa01"
-                    asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.dll")
+                    asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.dll")
                     [mod] = asm.GetModule("Rpa01.dll")
                     [type] = [mod].GetType("Rpa01.Rpa01")
                     If [type] IsNot Nothing Then

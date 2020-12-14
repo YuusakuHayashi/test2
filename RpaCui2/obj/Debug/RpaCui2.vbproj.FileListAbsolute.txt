@@ -1,5 +1,4 @@
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\bin\Debug\RpaCui2.exe.config
-\\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.vbprojResolveAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.vbproj.GenerateResource.Cache
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.xml
@@ -25,3 +24,4 @@ C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.xml
 C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.vbproj.ResolveComReference.cache
 C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.vbproj.ResolveComReference.cache
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.vbprojResolveAssemblyReference.cache
