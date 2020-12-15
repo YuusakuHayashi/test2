@@ -10,8 +10,8 @@ Public Class RpaSystem
             Select Case cmd
                 Case "SaveJson"
                     dlg = AddressOf SaveJson
-                Case "MacroUpdate"
-                    dlg = AddressOf UpdateMacro
+                'Case "MacroUpdate"
+                '    dlg = AddressOf UpdateMacro
                 Case "Run"
                     dlg = AddressOf RunRobot
                 Case "Update"
@@ -29,8 +29,6 @@ Public Class RpaSystem
             If dlg IsNot Nothing Then
                 Return dlg
             End If
-
-
         End Get
     End Property
     '---------------------------------------------------------------------------------------------'
@@ -66,25 +64,25 @@ Public Class RpaSystem
     '---------------------------------------------------------------------------------------------'
 
     ' マクロの更新
-    '---------------------------------------------------------------------------------------------'
-    Private Function UpdateMacro(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
-        Dim bas As String
-        If trn.Parameters.Count = 0 Then
-            Console.WriteLine("パラメータが指定されていません: " & trn.CommandText)
-            Return 1000
-        End If
+    ''---------------------------------------------------------------------------------------------'
+    'Private Function UpdateMacro(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+    '    Dim bas As String
+    '    If trn.Parameters.Count = 0 Then
+    '        Console.WriteLine("パラメータが指定されていません: " & trn.CommandText)
+    '        Return 1000
+    '    End If
 
-        For Each p In trn.Parameters
-            bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
-            If File.Exists(bas) Then
-                Console.WriteLine($"指定マクロ '{p}' をインストールします")
-                Call rpa.InvokeMacro("MacroImporter.Main", {bas})
-            Else
-                Console.WriteLine($"指定マクロ '{p}' は存在しません")
-            End If
-        Next
-        Return 0
-    End Function
+    '    For Each p In trn.Parameters
+    '        bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
+    '        If File.Exists(bas) Then
+    '            Console.WriteLine($"指定マクロ '{p}' をインストールします")
+    '            Call rpa.InvokeMacro("MacroImporter.Main", {bas})
+    '        Else
+    '            Console.WriteLine($"指定マクロ '{p}' は存在しません")
+    '        End If
+    '    Next
+    '    Return 0
+    'End Function
 
     '---------------------------------------------------------------------------------------------'
 

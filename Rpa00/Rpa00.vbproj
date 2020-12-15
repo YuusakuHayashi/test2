@@ -94,7 +94,7 @@
     <Compile Include="RpaProject.vb" />
     <Compile Include="RpaSystem.vb" />
     <Compile Include="RpaTransaction.vb" />
-    <Compile Include="RpaUtilities.vb" />
+    <Compile Include="RpaUtility.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

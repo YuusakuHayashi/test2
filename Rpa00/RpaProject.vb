@@ -32,12 +32,6 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    'Private ReadOnly Property _RootSystemMacroFileName As String
-    '    Get
-    '        Return Me._RootSystemDirectory & "\macro.xlsm"
-    '    End Get
-    'End Property
-
     Private Shared _SYSTEM_DIRECTORY As String
     Public Shared ReadOnly Property SYSTEM_DIRECTORY As String
         Get
@@ -77,31 +71,18 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private _SystemUtilities As Dictionary(Of String, Object)
-    Public Property SystemUtilities As Dictionary(Of String, Object)
+    Private _SystemUtilities As Dictionary(Of String, RpaUtility)
+    Public Property SystemUtilities As Dictionary(Of String, RpaUtility)
         Get
             If Me._SystemUtilities Is Nothing Then
-                Me._SystemUtilities = New Dictionary(Of String, Object)
+                Me._SystemUtilities = New Dictionary(Of String, RpaUtility)
             End If
             Return Me._SystemUtilities
         End Get
-        Set(value As Dictionary(Of String, Object))
+        Set(value As Dictionary(Of String, RpaUtility))
             Me._SystemUtilities = value
         End Set
     End Property
-
-    'Private Shared _SYSTEM_MACRO_FILENAME As String
-    'Public ReadOnly Property SystemMacroFileName As String
-    '    Get
-    '        If String.IsNullOrEmpty(RpaProject._SYSTEM_MACRO_FILENAME) Then
-    '            RpaProject._SYSTEM_MACRO_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\macro.xlsm"
-    '            If Not File.Exists(RpaProject._SYSTEM_MACRO_FILENAME) Then
-    '                File.Copy(Me._RootSystemMacroFileName, RpaProject._SYSTEM_MACRO_FILENAME, True)
-    '            End If
-    '        End If
-    '        Return RpaProject._SYSTEM_MACRO_FILENAME
-    '    End Get
-    'End Property
 
     Public Shared SYSTEM_JSON_FILENAME As String
     Public ReadOnly Property SystemJsonFileName As String

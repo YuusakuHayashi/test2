@@ -333,13 +333,14 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Public Overrides Function Main() As Integer
         Me.RestartCount = IIf(Me.RestartCount = 0, 1, Me.RestartCount)
 
+        Dim mutil = Rpa.SystemUtilities("MacroUtility").UtilityObject
+
         ' プリンター名設定
         '-----------------------------------------------------------------------------------------'
         Rpa.UsePrinterName = Rpa.PrinterName
         Rpa.UsePrinterName = Rpa.RootProjectObject.PrinterName
         Rpa.UsePrinterName = IIf(String.IsNullOrEmpty(Me.PrinterName), Rpa.UsePrinterName, Me.PrinterName)
         '-----------------------------------------------------------------------------------------'
-
 
         ' マスターファイルのチェック・コピー
         '-----------------------------------------------------------------------------------------'
@@ -395,7 +396,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         ixls_1 = $"{Rpa.MyProjectDirectory}\input.xls"
 
         ' ＣＳＶデータ生成
-        Call Rpa.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
+        Call mutil.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
         '-----------------------------------------------------------------------------------------'
 
 
@@ -428,7 +429,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         For Each f In Directory.GetFiles(Me.IraishoDirectory)
             File.Copy(f, $"{Me.Work2Directory}\{Path.GetFileName(f)}", True)
         Next
-        Call Rpa.InvokeMacro("Rpa01.CreateIraisho", {idata2_2})
+        Call mutil.InvokeMacro("Rpa01.CreateIraisho", {idata2_2})
 
         Me.IraishoMeisaiDatas.Sort(
             Function(before, after)
@@ -464,12 +465,12 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         If Not Transaction.Parameters.Contains("print=no") Then
             For Each imd In Me.IraishoMeisaiDatas
                 If bookname_1 <> imd.BookName Then
-                    Call Rpa.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    Call mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
                     bookname_1 = imd.BookName
                     sheetname_1 = imd.DistinationSheetName
                 End If
                 If sheetname_1 <> imd.DistinationSheetName Then
-                    Call Rpa.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    Call mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
                     sheetname_1 = imd.DistinationSheetName
                 End If
             Next
@@ -517,13 +518,13 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         If Me.RestartCount = 1 Then
             File.Delete(outxlsx_1)
-            Call Rpa.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", "Shift-JIS"})
+            Call mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", "Shift-JIS"})
         End If
         sheetname_2 = $"停止{Me.RestartCount.ToString}回目"
-        Call Rpa.InvokeMacro("Rpa01.CreateSofuMeisai", {tincsv_v2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
+        Call mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {tincsv_v2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
 
         If Not Transaction.Parameters.Contains("print=no") Then
-            Call Rpa.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, outxlsx_1, sheetname_2})
+            Call mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, outxlsx_1, sheetname_2})
         End If
 
         Console.WriteLine("加工済送付明細作成完了！")

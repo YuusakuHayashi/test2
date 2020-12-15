@@ -5,9 +5,6 @@ Public Class RpaMacroUtility
     Private _MacroFileName As String
     Public Property MacroFileName As String
         Get
-            If String.IsNullOrEmpty(Me._MacroFileName) Then
-                Me._MacroFileName = $"{RpaProject.SYSTEM_UTILITIES_DIRECTORY}\macro.xlsm"
-            End If
             Return Me._MacroFileName
         End Get
         Set(value As String)
@@ -42,4 +39,25 @@ Public Class RpaMacroUtility
             Marshal.ReleaseComObject(exapp)
         End Try
     End Sub
+
+    ' マクロの更新
+    '---------------------------------------------------------------------------------------------'
+    Private Function UpdateMacro(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Dim bas As String
+        If trn.Parameters.Count = 0 Then
+            Console.WriteLine("パラメータが指定されていません: " & trn.CommandText)
+            Return 1000
+        End If
+
+        For Each p In trn.Parameters
+            bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
+            If File.Exists(bas) Then
+                Console.WriteLine($"指定マクロ '{p}' をインストールします")
+                Call InvokeMacro("MacroImporter.Main", {bas})
+            Else
+                Console.WriteLine($"指定マクロ '{p}' は存在しません")
+            End If
+        Next
+        Return 0
+    End Function
 End Class
