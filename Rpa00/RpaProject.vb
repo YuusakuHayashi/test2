@@ -28,46 +28,33 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
 
     Private ReadOnly Property _RootSystemDirectory As String
         Get
-            Return Me.RootDirectory & "\system"
+            Return $"{Me.RootDirectory}\system"
         End Get
     End Property
 
-    Private Shared _SYSTEM_DIRECTORY As String
     Public Shared ReadOnly Property SYSTEM_DIRECTORY As String
         Get
-            If String.IsNullOrEmpty(RpaProject._SYSTEM_DIRECTORY) Then
-                RpaProject._SYSTEM_DIRECTORY = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
-                If Not Directory.Exists(RpaProject._SYSTEM_DIRECTORY) Then
-                    Directory.CreateDirectory(RpaProject._SYSTEM_DIRECTORY)
-                End If
-            End If
-            Return RpaProject._SYSTEM_DIRECTORY
+            Return System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
         End Get
     End Property
 
-    Private Shared _SYSTEM_SCRIPT_DIRECTORY As String
     Public Shared ReadOnly Property SYSTEM_SCRIPT_DIRECTORY As String
         Get
-            If String.IsNullOrEmpty(RpaProject._SYSTEM_SCRIPT_DIRECTORY) Then
-                RpaProject._SYSTEM_SCRIPT_DIRECTORY = RpaProject.SYSTEM_DIRECTORY & "\script"
-                If Not Directory.Exists(RpaProject._SYSTEM_SCRIPT_DIRECTORY) Then
-                    Directory.CreateDirectory(RpaProject._SYSTEM_SCRIPT_DIRECTORY)
-                End If
+            Dim d = $"{RpaProject.SYSTEM_DIRECTORY}\script"
+            If Not Directory.Exists(d) Then
+                Directory.CreateDirectory(d)
             End If
-            Return RpaProject._SYSTEM_SCRIPT_DIRECTORY
+            Return d
         End Get
     End Property
 
-    Private Shared _SYSTEM_UTILITIES_DIRECTORY As String
-    Public Shared ReadOnly Property SYSTEM_UTILITIES_DIRECTORY As String
+    Public Shared ReadOnly Property SYSTEM_UTILITY_DIRECTORY As String
         Get
-            If String.IsNullOrEmpty(RpaProject._SYSTEM_UTILITIES_DIRECTORY) Then
-                RpaProject._SYSTEM_UTILITIES_DIRECTORY = RpaProject.SYSTEM_DIRECTORY & "\utils"
-                If Not Directory.Exists(RpaProject._SYSTEM_UTILITIES_DIRECTORY) Then
-                    Directory.CreateDirectory(RpaProject._SYSTEM_UTILITIES_DIRECTORY)
-                End If
+            Dim d = $"{RpaProject.SYSTEM_DIRECTORY}\util"
+            If Not Directory.Exists(d) Then
+                Directory.CreateDirectory(d)
             End If
-            Return RpaProject._SYSTEM_UTILITIES_DIRECTORY
+            Return d
         End Get
     End Property
 
@@ -97,27 +84,14 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private Shared _SYSTEM_DLL_DIRECTORY As String
     Public Shared ReadOnly Property SYSTEM_DLL_DIRECTORY As String
         Get
-            If String.IsNullOrEmpty(RpaProject._SYSTEM_DLL_DIRECTORY) Then
-                RpaProject._SYSTEM_DLL_DIRECTORY = RpaProject.SYSTEM_DIRECTORY & "\dll"
-                If Not Directory.Exists(RpaProject._SYSTEM_DLL_DIRECTORY) Then
-                    Directory.CreateDirectory(RpaProject._SYSTEM_DLL_DIRECTORY)
-                End If
+            Dim d = $"{RpaProject.SYSTEM_DIRECTORY}\dll"
+            If Not Directory.Exists(d) Then
+                Directory.CreateDirectory(d)
             End If
-            Return RpaProject._SYSTEM_DLL_DIRECTORY
+            Return d
         End Get
-    End Property
-
-    Private _DebugDllDirectory As String
-    Public Property DebugDllDirectory As String
-        Get
-            Return Me._DebugDllDirectory
-        End Get
-        Set(value As String)
-            Me._DebugDllDirectory = value
-        End Set
     End Property
 
     Private Shared _MyDirectory As String
@@ -220,8 +194,9 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         Get
             If String.IsNullOrEmpty(Me._RootProjectJsonFileName) Then
                 Me._RootProjectJsonFileName = $"{Me.RootProjectDirectory}\rpa_project.json"
-                If Not File.Exists(Me._RootProjectJsonFileName) Then
-                    Me.RootProjectObject.ModelSave(Me._RootProjectJsonFileName, Me.RootProjectObject)
+                If Directory.Exists(Me.RootProjectDirectory) Then
+                    If Not File.Exists(Me.RootProjectJsonFileName) Then
+                    End If
                 End If
             End If
             Return Me._RootProjectJsonFileName
@@ -235,13 +210,17 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
             If Me._RootProjectObject Is Nothing Then
                 Dim obj = RpaCodes.RpaObject(Me)
                 Dim obj2 = Nothing
-                If File.Exists(Me.RootProjectJsonFileName) Then
-                    obj2 = obj.ModelLoad(Me.RootProjectJsonFileName)
-                End If
-                If obj2 IsNot Nothing Then
-                    Me._RootProjectObject = obj2
+                If obj Is Nothing Then
+                    Me._RootProjectObject = Nothing
                 Else
-                    Me._RootProjectObject = obj
+                    If File.Exists(Me.RootProjectJsonFileName) Then
+                        obj2 = obj.ModelLoad(Me.RootProjectJsonFileName)
+                    End If
+                    If obj2 Is Nothing Then
+                        Me._RootProjectObject = obj
+                    Else
+                        Me._RootProjectObject = obj2
+                    End If
                 End If
             End If
             Return Me._RootProjectObject
@@ -340,8 +319,10 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         Get
             If String.IsNullOrEmpty(Me._MyProjectWorkDirectory) Then
                 Me._MyProjectWorkDirectory = Me.MyProjectDirectory & "\work"
-                If Directory.Exists(Me._MyProjectWorkDirectory) Then
-                    Directory.CreateDirectory(Me._MyProjectWorkDirectory)
+                If Directory.Exists(Me._MyProjectDirectory) Then
+                    If Not Directory.Exists(Me._MyProjectWorkDirectory) Then
+                        Directory.CreateDirectory(Me._MyProjectWorkDirectory)
+                    End If
                 End If
             End If
             Return Me._MyProjectWorkDirectory
@@ -349,18 +330,18 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     End Property
 
     ' 現状不要 2020-12-11
-    Private _MyProjectScriptDirectory As String
-    Public ReadOnly Property MyProjectScriptDirectory As String
-        Get
-            If String.IsNullOrEmpty(Me._MyProjectScriptDirectory) Then
-                Me._MyProjectScriptDirectory = Me.MyProjectDirectory & "\script"
-                If Directory.Exists(Me._MyProjectScriptDirectory) Then
-                    Directory.CreateDirectory(Me._MyProjectScriptDirectory)
-                End If
-            End If
-            Return Me._MyProjectScriptDirectory
-        End Get
-    End Property
+    'Private _MyProjectScriptDirectory As String
+    'Public ReadOnly Property MyProjectScriptDirectory As String
+    '    Get
+    '        If String.IsNullOrEmpty(Me._MyProjectScriptDirectory) Then
+    '            Me._MyProjectScriptDirectory = Me.MyProjectDirectory & "\script"
+    '            If Directory.Exists(Me._MyProjectScriptDirectory) Then
+    '                Directory.CreateDirectory(Me._MyProjectScriptDirectory)
+    '            End If
+    '        End If
+    '        Return Me._MyProjectScriptDirectory
+    '    End Get
+    'End Property
 
     ' 成果物保管用
     Private _MyProjectBackupDirectory As String
@@ -368,8 +349,10 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         Get
             If String.IsNullOrEmpty(Me._MyProjectBackupDirectory) Then
                 Me._MyProjectBackupDirectory = Me.MyProjectDirectory & "\backup"
-                If Directory.Exists(Me._MyProjectBackupDirectory) Then
-                    Directory.CreateDirectory(Me._MyProjectBackupDirectory)
+                If Directory.Exists(Me._MyProjectDirectory) Then
+                    If Not Directory.Exists(Me._MyProjectBackupDirectory) Then
+                        Directory.CreateDirectory(Me._MyProjectBackupDirectory)
+                    End If
                 End If
             End If
             Return Me._MyProjectBackupDirectory
@@ -381,9 +364,6 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         Get
             If String.IsNullOrEmpty(Me._MyProjectJsonFileName) Then
                 Me._MyProjectJsonFileName = $"{Me.MyProjectDirectory}\rpa_project.json"
-                If Not File.Exists(Me._MyProjectJsonFileName) Then
-                    Me.MyProjectObject.ModelSave(Me._MyProjectJsonFileName, Me.MyProjectObject)
-                End If
             End If
             Return Me._MyProjectJsonFileName
         End Get
@@ -396,13 +376,17 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
             If Me._MyProjectObject Is Nothing Then
                 Dim obj = RpaCodes.RpaObject(Me)
                 Dim obj2 = Nothing
-                If File.Exists(Me.MyProjectJsonFileName) Then
-                    obj2 = obj.ModelLoad(Me.MyProjectJsonFileName)
-                End If
-                If obj2 IsNot Nothing Then
-                    Me._MyProjectObject = obj2
+                If obj Is Nothing Then
+                    Me._MyProjectObject = Nothing
                 Else
-                    Me._MyProjectObject = obj
+                    If File.Exists(Me.MyProjectJsonFileName) Then
+                        obj2 = obj.ModelLoad(Me.MyProjectJsonFileName)
+                    End If
+                    If obj2 Is Nothing Then
+                        Me._MyProjectObject = obj
+                    Else
+                        Me._MyProjectObject = obj2
+                    End If
                 End If
             End If
             Return Me._MyProjectObject

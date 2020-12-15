@@ -20,6 +20,8 @@ Public Class RpaSystem
                     dlg = AddressOf DownloadProject
                 Case "Project"
                     dlg = AddressOf SetProject
+                Case "AddUtility"
+                    dlg = AddressOf AddUtility
                 Case "Exit"
                     dlg = AddressOf RpaExit
                 Case Else
@@ -31,6 +33,33 @@ Public Class RpaSystem
             End If
         End Get
     End Property
+    '---------------------------------------------------------------------------------------------'
+
+    ' ユーティリティの追加
+    '---------------------------------------------------------------------------------------------'
+    Private Function AddUtility(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Dim obj As Object
+        Dim util As String
+        If trn.Parameters.Count = 0 Then
+            Console.WriteLine("ユーティリティが指定されていません")
+            Return 1000
+        End If
+
+        util = trn.Parameters(0)
+        obj = RpaCodes.RpaUtility(util)
+        If obj Is Nothing Then
+            Console.WriteLine($"指定のユーティリティ '{util}' は存在しません")
+            Return 1000
+        End If
+
+        If rpa.SystemUtilities.ContainsKey(util) Then
+            Console.WriteLine($"指定のユーティリティ '{util}' は既に追加されています")
+            Return 1000
+        End If
+
+        rpa.SystemUtilities.Add(util, obj)
+        Return 0
+    End Function
     '---------------------------------------------------------------------------------------------'
 
     ' Ｊｓｏｎのセーブ

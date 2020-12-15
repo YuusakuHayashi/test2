@@ -11,6 +11,7 @@ Module Program
         Dim rpadir As String
         Dim dlldir As String
         Dim rpa00dll As String
+        Dim json As String
 
         rpadir = Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
         dlldir = $"{rpadir}\dll"
@@ -50,10 +51,10 @@ Module Program
         End If
 
         ' rpa.SystemJsonFileName を参照する際に、なければファイルが生成される。
-        rpa = rpa.ModelLoad(rpa.SystemJsonFileName)
+        json = rpa.SystemJsonFileName
+        rpa = rpa.ModelLoad(json)
         If rpa Is Nothing Then
-            Console.WriteLine(rpa.SYSTEM_JSON_FILENAME & " の読み込みに失敗しました")
-            Console.WriteLine("RPAの実行終了しました")
+            Console.WriteLine($"設定ファイル '{json}' の読み込みに失敗しました")
             Console.ReadLine()
             Exit Sub
         End If

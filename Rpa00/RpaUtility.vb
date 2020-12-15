@@ -4,6 +4,16 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public Class RpaUtility
+    Private _UtilityJsonFileName As String
+    Public Property UtilityJsonFileName As String
+        Get
+            Return Me._UtilityJsonFileName
+        End Get
+        Set(value As String)
+            Me._UtilityJsonFileName = value
+        End Set
+    End Property
+
     Private _UtilityName As String
     Public Property UtilityName As String
         Get
