@@ -169,6 +169,12 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
 
     ' Root Directory 関係
     '-----------------------------------------------------------------------------------'
+    Public ReadOnly Property RootProjectDirectory As String
+        Get
+            Return $"{Me.RootDirectory}\{Me.ProjectName}"
+        End Get
+    End Property
+
     Public ReadOnly Property IsRootProjectExists As Boolean
         Get
             If Directory.Exists(Me.RootProjectDirectory) Then
@@ -179,27 +185,13 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private _RootProjectDirectory As String
-    Public ReadOnly Property RootProjectDirectory As String
-        Get
-            If String.IsNullOrEmpty(Me._RootProjectDirectory) Then
-                Me._RootProjectDirectory = Me.RootDirectory & "\" & Me.ProjectName
-            End If
-            Return Me._RootProjectDirectory
-        End Get
-    End Property
-
-    Private _RootProjectJsonFileName As String
     Public ReadOnly Property RootProjectJsonFileName As String
         Get
-            If String.IsNullOrEmpty(Me._RootProjectJsonFileName) Then
-                Me._RootProjectJsonFileName = $"{Me.RootProjectDirectory}\rpa_project.json"
-                If Directory.Exists(Me.RootProjectDirectory) Then
-                    If Not File.Exists(Me.RootProjectJsonFileName) Then
-                    End If
-                End If
+            If Me.IsRootProjectExists Then
+                Return $"{Me.RootProjectDirectory}\rpa_project.json"
+            Else
+                Return vbNullString
             End If
-            Return Me._RootProjectJsonFileName
         End Get
     End Property
 
