@@ -2,6 +2,7 @@
 Imports System.IO
 
 Public Class RpaMacroUtility
+    
     Public ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As RpaProject) As RpaSystem.ExecuteDelegater
         Get
             Dim dlg As RpaSystem.ExecuteDelegater
@@ -14,14 +15,20 @@ Public Class RpaMacroUtility
         End Get
     End Property
 
-    Private _MacroFileName As String
-    Public Property MacroFileName As String
+    Private ReadOnly Property _MacroUtilityDirectory As String
         Get
-            Return Me._MacroFileName
+            Dim d = $"{RpaProject.SYSTEM_DIRECTORY}\MacroUtility"
+            If Not Directory.Exists(d) Then
+                Directory.CreateDirectory(d)
+            End If
+            Return d
         End Get
-        Set(value As String)
-            Me._MacroFileName = value
-        End Set
+    End Property
+
+    Private ReadOnly Property _MacroFileName As String
+        Get
+            Return $"{RpaProject.SYSTEM_DIRECTORY}\macro.xlsm"
+        End Get
     End Property
 
     Public Sub InvokeMacro(ByVal method As String, args() As Object)
@@ -32,8 +39,8 @@ Public Class RpaMacroUtility
             Try
                 exbooks = exapp.Workbooks
                 Try
-                    exbook = exbooks.Open(Me.MacroFileName, 0)
-                    macrofile = Path.GetFileName(Me.MacroFileName)
+                    exbook = exbooks.Open(Me._MacroFileName, 0)
+                    macrofile = Path.GetFileName(Me._MacroFileName)
                     exapp.Run($"{macrofile}!{method}", args)
                 Finally
                     If exbook IsNot Nothing Then
@@ -61,8 +68,14 @@ Public Class RpaMacroUtility
             Return 1000
         End If
 
+        If Not File.Exists(Me._MacroFileName) Then
+            Console.WriteLine($"マクロファイル '{Me._MacroFileName}' が存在しません")
+            Console.WriteLine($"開発者から入手してください")
+            Return 1000
+        End If
+
         For Each p In trn.Parameters
-            bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
+            bas = $"{Me._MacroUtilityDirectory}\{p}"
             If File.Exists(bas) Then
                 Console.WriteLine($"指定マクロ '{p}' をインストールします")
                 Call InvokeMacro("MacroImporter.Main", {bas})

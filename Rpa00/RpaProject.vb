@@ -9,6 +9,22 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     Private Const UTF8 As String = "utf-8"
     Public Shared MYENCODING As String = UTF8
 
+    Private _UserName As String
+    Public Property UserName As String
+        Get
+            Return Me._UserName
+        End Get
+        Set(value As String)
+            Me._UserName = value
+        End Set
+    End Property
+
+    Private ReadOnly Property HelloFileName As String
+        Get
+            Return $"{RpaProject.SYSTEM_DIRECTORY}\Hello.txt"
+        End Get
+    End Property
+
     Private Shared _RootDirectory As String
     Public Property RootDirectory As String
         Get
@@ -17,11 +33,6 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         Set(value As String)
             If String.IsNullOrEmpty(RpaProject._RootDirectory) Then
                 RpaProject._RootDirectory = value
-                If Not Directory.Exists(RpaProject._RootDirectory) Then
-                    Console.WriteLine("RootDirectory が存在しません")
-                    Console.WriteLine("ファイル: " & Me.SystemJsonFileName & "の'RootDirectory' に任意のパスを書いてください")
-                    Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
-                End If
             End If
         End Set
     End Property
@@ -38,15 +49,15 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Public Shared ReadOnly Property SYSTEM_SCRIPT_DIRECTORY As String
-        Get
-            Dim d = $"{RpaProject.SYSTEM_DIRECTORY}\script"
-            If Not Directory.Exists(d) Then
-                Directory.CreateDirectory(d)
-            End If
-            Return d
-        End Get
-    End Property
+    'Public Shared ReadOnly Property SYSTEM_SCRIPT_DIRECTORY As String
+    '    Get
+    '        Dim d = $"{RpaProject.SYSTEM_DIRECTORY}\script"
+    '        If Not Directory.Exists(d) Then
+    '            Directory.CreateDirectory(d)
+    '        End If
+    '        Return d
+    '    End Get
+    'End Property
 
     Public Shared ReadOnly Property SYSTEM_UTILITY_DIRECTORY As String
         Get
@@ -102,11 +113,6 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         Set(value As String)
             If String.IsNullOrEmpty(RpaProject._MyDirectory) Then
                 RpaProject._MyDirectory = value
-                If Not Directory.Exists(RpaProject._MyDirectory) Then
-                    Console.WriteLine("MyDirectory が存在しません")
-                    Console.WriteLine("ファイル: " & Me.SystemJsonFileName & "の'MyDirectory' に任意のパスを書いてください")
-                    Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
-                End If
             End If
         End Set
     End Property
@@ -455,21 +461,48 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Set
     End Property
 
+    Public Sub HelloProject()
+        Dim txt As String
+        Dim sr As StreamReader
+
+        If File.Exists(Me.HelloFileName) Then
+            sr = New StreamReader(Me.HelloFileName, Encoding.GetEncoding(MYENCODING))
+            txt = sr.ReadToEnd()
+            Console.WriteLine($"{txt}")
+        End If
+
+        If sr IsNot Nothing Then
+            sr.Close()
+            sr.Dispose()
+        End If
+    End Sub
+
+    Public Function _CheckConstitution() As Boolean
+        Dim b = True
+        If Not Directory.Exists(Me.RootDirectory) Then
+            Console.WriteLine($"RootDirectory '{Me.RootDirectory}' がありません")
+            Console.WriteLine($"ファイル '{Me.SystemJsonFileName}' の 'RootDirectory' に任意のパスを書いてください")
+            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+            b = False
+        End If
+        If Not Directory.Exists(Me.MyDirectory) Then
+            Console.WriteLine($"MyDirectory '{Me.MyDirectory}' がありません")
+            Console.WriteLine($"ファイル '{Me.SystemJsonFileName}' の 'MyDirectory' に任意のパスを書いてください")
+            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+            b = False
+        End If
+        Return b
+    End Function
 
     Private Sub _CheckProject()
-        Dim rpack As RpaPackage = Nothing
-        Dim mpack As RpaPackage = Nothing
-        Console.WriteLine("プロジェクトの検査中...")
-        Console.WriteLine("プロジェクト名                 : " & Me.ProjectName)
-        Console.WriteLine("プロジェクト別名               : " & Me.ProjectAlias)
-        Console.WriteLine("ルートプロジェクトディレクトリ : " & Me.RootProjectDirectory)
+        Console.WriteLine("プロジェクトのチェック....")
         If Not Me.IsRootProjectExists Then
-            Console.WriteLine("(警告) ルートプロジェクトディレクトリは存在しません")
+            Console.WriteLine($"RootProjectDirectory '{Me.RootProjectDirectory}' がありません")
         End If
-        Console.WriteLine("ユーザプロジェクトディレクトリ : " & Me.MyProjectDirectory)
         If Not Me.IsMyProjectExists Then
-            Console.WriteLine("       ユーザプロジェクトディレクトリは存在しません")
+            Console.WriteLine($"MyProjectDirectory '{Me.MyProjectDirectory}' がありません")
         End If
+        Console.WriteLine("プロジェクトのチェック終了")
 
         'Dim installed = False
         'Console.WriteLine("アップデートパッケージを検索しています...")
@@ -485,7 +518,6 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         '        Console.WriteLine("パッケージ : " & rp.Name & " をインストールしていません")
         '    End If
         'Next
-        Console.WriteLine("プロジェクトの検査完了")
     End Sub
 
     'Public Sub InvokeOutlookMacro(ByVal method As String, ParamArray args As Object())
