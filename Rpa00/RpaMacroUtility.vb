@@ -2,6 +2,18 @@
 Imports System.IO
 
 Public Class RpaMacroUtility
+    Public ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As RpaProject) As RpaSystem.ExecuteDelegater
+        Get
+            Dim dlg As RpaSystem.ExecuteDelegater
+            Select Case trn.MainCommand
+                Case "InstallMacro" : dlg = AddressOf UpdateMacro
+                Case "UpdateMacro" : dlg = AddressOf UpdateMacro
+                Case Else : dlg = Nothing
+            End Select
+            Return dlg
+        End Get
+    End Property
+
     Private _MacroFileName As String
     Public Property MacroFileName As String
         Get

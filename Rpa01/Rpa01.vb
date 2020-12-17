@@ -64,31 +64,56 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End Set
     End Property
 
-    Private _IraishoDirectory As String
+    Private __IraishoDirectory As String
     <JsonIgnore>
-    Public ReadOnly Property IraishoDirectory As String
+    Private ReadOnly Property _IraishoDirectory As String
         Get
-            If String.IsNullOrEmpty(Me._IraishoDirectory) Then
-                Me._IraishoDirectory = Rpa.MyProjectDirectory & "\iraisho"
-                If Not Directory.Exists(Me._IraishoDirectory) Then
-                    Directory.CreateDirectory(Me._IraishoDirectory)
+            If String.IsNullOrEmpty(Me.__IraishoDirectory) Then
+                Me.__IraishoDirectory = $"{Rpa.MyProjectDirectory}\iraisho"
+                If Not Directory.Exists(Me.__IraishoDirectory) Then
+                    Directory.CreateDirectory(Me.__IraishoDirectory)
                 End If
             End If
-            Return Me._IraishoDirectory
+            Return Me.__IraishoDirectory
         End Get
     End Property
 
-    Private _Work2Directory As String
-    <JsonIgnore>
-    Public ReadOnly Property Work2Directory As String
+    Private __BackupDirectory As String
+    Private ReadOnly Property _BackupDirectory As String
         Get
-            If String.IsNullOrEmpty(Me._Work2Directory) Then
-                Me._Work2Directory = Rpa.MyProjectDirectory & "\work2"
-                If Not Directory.Exists(Me._Work2Directory) Then
-                    Directory.CreateDirectory(Me._Work2Directory)
+            If String.IsNullOrEmpty(Me.__BackupDirectory) Then
+                Me.__BackupDirectory = $"{Rpa.MyProjectDirectory}\backup"
+                If Not Directory.Exists(Me.__BackupDirectory) Then
+                    Directory.CreateDirectory(Me.__BackupDirectory)
                 End If
             End If
-            Return Me._Work2Directory
+            Return Me.__BackupDirectory
+        End Get
+    End Property
+
+    Private __Work2Directory As String
+    Private ReadOnly Property _Work2Directory As String
+        Get
+            If String.IsNullOrEmpty(Me.__Work2Directory) Then
+                Me.__Work2Directory = $"{Rpa.MyProjectDirectory}\work2"
+                If Not Directory.Exists(Me.__Work2Directory) Then
+                    Directory.CreateDirectory(Me.__Work2Directory)
+                End If
+            End If
+            Return Me.__Work2Directory
+        End Get
+    End Property
+
+    Private __WorkDirectory As String
+    Private ReadOnly Property _WorkDirectory As String
+        Get
+            If String.IsNullOrEmpty(Me.__WorkDirectory) Then
+                Me.__WorkDirectory = $"{Rpa.MyProjectDirectory}\work"
+                If Not Directory.Exists(Me.__WorkDirectory) Then
+                    Directory.CreateDirectory(Me.__WorkDirectory)
+                End If
+            End If
+            Return Me.__WorkDirectory
         End Get
     End Property
 
@@ -345,7 +370,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         ' マスターファイルのチェック・コピー
         '-----------------------------------------------------------------------------------------'
         Dim imaster_1 = $"{Rpa.MyProjectDirectory}\{Me.MasterCsvFileName}"
-        Dim wmaster_1 = $"{Rpa.MyProjectWorkDirectory}\{Me.MasterCsvFileName}"
+        Dim wmaster_1 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
         Console.WriteLine("以下のファイルを用意したら、[Enter]キーをクリックしてください")
         Console.WriteLine("ファイル名 : " & Me.MasterCsvFileName)
         Console.ReadLine()
@@ -362,7 +387,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim afile_1 = vbNullString           ' 添付ファイル（フルパス）
         Dim afile_1_base = vbNullString      ' 添付ファイル（ファイル名（拡張子除く）のみ）
         Dim ixls_1 = vbNullString            ' 解凍後ファイル名
-        Dim icsv_1 = $"{Rpa.MyProjectWorkDirectory}\input.csv"
+        Dim icsv_1 = $"{Me._WorkDirectory}\input.csv"
 
         'Console.WriteLine("添付ファイルを検索しています...")
 
@@ -403,11 +428,11 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         ' ＣＳＶから対象得意先（モテキ）のみ抜き出し・入力ＣＳＶとのマッチング
         '-----------------------------------------------------------------------------------------'
         Dim target = Me.ItakusyaCodeDictionary("Moteki")
-        Dim wmaster_2 = $"{Rpa.MyProjectWorkDirectory}\{Me.MasterCsvFileName}"
-        Dim tmpcsv_1 = $"{Rpa.MyProjectWorkDirectory}\tmp.csv"
-        Dim icsv_2 = $"{Rpa.MyProjectWorkDirectory}\input.csv"
-        Dim idata1_1 = $"{Rpa.MyProjectWorkDirectory}\idata1.csv"
-        Dim idata2_1 = $"{Rpa.MyProjectWorkDirectory}\idata2.csv"
+        Dim wmaster_2 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
+        Dim tmpcsv_1 = $"{Me._WorkDirectory}\tmp.csv"
+        Dim icsv_2 = $"{Me._WorkDirectory}\input.csv"
+        Dim idata1_1 = $"{Me._WorkDirectory}\idata1.csv"
+        Dim idata2_1 = $"{Me._WorkDirectory}\idata2.csv"
         Call _CreateTmpCsv(wmaster_2, target, tmpcsv_1)
         Call _CompareInputCsvToTmpCsv(icsv_1, tmpcsv_1, idata1_1)
         Call _CreateIraishoMeisaiDatas(idata1_1, idata2_1)
@@ -416,7 +441,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' 各停止依頼書を作成
         '-----------------------------------------------------------------------------------------'
-        Dim idata2_2 = $"{Rpa.MyProjectWorkDirectory}\idata2.csv"
+        Dim idata2_2 = $"{Me._WorkDirectory}\idata2.csv"
         Dim bookname_1 As String = vbNullString
         Dim sheetname_1 As String = vbNullString
         Dim cmp = StringComparer.Ordinal
@@ -426,8 +451,8 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Console.WriteLine("停止依頼書を作成中・・・")
 
         ' ワークへコピー
-        For Each f In Directory.GetFiles(Me.IraishoDirectory)
-            File.Copy(f, $"{Me.Work2Directory}\{Path.GetFileName(f)}", True)
+        For Each f In Directory.GetFiles(Me._IraishoDirectory)
+            File.Copy(f, $"{Me._Work2Directory}\{Path.GetFileName(f)}", True)
         Next
         Call mutil.InvokeMacro("Rpa01.CreateIraisho", {idata2_2})
 
@@ -450,14 +475,14 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                 If bookname_1 <> imd.BookName Then
                     File.Copy(
                         imd.BookName,
-                        $"{Rpa.MyProjectBackupDirectory}\{Path.GetFileName(imd.BookName)}",
+                        $"{Me._BackupDirectory}\{Path.GetFileName(imd.BookName)}",
                         True
                 )
                 End If
             Next
         Else
-            For Each f In Directory.GetFiles(Me.Work2Directory)
-                File.Copy(f, $"{Rpa.MyProjectBackupDirectory}\{Path.GetFileName(f)}", True)
+            For Each f In Directory.GetFiles(Me._Work2Directory)
+                File.Copy(f, $"{Me._BackupDirectory}\{Path.GetFileName(f)}", True)
             Next
         End If
 
@@ -484,9 +509,9 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         '-----------------------------------------------------------------------------------------'
         Console.WriteLine("加工済み送付明細を作成中・・・")
         Dim idx_1 = 0
-        Dim wkmaster_v2 = $"{Rpa.MyProjectWorkDirectory}\{Me.MasterCsvFileName}"
-        Dim tincsv_v2 = $"{Rpa.MyProjectWorkDirectory}\t_input.csv"
-        Dim outxlsx_1 = $"{Rpa.MyProjectBackupDirectory}\加工済送付明細.xlsx"
+        Dim wkmaster_v2 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
+        Dim tincsv_v2 = $"{Me._WorkDirectory}\t_input.csv"
+        Dim outxlsx_1 = $"{Me._BackupDirectory}\加工済送付明細.xlsx"
         Dim sheetname_2 = vbNullString
         Dim setting_v1(26) As Double
         setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnALength : idx_1 += 1
@@ -532,7 +557,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
 
         '-----------------------------------------------------------------------------------------'
-        Dim outtxt_1 = $"{Rpa.MyProjectBackupDirectory}\件数集計.txt"
+        Dim outtxt_1 = $"{Me._BackupDirectory}\件数集計.txt"
         Dim printer_2 As New Rpa00.RpaPrinter
 
         Console.WriteLine("件数集計ファイルを作成中・・・")
@@ -771,7 +796,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
             '---------------------------------------------------------------------------'
             ' ブック名を取得（印刷時に使用）
-            bookname = $"{Me.Work2Directory}\{R_iraisho.BookName}"
+            bookname = $"{Me._Work2Directory}\{R_iraisho.BookName}"
             imd.BookName = bookname
 
             ' 改ページ判定
@@ -1139,7 +1164,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
             ' 添付ファイルを保存し、その名前を得る
             fnc = Function(atc As Object)
-                      Call atc.SaveAsFile($"{Rpa.MyProjectWorkDirectory}\{atc.FileName}")
+                      Call atc.SaveAsFile($"{Me._WorkDirectory}\{atc.FileName}")
                       Return atc.FileName
                   End Function
             If [item] IsNot Nothing Then

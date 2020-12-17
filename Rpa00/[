@@ -64,7 +64,6 @@ Public Class RpaSystem
             Return 1000
         End If
         uobj = New RpaUtility With {
-            .UtilityName = util,
             .UtilityObject = obj
         }
         rpa.SystemUtilities.Add(util, uobj)

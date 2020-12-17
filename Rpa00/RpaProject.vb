@@ -247,36 +247,34 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Set
     End Property
 
-    Public ReadOnly Property RootProjectUpdateDirectory As String
-        Get
-            Return Me.RootProjectDirectory & "\updates"
-        End Get
-    End Property
+    'Public ReadOnly Property RootProjectUpdateDirectory As String
+    '    Get
+    '        Return Me.RootProjectDirectory & "\updates"
+    '    End Get
+    'End Property
 
-    Private _RootProjectUpdatePackages As List(Of RpaPackage)
-    Public ReadOnly Property RootProjectUpdatePackages As List(Of RpaPackage)
-        Get
-            Dim pack As RpaPackage
-            Dim jh As New RpaCui2.JsonHandler(Of Object)
-            If Me._RootProjectUpdatePackages Is Nothing Then
-                Me._RootProjectUpdatePackages = New List(Of RpaPackage)
-                If Directory.Exists(Me.RootProjectUpdateDirectory) Then
-                    For Each d In Directory.GetDirectories(Me.RootProjectUpdateDirectory)
-                        If Directory.GetFiles(d).Contains(d & "\RpaPackage.json") Then
-                            pack = jh.ModelLoad(Of RpaPackage)(d & "\RpaPackage.json")
-                            If pack Is Nothing Then
-                                Me._RootProjectUpdatePackages.Add(pack)
-                            End If
-                        End If
-                    Next
-                End If
-            End If
-            Return Me._RootProjectUpdatePackages
-        End Get
-    End Property
+    'Private _RootProjectUpdatePackages As List(Of RpaPackage)
+    'Public ReadOnly Property RootProjectUpdatePackages As List(Of RpaPackage)
+    '    Get
+    '        Dim pack As RpaPackage
+    '        Dim jh As New RpaCui2.JsonHandler(Of Object)
+    '        If Me._RootProjectUpdatePackages Is Nothing Then
+    '            Me._RootProjectUpdatePackages = New List(Of RpaPackage)
+    '            If Directory.Exists(Me.RootProjectUpdateDirectory) Then
+    '                For Each d In Directory.GetDirectories(Me.RootProjectUpdateDirectory)
+    '                    If Directory.GetFiles(d).Contains(d & "\RpaPackage.json") Then
+    '                        pack = jh.ModelLoad(Of RpaPackage)(d & "\RpaPackage.json")
+    '                        If pack Is Nothing Then
+    '                            Me._RootProjectUpdatePackages.Add(pack)
+    '                        End If
+    '                    End If
+    '                Next
+    '            End If
+    '        End If
+    '        Return Me._RootProjectUpdatePackages
+    '    End Get
+    'End Property
     '-----------------------------------------------------------------------------------'
-
-
 
     ' MyProject Directory 関係
     '-----------------------------------------------------------------------------------'
@@ -290,36 +288,32 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Get
     End Property
 
-    Private _MyProjectDirectory As String
     Public ReadOnly Property MyProjectDirectory As String
         Get
-            If String.IsNullOrEmpty(Me._MyProjectDirectory) Then
-                Me._MyProjectDirectory = Me.MyDirectory & "\" & Me.ProjectAlias
-            End If
-            Return Me._MyProjectDirectory
+            Return $"{Me.MyDirectory}\{Me.ProjectAlias}"
         End Get
     End Property
 
-    Public ReadOnly Property MyProjectSysDirectory As String
-        Get
-            Return Me.MyProjectDirectory & "\sys"
-        End Get
-    End Property
+    'Public ReadOnly Property MyProjectSysDirectory As String
+    '    Get
+    '        Return Me.MyProjectDirectory & "\sys"
+    '    End Get
+    'End Property
 
-    Private _MyProjectWorkDirectory As String
-    Public ReadOnly Property MyProjectWorkDirectory As String
-        Get
-            If String.IsNullOrEmpty(Me._MyProjectWorkDirectory) Then
-                Me._MyProjectWorkDirectory = Me.MyProjectDirectory & "\work"
-                If Directory.Exists(Me._MyProjectDirectory) Then
-                    If Not Directory.Exists(Me._MyProjectWorkDirectory) Then
-                        Directory.CreateDirectory(Me._MyProjectWorkDirectory)
-                    End If
-                End If
-            End If
-            Return Me._MyProjectWorkDirectory
-        End Get
-    End Property
+    'Private _MyProjectWorkDirectory As String
+    'Public ReadOnly Property MyProjectWorkDirectory As String
+    '    Get
+    '        If String.IsNullOrEmpty(Me._MyProjectWorkDirectory) Then
+    '            Me._MyProjectWorkDirectory = Me.MyProjectDirectory & "\work"
+    '            If Directory.Exists(Me._MyProjectDirectory) Then
+    '                If Not Directory.Exists(Me._MyProjectWorkDirectory) Then
+    '                    Directory.CreateDirectory(Me._MyProjectWorkDirectory)
+    '                End If
+    '            End If
+    '        End If
+    '        Return Me._MyProjectWorkDirectory
+    '    End Get
+    'End Property
 
     ' 現状不要 2020-12-11
     'Private _MyProjectScriptDirectory As String
@@ -336,20 +330,20 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     'End Property
 
     ' 成果物保管用
-    Private _MyProjectBackupDirectory As String
-    Public ReadOnly Property MyProjectBackupDirectory As String
-        Get
-            If String.IsNullOrEmpty(Me._MyProjectBackupDirectory) Then
-                Me._MyProjectBackupDirectory = Me.MyProjectDirectory & "\backup"
-                If Directory.Exists(Me._MyProjectDirectory) Then
-                    If Not Directory.Exists(Me._MyProjectBackupDirectory) Then
-                        Directory.CreateDirectory(Me._MyProjectBackupDirectory)
-                    End If
-                End If
-            End If
-            Return Me._MyProjectBackupDirectory
-        End Get
-    End Property
+    'Private _MyProjectBackupDirectory As String
+    'Public ReadOnly Property MyProjectBackupDirectory As String
+    '    Get
+    '        If String.IsNullOrEmpty(Me._MyProjectBackupDirectory) Then
+    '            Me._MyProjectBackupDirectory = Me.MyProjectDirectory & "\backup"
+    '            If Directory.Exists(Me._MyProjectDirectory) Then
+    '                If Not Directory.Exists(Me._MyProjectBackupDirectory) Then
+    '                    Directory.CreateDirectory(Me._MyProjectBackupDirectory)
+    '                End If
+    '            End If
+    '        End If
+    '        Return Me._MyProjectBackupDirectory
+    '    End Get
+    'End Property
 
     Private _MyProjectJsonFileName As String
     Public ReadOnly Property MyProjectJsonFileName As String
@@ -411,33 +405,33 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Set
     End Property
 
-    Public ReadOnly Property MyProjectUpdatedDirectory As String
-        Get
-            Return Me.MyProjectDirectory & "\updated"
-        End Get
-    End Property
+    'Public ReadOnly Property MyProjectUpdatedDirectory As String
+    '    Get
+    '        Return Me.MyProjectDirectory & "\updated"
+    '    End Get
+    'End Property
 
-    Private _MyProjectUpdatedPackages As List(Of RpaPackage)
-    Public ReadOnly Property MyProjectUpdatedPackages As List(Of RpaPackage)
-        Get
-            Dim pack As RpaPackage
-            Dim jh As New RpaCui2.JsonHandler(Of Object)
-            If Me._MyProjectUpdatedPackages Is Nothing Then
-                Me._MyProjectUpdatedPackages = New List(Of RpaPackage)
-                If Directory.Exists(Me.MyProjectUpdatedDirectory) Then
-                    For Each f In Directory.GetFiles(Me.MyProjectUpdatedDirectory)
-                        If Path.GetFileName(f) = "RpaPackage.json" Then
-                            pack = jh.ModelLoad(Of RpaPackage)(f)
-                            If pack Is Nothing Then
-                                Me._MyProjectUpdatedPackages.Add(pack)
-                            End If
-                        End If
-                    Next
-                End If
-            End If
-            Return Me._MyProjectUpdatedPackages
-        End Get
-    End Property
+    'Private _MyProjectUpdatedPackages As List(Of RpaPackage)
+    'Public ReadOnly Property MyProjectUpdatedPackages As List(Of RpaPackage)
+    '    Get
+    '        Dim pack As RpaPackage
+    '        Dim jh As New RpaCui2.JsonHandler(Of Object)
+    '        If Me._MyProjectUpdatedPackages Is Nothing Then
+    '            Me._MyProjectUpdatedPackages = New List(Of RpaPackage)
+    '            If Directory.Exists(Me.MyProjectUpdatedDirectory) Then
+    '                For Each f In Directory.GetFiles(Me.MyProjectUpdatedDirectory)
+    '                    If Path.GetFileName(f) = "RpaPackage.json" Then
+    '                        pack = jh.ModelLoad(Of RpaPackage)(f)
+    '                        If pack Is Nothing Then
+    '                            Me._MyProjectUpdatedPackages.Add(pack)
+    '                        End If
+    '                    End If
+    '                Next
+    '            End If
+    '        End If
+    '        Return Me._MyProjectUpdatedPackages
+    '    End Get
+    'End Property
     '-----------------------------------------------------------------------------------'
 
     Private _PrinterName As String
@@ -477,20 +471,20 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
             Console.WriteLine("       ユーザプロジェクトディレクトリは存在しません")
         End If
 
-        Dim installed = False
-        Console.WriteLine("アップデートパッケージを検索しています...")
-        For Each rp In Me.RootProjectUpdatePackages
-            installed = False
-            For Each mp In Me.MyProjectUpdatedPackages
-                If rp.Name = mp.Name Then
-                    installed = True
-                    Exit For
-                End If
-            Next
-            If Not installed Then
-                Console.WriteLine("パッケージ : " & rp.Name & " をインストールしていません")
-            End If
-        Next
+        'Dim installed = False
+        'Console.WriteLine("アップデートパッケージを検索しています...")
+        'For Each rp In Me.RootProjectUpdatePackages
+        '    installed = False
+        '    For Each mp In Me.MyProjectUpdatedPackages
+        '        If rp.Name = mp.Name Then
+        '            installed = True
+        '            Exit For
+        '        End If
+        '    Next
+        '    If Not installed Then
+        '        Console.WriteLine("パッケージ : " & rp.Name & " をインストールしていません")
+        '    End If
+        'Next
         Console.WriteLine("プロジェクトの検査完了")
     End Sub
 
