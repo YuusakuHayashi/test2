@@ -8,14 +8,16 @@ Public Class RpaSystem
         Get
             Dim dlg As ExecuteDelegater
             Select Case trn.MainCommand
-                Case "SaveJson" : dlg = AddressOf SaveJson
-                Case "Save" : dlg = AddressOf SaveSystem
-                Case "Run" : dlg = AddressOf RunRobot
-                Case "Update" : dlg = AddressOf UpdateProject
-                Case "CopyProject" : dlg = AddressOf DownloadProject
-                Case "Project" : dlg = AddressOf SetProject
-                Case "AddUtility" : dlg = AddressOf AddUtility
-                Case "Exit" : dlg = AddressOf RpaExit
+                Case "saveJson" : dlg = AddressOf SaveJson
+                Case "save" : dlg = AddressOf SaveSystem
+                Case "load" : dlg = AddressOf LoadSystem
+                Case "run" : dlg = AddressOf RunRobot
+                Case "update" : dlg = AddressOf UpdateProject
+                Case "copyproject" : dlg = AddressOf CopyProject
+                Case "select" : dlg = AddressOf SelectProject
+                Case "addutility" : dlg = AddressOf AddUtility
+                Case "show" : dlg = AddressOf ShowProject
+                Case "exit" : dlg = AddressOf RpaExit
                 Case Else : dlg = Nothing
             End Select
 
@@ -35,10 +37,72 @@ Public Class RpaSystem
     End Property
     '---------------------------------------------------------------------------------------------'
 
+    ' システムのロード
+    '---------------------------------------------------------------------------------------------'
+    Private Function LoadSystem(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Dim [load] = rpa.ModelLoad(rpa.SystemJsonFileName)
+        Dim i = 0
+        If [load] Is Nothing Then
+            Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' のロードに失敗しました。")
+            Return 1000
+        End If
+        If Not Directory.Exists([load].RootDirectory) Then
+            Console.WriteLine($"RootDirectory '{[load].RootDirectory}' がありません")
+            Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'RootDirectory' に任意のパスを書いてください")
+            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+            Console.ReadLine()
+            trn.ExitFlag = True
+            Return 1000
+        End If
+        If Not Directory.Exists([load].MyDirectory) Then
+            Console.WriteLine($"MyDirectory '{[load].MyDirectory}' がありません")
+            Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'MyDirectory' に任意のパスを書いてください")
+            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+            Console.ReadLine()
+            trn.ExitFlag = True
+            Return 1000
+        End If
+        rpa = [load]
+        Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' をロードしました。")
+        Return 0
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
     ' システムのセーブ
     '---------------------------------------------------------------------------------------------'
     Private Function SaveSystem(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
         Call rpa.ModelSave(rpa.SystemJsonFileName, rpa)
+        Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' をセーブしました。")
+        Return 0
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    ' プロジェクトの確認
+    '---------------------------------------------------------------------------------------------'
+    Private Function ShowProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        If trn.Parameters.Count = 0 Then
+            Console.WriteLine("パラメータが指定されていません")
+            Return 1000
+        End If
+        If trn.Parameters.Last = "Utilities" Then
+            Return _ShowProjectUtilities(trn, rpa)
+        End If
+        Return 1000
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    ' ユーティリティの確認
+    '---------------------------------------------------------------------------------------------'
+    Private Function _ShowProjectUtilities(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Console.WriteLine(Strings.StrDup(100, "-"))
+        If rpa.SystemUtilities.Count > 0 Then
+            For Each util In rpa.SystemUtilities
+                Console.WriteLine($"{util.Key}")
+            Next
+        Else
+            Console.WriteLine("ユーティリティなし")
+        End If
+        Console.WriteLine(Strings.StrDup(100, "-"))
         Return 0
     End Function
     '---------------------------------------------------------------------------------------------'
@@ -129,8 +193,14 @@ Public Class RpaSystem
     ' ロボットの起動
     '---------------------------------------------------------------------------------------------'
     Private Function RunRobot(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+        Dim i = 0
         Call rpa.MyProjectObject.SetData(trn, rpa)
-        Dim i = rpa.MyProjectObject.Main()
+        If rpa.MyProjectObject.CanExecute() Then
+            i = rpa.MyProjectObject.Execute()
+        Else
+            Console.WriteLine("ロボットの起動条件を満たしていません")
+            i = 1000
+        End If
         Return i
     End Function
     '---------------------------------------------------------------------------------------------'
@@ -226,17 +296,18 @@ Public Class RpaSystem
 
     ' プロジェクトのダウンロード
     '---------------------------------------------------------------------------------------------'
-    Private Function DownloadProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+    Private Function CopyProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
         If trn.Parameters.Count > 0 Then
-            Call SelectedDownload(trn, rpa)
+            Call SelectedCopy(trn, rpa)
         Else
-            Call AllDownload(trn, rpa, rpa.RootProjectDirectory, rpa.MyProjectDirectory)
+            Call AllCopy(trn, rpa, rpa.RootProjectDirectory, rpa.MyProjectDirectory)
         End If
+        Console.WriteLine("コピーが完了しました")
 
         Return 0
     End Function
 
-    Private Sub SelectedDownload(ByRef trn As RpaTransaction, ByRef rpa As RpaProject)
+    Private Sub SelectedCopy(ByRef trn As RpaTransaction, ByRef rpa As RpaProject)
         Dim src = vbNullString
         Dim dst = vbNullString
         Dim dstp = vbNullString
@@ -250,26 +321,26 @@ Public Class RpaSystem
             End If
             If File.Exists(src) Then
                 File.Copy(src, dst, True)
-                Console.WriteLine("File.Copy... src: " & src)
-                Console.WriteLine("          => dst: " & dst)
+                Console.WriteLine($"Directory.CreateDirectory... src: {src}")
+                Console.WriteLine($"                          => dst: {dst}")
             ElseIf Directory.Exists(src) Then
                 If Directory.Exists(dst) Then
                     Console.WriteLine("既にディレクトリが存在します: " & dst)
                 Else
                     Directory.CreateDirectory(dst)
-                    Console.WriteLine("Directory.CreateDirectory... src: " & src)
-                    Console.WriteLine("                          => dst: " & dst)
+                    Console.WriteLine($"Directory.CreateDirectory... src: {src}")
+                    Console.WriteLine($"                          => dst: {dst}")
                 End If
             End If
         Next
     End Sub
 
-    Private Sub AllDownload(ByRef trn As RpaTransaction, ByRef rpa As RpaProject,
+    Private Sub AllCopy(ByRef trn As RpaTransaction, ByRef rpa As RpaProject,
                                   ByVal src As String, ByVal dst As String)
         If Not Directory.Exists(dst) Then
             Directory.CreateDirectory(dst)
-            Console.WriteLine("Directory.CreateDirectory... src: " & src)
-            Console.WriteLine("                          => dst: " & dst)
+            Console.WriteLine($"Directory.CreateDirectory... src: {src}")
+            Console.WriteLine($"                          => dst: {dst}")
         End If
 
         Dim fsis As FileSystemInfo()
@@ -284,7 +355,7 @@ Public Class RpaSystem
             If Not rpa.RootProjectIgnoreList.Contains(src2) Then
                 If Not rpa.MyProjectIgnoreList.Contains(src2) Then
                     If ((fsi.Attributes And FileAttributes.Directory) = FileAttributes.Directory) Then
-                        Call AllDownload(trn, rpa, src2, dst2)
+                        Call AllCopy(trn, rpa, src2, dst2)
                     Else
                         File.Copy(src2, dst2, True)
                         Console.WriteLine("File.Copy... src: " & src2)
@@ -299,8 +370,9 @@ Public Class RpaSystem
 
     ' プロジェクトの切り替え
     '---------------------------------------------------------------------------------------------'
-    Private Function SetProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
+    Private Function SelectProject(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
         If trn.Parameters.Count = 0 Then
+            Console.WriteLine($"プロジェクトが選択されていません")
             Return 1000
         Else
             rpa = New RpaProject With {.ProjectName = trn.Parameters(0)}

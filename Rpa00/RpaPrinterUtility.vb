@@ -1,8 +1,16 @@
 ﻿Imports System.IO
+Imports Rpa00
 
-Public Class RpaPrinter
+Public Class RpaPrinterUtility : Inherits RpaUtilityBase
+
     Public PrintText As String
     Public PrintFile As FileInfo
+
+    Public Overrides ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As RpaProject) As RpaSystem.ExecuteDelegater
+        Get
+            Return Nothing
+        End Get
+    End Property
 
     Public Overloads Sub TextPrintRequest(ByVal txt As String)
         Me.PrintText = txt

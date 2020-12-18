@@ -355,10 +355,16 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Throw New NotImplementedException()
     End Function
 
-    Public Overrides Function Main() As Integer
+    Public Overrides Function Execute() As Integer
         Me.RestartCount = IIf(Me.RestartCount = 0, 1, Me.RestartCount)
 
         Dim mutil = Rpa.SystemUtilities("MacroUtility").UtilityObject
+        Dim putil = Rpa.SystemUtilities("PrintUtility").UtilityObject
+        Dim [x] As Integer
+
+        If Not mutil.IsMacroFileExists Then
+            Return 1000
+        End If
 
         ' プリンター名設定
         '-----------------------------------------------------------------------------------------'
@@ -421,7 +427,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         ixls_1 = $"{Rpa.MyProjectDirectory}\input.xls"
 
         ' ＣＳＶデータ生成
-        Call mutil.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
+        [x] = mutil.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
         '-----------------------------------------------------------------------------------------'
 
 
@@ -454,7 +460,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         For Each f In Directory.GetFiles(Me._IraishoDirectory)
             File.Copy(f, $"{Me._Work2Directory}\{Path.GetFileName(f)}", True)
         Next
-        Call mutil.InvokeMacro("Rpa01.CreateIraisho", {idata2_2})
+        [x] = mutil.InvokeMacro("Rpa01.CreateIraisho", {idata2_2})
 
         Me.IraishoMeisaiDatas.Sort(
             Function(before, after)
@@ -490,12 +496,12 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         If Not Transaction.Parameters.Contains("print=no") Then
             For Each imd In Me.IraishoMeisaiDatas
                 If bookname_1 <> imd.BookName Then
-                    Call mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
                     bookname_1 = imd.BookName
                     sheetname_1 = imd.DistinationSheetName
                 End If
                 If sheetname_1 <> imd.DistinationSheetName Then
-                    Call mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
                     sheetname_1 = imd.DistinationSheetName
                 End If
             Next
@@ -543,33 +549,31 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         If Me.RestartCount = 1 Then
             File.Delete(outxlsx_1)
-            Call mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", "Shift-JIS"})
+            [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", "Shift-JIS"})
         End If
         sheetname_2 = $"停止{Me.RestartCount.ToString}回目"
-        Call mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {tincsv_v2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
+        [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {tincsv_v2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
 
         If Not Transaction.Parameters.Contains("print=no") Then
-            Call mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, outxlsx_1, sheetname_2})
+            [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, outxlsx_1, sheetname_2})
         End If
 
         Console.WriteLine("加工済送付明細作成完了！")
         '-----------------------------------------------------------------------------------------'
 
 
+        ' 件数集計ファイル作成・出力
         '-----------------------------------------------------------------------------------------'
         Dim outtxt_1 = $"{Me._BackupDirectory}\件数集計.txt"
-        Dim printer_2 As New Rpa00.RpaPrinter
 
         Console.WriteLine("件数集計ファイルを作成中・・・")
-
         Call _CreateSummaryFile(outtxt_1)
-
         If Not Transaction.Parameters.Contains("print=no") Then
-            Call printer_2.TextPrintRequest((New FileInfo(outtxt_1)), SHIFT_JIS)
+            Call putil.TextPrintRequest((New FileInfo(outtxt_1)), SHIFT_JIS)
         End If
-
         Console.WriteLine("件数集計ファイル作成完了！")
         '-----------------------------------------------------------------------------------------'
+
 
         If Transaction.Parameters.Count > 0 Then
             If Transaction.Parameters.Last = "end" Then
@@ -1189,5 +1193,18 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             Marshal.ReleaseComObject(olapp)
         End Try
         Return rtn
+    End Function
+
+    Public Overrides Function CanExecute() As Boolean
+        Dim b = True
+        If Not Rpa.SystemUtilities.ContainsKey("MacroUtility") Then
+            Console.WriteLine($"機能 'MacroUtiliity' が含まれていません")
+            b = False
+        End If
+        If Not Rpa.SystemUtilities.ContainsKey("PrintUtility") Then
+            Console.WriteLine($"機能 'PrintUtiliity' が含まれていません")
+            b = False
+        End If
+        Return b
     End Function
 End Class

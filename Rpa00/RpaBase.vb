@@ -1,6 +1,7 @@
 ﻿Public MustInherit Class RpaBase(Of T As {New}) : Inherits RpaCui2.JsonHandler(Of T)
     Public MustOverride Function SetupProjectObject(ByVal project As String) As Object
-    Public MustOverride Function Main() As Integer
+    Public MustOverride Function Execute() As Integer
+    Public MustOverride Function CanExecute() As Boolean
 
     Protected Rpa As RpaProject
     Protected Transaction As RpaTransaction

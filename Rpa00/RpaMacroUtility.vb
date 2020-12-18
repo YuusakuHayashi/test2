@@ -1,9 +1,9 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.IO
+Imports Rpa00
 
-Public Class RpaMacroUtility
-    
-    Public ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As RpaProject) As RpaSystem.ExecuteDelegater
+Public Class RpaMacroUtility : Inherits RpaUtilityBase
+    Public Overrides ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As RpaProject) As RpaSystem.ExecuteDelegater
         Get
             Dim dlg As RpaSystem.ExecuteDelegater
             Select Case trn.MainCommand
@@ -27,13 +27,19 @@ Public Class RpaMacroUtility
 
     Private ReadOnly Property _MacroFileName As String
         Get
-            Return $"{RpaProject.SYSTEM_DIRECTORY}\macro.xlsm"
+            Dim f = $"{RpaProject.SYSTEM_DIRECTORY}\macro.xlsm"
+            Return f
         End Get
     End Property
 
-    Public Sub InvokeMacro(ByVal method As String, args() As Object)
+    Public Function InvokeMacro(ByVal method As String, args() As Object)
         Dim exapp, exbooks, exbook
         Dim macrofile As String
+
+        If Not Me.IsMacroFileExists Then
+            Return 8000
+        End If
+
         Try
             exapp = CreateObject("Excel.Application")
             Try
@@ -51,13 +57,14 @@ Public Class RpaMacroUtility
             Finally
                 Marshal.ReleaseComObject(exbooks)
             End Try
+            Return 0
         Finally
             If exapp IsNot Nothing Then
                 exapp.Quit()
             End If
             Marshal.ReleaseComObject(exapp)
         End Try
-    End Sub
+    End Function
 
     ' マクロの更新
     '---------------------------------------------------------------------------------------------'
@@ -68,10 +75,8 @@ Public Class RpaMacroUtility
             Return 1000
         End If
 
-        If Not File.Exists(Me._MacroFileName) Then
-            Console.WriteLine($"マクロファイル '{Me._MacroFileName}' が存在しません")
-            Console.WriteLine($"開発者から入手してください")
-            Return 1000
+        If Not Me.IsMacroFileExists Then
+            Return 8000
         End If
 
         For Each p In trn.Parameters
@@ -85,4 +90,16 @@ Public Class RpaMacroUtility
         Next
         Return 0
     End Function
+
+    Public ReadOnly Property IsMacroFileExists As Boolean
+        Get
+            If File.Exists(Me._MacroFileName) Then
+                Return True
+            Else
+                Console.WriteLine($"マクロファイル '{Me._MacroFileName}' が存在しません")
+                Console.WriteLine($"開発者から入手してください")
+                Return False
+            End If
+        End Get
+    End Property
 End Class

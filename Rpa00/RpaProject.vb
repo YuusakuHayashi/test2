@@ -9,6 +9,9 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     Private Const UTF8 As String = "utf-8"
     Public Shared MYENCODING As String = UTF8
 
+    <JsonIgnore>
+    Public PrivateMode As Boolean
+
     Private _UserName As String
     Public Property UserName As String
         Get
@@ -37,11 +40,11 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End Set
     End Property
 
-    Private ReadOnly Property _RootSystemDirectory As String
-        Get
-            Return $"{Me.RootDirectory}\system"
-        End Get
-    End Property
+    'Private ReadOnly Property _RootSystemDirectory As String
+    '    Get
+    '        Return $"{Me.RootDirectory}\system"
+    '    End Get
+    'End Property
 
     Public Shared ReadOnly Property SYSTEM_DIRECTORY As String
         Get
@@ -86,7 +89,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     Public ReadOnly Property SystemJsonFileName As String
         Get
             If String.IsNullOrEmpty(RpaProject.SYSTEM_JSON_FILENAME) Then
-                RpaProject.SYSTEM_JSON_FILENAME = RpaProject.SYSTEM_DIRECTORY & "\rpa_project.json"
+                RpaProject.SYSTEM_JSON_FILENAME = $"{RpaProject.SYSTEM_DIRECTORY}\rpa_project.json"
                 If Not File.Exists(RpaProject.SYSTEM_JSON_FILENAME) Then
                     Call Me.ModelSave(RpaProject.SYSTEM_JSON_FILENAME, Me)
                 End If
@@ -230,7 +233,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
 
     Public ReadOnly Property RootProjectIgnoreFileName As String
         Get
-            Return Me.RootProjectDirectory & "\ignore"
+            Return $"{Me.RootProjectDirectory}\ignore"
         End Get
     End Property
 
@@ -243,7 +246,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
             If Me._RootProjectIgnoreList Is Nothing Then
                 Me._RootProjectIgnoreList = New List(Of String)
                 If File.Exists(Me.RootProjectIgnoreFileName) Then
-                    Me._RootProjectIgnoreList = _GetFileLines(Me.RootProjectIgnoreFileName)
+                    Me._RootProjectIgnoreList = _GetIgnoreList(Me.RootProjectIgnoreFileName)
                 End If
             End If
             Return Me._RootProjectIgnoreList
@@ -390,7 +393,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
 
     Public ReadOnly Property MyProjectIgnoreFileName As String
         Get
-            Return Me.MyProjectDirectory & "\ignore"
+            Return $"{Me.MyProjectDirectory}\ignore"
         End Get
     End Property
 
@@ -401,7 +404,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
             If Me._MyProjectIgnoreList Is Nothing Then
                 Me._MyProjectIgnoreList = New List(Of String)
                 If File.Exists(Me.MyProjectIgnoreFileName) Then
-                    Me._MyProjectIgnoreList = _GetFileLines(Me.MyProjectIgnoreFileName)
+                    Me._MyProjectIgnoreList = _GetIgnoreList(Me.MyProjectIgnoreFileName)
                 End If
             End If
             Return Me._MyProjectIgnoreList
@@ -440,6 +443,16 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
     'End Property
     '-----------------------------------------------------------------------------------'
 
+    Private _AutoProjectLoad As Boolean
+    Public Property AutoProjectLoad As Boolean
+        Get
+            Return Me._AutoProjectLoad
+        End Get
+        Set(value As Boolean)
+            Me._AutoProjectLoad = value
+        End Set
+    End Property
+
     Private _PrinterName As String
     Public Property PrinterName As String
         Get
@@ -468,7 +481,7 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         If File.Exists(Me.HelloFileName) Then
             sr = New StreamReader(Me.HelloFileName, Encoding.GetEncoding(MYENCODING))
             txt = sr.ReadToEnd()
-            Console.WriteLine($"{txt}")
+            Call _ConsoleWriteLine($"{txt}")
         End If
 
         If sr IsNot Nothing Then
@@ -477,35 +490,35 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         End If
     End Sub
 
-    Public Function _CheckConstitution() As Boolean
+    Public Function CheckConstitution() As Boolean
         Dim b = True
         If Not Directory.Exists(Me.RootDirectory) Then
-            Console.WriteLine($"RootDirectory '{Me.RootDirectory}' がありません")
-            Console.WriteLine($"ファイル '{Me.SystemJsonFileName}' の 'RootDirectory' に任意のパスを書いてください")
-            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+            Call _ConsoleWriteLine($"RootDirectory '{Me.RootDirectory}' がありません")
+            Call _ConsoleWriteLine($"ファイル '{Me.SystemJsonFileName}' の 'RootDirectory' に任意のパスを書いてください")
+            Call _ConsoleWriteLine("ファイルを保存した後、アプリケーションを再起動してください")
             b = False
         End If
         If Not Directory.Exists(Me.MyDirectory) Then
-            Console.WriteLine($"MyDirectory '{Me.MyDirectory}' がありません")
-            Console.WriteLine($"ファイル '{Me.SystemJsonFileName}' の 'MyDirectory' に任意のパスを書いてください")
-            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+            Call _ConsoleWriteLine($"MyDirectory '{Me.MyDirectory}' がありません")
+            Call _ConsoleWriteLine($"ファイル '{Me.SystemJsonFileName}' の 'MyDirectory' に任意のパスを書いてください")
+            Call _ConsoleWriteLine("ファイルを保存した後、アプリケーションを再起動してください")
             b = False
         End If
         Return b
     End Function
 
     Private Sub _CheckProject()
-        Console.WriteLine("プロジェクトのチェック....")
+        Call _ConsoleWriteLine($"プロジェクト '{Me.ProjectAlias}' のチェック....")
         If Not Me.IsRootProjectExists Then
-            Console.WriteLine($"RootProjectDirectory '{Me.RootProjectDirectory}' がありません")
+            Call _ConsoleWriteLine($"RootProjectDirectory '{Me.RootProjectDirectory}' がありません")
         End If
         If Not Me.IsMyProjectExists Then
-            Console.WriteLine($"MyProjectDirectory '{Me.MyProjectDirectory}' がありません")
+            Call _ConsoleWriteLine($"MyProjectDirectory '{Me.MyProjectDirectory}' がありません")
         End If
-        Console.WriteLine("プロジェクトのチェック終了")
+        Call _ConsoleWriteLine("プロジェクトのチェック終了")
 
         'Dim installed = False
-        'Console.WriteLine("アップデートパッケージを検索しています...")
+        'Call _ConsoleWriteLine("アップデートパッケージを検索しています...")
         'For Each rp In Me.RootProjectUpdatePackages
         '    installed = False
         '    For Each mp In Me.MyProjectUpdatedPackages
@@ -515,9 +528,15 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         '        End If
         '    Next
         '    If Not installed Then
-        '        Console.WriteLine("パッケージ : " & rp.Name & " をインストールしていません")
+        '        Call _ConsoleWriteLine("パッケージ : " & rp.Name & " をインストールしていません")
         '    End If
         'Next
+    End Sub
+
+    Private Sub _ConsoleWriteLine(ByVal [line] As String)
+        If Not Me.PrivateMode Then
+            Console.WriteLine([line])
+        End If
     End Sub
 
     'Public Sub InvokeOutlookMacro(ByVal method As String, ParamArray args As Object())
@@ -596,26 +615,24 @@ Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
         proc.Close()
     End Sub
 
-    Private Function _GetFileLines(ByVal f As String) As List(Of String)
+    Private Function _GetIgnoreList(ByVal f As String) As List(Of String)
         Dim txt As String
-        Dim olines As String()
-        Dim nlines = New List(Of String)
+        Dim sr As StreamReader
+        Try
+            sr = New System.IO.StreamReader(
+                f, System.Text.Encoding.GetEncoding(MYENCODING))
+            txt = sr.ReadToEnd()
 
-        Dim sr = New StreamReader(f, Encoding.GetEncoding(MYENCODING))
-
-        txt = sr.ReadToEnd()
-        olines = txt.Split(vbCrLf)
-
-        For Each line In olines
-            line = IIf(line.Contains(vbCr), line.Trim(vbCr), line)
-            line = IIf(line.Contains(vbLf), line.Trim(vbLf), line)
-            nlines.Add(line)
-        Next
-
-        sr.Close()
-        sr.Dispose()
-
-        Return nlines
+            _GetIgnoreList = JsonConvert.DeserializeObject(Of List(Of String))(txt)
+        Catch ex As Exception
+            Call _ConsoleWriteLine(ex.Message)
+            _GetIgnoreList = Nothing
+        Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
+        End Try
     End Function
 
     Public Sub New()

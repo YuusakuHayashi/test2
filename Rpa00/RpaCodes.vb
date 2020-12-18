@@ -14,6 +14,8 @@ Module RpaCodes
                     [type] = [mod].GetType("Rpa01.Rpa01")
                     If [type] IsNot Nothing Then
                         Return Activator.CreateInstance([type])
+                    Else
+                        Return Nothing
                     End If
                 Case Else
                     Return Nothing
@@ -27,6 +29,8 @@ Module RpaCodes
             Select Case util
                 Case "MacroUtility"
                     Return New RpaMacroUtility
+                Case "PrintUtility"
+                    Return New RpaPrinterUtility
                 Case Else
                     Return Nothing
             End Select

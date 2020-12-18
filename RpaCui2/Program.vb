@@ -7,11 +7,10 @@ Module Program
         Dim asm As Assembly
         Dim [mod] As [Module]
         Dim rpa_type As Type : Dim trn_type As Type : Dim sys_type As Type
-        Dim rpa, trn, sys
+        Dim rpa, trn, sys, rpa2
         Dim rpadir As String
         Dim dlldir As String
         Dim rpa00dll As String
-        Dim json As String
 
         rpadir = Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
         dlldir = $"{rpadir}\dll"
@@ -29,7 +28,7 @@ Module Program
             Directory.CreateDirectory(dlldir)
         End If
         If Not File.Exists(rpa00dll) Then
-            Console.WriteLine($"DLL '{rpa00dll}' がありません。所有者から入手してください   DATE-WRITTEN: 2020/12/14")
+            Console.WriteLine($"DLL '{rpa00dll}' がありません。所有者から入手してください")
             Console.ReadLine()
             Exit Sub
         End If
@@ -50,13 +49,12 @@ Module Program
             sys = Activator.CreateInstance(sys_type)
         End If
 
-        ' rpa.SystemJsonFileName を参照する際に、なければファイルが生成される。
-        json = rpa.SystemJsonFileName
-        rpa = rpa.ModelLoad(json)
-        If rpa Is Nothing Then
-            Console.WriteLine($"設定ファイル '{json}' の読み込みに失敗しました")
-            Console.ReadLine()
-            Exit Sub
+        Call rpa.HelloProject()
+
+        If args(2) = "auto" Then
+            trn.CommandText = "load"
+            Call trn.CreateCommand()
+            Call sys.Main(trn, rpa)
         End If
 
         Do Until trn.ExitFlag
