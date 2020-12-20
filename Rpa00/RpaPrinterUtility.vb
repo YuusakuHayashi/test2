@@ -6,7 +6,7 @@ Public Class RpaPrinterUtility : Inherits RpaUtilityBase
     Public PrintText As String
     Public PrintFile As FileInfo
 
-    Public Overrides ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As RpaProject) As RpaSystem.ExecuteDelegater
+    Public Overrides ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As IntranetClientServerProject) As Object
         Get
             Return Nothing
         End Get

@@ -15,7 +15,7 @@ Public Class JsonHandler(Of T As New)
         Dim b As Boolean : b = False
         Dim m As T2
         Try
-            m = Me.ModelLoad(Of T2)(f)
+            m = Me.Load(Of T2)(f)
             b = True
         Catch ex As Exception
             b = False
@@ -28,20 +28,20 @@ Public Class JsonHandler(Of T As New)
     End Function
 
     ' この関数は呼び出したオブジェクトのモデルをロードします
-    Public Overloads Function ModelLoad(ByVal f As String) As T
+    Public Overloads Function Load(ByVal f As String) As T
         Dim txt As String
         Dim sr As StreamReader
 
         'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
-        ModelLoad = Nothing
+        Load = Nothing
 
         Try
             sr = New System.IO.StreamReader(
                 f, System.Text.Encoding.GetEncoding(MyEncoding))
             txt = sr.ReadToEnd()
 
-            ModelLoad = JsonConvert.DeserializeObject(Of T)(txt)
+            Load = JsonConvert.DeserializeObject(Of T)(txt)
         Catch ex As Exception
             Console.WriteLine(ex.Message)
         Finally
@@ -53,24 +53,24 @@ Public Class JsonHandler(Of T As New)
     End Function
 
     ' この関数は指定したジェネリックモデルをロードします
-    'Public Overloads Function ModelLoad(Of T2 As New)() As T2
-    '    ModelLoad = ModelLoad(Of T2)(Me.ModelFileName)
+    'Public Overloads Function Load(Of T2 As New)() As T2
+    '    Load = Load(Of T2)(Me.ModelFileName)
     'End Function
 
     ' この関数は指定したジェネリックモデルをロードします
-    Public Overloads Function ModelLoad(Of T2 As New)(ByVal f As String) As T2
+    Public Overloads Function Load(Of T2 As New)(ByVal f As String) As T2
         Dim txt As String
         Dim sr As IO.StreamReader
 
         'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
 
-        ModelLoad = Nothing
+        Load = Nothing
         Try
             sr = New System.IO.StreamReader(
                 f, System.Text.Encoding.GetEncoding(MyEncoding))
             txt = sr.ReadToEnd()
 
-            ModelLoad = JsonConvert.DeserializeObject(Of T2)(txt)
+            Load = JsonConvert.DeserializeObject(Of T2)(txt)
         Catch ex As Exception
         Finally
             If sr IsNot Nothing Then
@@ -84,17 +84,11 @@ Public Class JsonHandler(Of T As New)
         ' Nothing To Do
     End Sub
 
-    'Public Overloads Sub ModelSave(ByVal m As T)
-    '    Call ModelSave(Me.ModelFileName, m)
-    'End Sub
-
-    Public Overloads Sub ModelSave(ByVal f As String,
+    Public Overloads Sub Save(ByVal f As String,
                                    ByVal m As T)
         Dim txt As String
         Dim sw As System.IO.StreamWriter
-
         'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
-
         Try
             sw = New System.IO.StreamWriter(
                 f, False, System.Text.Encoding.GetEncoding(MyEncoding)
@@ -114,11 +108,7 @@ Public Class JsonHandler(Of T As New)
         End Try
     End Sub
 
-    'Public Overloads Sub ModelSave(Of T2 As New)(ByVal m As T2)
-    '    Call ModelSave(Of T2)(Me.ModelFileName, m)
-    'End Sub
-
-    Public Overloads Sub ModelSave(Of T2 As New)(ByVal f As String,
+    Public Overloads Sub Save(Of T2 As New)(ByVal f As String,
                                           ByVal m As T2)
         Dim txt As String
         Dim sw As System.IO.StreamWriter

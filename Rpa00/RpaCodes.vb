@@ -2,7 +2,18 @@
 Imports System.Reflection
 
 Module RpaCodes
-    Public ReadOnly Property RpaObject(rpa As RpaProject) As Object
+
+    Public Enum ProjectArchitecture
+        IntranetClientServer = 1
+        StandAlone = 2
+        ClientServer = 3
+    End Enum
+    Public Enum ProjectUserLevel
+        User = 1
+        HiLevelUser = 2
+    End Enum
+
+    Public ReadOnly Property RpaObject(rpa As Object) As Object
         Get
             Dim asm As Assembly
             Dim [mod] As [Module]

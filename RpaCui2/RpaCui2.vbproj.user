@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>Debug \\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug auto</StartArguments>
+    <StartArguments>Debug C:\Users\yuusa\project\test2\Rpa00\obj\Debug auto</StartArguments>
   </PropertyGroup>
 </Project>

@@ -52,6 +52,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -70,6 +71,15 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientServerProject.vb" />
+    <Compile Include="Command\AddUtilityCommand.vb" />
+    <Compile Include="Command\CloneProjectCommand.vb" />
+    <Compile Include="Command\ExitCommand.vb" />
+    <Compile Include="Command\LoadCommand.vb" />
+    <Compile Include="Command\RunRobotCommand.vb" />
+    <Compile Include="Command\SaveCommand.vb" />
+    <Compile Include="CommonProject.vb" />
+    <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -87,15 +97,21 @@
     </Compile>
     <Compile Include="RpaBase.vb" />
     <Compile Include="RpaCodes.vb" />
+    <Compile Include="Command\RpaCommandBase.vb" />
+    <Compile Include="RpaInitializer.vb" />
     <Compile Include="RpaMacroUtility.vb" />
     <Compile Include="RpaModule.vb" />
     <Compile Include="RpaPackage.vb" />
     <Compile Include="RpaPrinterUtility.vb" />
-    <Compile Include="RpaProject.vb" />
+    <Compile Include="IntranetClientServerProject.vb" />
+    <Compile Include="RpaProjectBase.vb" />
+    <Compile Include="RpaProjectInterface.vb" />
     <Compile Include="RpaSystem.vb" />
     <Compile Include="RpaTransaction.vb" />
     <Compile Include="RpaUtility.vb" />
     <Compile Include="RpaUtilityBase.vb" />
+    <Compile Include="Command\SelectProjectCommand.vb" />
+    <Compile Include="StandAloneProject.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

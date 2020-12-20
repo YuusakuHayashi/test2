@@ -1,0 +1,17 @@
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.vbprojAssemblyReference.cache
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.Resources.resources
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.vbproj.GenerateResource.cache
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.vbproj.CoreCompileInputs.cache
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Setup.exe.config
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Setup.exe
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Setup.pdb
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Setup.xml
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Newtonsoft.Json.dll
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Rpa00.dll
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Rpa00.pdb
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Rpa00.xml
+C:\Users\yuusa\project\test2\Setup\bin\Debug\Newtonsoft.Json.xml
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.vbproj.CopyComplete
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.exe
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.xml
+C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.pdb

@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B14145FA-7DCC-4EA8-B4B7-3B3BC7EC3978}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>RpaCui2.Program</StartupObject>
+    <StartupObject>Sub Main</StartupObject>
     <RootNamespace>RpaCui2</RootNamespace>
     <AssemblyName>RpaCui2</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -72,7 +72,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -88,7 +87,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Program.vb" />
+    <Compile Include="RpaProgram.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
