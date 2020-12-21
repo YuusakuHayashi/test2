@@ -234,15 +234,21 @@ Public Class IntranetClientServerProject : Inherits RpaProjectBase(Of IntranetCl
         End Set
     End Property
 
-    Public Overrides ReadOnly Property SystemProjectDirectory As String
+    Public Overrides ReadOnly Property SystemSolutionDirectory As String
         Get
-            Return $"{IntranetClientServerProject.SystemDirectory}\{IntranetClientServerProject.ARCHITECTURE_NAME}\{Me.SolutionName}"
+            Return $"{Me.SystemArchitecutureDirectory}\{Me.SolutionName}"
         End Get
     End Property
 
     Public Overrides ReadOnly Property SystemJsonFileName As String
         Get
-            Return $"{Me.SystemProjectDirectory}\rpa_project.json"
+            Return $"{Me.SystemSolutionDirectory}\rpa_project.json"
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property SystemArchitecutureDirectory As String
+        Get
+            Return $"{CommonProject.SystemDirectory}\{ARCHITECTURE_NAME}"
         End Get
     End Property
 

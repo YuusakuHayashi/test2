@@ -55,7 +55,9 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
-    Public MustOverride ReadOnly Property SystemProjectDirectory As String
+    Public MustOverride ReadOnly Property SystemArchitecutureDirectory As String
+
+    Public MustOverride ReadOnly Property SystemSolutionDirectory As String
 
     Public MustOverride ReadOnly Property SystemJsonFileName As String
 

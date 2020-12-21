@@ -7,13 +7,121 @@ Module Setup
     Const SAP As String = "StandAlone"
     Const CSP As String = "ClientServer"
 
-    Sub Main()
-        Dim sw As StreamWriter
+    Private _ExecutableStrings As Dictionary(Of String, Func(Of Integer))
+    Public ReadOnly Property ExecutableStrings As Dictionary(Of String, Func(Of Integer))
+        Get
+            If _ExecutableStrings Is Nothing Then
+                _ExecutableStrings = New Dictionary(Of String, Func(Of Integer))
+                _ExecutableStrings.Add("NewProject", AddressOf NewProject)
+            End If
+            Return _ExecutableStrings
+        End Get
+    End Property
+
+    Private Function NewProject() As Integer
+        Dim pidx As Integer = 0
         Dim obj As Object
-        Dim pidx As String : Dim pname As String = vbNullString
+        Dim [sln] As String = vbNullString
+        Dim flag As Boolean = False
+        Dim yorn As String = vbNullString
+        Dim arch As String = vbNullString
+
+        Do
+            Console.WriteLine($"プロジェクト構成を選択")
+            Console.WriteLine($"            1 ... {ICSP}")
+            Console.WriteLine($"            2 ... {SAP}")
+            Console.WriteLine($"            3 ... {CSP}")
+            Console.WriteLine($"            9 ... やっぱりやめる")
+            Console.Write($"NewProject>")
+            pidx = Console.ReadLine()
+            Console.WriteLine(vbNullString)
+        Loop Until pidx = "1" Or pidx = "2" Or pidx = "3" Or pidx = "9"
+
+        If pidx = "1" Then
+            obj = New IntranetClientServerProject
+            arch = ICSP
+        End If
+        If pidx = "2" Then
+            obj = New StandAloneProject
+            arch = SAP
+        End If
+        If pidx = "3" Then
+            obj = New ClientServerProject
+            arch = CSP
+        End If
+        If pidx = "9" Then
+            Return 1000
+        End If
+
+
+        Dim ini As New RpaInitializer
+        If File.Exists(CommonProject.SystemIniFileName) Then
+            ini = ini.Load(CommonProject.SystemIniFileName)
+        End If
+
+        flag = False
+        Do
+            Console.WriteLine($"プロジェクト名を入力してください ...")
+            Console.Write($"NewProject>")
+            [sln] = Console.ReadLine()
+            obj.SolutionName = [sln]
+            If Directory.Exists(obj.SystemSolutionDirectory) Then
+                Console.WriteLine($"プロジェクト '{obj.SolutionName}' は存在します")
+                Console.WriteLine($"他のプロジェクト名を入力してください")
+                Console.WriteLine(vbNullString)
+                Continue Do
+            End If
+            If ini.Solutions.Contains(obj.SystemSolutionDirectory) Then
+                Do
+                    yorn = vbNullString
+                    Console.WriteLine($"プロジェクト '{obj.SolutionName}' は存在します")
+                    Console.WriteLine($"プロジェクトを上書きしますか(y/n)")
+                    Console.Write($"NewProject>")
+                    yorn = Console.ReadLine()
+                    Console.WriteLine(vbNullString)
+                Loop Until yorn = "y" Or yorn = "n"
+                If yorn = "n" Then
+                    Continue Do
+                End If
+            End If
+            Do
+                yorn = vbNullString
+                Console.WriteLine($"'{obj.SolutionName}' よろしいですか？(y/n)")
+                Console.Write($"NewProject>")
+                yorn = Console.ReadLine()
+                Console.WriteLine(vbNullString)
+            Loop Until yorn = "y" Or yorn = "n"
+
+            If yorn = "y" Then
+                Directory.CreateDirectory(obj.SystemSolutionDirectory)
+                obj.Save(obj.SystemJsonFileName, obj)
+                ini.CurrentSolutionArchitecture = arch
+                ini.CurrentSolution = obj.SystemSolutionDirectory
+                ini.Solutions.Add(obj.SystemSolutionDirectory)
+                Call ini.Save(CommonProject.SystemIniFileName, ini)
+
+                Console.WriteLine($"ディレクトリ '{obj.SystemSolutionDirectory}' を新規作成しました")
+                Console.WriteLine(vbNullString)
+                flag = True
+            Else
+                Console.WriteLine($"プロジェクトの新規作成を中止しました")
+                Console.WriteLine(vbNullString)
+                flag = True
+            End If
+        Loop Until flag
+
+        Console.WriteLine($"プロジェクト構成を '{ini.CurrentSolutionArchitecture}' に設定しました")
+        Return 0
+    End Function
+
+    Public Sub Main()
+        Dim pname As String = vbNullString
         Dim yorn As String = vbNullString : Dim yorn2 As String = vbNullString
         Dim flag As Boolean = False
         Dim endflag As Boolean = False
+        Dim txt As String = vbNullString
+        Dim i As Integer
+        Dim fnc As Func(Of Integer)
 
         If Not Directory.Exists(CommonProject.SystemDirectory) Then
             Directory.CreateDirectory(CommonProject.SystemDirectory)
@@ -23,58 +131,13 @@ Module Setup
         End If
 
         Do
-            Console.WriteLine($"設定項目の選択")
-            Console.WriteLine($"    1 ... 新規作成")
-            Console.WriteLine($"    2 ... 変更")
-            Console.WriteLine($"    3 ... 変更")
-        Until endflag
+            Console.Write($"Setup>")
+            txt = Console.ReadLine()
+            fnc = ExecutableStrings(txt)
+            i = fnc()
+            Console.WriteLine(vbNullString)
+        Loop Until endflag
 
-        Do
-            Console.WriteLine($"プロジェクト構成を選択")
-            Console.WriteLine($"    1 ... {ICSP}")
-            Console.WriteLine($"    2 ... {SAP}")
-            Console.WriteLine($"    3 ... {CSP}")
-            Console.WriteLine($"    9 ... やっぱりやめる")
-            Console.Write($">>> ")
-            pidx = Console.ReadLine()
-        Loop Until pidx = "1" Or pidx = "2" Or pidx = "3" Or pidx = "9"
-
-        If pidx = "1" Then
-            obj = New IntranetClientServerProject
-            pname = ICSP
-        End If
-        If pidx = "2" Then
-            obj = New StandAloneProject
-            pname = SAP
-        End If
-        If pidx = "3" Then
-            obj = New ClientServerProject
-            pname = CSP
-        End If
-        If pidx = "9" Then
-            Exit Sub
-        End If
-
-        If Not Directory.Exists(obj.SystemProjectDirectory) Then
-            Directory.CreateDirectory(obj.SystemProjectDirectory)
-            Console.WriteLine($"ディレクトリ '{obj.SystemProjectDirectory}' を新規作成しました")
-        End If
-        If Not File.Exists(obj.SystemJsonFileName) Then
-            obj.Save(obj.SystemJsonFileName, obj)
-            Console.WriteLine($"ファイル     '{obj.SystemJsonFileName}' を新規作成しました")
-        End If
-
-        obj = obj.Load(obj.SystemJsonFileName)
-        Call _CreateMyDirectory(obj)
-
-        Dim ini As New RpaInitializer
-        If File.Exists(CommonProject.SystemIniFileName) Then
-            ini = ini.Load(CommonProject.SystemIniFileName)
-        End If
-        ini.CurrentProjectArchitecture = pname
-        Call ini.Save(CommonProject.SystemIniFileName, ini)
-
-        Console.WriteLine($"プロジェクト構成を '{ini.CurrentProjectArchitecture}' に設定しました")
         Console.WriteLine($"プロジェクト設定変更を終了します")
         Console.ReadLine()
     End Sub

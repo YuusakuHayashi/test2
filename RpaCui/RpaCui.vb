@@ -43,11 +43,12 @@ Module RpaCui
 
         ' オブジェクト生成
         'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
-        asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.dll")
+        'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.dll")
+        asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
         [mod] = asm.GetModule("Rpa00.dll")
         trn_type = [mod].GetType("Rpa00.RpaTransaction")
         sys_type = [mod].GetType("Rpa00.RpaSystem")
-        Select Case ini.CurrentProjectArchitecture
+        Select Case ini.CurrentSolutionArchitecture
             Case "IntranetClientServer"
                 rpa_type = [mod].GetType("Rpa00.IntranetClientServerProject")
                 arch = RpaCodes.ProjectArchitecture.IntranetClientServer
