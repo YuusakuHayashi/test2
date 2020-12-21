@@ -83,12 +83,23 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
+    Private _SolutionName As String
+    Public Property SolutionName As String
+        Get
+            Return Me._SolutionName
+        End Get
+        Set(value As String)
+            Me._SolutionName = value
+        End Set
+    End Property
+
     Private _ProjectName As String
     Public Property ProjectName As String
         Get
             Return Me._ProjectName
         End Get
         Set(value As String)
+            Me._ProjectAlias = vbNullString
             Me._ProjectName = value
         End Set
     End Property

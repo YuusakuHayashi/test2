@@ -9,6 +9,16 @@
         End Set
     End Property
 
+    Private _ProjectArchitecture As Integer
+    Public Property ProjectArchitecture As Integer
+        Get
+            Return Me._ProjectArchitecture
+        End Get
+        Set(value As Integer)
+            Me._ProjectArchitecture = value
+        End Set
+    End Property
+
     Private _CommandText As String
     Public Property CommandText As String
         Get

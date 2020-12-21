@@ -15,3 +15,17 @@ C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.exe
 C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.xml
 C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Setup.exe.config
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Setup.exe
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Setup.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Setup.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Newtonsoft.Json.dll
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Rpa00.dll
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Rpa00.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Rpa00.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\bin\Debug\Newtonsoft.Json.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.Resources.resources
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.vbproj.GenerateResource.Cache
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.exe
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.pdb

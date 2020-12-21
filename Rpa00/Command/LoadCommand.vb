@@ -37,22 +37,22 @@ Public Class LoadCommand : Inherits RpaCommandBase
             Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' のロードに失敗しました。")
             Return 1000
         End If
-        If Not Directory.Exists([load].RootDirectory) Then
-            Console.WriteLine($"RootDirectory '{[load].RootDirectory}' がありません")
-            Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'RootDirectory' に任意のパスを書いてください")
-            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
-            Console.ReadLine()
-            trn.ExitFlag = True
-            Return 1000
-        End If
-        If Not Directory.Exists([load].MyDirectory) Then
-            Console.WriteLine($"MyDirectory '{[load].MyDirectory}' がありません")
-            Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'MyDirectory' に任意のパスを書いてください")
-            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
-            Console.ReadLine()
-            trn.ExitFlag = True
-            Return 1000
-        End If
+        'If Not Directory.Exists([load].RootDirectory) Then
+        '    Console.WriteLine($"RootDirectory '{[load].RootDirectory}' がありません")
+        '    Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'RootDirectory' に任意のパスを書いてください")
+        '    Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+        '    Console.ReadLine()
+        '    trn.ExitFlag = True
+        '    Return 1000
+        'End If
+        'If Not Directory.Exists([load].MyDirectory) Then
+        '    Console.WriteLine($"MyDirectory '{[load].MyDirectory}' がありません")
+        '    Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'MyDirectory' に任意のパスを書いてください")
+        '    Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
+        '    Console.ReadLine()
+        '    trn.ExitFlag = True
+        '    Return 1000
+        'End If
         rpa = [load]
         Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' をロードしました。")
         Return 0

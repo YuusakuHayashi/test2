@@ -1,7 +1,7 @@
 ﻿Imports System.Linq
 Imports System.Reflection
 
-Module RpaCodes
+Public Module RpaCodes
 
     Public Enum ProjectArchitecture
         IntranetClientServer = 1
@@ -21,6 +21,7 @@ Module RpaCodes
             Select Case rpa.ProjectName
                 Case "rpa01"
                     asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.dll")
+                    'asm = Assembly.LoadFrom($"{CommonProject.SystemDllDirectory}\Rpa01.dll")
                     [mod] = asm.GetModule("Rpa01.dll")
                     [type] = [mod].GetType("Rpa01.Rpa01")
                     If [type] IsNot Nothing Then
@@ -33,7 +34,6 @@ Module RpaCodes
             End Select
         End Get
     End Property
-
 
     Public ReadOnly Property RpaUtility(util As String) As Object
         Get

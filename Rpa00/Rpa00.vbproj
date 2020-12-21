@@ -134,12 +134,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RpaCui2\RpaCui2.vbproj">
-      <Project>{b14145fa-7dcc-4ea8-b4b7-3b3bc7ec3978}</Project>
-      <Name>RpaCui2</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Hello.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

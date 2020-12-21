@@ -3,8 +3,7 @@ Imports System.IO
 Imports Rpa00
 
 Module RpaCui
-
-    Sub Main()
+    Public Sub Main()
         Dim asm As Assembly
         Dim [mod] As [Module]
         Dim rpa_type As Type : Dim trn_type As Type : Dim sys_type As Type
@@ -12,6 +11,7 @@ Module RpaCui
         Dim ptype As String = vbNullString
         Dim txt As String = vbNullString
         Dim inv As Boolean = False
+        Dim arch As Integer
 
         If Not File.Exists(CommonProject.SystemIniFileName) Then
             Console.WriteLine($"ファイル     '{CommonProject.SystemIniFileName}' が存在しません")
@@ -40,33 +40,31 @@ Module RpaCui
             Console.ReadLine()
             Exit Sub
         End If
-        flag = IIf(ini.CurrentProjectArchitecture = "IntranetClientServer", True, flag)
-        flag = IIf(ini.CurrentProjectArchitecture = "StandAlone", True, flag)
-        flag = IIf(ini.CurrentProjectArchitecture = "ClientServer", True, flag)
-        If Not flag Then
-            Console.WriteLine($"プロジェクト構成 '{ini.CurrentProjectArchitecture}' は想定外です")
-            Console.ReadLine()
-            Exit Sub
-        End If
 
         ' オブジェクト生成
-        asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
+        'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
+        asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.dll")
         [mod] = asm.GetModule("Rpa00.dll")
         trn_type = [mod].GetType("Rpa00.RpaTransaction")
         sys_type = [mod].GetType("Rpa00.RpaSystem")
         Select Case ini.CurrentProjectArchitecture
             Case "IntranetClientServer"
                 rpa_type = [mod].GetType("Rpa00.IntranetClientServerProject")
+                arch = RpaCodes.ProjectArchitecture.IntranetClientServer
             Case "StandAlone"
                 rpa_type = [mod].GetType("Rpa00.StandAloneProject")
+                arch = RpaCodes.ProjectArchitecture.StandAlone
             Case "ClientServer"
                 rpa_type = [mod].GetType("Rpa00.ClientServerProject")
+                arch = RpaCodes.ProjectArchitecture.ClientServer
         End Select
+
         If rpa_type IsNot Nothing Then
             rpa = Activator.CreateInstance(rpa_type)
         End If
         If trn_type IsNot Nothing Then
             trn = Activator.CreateInstance(trn_type)
+            trn.ProjectArchitecture = arch
         End If
         If sys_type IsNot Nothing Then
             sys = Activator.CreateInstance(sys_type)
@@ -77,7 +75,7 @@ Module RpaCui
 
         ' 実行
         Do Until trn.ExitFlag
-            Console.Write($"{rpa.ProjectAlias} > ")
+            Console.Write($"{rpa.ProjectAlias}>")
             trn.CommandText = Console.ReadLine()
             Call trn.CreateCommand()
             Call sys.Main(trn, rpa)

@@ -13,6 +13,7 @@ Module Setup
         Dim pidx As String : Dim pname As String = vbNullString
         Dim yorn As String = vbNullString : Dim yorn2 As String = vbNullString
         Dim flag As Boolean = False
+        Dim endflag As Boolean = False
 
         If Not Directory.Exists(CommonProject.SystemDirectory) Then
             Directory.CreateDirectory(CommonProject.SystemDirectory)
@@ -20,6 +21,13 @@ Module Setup
         If Not Directory.Exists(CommonProject.SystemDllDirectory) Then
             Directory.CreateDirectory(CommonProject.SystemDllDirectory)
         End If
+
+        Do
+            Console.WriteLine($"設定項目の選択")
+            Console.WriteLine($"    1 ... 新規作成")
+            Console.WriteLine($"    2 ... 変更")
+            Console.WriteLine($"    3 ... 変更")
+        Until endflag
 
         Do
             Console.WriteLine($"プロジェクト構成を選択")

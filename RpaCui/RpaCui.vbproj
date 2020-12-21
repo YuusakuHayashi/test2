@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B83D9732-FB30-4D9C-A1E9-439DFDDE8811}</ProjectGuid>
+    <ProjectGuid>{54DCE427-83B7-48AF-8DDC-EEDB87ACD7E6}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <StartupObject>RpaCui.RpaCui</StartupObject>
     <RootNamespace>RpaCui</RootNamespace>
     <AssemblyName>RpaCui</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>

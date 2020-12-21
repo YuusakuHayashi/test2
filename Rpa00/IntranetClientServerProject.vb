@@ -12,6 +12,8 @@ Public Class IntranetClientServerProject : Inherits RpaProjectBase(Of IntranetCl
     Private Const UTF8 As String = "utf-8"
     Public Shared MYENCODING As String = UTF8
 
+    Private Const ARCHITECTURE_NAME As String = "IntranetClientServer"
+
     <JsonIgnore>
     Public PrivateMode As Boolean
 
@@ -234,7 +236,7 @@ Public Class IntranetClientServerProject : Inherits RpaProjectBase(Of IntranetCl
 
     Public Overrides ReadOnly Property SystemProjectDirectory As String
         Get
-            Return $"{IntranetClientServerProject.SystemDirectory}\IntranetClientServer"
+            Return $"{IntranetClientServerProject.SystemDirectory}\{IntranetClientServerProject.ARCHITECTURE_NAME}\{Me.SolutionName}"
         End Get
     End Property
 

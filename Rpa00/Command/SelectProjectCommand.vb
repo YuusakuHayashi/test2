@@ -33,7 +33,7 @@
             Console.WriteLine($"プロジェクトが選択されていません")
             Return 1000
         Else
-            'rpa = New T With {.ProjectName = trn.Parameters(0)}
+            rpa.ProjectName = trn.Parameters(0)
             Return 0
         End If
     End Function
