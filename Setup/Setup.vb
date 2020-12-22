@@ -10,50 +10,96 @@ Module Setup
             If _ExecutableStrings Is Nothing Then
                 _ExecutableStrings = New Dictionary(Of String, Func(Of RpaInitializer, RpaInitializer))
                 _ExecutableStrings.Add("NewProject", AddressOf NewProject)
+                _ExecutableStrings.Add("AutoLoad", AddressOf SetAutoLoad)
+                _ExecutableStrings.Add("ChangeProject", AddressOf ChangeSolution)
                 _ExecutableStrings.Add("Exit", AddressOf ExitSetup)
             End If
             Return _ExecutableStrings
         End Get
     End Property
 
-    Private Function _GetSolution(ByRef rpa As Object) As Object
-        Dim [sln] As String = vbNullString
+    ' Select Solution
+    '---------------------------------------------------------------------------------------------'
+    Private Function ChangeSolution(ini As RpaInitializer) As RpaInitializer
+        Dim idx As Integer = 0
+        Dim idxstr As String = vbNullString
+        Dim idx2 As Integer = -1
         Dim flag As Boolean = False
-        Dim yorn As String = vbNullString
 
+        For Each sl In ini.Solutions
+            Console.WriteLine($"{idx}... '{sl.Name}'")
+            idx += 1
+        Next
+        Console.WriteLine($"現在のプロジェクトは '{ini.CurrentSolution.Name}' です")
+        Console.WriteLine(vbNullString)
         Do
             flag = False
-            [sln] = vbNullString
-
-            Console.WriteLine($"プロジェクト名を入力してください ...")
-            Console.Write($"NewProject>")
-            [sln] = Console.ReadLine()
-            rpa.SolutionName = [sln]
+            idx2 = -1
+            idxstr = vbNullString
+            Console.WriteLine($"プロジェクトＮｏを選択")
+            Console.Write($"ChangeProject>")
+            idxstr = Console.ReadLine()
             Console.WriteLine(vbNullString)
 
-            If Directory.Exists(rpa.SystemSolutionDirectory) Then
-                Console.WriteLine($"プロジェクト '{rpa.SolutionName}' は存在します")
-                Console.WriteLine($"他のプロジェクト名を入力してください")
+            idx2 = idxstr.ToString()
+            If (idx2 + 1) > ini.Solutions.Count Then
+                Console.WriteLine($"プロジェクトＮｏが範囲外です")
                 Console.WriteLine(vbNullString)
                 Continue Do
-            End If
-
-            Do
-                yorn = vbNullString
-                Console.WriteLine($"'{rpa.SolutionName}' よろしいですか？(y/n)")
-                Console.Write($"NewProject>")
-                yorn = Console.ReadLine()
-                Console.WriteLine(vbNullString)
-            Loop Until yorn = "y" Or yorn = "n"
-
-            If yorn = "y" Then
-                flag = True
             Else
-                rpa = Nothing
+                ini.CurrentSolution = ini.Solutions(idx2)
+                Console.WriteLine($"プロジェクト '{ini.Solutions(idx2).Name}' に変更しました")
+                Console.WriteLine(vbNullString)
                 flag = True
             End If
         Loop Until flag
-        Return rpa
+
+        Return ini
+    End Function
+
+    ' New Project
+    '---------------------------------------------------------------------------------------------'
+    Private Function NewProject(ini As RpaInitializer) As RpaInitializer
+        Dim pidx As Integer = 0
+        Dim arch As Object
+        Dim [sln] As RpaInitializer.RpaSolution
+        Dim flag As Boolean = False
+        Dim yorn As String = vbNullString
+        Dim pname As String
+
+        arch = _SelectProjectArchitecture()
+        If arch Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        arch = _GetSolution(arch)
+        If arch Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        arch = _GetMyDirectory(arch)
+        If arch Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        ini = _RegisterSolution(ini, arch)
+        If ini Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        Directory.CreateDirectory(arch.SystemSolutionDirectory)
+        Console.WriteLine($"ディレクトリ '{arch.SystemSolutionDirectory}' を新規作成しました")
+        Call arch.Save(arch.SystemJsonFileName, arch)
+        Console.WriteLine($"ファイル     '{arch.SystemJsonFileName}' を新規作成しました")
+        Return ini
     End Function
 
     Private Function _SelectProjectArchitecture() As Object
@@ -109,6 +155,46 @@ Module Setup
         Return obj
     End Function
 
+    Private Function _GetSolution(ByRef rpa As Object) As Object
+        Dim [sln] As String = vbNullString
+        Dim flag As Boolean = False
+        Dim yorn As String = vbNullString
+
+        Do
+            flag = False
+            [sln] = vbNullString
+
+            Console.WriteLine($"プロジェクト名を入力してください ...")
+            Console.Write($"NewProject>")
+            [sln] = Console.ReadLine()
+            rpa.SolutionName = [sln]
+            Console.WriteLine(vbNullString)
+
+            If Directory.Exists(rpa.SystemSolutionDirectory) Then
+                Console.WriteLine($"プロジェクト '{rpa.SolutionName}' は存在します")
+                Console.WriteLine($"他のプロジェクト名を入力してください")
+                Console.WriteLine(vbNullString)
+                Continue Do
+            End If
+
+            Do
+                yorn = vbNullString
+                Console.WriteLine($"'{rpa.SolutionName}' よろしいですか？(y/n)")
+                Console.Write($"NewProject>")
+                yorn = Console.ReadLine()
+                Console.WriteLine(vbNullString)
+            Loop Until yorn = "y" Or yorn = "n"
+
+            If yorn = "y" Then
+                flag = True
+            Else
+                rpa = Nothing
+                flag = True
+            End If
+        Loop Until flag
+        Return rpa
+    End Function
+
     Private Function _RegisterSolution(ini As RpaInitializer, rpa As Object) As RpaInitializer
         Dim sl As RpaInitializer.RpaSolution
         Dim [new] As RpaInitializer.RpaSolution
@@ -133,49 +219,31 @@ Module Setup
         Return ini
     End Function
 
-    Private Function NewProject(ini As RpaInitializer) As RpaInitializer
-        Dim pidx As Integer = 0
-        Dim arch As Object
-        Dim [sln] As RpaInitializer.RpaSolution
-        Dim flag As Boolean = False
+    ' AutoLoad
+    '---------------------------------------------------------------------------------------------'
+    Private Function SetAutoLoad(ini As RpaInitializer) As RpaInitializer
         Dim yorn As String = vbNullString
-        Dim pname As String
+        Dim onoff As String = IIf(ini.AutoLoad, "ON", "OFF")
+        Dim [switch] As String = IIf(ini.AutoLoad, "OFF", "ON")
 
-        arch = _SelectProjectArchitecture()
-        If arch Is Nothing Then
-            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+        Console.WriteLine($"現在 AutoLoad = {onoff} です")
+        Console.WriteLine($"     AutoLoad = {[switch]} に変更しますか？ (y/n)")
+
+        Do
+            yorn = vbNullString
+            Console.Write($"AutoLoad>")
+            yorn = Console.ReadLine()
             Console.WriteLine(vbNullString)
-            Return Nothing
-        End If
+            If yorn = "y" Then
+                ini.AutoLoad = (Not ini.AutoLoad)
+            End If
+        Loop Until yorn = "y" Or yorn = "n"
 
-        arch = _GetSolution(arch)
-        If arch Is Nothing Then
-            Console.WriteLine($"プロジェクトの新規作成を中止しました")
-            Console.WriteLine(vbNullString)
-            Return Nothing
-        End If
-
-        arch = _GetMyDirectory(arch)
-        If arch Is Nothing Then
-            Console.WriteLine($"プロジェクトの新規作成を中止しました")
-            Console.WriteLine(vbNullString)
-            Return Nothing
-        End If
-
-        ini = _RegisterSolution(ini, arch)
-        If ini Is Nothing Then
-            Console.WriteLine($"プロジェクトの新規作成を中止しました")
-            Console.WriteLine(vbNullString)
-            Return Nothing
-        End If
-
-        Directory.CreateDirectory(arch.SystemSolutionDirectory)
-        Console.WriteLine($"ディレクトリ '{arch.SystemSolutionDirectory}' を新規作成しました")
-        Call arch.Save(arch.SystemJsonFileName, arch)
-        Console.WriteLine($"ファイル     '{arch.SystemJsonFileName}' を新規作成しました")
         Return ini
     End Function
 
+    ' Exit
+    '---------------------------------------------------------------------------------------------'
     Private Function ExitSetup(ini As RpaInitializer) As RpaInitializer
         Return Nothing
     End Function
@@ -233,7 +301,7 @@ Module Setup
         Do
             yorn = vbNullString
             Console.WriteLine($"MyDirectory の設定を行いますか (y/n)")
-            Console.Write($"GetMyDirectory>>")
+            Console.Write($"GetMyDirectory>")
             yorn = Console.ReadLine()
             Console.WriteLine(vbNullString)
         Loop Until yorn = "y" Or yorn = "n"
@@ -248,7 +316,7 @@ Module Setup
                 }
                 If fbd.ShowDialog() = DialogResult.OK Then
                     Console.WriteLine($"よろしいですか？ '{fbd.SelectedPath}' (y/n)")
-                    Console.Write($"GetMyDirectory>>")
+                    Console.Write($"GetMyDirectory>")
                     yorn2 = Console.ReadLine()
                     Console.WriteLine(vbNullString)
                 Else
