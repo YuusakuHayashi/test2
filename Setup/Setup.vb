@@ -3,115 +3,181 @@ Imports System.Windows.Forms
 Imports Rpa00
 
 Module Setup
-    Const ICSP As String = "IntranetClientServer"
-    Const SAP As String = "StandAlone"
-    Const CSP As String = "ClientServer"
 
-    Private _ExecutableStrings As Dictionary(Of String, Func(Of Integer))
-    Public ReadOnly Property ExecutableStrings As Dictionary(Of String, Func(Of Integer))
+    Private _ExecutableStrings As Dictionary(Of String, Func(Of RpaInitializer, RpaInitializer))
+    Public ReadOnly Property ExecutableStrings As Dictionary(Of String, Func(Of RpaInitializer, RpaInitializer))
         Get
             If _ExecutableStrings Is Nothing Then
-                _ExecutableStrings = New Dictionary(Of String, Func(Of Integer))
+                _ExecutableStrings = New Dictionary(Of String, Func(Of RpaInitializer, RpaInitializer))
                 _ExecutableStrings.Add("NewProject", AddressOf NewProject)
+                _ExecutableStrings.Add("Exit", AddressOf ExitSetup)
             End If
             Return _ExecutableStrings
         End Get
     End Property
 
-    Private Function NewProject() As Integer
-        Dim pidx As Integer = 0
-        Dim obj As Object
+    Private Function _GetSolution(ByRef rpa As Object) As Object
         Dim [sln] As String = vbNullString
         Dim flag As Boolean = False
         Dim yorn As String = vbNullString
-        Dim arch As String = vbNullString
 
         Do
-            Console.WriteLine($"プロジェクト構成を選択")
-            Console.WriteLine($"            1 ... {ICSP}")
-            Console.WriteLine($"            2 ... {SAP}")
-            Console.WriteLine($"            3 ... {CSP}")
-            Console.WriteLine($"            9 ... やっぱりやめる")
-            Console.Write($"NewProject>")
-            pidx = Console.ReadLine()
-            Console.WriteLine(vbNullString)
-        Loop Until pidx = "1" Or pidx = "2" Or pidx = "3" Or pidx = "9"
+            flag = False
+            [sln] = vbNullString
 
-        If pidx = "1" Then
-            obj = New IntranetClientServerProject
-            arch = ICSP
-        End If
-        If pidx = "2" Then
-            obj = New StandAloneProject
-            arch = SAP
-        End If
-        If pidx = "3" Then
-            obj = New ClientServerProject
-            arch = CSP
-        End If
-        If pidx = "9" Then
-            Return 1000
-        End If
-
-
-        Dim ini As New RpaInitializer
-        If File.Exists(CommonProject.SystemIniFileName) Then
-            ini = ini.Load(CommonProject.SystemIniFileName)
-        End If
-
-        flag = False
-        Do
             Console.WriteLine($"プロジェクト名を入力してください ...")
             Console.Write($"NewProject>")
             [sln] = Console.ReadLine()
-            obj.SolutionName = [sln]
-            If Directory.Exists(obj.SystemSolutionDirectory) Then
-                Console.WriteLine($"プロジェクト '{obj.SolutionName}' は存在します")
+            rpa.SolutionName = [sln]
+            Console.WriteLine(vbNullString)
+
+            If Directory.Exists(rpa.SystemSolutionDirectory) Then
+                Console.WriteLine($"プロジェクト '{rpa.SolutionName}' は存在します")
                 Console.WriteLine($"他のプロジェクト名を入力してください")
                 Console.WriteLine(vbNullString)
                 Continue Do
             End If
-            If ini.Solutions.Contains(obj.SystemSolutionDirectory) Then
-                Do
-                    yorn = vbNullString
-                    Console.WriteLine($"プロジェクト '{obj.SolutionName}' は存在します")
-                    Console.WriteLine($"プロジェクトを上書きしますか(y/n)")
-                    Console.Write($"NewProject>")
-                    yorn = Console.ReadLine()
-                    Console.WriteLine(vbNullString)
-                Loop Until yorn = "y" Or yorn = "n"
-                If yorn = "n" Then
-                    Continue Do
-                End If
-            End If
+
             Do
                 yorn = vbNullString
-                Console.WriteLine($"'{obj.SolutionName}' よろしいですか？(y/n)")
+                Console.WriteLine($"'{rpa.SolutionName}' よろしいですか？(y/n)")
                 Console.Write($"NewProject>")
                 yorn = Console.ReadLine()
                 Console.WriteLine(vbNullString)
             Loop Until yorn = "y" Or yorn = "n"
 
             If yorn = "y" Then
-                Directory.CreateDirectory(obj.SystemSolutionDirectory)
-                obj.Save(obj.SystemJsonFileName, obj)
-                ini.CurrentSolutionArchitecture = arch
-                ini.CurrentSolution = obj.SystemSolutionDirectory
-                ini.Solutions.Add(obj.SystemSolutionDirectory)
-                Call ini.Save(CommonProject.SystemIniFileName, ini)
-
-                Console.WriteLine($"ディレクトリ '{obj.SystemSolutionDirectory}' を新規作成しました")
-                Console.WriteLine(vbNullString)
                 flag = True
             Else
-                Console.WriteLine($"プロジェクトの新規作成を中止しました")
-                Console.WriteLine(vbNullString)
+                rpa = Nothing
                 flag = True
             End If
         Loop Until flag
+        Return rpa
+    End Function
 
-        Console.WriteLine($"プロジェクト構成を '{ini.CurrentSolutionArchitecture}' に設定しました")
-        Return 0
+    Private Function _SelectProjectArchitecture() As Object
+        Dim inp As String = vbNullString
+        Dim pidx As Integer = 0
+        Dim yorn As String = vbNullString
+        Dim obj As Object
+        Dim arch(4) As String
+        Dim ics As New IntranetClientServerProject
+        Dim sap As New StandAloneProject
+        Dim csp As New ClientServerProject
+
+        Do
+            yorn = vbNullString
+            Do
+                inp = vbNullString
+                Console.WriteLine($"プロジェクト構成を選択")
+                Console.WriteLine($"           {ics.SystemArchType} ... {ics.SystemArchTypeName}")
+                Console.WriteLine($"           {sap.SystemArchType} ... {sap.SystemArchTypeName}")
+                Console.WriteLine($"           {csp.SystemArchType} ... {csp.SystemArchTypeName}")
+                Console.WriteLine($"           9 ... やっぱりやめる")
+                Console.Write($"NewProject>")
+                inp = Console.ReadLine()
+                pidx = inp.ToString()
+                Console.WriteLine(vbNullString)
+            Loop Until pidx < 10
+            If pidx = ics.SystemArchType Then
+                obj = ics
+            End If
+            If pidx = sap.SystemArchType Then
+                obj = sap
+            End If
+            If pidx = csp.SystemArchType Then
+                obj = csp
+            End If
+            If pidx = 9 Then
+                obj = Nothing
+                Exit Do
+            End If
+
+            If Not Directory.Exists(obj.SystemArchDirectory) Then
+                Directory.CreateDirectory(obj.SystemArchDirectory)
+            End If
+
+            Do
+                Console.WriteLine($"よろしいですか？ '{inp} ... {obj.SystemArchTypeName}' (y/n)")
+                Console.Write($"NewProject>")
+                yorn = Console.ReadLine()
+                Console.WriteLine(vbNullString)
+            Loop Until yorn = "y" Or yorn = "n"
+        Loop Until yorn = "y"
+
+        Return obj
+    End Function
+
+    Private Function _RegisterSolution(ini As RpaInitializer, rpa As Object) As RpaInitializer
+        Dim sl As RpaInitializer.RpaSolution
+        Dim [new] As RpaInitializer.RpaSolution
+        Dim idx As Integer = -1
+        sl = ini.Solutions.Find(
+            Function(s)
+                Return (s.Name = rpa.SolutionName)
+            End Function
+        )
+        [new] = New RpaInitializer.RpaSolution With {
+            .Name = rpa.SolutionName,
+            .Architecture = rpa.SystemArchType,
+            .SolutionDirectory = rpa.SystemSolutionDirectory
+        }
+        If sl Is Nothing Then
+            ini.Solutions.Add([new])
+        Else
+            idx = ini.Solutions.IndexOf(sl)
+            ini.Solutions(idx) = [new]
+        End If
+        ini.CurrentSolution = [new]
+        Return ini
+    End Function
+
+    Private Function NewProject(ini As RpaInitializer) As RpaInitializer
+        Dim pidx As Integer = 0
+        Dim arch As Object
+        Dim [sln] As RpaInitializer.RpaSolution
+        Dim flag As Boolean = False
+        Dim yorn As String = vbNullString
+        Dim pname As String
+
+        arch = _SelectProjectArchitecture()
+        If arch Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        arch = _GetSolution(arch)
+        If arch Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        arch = _GetMyDirectory(arch)
+        If arch Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        ini = _RegisterSolution(ini, arch)
+        If ini Is Nothing Then
+            Console.WriteLine($"プロジェクトの新規作成を中止しました")
+            Console.WriteLine(vbNullString)
+            Return Nothing
+        End If
+
+        Directory.CreateDirectory(arch.SystemSolutionDirectory)
+        Console.WriteLine($"ディレクトリ '{arch.SystemSolutionDirectory}' を新規作成しました")
+        Call arch.Save(arch.SystemJsonFileName, arch)
+        Console.WriteLine($"ファイル     '{arch.SystemJsonFileName}' を新規作成しました")
+        Return ini
+    End Function
+
+    Private Function ExitSetup(ini As RpaInitializer) As RpaInitializer
+        Return Nothing
     End Function
 
     Public Sub Main()
@@ -121,7 +187,8 @@ Module Setup
         Dim endflag As Boolean = False
         Dim txt As String = vbNullString
         Dim i As Integer
-        Dim fnc As Func(Of Integer)
+        Dim fnc As Func(Of RpaInitializer, RpaInitializer)
+        Dim ini As RpaInitializer
 
         If Not Directory.Exists(CommonProject.SystemDirectory) Then
             Directory.CreateDirectory(CommonProject.SystemDirectory)
@@ -130,11 +197,27 @@ Module Setup
             Directory.CreateDirectory(CommonProject.SystemDllDirectory)
         End If
 
+        ini = New RpaInitializer
+        If Not File.Exists(CommonProject.SystemIniFileName) Then
+            ini.Save(CommonProject.SystemIniFileName, ini)
+        End If
+        ini = ini.Load(CommonProject.SystemIniFileName)
+
         Do
             Console.Write($"Setup>")
             txt = Console.ReadLine()
-            fnc = ExecutableStrings(txt)
-            i = fnc()
+            If ExecutableStrings.ContainsKey(txt) Then
+                fnc = ExecutableStrings(txt)
+                ini = fnc(ini)
+                If ini Is Nothing Then
+                    endflag = True
+                Else
+                    Call ini.Save(CommonProject.SystemIniFileName, ini)
+                    Console.WriteLine($"ファイル     '{CommonProject.SystemIniFileName}' を変更しました")
+                End If
+            Else
+                Console.WriteLine($"'{txt}' は不正です")
+            End If
             Console.WriteLine(vbNullString)
         Loop Until endflag
 
@@ -143,15 +226,16 @@ Module Setup
     End Sub
 
 
-    Private Sub _CreateMyDirectory(ByRef obj As Object)
+    Private Function _GetMyDirectory(ByRef obj As Object) As Object
         Dim yorn As String = vbNullString
         Dim yorn2 As String = vbNullString
         Dim fbd As FolderBrowserDialog
         Do
             yorn = vbNullString
             Console.WriteLine($"MyDirectory の設定を行いますか (y/n)")
-            Console.Write($">>> ")
+            Console.Write($"GetMyDirectory>>")
             yorn = Console.ReadLine()
+            Console.WriteLine(vbNullString)
         Loop Until yorn = "y" Or yorn = "n"
         If yorn = "y" Then
             Do
@@ -164,20 +248,22 @@ Module Setup
                 }
                 If fbd.ShowDialog() = DialogResult.OK Then
                     Console.WriteLine($"よろしいですか？ '{fbd.SelectedPath}' (y/n)")
-                    Console.Write($">>> ")
+                    Console.Write($"GetMyDirectory>>")
                     yorn2 = Console.ReadLine()
+                    Console.WriteLine(vbNullString)
                 Else
-                    yorn2 = "x"
+                    yorn2 = vbNullString
                 End If
-            Loop Until yorn2 = "y" Or yorn2 = "x"
+            Loop Until yorn2 = "y" Or yorn2 = vbNullString
             If yorn2 = "y" Then
                 obj.MyDirectory = fbd.SelectedPath
-                obj.Save(obj.SystemJsonFileName, obj)
                 Console.WriteLine($"MyDirectory が設定されました")
-            End If
-            If yorn2 = "x" Then
+                Console.WriteLine(vbNullString)
+            Else
                 Console.WriteLine($"MyDirectory の設定は行いませんでした")
+                Console.WriteLine(vbNullString)
             End If
         End If
-    End Sub
+        Return obj
+    End Function
 End Module

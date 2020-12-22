@@ -29,3 +29,4 @@ C:\Users\yuusa\project\test2\Setup\obj\Debug\Setup.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.exe
 \\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Debug\Setup.vbprojResolveAssemblyReference.cache

@@ -4,9 +4,11 @@ Imports System.Runtime.InteropServices
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 Imports System.Windows.Forms
+Imports Rpa00
 
 'Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
-Public Class IntranetClientServerProject : Inherits RpaProjectBase(Of IntranetClientServerProject)
+Public Class IntranetClientServerProject
+    Inherits RpaProjectBase(Of IntranetClientServerProject)
 
     Private Const SHIFT_JIS As String = "Shift-JIS"
     Private Const UTF8 As String = "utf-8"
@@ -236,7 +238,7 @@ Public Class IntranetClientServerProject : Inherits RpaProjectBase(Of IntranetCl
 
     Public Overrides ReadOnly Property SystemSolutionDirectory As String
         Get
-            Return $"{Me.SystemArchitecutureDirectory}\{Me.SolutionName}"
+            Return $"{Me.SystemArchDirectory}\{Me.SolutionName}"
         End Get
     End Property
 
@@ -246,11 +248,24 @@ Public Class IntranetClientServerProject : Inherits RpaProjectBase(Of IntranetCl
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemArchitecutureDirectory As String
+    Public Overrides ReadOnly Property SystemArchDirectory As String
         Get
-            Return $"{CommonProject.SystemDirectory}\{ARCHITECTURE_NAME}"
+            Return $"{CommonProject.SystemDirectory}\{Me.GetType.Name}"
         End Get
     End Property
+
+    Public Overrides ReadOnly Property SystemArchType As Integer
+        Get
+            Return 1
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property SystemArchTypeName As String
+        Get
+            Return Me.GetType.Name
+        End Get
+    End Property
+
 
     'Public ReadOnly Property MyProjectUpdatedDirectory As String
     '    Get

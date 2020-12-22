@@ -6,15 +6,28 @@
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemArchitecutureDirectory As String
+    Public Overrides ReadOnly Property SystemSolutionDirectory As String
         Get
             Throw New NotImplementedException()
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemSolutionDirectory As String
+
+    Public Overrides ReadOnly Property SystemArchDirectory As String
         Get
             Throw New NotImplementedException()
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property SystemArchType As Integer
+        Get
+            Return 2
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property SystemArchTypeName As String
+        Get
+            Return Me.GetType.Name
         End Get
     End Property
 

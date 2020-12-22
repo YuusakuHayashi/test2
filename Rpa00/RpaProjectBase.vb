@@ -3,6 +3,7 @@ Imports System.Text
 Imports System.Runtime.InteropServices
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
+Imports Rpa00
 
 Public MustInherit Class RpaProjectBase(Of T As {New})
     Inherits JsonHandler(Of T)
@@ -55,11 +56,11 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
-    Public MustOverride ReadOnly Property SystemArchitecutureDirectory As String
-
+    Public MustOverride ReadOnly Property SystemArchDirectory As String
     Public MustOverride ReadOnly Property SystemSolutionDirectory As String
-
     Public MustOverride ReadOnly Property SystemJsonFileName As String
+    Public MustOverride ReadOnly Property SystemArchType As Integer
+    Public MustOverride ReadOnly Property SystemArchTypeName As String
 
     <JsonIgnore>
     Public Shared ReadOnly Property SystemDllDirectory As String
@@ -206,7 +207,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
             Me._UsePrinterName = value
         End Set
     End Property
-
 
     Public MustOverride Sub CheckProject()
 End Class
