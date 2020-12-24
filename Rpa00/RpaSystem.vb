@@ -3,34 +3,43 @@ Public Class RpaSystem
 
     ' 機能はここに追加
     '---------------------------------------------------------------------------------------------'
-    Private ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As Object) As Object
+    Private ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Object
         Get
             Dim cmd As Object
-            Select Case trn.MainCommand
-                Case "save" : cmd = New SaveCommand
-                Case "load" : cmd = New LoadCommand
-                Case "run" : cmd = New RunRobotCommand
-                Case "clone" : cmd = New CloneProjectCommand
-                Case "select" : cmd = New SelectProjectCommand
-                Case "exit" : cmd = New ExitCommand
-                Case "addutility" : cmd = New AddUtilityCommand
-
+            If rpa Is Nothing Then
+                ' rpa なしで実行可
+                Select Case trn.MainCommand
+                    Case "setup" : cmd = New SetupRpaCommand
+                    Case "exit" : cmd = New ExitCommand
+                    Case Else : cmd = Nothing
+                End Select
+            Else
+                ' rpa ありで実行可
+                Select Case trn.MainCommand
+                    Case "setup" : cmd = New SetupRpaCommand
+                    Case "save" : cmd = New SaveCommand
+                    Case "load" : cmd = New LoadCommand
+                    Case "run" : cmd = New RunRobotCommand
+                    Case "clone" : cmd = New CloneProjectCommand
+                    Case "select" : cmd = New SelectProjectCommand
+                    Case "exit" : cmd = New ExitCommand
+                    Case "addutility" : cmd = New AddUtilityCommand
                     'Case "project" : cmd = AddressOf ShowCurrentProject
                     'Case "savejson" : cmd = AddressOf SaveJson
                     'Case "update" : cmd = AddressOf UpdateProject
                     'Case "show" : cmd = AddressOf ShowProject
-                Case Else : cmd = Nothing
-            End Select
+                    Case Else : cmd = Nothing
+                End Select
 
-            If cmd Is Nothing And rpa.SystemUtilities.Count > 0 Then
-                For Each util In rpa.SystemUtilities
-                    cmd = util.Value.UtilityObject.ExecuteHandler(trn, rpa)
-                    If cmd IsNot Nothing Then
-                        Exit For
-                    End If
-                Next
+                If cmd Is Nothing And rpa.SystemUtilities.Count > 0 Then
+                    For Each util In rpa.SystemUtilities
+                        cmd = util.Value.UtilityObject.ExecuteHandler(trn, rpa)
+                        If cmd IsNot Nothing Then
+                            Exit For
+                        End If
+                    Next
+                End If
             End If
-
             Return cmd
         End Get
     End Property
@@ -398,10 +407,10 @@ Public Class RpaSystem
     'End Function
     '---------------------------------------------------------------------------------------------'
 
-    Public Sub Main(ByRef trn As RpaTransaction, ByRef rpa As Object)
-        Dim cmd = ExecuteHandler(trn, rpa)
+    Public Sub Main(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer)
+        Dim cmd = ExecuteHandler(trn, rpa, ini)
         If cmd IsNot Nothing Then
-            trn.ReturnCode = cmd.Execute(trn, rpa)
+            trn.ReturnCode = cmd.Execute(trn, rpa, ini)
         Else
             Console.WriteLine($"コマンド : '{trn.CommandText}' はありません")
         End If

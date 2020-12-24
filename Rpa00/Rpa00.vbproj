@@ -76,8 +76,10 @@
     <Compile Include="Command\CloneProjectCommand.vb" />
     <Compile Include="Command\ExitCommand.vb" />
     <Compile Include="Command\LoadCommand.vb" />
+    <Compile Include="Command\NewProjectCommand.vb" />
     <Compile Include="Command\RunRobotCommand.vb" />
     <Compile Include="Command\SaveCommand.vb" />
+    <Compile Include="Command\SetupRpaCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

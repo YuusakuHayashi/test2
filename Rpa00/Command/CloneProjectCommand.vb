@@ -12,7 +12,7 @@ Public Class CloneProjectCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides ReadOnly Property CanExecute(trn As RpaTransaction, rpa As Object) As Boolean
+    Public Overrides ReadOnly Property CanExecute(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Boolean
         Get
             Return True
         End Get
@@ -30,7 +30,7 @@ Public Class CloneProjectCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object) As Integer
+    Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
         If trn.Parameters.Count > 0 Then
             Call SelectedCopy(trn, rpa)
         Else

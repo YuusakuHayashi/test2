@@ -4,24 +4,16 @@ Imports Rpa00
 
 Module RpaCui
     Public Sub Main()
-        Dim asm As Assembly
-        Dim [mod] As [Module]
-        Dim rpa_type As Type : Dim trn_type As Type : Dim sys_type As Type
-        Dim rpa, trn, sys
         Dim ptype As String = vbNullString
         Dim txt As String = vbNullString
         Dim inv As Boolean = False
         Dim arch As Integer
 
-        If Not File.Exists(CommonProject.SystemIniFileName) Then
-            Console.WriteLine($"ファイル     '{CommonProject.SystemIniFileName}' が存在しません")
-            Console.ReadLine()
-            Exit Sub
+        If Not Directory.Exists(CommonProject.SystemDirectory) Then
+            Directory.CreateDirectory(CommonProject.SystemDirectory)
         End If
         If Not Directory.Exists(CommonProject.SystemDllDirectory) Then
-            Console.WriteLine($"ディレクトリ '{CommonProject.SystemDllDirectory}' が存在しません")
-            Console.ReadLine()
-            Exit Sub
+            Directory.CreateDirectory(CommonProject.SystemDllDirectory)
         End If
         If Not File.Exists(CommonProject.System00DllFileName) Then
             Console.WriteLine($"ファイル     '{CommonProject.System00DllFileName}' が存在しません")
@@ -29,57 +21,53 @@ Module RpaCui
             Exit Sub
         End If
 
-        ' IniFile 読み込み
-        Dim flag As Boolean = False
-        Dim jh As JsonHandler(Of RpaInitializer)
-        Dim ini As RpaInitializer
-        jh = New JsonHandler(Of RpaInitializer)
-        ini = jh.Load(CommonProject.SystemIniFileName)
-        If ini Is Nothing Then
-            Console.WriteLine($"ファイル     '{CommonProject.SystemIniFileName}' の読み込みに失敗しました")
-            Console.ReadLine()
-            Exit Sub
-        End If
-
-        ' オブジェクト生成
+        Dim asm As Assembly = Nothing
+        Dim [mod] As [Module] = Nothing
         'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
-        'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.dll")
         asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
         [mod] = asm.GetModule("Rpa00.dll")
-        trn_type = [mod].GetType("Rpa00.RpaTransaction")
-        sys_type = [mod].GetType("Rpa00.RpaSystem")
-        Select Case ini.CurrentSolutionArchitecture
-            Case "IntranetClientServer"
-                rpa_type = [mod].GetType("Rpa00.IntranetClientServerProject")
-                arch = RpaCodes.ProjectArchitecture.IntranetClientServer
-            Case "StandAlone"
-                rpa_type = [mod].GetType("Rpa00.StandAloneProject")
-                arch = RpaCodes.ProjectArchitecture.StandAlone
-            Case "ClientServer"
-                rpa_type = [mod].GetType("Rpa00.ClientServerProject")
-                arch = RpaCodes.ProjectArchitecture.ClientServer
-        End Select
+        Dim trn_type = [mod].GetType("Rpa00.RpaTransaction")
+        Dim sys_type = [mod].GetType("Rpa00.RpaSystem")
+        Dim ini_type = [mod].GetType("Rpa00.RpaInitializer")
+        Dim rpa As Object = Nothing
+        Dim trn = Activator.CreateInstance(trn_type)
+        Dim sys = Activator.CreateInstance(sys_type)
+        Dim ini = Activator.CreateInstance(ini_type)
+        Dim ics_type = [mod].GetType("Rpa00.IntranetClientServerProject")
+        Dim sap_type = [mod].GetType("Rpa00.StandAloneProject")
+        Dim csp_type = [mod].GetType("Rpa00.ClientServerProject")
+        Dim ics = Activator.CreateInstance(ics_type)
+        Dim sap = Activator.CreateInstance(sap_type)
+        Dim csp = Activator.CreateInstance(csp_type)
 
-        If rpa_type IsNot Nothing Then
-            rpa = Activator.CreateInstance(rpa_type)
+        If Not File.Exists(CommonProject.SystemIniFileName) Then
+            ini.Save(CommonProject.SystemIniFileName, ini)
         End If
-        If trn_type IsNot Nothing Then
-            trn = Activator.CreateInstance(trn_type)
-            trn.ProjectArchitecture = arch
-        End If
-        If sys_type IsNot Nothing Then
-            sys = Activator.CreateInstance(sys_type)
+        ini = ini.Load(CommonProject.SystemIniFileName)
+        If ini.CurrentSolution Is Nothing Then
+            rpa = Nothing
+        Else
+            ' 動的オブジェクト生成
+            Select Case ini.CurrentSolution.Architecture
+                Case ics.SystemArchType : rpa = ics
+                Case sap.SystemArchType : rpa = sap
+                Case csp.SystemArchType : rpa = csp
+            End Select
         End If
 
-        Call rpa.HelloProject()
-        Call rpa.CheckProject()
+        'Call rpa.HelloProject()
+        'Call rpa.CheckProject()
 
         ' 実行
         Do Until trn.ExitFlag
-            Console.Write($"{rpa.ProjectAlias}>")
+            If rpa IsNot Nothing Then
+                Console.Write($"{rpa.ProjectAlias}>")
+            Else
+                Console.Write("NoRpa>")
+            End If
             trn.CommandText = Console.ReadLine()
             Call trn.CreateCommand()
-            Call sys.Main(trn, rpa)
+            Call sys.Main(trn, rpa, ini)
             Console.WriteLine(vbNullString)
         Loop
     End Sub
