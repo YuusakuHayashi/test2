@@ -88,7 +88,8 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         Dim asm As Assembly = Nothing
         Dim [mod] As [Module] = Nothing
         'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
-        asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
+        'asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
+        asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.dll")
         [mod] = asm.GetModule("Rpa00.dll")
         Dim ics_type As Type = [mod].GetType("Rpa00.IntranetClientServerProject")
         Dim sap_type As Type = [mod].GetType("Rpa00.StandAloneProject")
