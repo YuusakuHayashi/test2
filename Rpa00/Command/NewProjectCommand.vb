@@ -33,11 +33,8 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
 
     Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
         Dim rpa2 As Object
-        Dim flag As Boolean = False
-        Dim yorn As String = vbNullString
-        Dim pname As String
 
-        rpa2 = _SelectProjectArchitecture()
+        rpa2 = _SelectProjectArchitecture(trn)
         If rpa2 Is Nothing Then
             Console.WriteLine($"プロジェクトの新規作成を中止しました")
             Console.WriteLine(vbNullString)
@@ -53,13 +50,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
             Return 1000
         End If
 
-        rpa2 = _GetMyDirectory(rpa2)
-        If rpa2 Is Nothing Then
-            Console.WriteLine($"プロジェクトの新規作成を中止しました")
-            Console.WriteLine(vbNullString)
-            trn.ExitFlag = True
-            Return 1000
-        End If
+        rpa2.MyDirectory = RpaModule.SetDirectoryFromDialog(trn, rpa2, ini, "MyDirectory")
 
         ini = _RegisterSolution(ini, rpa2)
         If ini Is Nothing Then
@@ -69,6 +60,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
             Return 1000
         End If
 
+        rpa = rpa2
         Directory.CreateDirectory(rpa2.SystemSolutionDirectory)
         Console.WriteLine($"ディレクトリ '{rpa2.SystemSolutionDirectory}' を新規作成しました")
         Call rpa2.Save(rpa2.SystemJsonFileName, rpa2)
@@ -78,51 +70,48 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         Return 0
     End Function
 
-    Private Function _SelectProjectArchitecture() As Object
-        Dim inp As String = vbNullString
-        Dim pidx As Integer = 0
-        Dim yorn As String = vbNullString
+    Private Function _SelectProjectArchitecture(ByRef trn As RpaTransaction) As Object
         Dim rpa As Object
-        Dim arch(4) As String
-
-        Dim asm As Assembly = Nothing
-        Dim [mod] As [Module] = Nothing
-        'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
-        'asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
-        asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.dll")
-        [mod] = asm.GetModule("Rpa00.dll")
-        Dim ics_type As Type = [mod].GetType("Rpa00.IntranetClientServerProject")
-        Dim sap_type As Type = [mod].GetType("Rpa00.StandAloneProject")
-        Dim csp_type As Type = [mod].GetType("Rpa00.ClientServerProject")
-        Dim ics = Activator.CreateInstance(ics_type)
-        Dim sap = Activator.CreateInstance(sap_type)
-        Dim csp = Activator.CreateInstance(csp_type)
-
+        Dim yorn = vbNullString
         Do
-            yorn = vbNullString
+            Dim eidx As Integer
+            Dim eflg As Boolean
+            Dim iidx As Integer
+            Dim inp As String
             Do
-                inp = vbNullString
-                Console.WriteLine($"プロジェクト構成を選択")
-                Console.WriteLine($"           {ics.SystemArchType} ... {ics.SystemArchTypeName}")
-                Console.WriteLine($"           {sap.SystemArchType} ... {sap.SystemArchTypeName}")
-                Console.WriteLine($"           {csp.SystemArchType} ... {csp.SystemArchTypeName}")
-                Console.WriteLine($"           9 ... やっぱりやめる")
-                Console.Write($"setup>")
-                inp = Console.ReadLine()
-                pidx = inp.ToString()
-                Console.WriteLine(vbNullString)
-            Loop Until pidx < 10
+                iidx = -1 : eidx = -1
+                Console.WriteLine($"プロジェクト構成のインデックスを指定")
+                Dim idx As Integer = 1
+                eflg = True
+                Do
+                    Dim rpa2 As Object = RpaModule.RpaObject(idx)
+                    If rpa2 IsNot Nothing Then
+                        Console.WriteLine($"{idx} ... {rpa2.SystemArchTypeName}")
+                    Else
+                        Console.WriteLine($"{idx} ... やっぱりやめる")
+                        eidx = idx
+                        eflg = False
+                    End If
+                    idx += 1
+                Loop Until (Not eflg)
 
-            If pidx = ics.SystemArchType Then
-                rpa = ics
+                inp = trn.ShowRpaIndicator(Nothing)
+                If IsNumeric(inp) Then
+                    iidx = Integer.Parse(inp)
+                Else
+                    iidx = eidx + 1
+                End If
+                Console.WriteLine()
+            Loop Until iidx <= eidx
+
+            rpa = RpaModule.RpaObject(iidx)
+
+            If iidx = eidx Then
+                rpa = Nothing
+                Exit Do
             End If
-            If pidx = sap.SystemArchType Then
-                rpa = sap
-            End If
-            If pidx = csp.SystemArchType Then
-                rpa = csp
-            End If
-            If pidx = 9 Then
+            If rpa Is Nothing Then
+                Console.WriteLine($"指定のインデックス '{inp}' からはオブジェクトを生成できませんでした")
                 rpa = Nothing
                 Exit Do
             End If
@@ -130,11 +119,9 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
             If Not Directory.Exists(rpa.SystemArchDirectory) Then
                 Directory.CreateDirectory(rpa.SystemArchDirectory)
             End If
-
             Do
                 Console.WriteLine($"よろしいですか？ '{inp} ... {rpa.SystemArchTypeName}' (y/n)")
-                Console.Write($"setup>")
-                yorn = Console.ReadLine()
+                yorn = trn.ShowRpaIndicator(Nothing)
                 Console.WriteLine(vbNullString)
             Loop Until yorn = "y" Or yorn = "n"
         Loop Until yorn = "y"
@@ -195,7 +182,8 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         [new] = New RpaInitializer.RpaSolution With {
             .Name = rpa.SolutionName,
             .Architecture = rpa.SystemArchType,
-            .SolutionDirectory = rpa.SystemSolutionDirectory
+            .SolutionDirectory = rpa.SystemSolutionDirectory,
+            .JsonFileName = rpa.SystemJsonFileName
         }
         If sl Is Nothing Then
             ini.Solutions.Add([new])

@@ -1,33 +1,17 @@
 ﻿Public Class SetupRpaCommand : Inherits RpaCommandBase
-
     Private ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Object
         Get
             Dim cmd As Object
             Select Case trn.MainCommand
                 Case "newproject" : cmd = New NewProjectCommand
-                Case "exit" : cmd = New ExitCommand                ' 現状、SetupのExit と ApplicationのExit に差はないため再利用している
+                Case "setupinitializer" : cmd = New SetupInitializerCommand
+                Case "exit" : cmd = New ExitCommand                          ' 現状、SetupのExit と ApplicationのExit に差はないため再利用している
                 Case Else : cmd = Nothing
             End Select
             Return cmd
         End Get
     End Property
     '---------------------------------------------------------------------------------------------'
-
-    Public Overrides ReadOnly Property ExecutableProjectArchitectures As Integer()
-        Get
-            Return {
-                (New IntranetClientServerProject).SystemArchType,
-                (New StandAloneProject).SystemArchType,
-                (New ClientServerProject).SystemArchType
-            }
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property CanExecute(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Boolean
-        Get
-            Return True
-        End Get
-    End Property
 
     Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
         Get
@@ -42,17 +26,18 @@
     End Property
 
     Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
+        Console.WriteLine($"設定モード移行")
+        trn.Modes.Add("setup")
         Do
-            Console.Write("setup>")
-            trn.CommandText = Console.ReadLine()
+            trn.CommandText = trn.ShowRpaIndicator(rpa)
             Call trn.CreateCommand()
             Call CommandExecute(trn, rpa, ini)
-            Console.WriteLine(vbNullString)
+            Console.WriteLine()
         Loop Until trn.ExitFlag
 
         trn.ExitFlag = False
-        Console.WriteLine($"プロジェクト設定変更を終了します")
-        Console.ReadLine()
+        trn.Modes.Remove(trn.Modes.Remove("setup"))
+        Console.WriteLine($"設定モード終了")
     End Function
     
     Public Sub CommandExecute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) 
