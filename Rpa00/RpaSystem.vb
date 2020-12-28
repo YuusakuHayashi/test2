@@ -1,5 +1,18 @@
 ﻿Imports System.IO
 Public Class RpaSystem
+    Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
+        Get
+            Dim ics As New IntranetClientServerProject
+            Dim sap As New StandAloneProject
+            Dim csp As New ClientServerProject
+            Select Case index
+                Case ics.SystemArchType : Return ics
+                Case sap.SystemArchType : Return sap
+                Case csp.SystemArchType : Return csp
+                Case Else : Return Nothing
+            End Select
+        End Get
+    End Property
 
     ' 機能はここに追加
     '---------------------------------------------------------------------------------------------'

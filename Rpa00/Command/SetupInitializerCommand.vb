@@ -1,13 +1,41 @@
 ﻿Imports System.Reflection
 
 Public Class SetupInitializerCommand : Inherits RpaCommandBase
+    Private Delegate Function ExecuteDelegater(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
+    Private ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As ExecuteDelegater
+        Get
+            Dim cmd As ExecuteDelegater
+            Select Case trn.MainCommand
+                Case "change" : cmd = AddressOf ChangeInitializer
+                Case "exit"
+                Case Else : cmd = Nothing
+            End Select
+            Return cmd
+        End Get
+    End Property
+    '---------------------------------------------------------------------------------------------'
+
     Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
+        Dim cmd As Object
+        Dim i As Integer
+        trn.Modes.Add("setup")
+        Do
+            trn.CommandText = trn.ShowRpaIndicator(rpa)
+            cmd = ExecuteHandler(trn, rpa, ini)
+            i = cmd(trn, rpa, ini)
+            Console.WriteLine()
+        Loop Until trn.ExitFlag
+
+        trn.ExitFlag = False
+        trn.Modes.Remove(trn.Modes.Remove("setup"))
+    End Function
+
+    Private Function ChangeInitializer(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
         Dim tp As Type = ini.GetType()
         Dim props As PropertyInfo() = tp.GetProperties()
         For Each prop In props
             Console.WriteLine($"{prop.Name} {prop.PropertyType.Name} {prop.GetValue(ini).ToString}")
         Next
-        Console.WriteLine("アクセスするプロパティを指定してください")
 
         Dim txt As String = trn.ShowRpaIndicator(rpa)
         Dim param As String() = txt.Split(" "c)

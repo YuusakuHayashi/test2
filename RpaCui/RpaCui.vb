@@ -24,8 +24,8 @@ Module RpaCui
         Dim asm As Assembly = Nothing
         Dim [mod] As [Module] = Nothing
         'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
-        'asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
-        asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\Rpa00.dll")
+        asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
+        'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\Rpa00.dll")
         [mod] = asm.GetModule("Rpa00.dll")
         Dim trn_type = [mod].GetType("Rpa00.RpaTransaction")
         Dim sys_type = [mod].GetType("Rpa00.RpaSystem")
@@ -35,33 +35,15 @@ Module RpaCui
         Dim sys = Activator.CreateInstance(sys_type)
         Dim ini = Activator.CreateInstance(ini_type)
 
-        ' 新しくプロジェクト種別を追加する際には、記述を追加
-        '---------------------------------------------------------------------'
-        Dim ics_type = [mod].GetType("Rpa00.IntranetClientServerProject")
-        Dim sap_type = [mod].GetType("Rpa00.StandAloneProject")
-        Dim csp_type = [mod].GetType("Rpa00.ClientServerProject")
-        Dim ics = Activator.CreateInstance(ics_type)
-        Dim sap = Activator.CreateInstance(sap_type)
-        Dim csp = Activator.CreateInstance(csp_type)
-        Dim fnc As Func(Of Object)
-        fnc = Function()
-                  Select Case ini.CurrentSolution.Architecture
-                      Case ics.SystemArchType : Return ics
-                      Case sap.SystemArchType : Return sap
-                      Case csp.SystemArchType : Return csp
-                      Case Else : Return Nothing
-                  End Select
-              End Function
-        '---------------------------------------------------------------------'
-
         If Not File.Exists(CommonProject.SystemIniFileName) Then
             ini.Save(CommonProject.SystemIniFileName, ini)
         End If
         ini = ini.Load(CommonProject.SystemIniFileName)
-        If ini.CurrentSolution Is Nothing Then
-            rpa = Nothing
-        Else
-            rpa = fnc()
+
+        If ini.AutoLoad Then
+            If ini.CurrentSolution IsNot Nothing Then
+                rpa = RpaModule.LoadCurrentRpa(ini)
+            End If
         End If
 
         'Call rpa.HelloProject()
@@ -69,12 +51,7 @@ Module RpaCui
 
         ' 実行
         Do Until trn.ExitFlag
-            If rpa IsNot Nothing Then
-                Console.Write($"{rpa.ProjectAlias}>")
-            Else
-                Console.Write("NoRpa>")
-            End If
-            trn.CommandText = Console.ReadLine()
+            trn.CommandText = trn.ShowRpaIndicator(rpa)
             Call trn.CreateCommand()
             Call sys.Main(trn, rpa, ini)
             Console.WriteLine(vbNullString)

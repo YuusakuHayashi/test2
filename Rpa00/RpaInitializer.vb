@@ -62,5 +62,15 @@
                 Me._SolutionDirectory = value
             End Set
         End Property
+
+        Private _JsonFileName As String
+        Public Property JsonFileName As String
+            Get
+                Return Me._JsonFileName
+            End Get
+            Set(value As String)
+                Me._JsonFileName = value
+            End Set
+        End Property
     End Class
 End Class

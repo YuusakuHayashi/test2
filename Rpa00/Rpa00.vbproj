@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="ClientServerProject.vb" />
     <Compile Include="Command\AddUtilityCommand.vb" />
+    <Compile Include="Command\SetupInitializerCommand.vb" />
     <Compile Include="Command\CloneProjectCommand.vb" />
     <Compile Include="Command\ExitCommand.vb" />
     <Compile Include="Command\LoadCommand.vb" />

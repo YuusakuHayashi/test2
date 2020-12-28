@@ -3,7 +3,7 @@ Imports System.Text
 Imports System.Runtime.InteropServices
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
-Imports Rpa00
+Imports Rpa00s
 
 Public MustInherit Class RpaProjectBase(Of T As {New})
     Inherits JsonHandler(Of T)

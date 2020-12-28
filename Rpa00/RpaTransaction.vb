@@ -39,6 +39,19 @@
         End Set
     End Property
 
+    Private _Modes As List(Of String)
+    Public Property Modes As List(Of String)
+        Get
+            If Me._Modes Is Nothing Then
+                Me._Modes = New List(Of String)
+            End If
+            Return Me._Modes
+        End Get
+        Set(value As List(Of String))
+            Me._Modes = value
+        End Set
+    End Property
+
     Private _Parameters As List(Of String)
     Public Property Parameters As List(Of String)
         Get
@@ -76,4 +89,23 @@
             End If
         Next
     End Sub
+
+    Public Function ShowRpaIndicator(ByRef rpa As Object) As String
+        If Me.Modes.Count = 0 Then
+            If rpa IsNot Nothing Then
+                Console.Write($"{rpa.SolutionName}\{rpa.ProjectAlias}>")
+            Else
+                Console.Write("NoRpa>")
+            End If
+        Else
+            For Each mode In Me.Modes
+                If Me.Modes.Last = mode Then
+                    Console.Write($"{mode}>")
+                Else
+                    Console.Write($"{mode}\")
+                End If
+            Next
+        End If
+        Return Console.ReadLine()
+    End Function
 End Class

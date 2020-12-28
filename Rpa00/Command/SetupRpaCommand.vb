@@ -5,7 +5,8 @@
             Select Case trn.MainCommand
                 Case "newproject" : cmd = New NewProjectCommand
                 Case "setupinitializer" : cmd = New SetupInitializerCommand
-                Case "exit" : cmd = New ExitCommand                          ' 現状、SetupのExit と ApplicationのExit に差はないため再利用している
+                ' 現状、SetupのExit と ApplicationのExit に差はないため再利用している
+                Case "exit" : cmd = New ExitCommand
                 Case Else : cmd = Nothing
             End Select
             Return cmd
@@ -26,7 +27,6 @@
     End Property
 
     Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
-        Console.WriteLine($"設定モード移行")
         trn.Modes.Add("setup")
         Do
             trn.CommandText = trn.ShowRpaIndicator(rpa)
@@ -37,7 +37,6 @@
 
         trn.ExitFlag = False
         trn.Modes.Remove(trn.Modes.Remove("setup"))
-        Console.WriteLine($"設定モード終了")
     End Function
     
     Public Sub CommandExecute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) 
