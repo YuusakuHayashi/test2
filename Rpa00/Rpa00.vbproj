@@ -73,6 +73,8 @@
   <ItemGroup>
     <Compile Include="ClientServerProject.vb" />
     <Compile Include="Command\AddUtilityCommand.vb" />
+    <Compile Include="Command\ChangeInitializerCommand.vb" />
+    <Compile Include="Command\SelectProjectCommand.vb" />
     <Compile Include="Command\SetupInitializerCommand.vb" />
     <Compile Include="Command\CloneProjectCommand.vb" />
     <Compile Include="Command\ExitCommand.vb" />
@@ -80,6 +82,7 @@
     <Compile Include="Command\NewProjectCommand.vb" />
     <Compile Include="Command\RunRobotCommand.vb" />
     <Compile Include="Command\SaveCommand.vb" />
+    <Compile Include="Command\SetupProjectCommand.vb" />
     <Compile Include="Command\SetupRpaCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="JsonHandler.vb" />
@@ -113,7 +116,6 @@
     <Compile Include="RpaTransaction.vb" />
     <Compile Include="RpaUtility.vb" />
     <Compile Include="RpaUtilityBase.vb" />
-    <Compile Include="Command\SelectProjectCommand.vb" />
     <Compile Include="StandAloneProject.vb" />
   </ItemGroup>
   <ItemGroup>

@@ -1,33 +1,6 @@
-﻿Public Class SelectProjectCommand : Inherits RpaCommandBase
+﻿Imports Rpa00
 
-    Public Overrides ReadOnly Property ExecutableProjectArchitectures As Integer()
-        Get
-            Return {
-                RpaCodes.ProjectArchitecture.ClientServer,
-                RpaCodes.ProjectArchitecture.StandAlone,
-                RpaCodes.ProjectArchitecture.IntranetClientServer
-            }
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property CanExecute(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property ExecutableParameterCount() As Integer()
-        Get
-            Return {1, 1}
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property ExecutableUserLevel() As Integer
-        Get
-            Return RpaCodes.ProjectUserLevel.User
-        End Get
-    End Property
-
+Public Class SelectProjectCommand : Inherits RpaCommandBase
     Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
         If trn.Parameters.Count = 0 Then
             Console.WriteLine($"プロジェクトが選択されていません")

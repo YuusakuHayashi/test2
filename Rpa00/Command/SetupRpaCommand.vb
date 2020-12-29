@@ -4,6 +4,7 @@
             Dim cmd As Object
             Select Case trn.MainCommand
                 Case "newproject" : cmd = New NewProjectCommand
+                Case "setupproject" : cmd = New SetupProjectCommand
                 Case "setupinitializer" : cmd = New SetupInitializerCommand
                 ' 現状、SetupのExit と ApplicationのExit に差はないため再利用している
                 Case "exit" : cmd = New ExitCommand

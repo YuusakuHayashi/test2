@@ -22,8 +22,18 @@ Public Module RpaModule
         If ini.CurrentSolution Is Nothing Then
             Return Nothing
         End If
+
         Dim rpa = RpaObject(ini.CurrentSolution.Architecture)
-        Return (rpa.Load(ini.CurrentSolution.JsonFileName))
+        rpa = rpa.Load(ini.CurrentSolution.JsonFileName)
+        If rpa Is Nothing Then
+            Console.WriteLine($"ファイル '{ini.CurrentSolution.JsonFileName}' のロードに失敗しました")
+            Console.WriteLine()
+            Return Nothing
+        Else
+            Console.WriteLine($"ファイル '{ini.CurrentSolution.JsonFileName}' をロードしました")
+            Console.WriteLine()
+            Return rpa
+        End If
     End Function
 
     'Public Function ShowRpaIndicator(ByRef rpa As Object) As String

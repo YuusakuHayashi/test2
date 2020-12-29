@@ -7,7 +7,6 @@ Module RpaCui
         Dim ptype As String = vbNullString
         Dim txt As String = vbNullString
         Dim inv As Boolean = False
-        Dim arch As Integer
 
         If Not Directory.Exists(CommonProject.SystemDirectory) Then
             Directory.CreateDirectory(CommonProject.SystemDirectory)
@@ -24,8 +23,8 @@ Module RpaCui
         Dim asm As Assembly = Nothing
         Dim [mod] As [Module] = Nothing
         'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
-        asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
-        'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\Rpa00.dll")
+        'asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
+        asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\Rpa00.dll")
         [mod] = asm.GetModule("Rpa00.dll")
         Dim trn_type = [mod].GetType("Rpa00.RpaTransaction")
         Dim sys_type = [mod].GetType("Rpa00.RpaSystem")
@@ -54,7 +53,6 @@ Module RpaCui
             trn.CommandText = trn.ShowRpaIndicator(rpa)
             Call trn.CreateCommand()
             Call sys.Main(trn, rpa, ini)
-            Console.WriteLine(vbNullString)
         Loop
     End Sub
 End Module
