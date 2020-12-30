@@ -74,6 +74,8 @@
     <Compile Include="ClientServerProject.vb" />
     <Compile Include="Command\AddUtilityCommand.vb" />
     <Compile Include="Command\ChangeInitializerCommand.vb" />
+    <Compile Include="Command\ChangeProjectPropertyCommand.vb" />
+    <Compile Include="Command\ChangeProjectPropertyUsingFolderBrowserCommand.vb" />
     <Compile Include="Command\SelectProjectCommand.vb" />
     <Compile Include="Command\SetupInitializerCommand.vb" />
     <Compile Include="Command\CloneProjectCommand.vb" />
@@ -84,6 +86,7 @@
     <Compile Include="Command\SaveCommand.vb" />
     <Compile Include="Command\SetupProjectCommand.vb" />
     <Compile Include="Command\SetupRpaCommand.vb" />
+    <Compile Include="Command\ShowProjectPropertiesCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
