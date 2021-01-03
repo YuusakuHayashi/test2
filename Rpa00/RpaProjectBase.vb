@@ -3,7 +3,6 @@ Imports System.Text
 Imports System.Runtime.InteropServices
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
-Imports Rpa00s
 
 Public MustInherit Class RpaProjectBase(Of T As {New})
     Inherits JsonHandler(Of T)
@@ -36,13 +35,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Get
     End Property
 
-    <JsonIgnore>
-    Public Shared ReadOnly Property SystemIniFileName As String
-        Get
-            Return $"{RpaProjectBase(Of T).SystemDirectory}\rpa.ini"
-        End Get
-    End Property
-
     Private _SystemUtilities As Dictionary(Of String, RpaUtility)
     Public Property SystemUtilities As Dictionary(Of String, RpaUtility)
         Get
@@ -56,9 +48,37 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
+    Public Class RpaUtility
+        Private _UtilityName As String
+        Public Property UtilityName As String
+            Get
+                Return _UtilityName
+            End Get
+            Set(value As String)
+                Me._UtilityName = value
+            End Set
+        End Property
+
+        Private _UtilityObject As Object
+        <JsonIgnore>
+        Public Property UtilityObject As Object
+            Get
+                If Me._UtilityObject Is Nothing Then
+                    Me._UtilityObject = RpaCodes.RpaUtilityObject(UtilityName)
+                End If
+                Return Me._UtilityObject
+            End Get
+            Set(value As Object)
+                Me._UtilityObject = value
+            End Set
+        End Property
+    End Class
+
+
     Public MustOverride ReadOnly Property SystemArchDirectory As String
-    Public MustOverride ReadOnly Property SystemSolutionDirectory As String
+    Public MustOverride ReadOnly Property SystemProjectDirectory As String
     Public MustOverride ReadOnly Property SystemJsonFileName As String
+    Public MustOverride ReadOnly Property SystemTempJsonFileName As String
     Public MustOverride ReadOnly Property SystemArchType As Integer
     Public MustOverride ReadOnly Property SystemArchTypeName As String
 
@@ -86,61 +106,59 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
-    Private _SolutionName As String
-    Public Property SolutionName As String
-        Get
-            Return Me._SolutionName
-        End Get
-        Set(value As String)
-            Me._SolutionName = value
-        End Set
-    End Property
-
     Private _ProjectName As String
     Public Property ProjectName As String
         Get
             Return Me._ProjectName
         End Get
         Set(value As String)
-            Me._ProjectAlias = vbNullString
             Me._ProjectName = value
         End Set
     End Property
 
-    Private _AliasDictionary As Dictionary(Of String, String)
-    Public Property AliasDictionary As Dictionary(Of String, String)
+    Private _RobotName As String
+    Public Property RobotName As String
         Get
-            If Me._AliasDictionary Is Nothing Then
-                Me._AliasDictionary = New Dictionary(Of String, String)
-            End If
-            Return Me._AliasDictionary
+            Return Me._RobotName
         End Get
-        Set(value As Dictionary(Of String, String))
-            Me._AliasDictionary = value
+        Set(value As String)
+            Me._RobotAlias = vbNullString
+            Me._RobotName = value
         End Set
     End Property
 
-    Private _ProjectAlias As String
-    Public ReadOnly Property ProjectAlias As String
+    Private _RobotAliasDictionary As Dictionary(Of String, String)
+    Public Property RobotAliasDictionary As Dictionary(Of String, String)
         Get
-            If String.IsNullOrEmpty(Me._ProjectAlias) Then
-                If String.IsNullOrEmpty(Me.ProjectName) Then
-                    Me._ProjectAlias = "No Project"
+            If Me._RobotAliasDictionary Is Nothing Then
+                Me._RobotAliasDictionary = New Dictionary(Of String, String)
+            End If
+            Return Me._RobotAliasDictionary
+        End Get
+        Set(value As Dictionary(Of String, String))
+            Me._RobotAliasDictionary = value
+        End Set
+    End Property
+
+    Private _RobotAlias As String
+    Public ReadOnly Property RobotAlias As String
+        Get
+            If String.IsNullOrEmpty(Me.RobotName) Then
+                Me._RobotAlias = "No Robot"
+            Else
+                If Me.RobotAliasDictionary.ContainsKey(Me.RobotName) Then
+                    Me._RobotAlias = Me.RobotAliasDictionary(Me.RobotName)
                 Else
-                    If Me.AliasDictionary.ContainsKey(Me.ProjectName) Then
-                        Me._ProjectAlias = Me.AliasDictionary(Me.ProjectName)
-                    Else
-                        Me._ProjectAlias = Me.ProjectName
-                    End If
+                    Me._RobotAlias = Me.RobotName
                 End If
             End If
-            Return Me._ProjectAlias
+            Return Me._RobotAlias
         End Get
     End Property
 
-    Public ReadOnly Property IsMyProjectExists As Boolean
+    Public ReadOnly Property IsMyRobotExists As Boolean
         Get
-            If Directory.Exists(Me.MyProjectDirectory) Then
+            If Directory.Exists(Me.MyRobotDirectory) Then
                 Return True
             Else
                 Return False
@@ -148,44 +166,54 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Get
     End Property
 
-    Public ReadOnly Property MyProjectDirectory As String
+    Public ReadOnly Property MyRobotDirectory As String
         Get
-            Return $"{Me.MyDirectory}\{Me.ProjectAlias}"
+            Return $"{Me.MyDirectory}\{Me.RobotAlias}"
         End Get
     End Property
 
-    Public ReadOnly Property MyProjectJsonFileName As String
+    Public ReadOnly Property MyRobotJsonFileName As String
         Get
-            Return $"{Me.MyProjectDirectory}\rpa_project.json"
+            Return $"{Me.MyRobotDirectory}\rpa_project.json"
         End Get
     End Property
 
-    Private Property _MyProjectObject As Object
+    Private Property _MyRobotObject As Object
     <JsonIgnore>
-    Public Property MyProjectObject As Object
+    Public Property MyRobotObject As Object
         Get
-            If Me._MyProjectObject Is Nothing Then
+            If Me._MyRobotObject Is Nothing Then
                 Dim obj = RpaCodes.RpaObject(Me)
                 Dim obj2 = Nothing
                 If obj Is Nothing Then
-                    Me._MyProjectObject = Nothing
+                    Me._MyRobotObject = Nothing
                 Else
-                    If File.Exists(Me.MyProjectJsonFileName) Then
-                        obj2 = obj.Load(Me.MyProjectJsonFileName)
+                    If File.Exists(Me.MyRobotJsonFileName) Then
+                        obj2 = obj.Load(Me.MyRobotJsonFileName)
                     End If
                     If obj2 Is Nothing Then
-                        Me._MyProjectObject = obj
+                        Me._MyRobotObject = obj
                     Else
-                        Me._MyProjectObject = obj2
+                        Me._MyRobotObject = obj2
                     End If
                 End If
             End If
-            Return Me._MyProjectObject
+            Return Me._MyRobotObject
         End Get
         Set(value As Object)
-            Me._MyProjectObject = value
+            Me._MyRobotObject = value
         End Set
     End Property
+
+
+    Public Sub AddUtility(ByVal util As String)
+        Me.SystemUtilities.Add(
+            util, (New RpaUtility With {
+                .UtilityName = util,
+                .UtilityObject = RpaCodes.RpaUtilityObject(util)
+            })
+        )
+    End Sub
 
     Private _PrinterName As String
     Public Property PrinterName As String
@@ -208,5 +236,13 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
-    Public MustOverride Sub CheckProject()
+
+    Public Function DeepCopy() As Object
+        Return MemberwiseClone()
+    End Function
+
+    Public MustOverride Sub BeginTransaction()
+
+    Public MustOverride Function TransactionRollBack() As RpaProjectBase(Of T)
+
 End Class

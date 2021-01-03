@@ -1,58 +1,103 @@
 ﻿Imports System.IO
-Public Class RpaSystem
-    Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
-        Get
-            Dim ics As New IntranetClientServerProject
-            Dim sap As New StandAloneProject
-            Dim csp As New ClientServerProject
-            Select Case index
-                Case ics.SystemArchType : Return ics
-                Case sap.SystemArchType : Return sap
-                Case csp.SystemArchType : Return csp
-                Case Else : Return Nothing
-            End Select
-        End Get
-    End Property
 
+Public Class RpaSystem
     ' 機能はここに追加
+    ' ここでインスタンス化されたコマンドには、RpaDataWrapper型を持たせることが出来る
+    ' (おそらく、コンパイル時に型の情報を検査するのだと思われる)
     '---------------------------------------------------------------------------------------------'
-    Private ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Object
+    Public ReadOnly Property CommandHandler(dat As RpaDataWrapper) As Object
         Get
-            Dim cmd As Object
-            If rpa Is Nothing Then
-                ' rpa なしで実行可
-                Select Case trn.MainCommand
-                    Case "setup" : cmd = New SetupRpaCommand
-                    Case "exit" : cmd = New ExitCommand
-                    Case Else : cmd = Nothing
-                End Select
-            Else
-                ' rpa ありで実行可
-                Select Case trn.MainCommand
-                    Case "setup" : cmd = New SetupRpaCommand
-                    Case "save" : cmd = New SaveCommand
-                    Case "load" : cmd = New LoadCommand
-                    Case "run" : cmd = New RunRobotCommand
-                    Case "clone" : cmd = New CloneProjectCommand
-                    Case "select" : cmd = New SelectProjectCommand
-                    Case "exit" : cmd = New ExitCommand
-                    Case "addutility" : cmd = New AddUtilityCommand
+            Dim cmd = Nothing
+
+            ' Aliasの変換
+            Dim [alias] = dat.Initializer.MyCommandDictionary.Where(
+                Function(pair)
+                    If pair.Value.Alias = dat.Transaction.MainCommand Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+                End Function
+            )
+            If Not String.IsNullOrEmpty([alias](0).Key) Then
+                dat.Transaction.MainCommand = [alias](0).Key
+            End If
+
+            Dim cmdtxt As String = dat.Transaction.MainCommand
+
+            Select Case cmdtxt
+                    'Case "setup" : cmd = New SetupRpaCommand
+                Case "load" : cmd = New LoadCommand
+                Case "exit" : cmd = New ExitCommand
+                Case "showmycommands" : cmd = New ShowMyCommandCommand
+                Case "exportmycommands" : cmd = New ExportMyCommandsCommand
+                Case "importmycommands" : cmd = New ImportMyCommandsCommand
+                Case "changecommandenabled" : cmd = New ChangeCommandEnabledCommand
+                Case "setup" : cmd = New SetupRpaCommand
+                Case "saveproject" : cmd = New SaveProjectCommand
+                Case "saveinitializer" : cmd = New SaveInitializerCommand
+                Case "load" : cmd = New LoadCommand
+                Case "runrobot" : cmd = New RunRobotCommand
+                Case "clonerobot" : cmd = New CloneRobotCommand
+                Case "attachrobot" : cmd = New AttachRobotCommand
+                Case "addutility" : cmd = New AddUtilityCommand
+                Case "addcommandalias" : cmd = New AddCommandAliasCommand
+                Case "addrobotalias" : cmd = New AddRobotAliasCommand
+                Case "removerobot" : cmd = New RemoveRobotCommand
+                Case "showmycommands" : cmd = New ShowMyCommandCommand
+                Case "exportmycommands" : cmd = New ExportMyCommandsCommand
+                Case "importmycommands" : cmd = New ImportMyCommandsCommand
+                Case "changecommandenabled" : cmd = New ChangeCommandEnabledCommand
                     'Case "project" : cmd = AddressOf ShowCurrentProject
                     'Case "savejson" : cmd = AddressOf SaveJson
                     'Case "update" : cmd = AddressOf UpdateProject
                     'Case "show" : cmd = AddressOf ShowProject
-                    Case Else : cmd = Nothing
-                End Select
+                Case "removeproject" : cmd = New RemoveProjectCommand
+                Case "newproject" : cmd = New NewProjectCommand
+                Case "changeprojectproperty" : cmd = New ChangeProjectPropertyCommand
+                Case "showprojectproperties" : cmd = New ShowProjectPropertiesCommand
+                Case "changeprojectpropertyusingfolderbrowser" : cmd = New ChangeProjectPropertyUsingFolderBrowserCommand
+                Case "showinitializerproperties" : cmd = New ShowInitializerPropertiesCommand
+                Case "changeinitializerproperty" : cmd = New ChangeInitializerPropertyCommand
+                Case Else : cmd = Nothing
+            End Select
 
-                If cmd Is Nothing And rpa.SystemUtilities.Count > 0 Then
-                    For Each util In rpa.SystemUtilities
-                        cmd = util.Value.UtilityObject.ExecuteHandler(trn, rpa)
-                        If cmd IsNot Nothing Then
-                            Exit For
-                        End If
-                    Next
+            ' コマンド無効化
+            If dat.Initializer.MyCommandDictionary.ContainsKey(cmdtxt) Then
+                If Not dat.Initializer.MyCommandDictionary(cmdtxt).IsEnabled Then
+                    cmd = Nothing
                 End If
             End If
+            'If dat.Transaction.Modes.Count > 0 Then
+            '    Select Case dat.Transaction.Modes.Last
+            '        Case (New SetupRpaCommand).GetType.Name
+            '            Select Case dat.Transaction.MainCommand
+            '                Case "newproject" : cmd = New NewProjectCommand
+            '                Case "setupproject" : cmd = New SetupProjectCommand
+            '                Case "setupinitializer" : cmd = New SetupInitializerCommand
+            '                Case "removeproject" : cmd = New RemoveProjectCommand
+            '                Case "exit" : cmd = New ExitCommand
+            '                Case Else : cmd = Nothing
+            '            End Select
+            '        Case (New SetupProjectCommand).GetType.Name
+            '            Select Case dat.Transaction.MainCommand
+            '                Case "changeprojectproperty" : cmd = New ChangeProjectPropertyCommand
+            '                Case "showprojectproperties" : cmd = New ShowProjectPropertiesCommand
+            '                Case "changeprojectpropertyusingfolderbrowser" : cmd = New ChangeProjectPropertyUsingFolderBrowserCommand
+            '                Case "exit" : cmd = New ExitCommand
+            '                Case Else : cmd = Nothing
+            '            End Select
+            '        Case (New SetupInitializerCommand).GetType.Name
+            '            Select Case dat.Transaction.MainCommand
+            '                Case "changeinitializerproperty" : cmd = New ChangeInitializerCommand
+            '                Case "showinitializerproperties" : cmd = New ShowInitializerPropertiesCommand
+            '                Case "exit" : cmd = New ExitCommand
+            '                Case Else : cmd = Nothing
+            '            End Select
+            '        Case Else : cmd = Nothing
+            '    End Select
+            'End If
+
             Return cmd
         End Get
     End Property
@@ -67,37 +112,6 @@ Public Class RpaSystem
     '    Console.WriteLine($"MyProject    : {rpa.MyProjectDirectory}")
     '    Return 0
     'End Function
-    '---------------------------------------------------------------------------------------------'
-
-    ' システムのロード
-    '---------------------------------------------------------------------------------------------'
-    Private Function LoadSystem(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
-        Dim [load] = rpa.Load(rpa.SystemJsonFileName)
-        Dim i = 0
-        If [load] Is Nothing Then
-            Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' のロードに失敗しました。")
-            Return 1000
-        End If
-        If Not Directory.Exists([load].RootDirectory) Then
-            Console.WriteLine($"RootDirectory '{[load].RootDirectory}' がありません")
-            Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'RootDirectory' に任意のパスを書いてください")
-            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
-            Console.ReadLine()
-            trn.ExitFlag = True
-            Return 1000
-        End If
-        If Not Directory.Exists([load].MyDirectory) Then
-            Console.WriteLine($"MyDirectory '{[load].MyDirectory}' がありません")
-            Console.WriteLine($"ファイル '{[load].SystemJsonFileName}' の 'MyDirectory' に任意のパスを書いてください")
-            Console.WriteLine("ファイルを保存した後、アプリケーションを再起動してください")
-            Console.ReadLine()
-            trn.ExitFlag = True
-            Return 1000
-        End If
-        rpa = [load]
-        Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' をロードしました。")
-        Return 0
-    End Function
     '---------------------------------------------------------------------------------------------'
 
     ' システムのセーブ
@@ -137,102 +151,34 @@ Public Class RpaSystem
     End Function
     '---------------------------------------------------------------------------------------------'
 
-    ' ユーティリティの追加
-    '---------------------------------------------------------------------------------------------'
-    Private Function AddUtility(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
-        Dim uobj As RpaUtility
-        Dim obj As Object
-        Dim util As String
-        If trn.Parameters.Count = 0 Then
-            Console.WriteLine("ユーティリティが指定されていません")
-            Return 1000
-        End If
-        util = trn.Parameters(0)
-        obj = RpaCodes.RpaUtility(util)
-        If obj Is Nothing Then
-            Console.WriteLine($"指定のユーティリティ '{util}' は存在しません")
-            Return 1000
-        End If
-        If rpa.SystemUtilities.ContainsKey(util) Then
-            Console.WriteLine($"指定のユーティリティ '{util}' は既に追加されています")
-            Return 1000
-        End If
-        uobj = New RpaUtility With {
-            .UtilityName = util,
-            .UtilityObject = obj
-        }
-        rpa.SystemUtilities.Add(util, uobj)
-        Console.WriteLine($"指定のユーティリティ '{util}' を追加しました")
-        Return 0
-    End Function
-    '---------------------------------------------------------------------------------------------'
-
     ' Ｊｓｏｎのセーブ
     '---------------------------------------------------------------------------------------------'
-    Private Delegate Sub SaveJsonDelegater(ByVal json As String, ByVal obj As Object)
-    Private Function SaveJson(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
-        Dim act As Action(Of String, Object)
-        act = Sub(json, obj)
-                  Call obj.Save(json, obj)
-                  obj = obj.Load(json)
-                  If obj IsNot Nothing Then
-                      Console.WriteLine($"'{json}' のセーブに成功しました")
-                      obj = obj
-                  End If
-              End Sub
-        If trn.Parameters.Count = 0 Then
-            Call act(rpa.RootProjectJsonFileName, rpa.RootProjectObject)
-            Call act(rpa.MyProjectJsonFileName, rpa.MyProjectObject)
-        Else
-            If trn.Parameters(0) = "root" Then
-                Call act(rpa.RootProjectJsonFileName, rpa.RootProjectObject)
-            ElseIf trn.Parameters(0) = "myproject" Then
-                Call act(rpa.MyProjectJsonFileName, rpa.MyProjectObject)
-            End If
-        End If
-        Return 0
-    End Function
-
-    Private Sub _SaveAndCheckJson(ByVal file As String, ByVal obj As Object)
-    End Sub
-    '---------------------------------------------------------------------------------------------'
-
-    ' マクロの更新
-    ''---------------------------------------------------------------------------------------------'
-    'Private Function UpdateMacro(ByRef trn As RpaTransaction, ByRef rpa As RpaProject) As Integer
-    '    Dim bas As String
+    'Private Delegate Sub SaveJsonDelegater(ByVal json As String, ByVal obj As Object)
+    'Private Function SaveJson(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
+    '    Dim act As Action(Of String, Object)
+    '    act = Sub(json, obj)
+    '              Call obj.Save(json, obj)
+    '              obj = obj.Load(json)
+    '              If obj IsNot Nothing Then
+    '                  Console.WriteLine($"'{json}' のセーブに成功しました")
+    '                  obj = obj
+    '              End If
+    '          End Sub
     '    If trn.Parameters.Count = 0 Then
-    '        Console.WriteLine("パラメータが指定されていません: " & trn.CommandText)
-    '        Return 1000
-    '    End If
-
-    '    For Each p In trn.Parameters
-    '        bas = RpaProject.SYSTEM_SCRIPT_DIRECTORY & "\" & p
-    '        If File.Exists(bas) Then
-    '            Console.WriteLine($"指定マクロ '{p}' をインストールします")
-    '            Call rpa.InvokeMacro("MacroImporter.Main", {bas})
-    '        Else
-    '            Console.WriteLine($"指定マクロ '{p}' は存在しません")
+    '        Call act(rpa.RootProjectJsonFileName, rpa.RootProjectObject)
+    '        Call act(rpa.MyProjectJsonFileName, rpa.MyProjectObject)
+    '    Else
+    '        If trn.Parameters(0) = "root" Then
+    '            Call act(rpa.RootProjectJsonFileName, rpa.RootProjectObject)
+    '        ElseIf trn.Parameters(0) = "myproject" Then
+    '            Call act(rpa.MyProjectJsonFileName, rpa.MyProjectObject)
     '        End If
-    '    Next
+    '    End If
     '    Return 0
     'End Function
 
-    '---------------------------------------------------------------------------------------------'
-
-    ' ロボットの起動
-    '---------------------------------------------------------------------------------------------'
-    'Private Function RunRobot(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
-    '    Dim i = 0
-    '    Call rpa.MyProjectObject.SetData(trn, rpa)
-    '    If rpa.MyProjectObject.CanExecute() Then
-    '        i = rpa.MyProjectObject.Execute()
-    '    Else
-    '        Console.WriteLine("ロボットの起動条件を満たしていません")
-    '        i = 1000
-    '    End If
-    '    Return i
-    'End Function
+    Private Sub _SaveAndCheckJson(ByVal file As String, ByVal obj As Object)
+    End Sub
     '---------------------------------------------------------------------------------------------'
 
 
@@ -420,12 +366,63 @@ Public Class RpaSystem
     'End Function
     '---------------------------------------------------------------------------------------------'
 
-    Public Sub Main(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer)
-        Dim cmd = ExecuteHandler(trn, rpa, ini)
-        If cmd IsNot Nothing Then
-            trn.ReturnCode = cmd.Execute(trn, rpa, ini)
-        Else
-            Console.WriteLine($"コマンド : '{trn.CommandText}' はありません")
+    Public Sub Main(ByRef dat As RpaDataWrapper)
+        dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
+        Call dat.Transaction.CreateCommand()
+
+        Dim cmd = CommandHandler(dat)
+
+        If dat.Project IsNot Nothing Then
+            If (dat.Project.SystemUtilities.Count > 0) And (cmd Is Nothing) Then
+                For Each util In dat.Project.SystemUtilities
+                    cmd = util.Value.UtilityObject.ExecuteHandler(dat)
+                Next
+            End If
         End If
+
+        If cmd Is Nothing Then
+            Console.WriteLine($"コマンド : '{dat.Transaction.CommandText}' はありません")
+            Console.WriteLine()
+            Exit Sub
+        End If
+
+        Dim err1 As String = $"パラメータ数が範囲外です: 許容パラメータ数範囲={cmd.ExecutableParameterCount(0)}~{cmd.ExecutableParameterCount(1)}"
+        If cmd.ExecutableParameterCount(0) > dat.Transaction.Parameters.Count Then
+            Console.WriteLine(err1)
+            Console.WriteLine()
+            Exit Sub
+        End If
+        If cmd.ExecutableParameterCount(1) < dat.Transaction.Parameters.Count Then
+            Console.WriteLine(err1)
+            Console.WriteLine()
+            Exit Sub
+        End If
+
+        Dim err2 As String = $"プロジェクトが存在しないため、実行できません"
+        If Not cmd.ExecuteIfNoProject Then
+            Console.WriteLine(err2)
+            Console.WriteLine()
+            Exit Sub
+        End If
+
+
+        Dim err3 As String = $"このプロジェクト構成では、コマンド '{dat.Transaction.CommandText}' は実行できません"
+        Dim archs As String() = cmd.ExecutableProjectArchitectures
+        If Not archs.Contains("AllArchitectures") Then
+            If Not archs.Contains(dat.Project.SystemArchTypeName) Then
+                Console.WriteLine(err3)
+                Console.WriteLine()
+                Exit Sub
+            End If
+        End If
+
+        Dim err4 As String = $"コマンドは実行出来ませんでした"
+        If Not cmd.CanExecute(dat) Then
+            Console.WriteLine(err4)
+            Console.WriteLine()
+            Exit Sub
+        End If
+
+        dat.Transaction.ReturnCode = cmd.Execute(dat)
     End Sub
 End Class

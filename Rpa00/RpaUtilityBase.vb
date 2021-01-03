@@ -1,3 +1,3 @@
 ﻿Public MustInherit Class RpaUtilityBase
-    Public MustOverride ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As IntranetClientServerProject) As Object
+    Public MustOverride ReadOnly Property ExecuteHandler(dat As Object) As Object
 End Class

@@ -26,33 +26,22 @@ Module RpaCui
         asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
         'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\Rpa00.dll")
         [mod] = asm.GetModule("Rpa00.dll")
-        Dim trn_type = [mod].GetType("Rpa00.RpaTransaction")
-        Dim sys_type = [mod].GetType("Rpa00.RpaSystem")
-        Dim ini_type = [mod].GetType("Rpa00.RpaInitializer")
-        Dim rpa As Object = Nothing
-        Dim trn = Activator.CreateInstance(trn_type)
-        Dim sys = Activator.CreateInstance(sys_type)
-        Dim ini = Activator.CreateInstance(ini_type)
+        Dim dat_type = [mod].GetType("Rpa00.RpaDataWrapper")
+        Dim dat = Activator.CreateInstance(dat_type)
 
-        If Not File.Exists(CommonProject.SystemIniFileName) Then
-            ini.Save(CommonProject.SystemIniFileName, ini)
+        If Not File.Exists(RpaInitializer.SystemIniFileName) Then
+            dat.Initializer.Save(RpaInitializer.SystemIniFileName, dat.Initializer)
         End If
-        ini = ini.Load(CommonProject.SystemIniFileName)
+        dat.Initializer = dat.Initializer.Load(RpaInitializer.SystemIniFileName)
 
-        If ini.AutoLoad Then
-            If ini.CurrentSolution IsNot Nothing Then
-                rpa = RpaModule.LoadCurrentRpa(ini)
-            End If
-        End If
+        dat.Project = RpaModule.LoadCurrentRpa(dat)
 
         'Call rpa.HelloProject()
         'Call rpa.CheckProject()
 
         ' 実行
-        Do Until trn.ExitFlag
-            trn.CommandText = trn.ShowRpaIndicator(rpa)
-            Call trn.CreateCommand()
-            Call sys.Main(trn, rpa, ini)
+        Do Until dat.Transaction.ExitFlag
+            Call dat.System.Main(dat)
         Loop
     End Sub
 End Module

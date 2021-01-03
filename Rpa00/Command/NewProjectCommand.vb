@@ -3,74 +3,64 @@ Imports System.Reflection
 Imports System.Windows.Forms
 
 Public Class NewProjectCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecutableProjectArchitectures As Integer()
-        Get
-            Return {
-                (New IntranetClientServerProject).SystemArchType,
-                (New StandAloneProject).SystemArchType,
-                (New ClientServerProject).SystemArchType
-            }
-        End Get
-    End Property
+    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+        Dim rpa As Object
 
-    Public Overrides ReadOnly Property CanExecute(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {0, 99}
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property ExecutableUserLevel As Integer
-        Get
-            Return RpaCodes.ProjectUserLevel.User
-        End Get
-    End Property
-
-    Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
-        Dim rpa2 As Object
-
-        rpa2 = _SelectProjectArchitecture(trn)
-        If rpa2 Is Nothing Then
+        ' Solutionオブジェクト
+        rpa = _SelectProjectArchitecture(dat)
+        If rpa Is Nothing Then
             Console.WriteLine($"プロジェクトの新規作成を中止しました")
-            Console.WriteLine(vbNullString)
-            trn.ExitFlag = True
+            Console.WriteLine()
+            dat.Transaction.ExitFlag = True
             Return 1000
         End If
 
-        rpa2 = _GetSolution(rpa2)
-        If rpa2 Is Nothing Then
+        ' ソリューション名の更新
+        rpa = _GetSolution(dat, rpa)
+        If rpa Is Nothing Then
             Console.WriteLine($"プロジェクトの新規作成を中止しました")
-            Console.WriteLine(vbNullString)
-            trn.ExitFlag = True
+            Console.WriteLine()
+            dat.Transaction.ExitFlag = True
             Return 1000
         End If
 
-        rpa2.MyDirectory = RpaModule.SetDirectoryFromDialog(trn, rpa2, ini, "MyDirectory")
+        rpa.MyDirectory = RpaModule.SetDirectoryFromDialog(dat, "MyDirectory")
 
-        ini = _RegisterSolution(ini, rpa2)
+        ' ソリューションをイニシャライザーへ登録
+        Dim ini As RpaInitializer = _RegisterSolution(dat, rpa)
         If ini Is Nothing Then
             Console.WriteLine($"プロジェクトの新規作成を中止しました")
-            Console.WriteLine(vbNullString)
-            trn.ExitFlag = True
+            Console.WriteLine()
+            dat.Transaction.ExitFlag = True
             Return 1000
         End If
 
-        rpa = rpa2
-        Directory.CreateDirectory(rpa2.SystemSolutionDirectory)
-        Console.WriteLine($"ディレクトリ '{rpa2.SystemSolutionDirectory}' を新規作成しました")
-        Call rpa2.Save(rpa2.SystemJsonFileName, rpa2)
-        Console.WriteLine($"ファイル     '{rpa2.SystemJsonFileName}' を新規作成しました")
-        Call ini.Save(CommonProject.SystemIniFileName, ini)
-        Console.WriteLine($"ファイル     '{CommonProject.SystemIniFileName}' を新規作成しました")
+        Dim yorn As String = vbNullString
+        If dat.Project IsNot Nothing Then
+            Console.WriteLine($"現在起動しているソリューション '{dat.Project.ProjectName}' から切り替えますか？ (y/n)")
+            Do
+                yorn = vbNullString
+                yorn = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+            Loop Until yorn = "y" Or yorn = "n"
+        Else
+            yorn = "y"
+        End If
+        If yorn = "y" Then
+            dat.Project = rpa
+        End If
+
+        Directory.CreateDirectory(rpa.SystemProjectDirectory)
+        Console.WriteLine($"ディレクトリ '{rpa.SystemProjectDirectory}' を新規作成しました")
+        Call rpa.Save(rpa.SystemJsonFileName, rpa)
+        Console.WriteLine($"ファイル     '{rpa.SystemJsonFileName}' を新規作成しました")
+        Call ini.Save(RpaInitializer.SystemIniFileName, ini)
+        Console.WriteLine($"ファイル     '{RpaInitializer.SystemIniFileName}' を更新しました")
+        Console.WriteLine()
         Return 0
     End Function
 
-    Private Function _SelectProjectArchitecture(ByRef trn As RpaTransaction) As Object
+    Private Function _SelectProjectArchitecture(ByRef dat As RpaDataWrapper) As Object
         Dim rpa As Object
         Dim yorn = vbNullString
         Do
@@ -95,7 +85,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
                     idx += 1
                 Loop Until (Not eflg)
 
-                inp = trn.ShowRpaIndicator(Nothing)
+                inp = dat.Transaction.ShowRpaIndicator(Nothing)
                 If IsNumeric(inp) Then
                     iidx = Integer.Parse(inp)
                 Else
@@ -121,16 +111,16 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
             End If
             Do
                 Console.WriteLine($"よろしいですか？ '{inp} ... {rpa.SystemArchTypeName}' (y/n)")
-                yorn = trn.ShowRpaIndicator(Nothing)
-                Console.WriteLine(vbNullString)
+                yorn = dat.Transaction.ShowRpaIndicator(Nothing)
+                Console.WriteLine()
             Loop Until yorn = "y" Or yorn = "n"
         Loop Until yorn = "y"
 
         Return rpa
     End Function
 
-    ' rpaプロジェクトオブジェクトの[SolutionName]を更新する
-    Private Function _GetSolution(ByRef rpa As Object) As Object
+    ' rpaプロジェクトオブジェクトの[ProjectName]を更新する
+    Private Function _GetSolution(ByRef dat As RpaDataWrapper, ByRef rpa As Object) As Object
         Dim [sln] As String = vbNullString
         Dim flag As Boolean = False
         Dim yorn As String = vbNullString
@@ -140,24 +130,22 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
             [sln] = vbNullString
 
             Console.WriteLine($"プロジェクト名を入力してください ...")
-            Console.Write($"setup>")
-            [sln] = Console.ReadLine()
-            rpa.SolutionName = [sln]
-            Console.WriteLine(vbNullString)
+            [sln] = dat.Transaction.ShowRpaIndicator(dat)
+            rpa.ProjectName = [sln]
+            Console.WriteLine()
 
-            If Directory.Exists(rpa.SystemSolutionDirectory) Then
-                Console.WriteLine($"プロジェクト '{rpa.SolutionName}' は存在します")
+            If Directory.Exists(rpa.SystemProjectDirectory) Then
+                Console.WriteLine($"プロジェクト '{rpa.ProjectName}' は存在します")
                 Console.WriteLine($"他のプロジェクト名を入力してください")
-                Console.WriteLine(vbNullString)
+                Console.WriteLine()
                 Continue Do
             End If
 
             Do
                 yorn = vbNullString
-                Console.WriteLine($"'{rpa.SolutionName}' よろしいですか？(y/n)")
-                Console.Write($"setup>")
-                yorn = Console.ReadLine()
-                Console.WriteLine(vbNullString)
+                Console.WriteLine($"'{rpa.ProjectName}' よろしいですか？ (y/n)")
+                yorn = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
             Loop Until yorn = "y" Or yorn = "n"
 
             If yorn = "y" Then
@@ -167,72 +155,35 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
                 flag = True
             End If
         Loop Until flag
+
         Return rpa
     End Function
 
-    Private Function _RegisterSolution(ini As RpaInitializer, rpa As Object) As RpaInitializer
-        Dim sl As RpaInitializer.RpaSolution
-        Dim [new] As RpaInitializer.RpaSolution
+    Private Function _RegisterSolution(ByRef dat As RpaDataWrapper, ByRef rpa As Object) As RpaInitializer
+        Dim sl As RpaInitializer.RpaProject       ' 既にあるソリューション
+        Dim [new] As RpaInitializer.RpaProject    ' 新規作成するソリューション
         Dim idx As Integer = -1
-        sl = ini.Solutions.Find(
+        Dim [sln] As String = rpa.ProjectName
+
+        sl = dat.Initializer.Projects.Find(
             Function(s)
-                Return (s.Name = rpa.SolutionName)
+                Return (s.Name = [sln])
             End Function
         )
-        [new] = New RpaInitializer.RpaSolution With {
-            .Name = rpa.SolutionName,
+        [new] = New RpaInitializer.RpaProject With {
+            .Name = rpa.ProjectName,
             .Architecture = rpa.SystemArchType,
-            .SolutionDirectory = rpa.SystemSolutionDirectory,
+            .ProjectDirectory = rpa.SystemProjectDirectory,
             .JsonFileName = rpa.SystemJsonFileName
         }
         If sl Is Nothing Then
-            ini.Solutions.Add([new])
+            dat.Initializer.Projects.Add([new])
         Else
-            idx = ini.Solutions.IndexOf(sl)
-            ini.Solutions(idx) = [new]
+            idx = dat.Initializer.Projects.IndexOf(sl)
+            dat.Initializer.Projects(idx) = [new]
         End If
-        ini.CurrentSolution = [new]
-        Return ini
-    End Function
+        dat.Initializer.CurrentProject = [new]
 
-    Private Function _GetMyDirectory(ByRef obj As Object) As Object
-        Dim yorn As String = vbNullString
-        Dim yorn2 As String = vbNullString
-        Dim fbd As FolderBrowserDialog
-        Do
-            yorn = vbNullString
-            Console.WriteLine($"MyDirectory の設定を行いますか (y/n)")
-            Console.Write($"GetMyDirectory>")
-            yorn = Console.ReadLine()
-            Console.WriteLine(vbNullString)
-        Loop Until yorn = "y" Or yorn = "n"
-        If yorn = "y" Then
-            Do
-                yorn2 = vbNullString
-                fbd = New FolderBrowserDialog With {
-                    .Description = $"Select MyDirectory",
-                    .RootFolder = Environment.SpecialFolder.Desktop,
-                    .SelectedPath = Environment.SpecialFolder.Desktop,
-                    .ShowNewFolderButton = True
-                }
-                If fbd.ShowDialog() = DialogResult.OK Then
-                    Console.WriteLine($"よろしいですか？ '{fbd.SelectedPath}' (y/n)")
-                    Console.Write($"GetMyDirectory>")
-                    yorn2 = Console.ReadLine()
-                    Console.WriteLine(vbNullString)
-                Else
-                    yorn2 = vbNullString
-                End If
-            Loop Until yorn2 = "y" Or yorn2 = vbNullString
-            If yorn2 = "y" Then
-                obj.MyDirectory = fbd.SelectedPath
-                Console.WriteLine($"MyDirectory が設定されました")
-                Console.WriteLine(vbNullString)
-            Else
-                Console.WriteLine($"MyDirectory の設定は行いませんでした")
-                Console.WriteLine(vbNullString)
-            End If
-        End If
-        Return obj
+        Return dat.Initializer
     End Function
 End Class

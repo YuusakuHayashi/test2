@@ -3,11 +3,11 @@
     Public MustOverride Function Execute() As Integer
     Public MustOverride Function CanExecute() As Boolean
 
-    Protected Rpa As IntranetClientServerProject
+    Protected Rpa As Object
     Protected Transaction As RpaTransaction
 
-    Public Sub SetData(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject)
-        Me.Rpa = rpa
-        Me.Transaction = trn
+    Public Sub SetData(ByRef dat As RpaDataWrapper)
+        Me.Rpa = dat.Project
+        Me.Transaction = dat.Transaction
     End Sub
 End Class

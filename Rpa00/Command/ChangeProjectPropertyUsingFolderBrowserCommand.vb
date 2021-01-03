@@ -1,8 +1,14 @@
 ﻿Imports System.Reflection
 Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaCommandBase
-    Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
-        Dim pname As String = trn.Parameters(0)
-        Dim pi As PropertyInfo = rpa.GetType().GetProperty(pname)
+    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
+        Get
+            Return {1, 1}
+        End Get
+    End Property
+
+    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+        Dim pname As String = dat.Transaction.Parameters(0)
+        Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
         If pi Is Nothing Then
             Console.WriteLine($"プロパティ '{pname}' は存在しません")
             Console.WriteLine()
@@ -15,7 +21,13 @@ Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaComman
             Return 1000
         End If
 
-        Dim ptext As String = SetDirectoryFromDialog(trn, rpa, ini, trn.Parameters(0))
+        Dim ptext As String = SetDirectoryFromDialog(dat, pname)
+        If String.IsNullOrEmpty(ptext) Then
+            Console.WriteLine($"選択パスが不正です")
+            Console.WriteLine()
+            Return 1000
+        End If
+
         Dim pvalue As Object
         Select Case pi.PropertyType
             Case (New Integer).GetType             ' 数値
@@ -36,10 +48,11 @@ Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaComman
             Return 1000
         End If
 
-        pi.SetValue(rpa, pvalue)
+        pi.SetValue(dat.Project, pvalue)
         Console.WriteLine($"プロパティ '{pname}' を 値' {ptext}' に変更しました")
-        Call rpa.Save(rpa.SystemJsonFileName, rpa)
-        Console.WriteLine($"'{rpa.SystemJsonFileName}' を更新しました")
+        Call dat.Project.Save(dat.Project.SystemJsonFileName, dat.Project)
+        Console.WriteLine($"'{dat.Project.SystemJsonFileName}' を更新しました")
         Console.WriteLine()
+        Return 0
     End Function
 End Class

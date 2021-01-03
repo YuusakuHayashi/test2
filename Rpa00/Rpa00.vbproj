@@ -72,20 +72,33 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientServerProject.vb" />
+    <Compile Include="Command\AddCommandAliasCommand.vb" />
+    <Compile Include="Command\AddRobotAliasCommand.vb" />
     <Compile Include="Command\AddUtilityCommand.vb" />
-    <Compile Include="Command\ChangeInitializerCommand.vb" />
+    <Compile Include="Command\ChangeInitializerPropertyCommand.vb" />
     <Compile Include="Command\ChangeProjectPropertyCommand.vb" />
     <Compile Include="Command\ChangeProjectPropertyUsingFolderBrowserCommand.vb" />
+    <Compile Include="Command\ExportMyCommandsCommand.vb" />
+    <Compile Include="Command\ImportMyCommandsCommand.vb" />
+    <Compile Include="Command\ChangeCommandEnabledCommand.vb" />
+    <Compile Include="Command\RemoveProjectCommand.vb" />
+    <Compile Include="Command\RemoveRobotCommand.vb" />
+    <Compile Include="Command\RpaCommandInterface.vb" />
+    <Compile Include="Command\RpaUtilityCommandBase.vb" />
+    <Compile Include="Command\SaveInitializerCommand.vb" />
+    <Compile Include="Command\AttachRobotCommand.vb" />
     <Compile Include="Command\SelectProjectCommand.vb" />
     <Compile Include="Command\SetupInitializerCommand.vb" />
-    <Compile Include="Command\CloneProjectCommand.vb" />
+    <Compile Include="Command\CloneRobotCommand.vb" />
     <Compile Include="Command\ExitCommand.vb" />
     <Compile Include="Command\LoadCommand.vb" />
     <Compile Include="Command\NewProjectCommand.vb" />
     <Compile Include="Command\RunRobotCommand.vb" />
-    <Compile Include="Command\SaveCommand.vb" />
+    <Compile Include="Command\SaveProjectCommand.vb" />
     <Compile Include="Command\SetupProjectCommand.vb" />
     <Compile Include="Command\SetupRpaCommand.vb" />
+    <Compile Include="Command\ShowMyCommandCommand.vb" />
+    <Compile Include="Command\ShowInitializerPropertiesCommand.vb" />
     <Compile Include="Command\ShowProjectPropertiesCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="JsonHandler.vb" />
@@ -107,6 +120,7 @@
     <Compile Include="RpaBase.vb" />
     <Compile Include="RpaCodes.vb" />
     <Compile Include="Command\RpaCommandBase.vb" />
+    <Compile Include="RpaDataWrapper.vb" />
     <Compile Include="RpaInitializer.vb" />
     <Compile Include="RpaMacroUtility.vb" />
     <Compile Include="RpaModule.vb" />

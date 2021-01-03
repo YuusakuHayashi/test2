@@ -1,31 +1,40 @@
-﻿Public MustInherit Class RpaCommandBase
-    Public MustOverride Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
+﻿Public MustInherit Class RpaCommandBase : Implements RpaCommandInterface
 
-    Public Overridable ReadOnly Property ExecutableProjectArchitectures As Integer()
+    Public Overridable ReadOnly Property ExecutableProjectArchitectures As String() Implements RpaCommandInterface.ExecutableProjectArchitectures
         Get
-            Return {
-                RpaCodes.ProjectArchitecture.ClientServer,
-                RpaCodes.ProjectArchitecture.IntranetClientServer,
-                RpaCodes.ProjectArchitecture.StandAlone
-            }
+            Return {"AllArchitectures"}
         End Get
     End Property
 
-    Public Overridable ReadOnly Property CanExecute(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
-    Public Overridable ReadOnly Property ExecutableParameterCount() As Integer()
+    Public Overridable ReadOnly Property ExecutableParameterCount() As Integer() Implements RpaCommandInterface.ExecutableParameterCount
         Get
             Return {0, 0}
         End Get
     End Property
 
-    Public Overridable ReadOnly Property ExecutableUserLevel() As Integer
+    Public Overridable ReadOnly Property ExecutableUser As String() Implements RpaCommandInterface.ExecutableUser
         Get
-            Return RpaCodes.ProjectUserLevel.User
+            Return {"AllUser"}
         End Get
     End Property
+
+    Public Overridable ReadOnly Property ExecuteIfNoProject As Boolean Implements RpaCommandInterface.ExecuteIfNoProject
+        Get
+            Return False
+        End Get
+    End Property
+
+    Public Overloads Function CanExecute() As Boolean Implements RpaCommandInterface.CanExecute
+        Throw New NotImplementedException
+    End Function
+
+    Public Overridable Overloads Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+        Return True
+    End Function
+
+    Public Overloads Function Execute() As Integer Implements RpaCommandInterface.Execute
+        Throw New NotImplementedException()
+    End Function
+
+    Public MustOverride Overloads Function Execute(ByRef dat As RpaDataWrapper) As Integer
 End Class

@@ -1,45 +1,27 @@
 ﻿Imports System.Reflection
 
 Public Class SetupProjectCommand : Inherits RpaCommandBase
-    Private ReadOnly Property ExecuteHandler(trn As RpaTransaction, rpa As Object, ini As RpaInitializer) As Object
-        Get
-            Dim cmd As Object
-            Select Case trn.MainCommand
-                Case "changeproperty" : cmd = New ChangeProjectPropertyCommand
-                Case "showproperties" : cmd = New ShowProjectPropertiesCommand
-                Case "folderbrowser" : cmd = New ChangeProjectPropertyUsingFolderBrowserCommand
-                ' 現状、SetupInitializerのExit と ApplicationのExit に差はないため再利用している
-                Case "exit" : cmd = New ExitCommand
-                Case Else : cmd = Nothing
-            End Select
-            Return cmd
-        End Get
-    End Property
-    '---------------------------------------------------------------------------------------------'
-
-    Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
-        trn.Modes.Add("project")
-
-        ' 初回時にプロパティ一覧を表示
-        trn.MainCommand = "showproperties"
-        Call CommandExecute(trn, rpa, ini)
-
-        Do
-            trn.CommandText = trn.ShowRpaIndicator(rpa)
-            Call trn.CreateCommand()
-            Call CommandExecute(trn, rpa, ini)
-        Loop Until trn.ExitFlag
-
-        trn.ExitFlag = False
-        trn.Modes.Remove(trn.Modes.Remove("project"))
+    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+        If dat.Project Is Nothing Then
+            Console.WriteLine($"現在、プロジェクトに入っていません")
+            Console.WriteLine()
+            Return False
+        End If
+        Return True
     End Function
 
-    Public Sub CommandExecute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer)
-        Dim cmd = ExecuteHandler(trn, rpa, ini)
-        If cmd IsNot Nothing Then
-            trn.ReturnCode = cmd.Execute(trn, rpa, ini)
-        Else
-            Console.WriteLine($"コマンド : '{trn.CommandText}' はありません")
-        End If
-    End Sub
+    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+        dat.Transaction.Modes.Add($"{Me.GetType.Name}")
+        Console.WriteLine($"'{Me.GetType.Name}' を起動します")
+        Console.WriteLine()
+
+        Do
+            Call dat.System.Main(dat)
+        Loop Until dat.Transaction.ExitFlag
+
+        dat.Transaction.ExitFlag = False
+        dat.Transaction.Modes.Remove(dat.Transaction.Modes.Remove($"{Me.GetType.Name}"))
+
+        Return 0
+    End Function
 End Class

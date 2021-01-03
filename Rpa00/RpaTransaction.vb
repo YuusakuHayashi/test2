@@ -83,17 +83,19 @@
         texts = Me.CommandText.Split(" ")
         Me.MainCommand = texts(0)
 
+        Dim i As Integer = 0
         For Each p In texts
-            If Not p = texts.First Then
+            If i <> 0 Then
                 Me.Parameters.Add(p)
             End If
+            i += 1
         Next
     End Sub
 
-    Public Function ShowRpaIndicator(ByRef rpa As Object) As String
+    Public Function ShowRpaIndicator(ByRef dat As RpaDataWrapper) As String
         If Me.Modes.Count = 0 Then
-            If rpa IsNot Nothing Then
-                Console.Write($"{rpa.SolutionName}\{rpa.ProjectAlias}>")
+            If dat.Project IsNot Nothing Then
+                Console.Write($"{dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
             Else
                 Console.Write("NoRpa>")
             End If

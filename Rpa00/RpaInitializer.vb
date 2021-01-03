@@ -1,11 +1,49 @@
-﻿Public Class RpaInitializer : Inherits JsonHandler(Of RpaInitializer)
-    Private _CurrentSolution As RpaSolution
-    Public Property CurrentSolution As RpaSolution
+﻿Imports System.IO
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+Imports System.ComponentModel
+
+Public Class RpaInitializer
+    Inherits JsonHandler(Of RpaInitializer)
+    Implements INotifyPropertyChanged
+
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Protected Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
+        RaiseEvent PropertyChanged(
+            Me, New PropertyChangedEventArgs(PropertyName)
+        )
+    End Sub
+
+    <JsonIgnore>
+    Public Shared ReadOnly Property SystemIniFileName As String
         Get
-            Return Me._CurrentSolution
+            Return $"{CommonProject.SystemDirectory}\rpa.ini"
         End Get
-        Set(value As RpaSolution)
-            Me._CurrentSolution = value
+    End Property
+
+    <JsonIgnore>
+    Public Shared ReadOnly Property SystemIniChangedFileName As String
+        Get
+            Return $"{CommonProject.SystemDirectory}\rpa.ini.chg"
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property SystemIniTempFileName As String
+        Get
+            Return $"{CommonProject.SystemDirectory}\rpa.temp.ini"
+        End Get
+    End Property
+
+
+    Private _CurrentProject As RpaProject
+    Public Property CurrentProject As RpaProject
+        Get
+            Return Me._CurrentProject
+        End Get
+        Set(value As RpaProject)
+            Me._CurrentProject = value
+            RaisePropertyChanged("CurrentProject")
         End Set
     End Property
 
@@ -16,23 +54,24 @@
         End Get
         Set(value As Boolean)
             Me._AutoLoad = value
+            RaisePropertyChanged("AutoLoad")
         End Set
     End Property
 
-    Private _Solutions As List(Of RpaSolution)
-    Public Property Solutions As List(Of RpaSolution)
+    Private _Projects As List(Of RpaProject)
+    Public Property Projects As List(Of RpaProject)
         Get
-            If Me._Solutions Is Nothing Then
-                Me._Solutions = New List(Of RpaSolution)
+            If Me._Projects Is Nothing Then
+                Me._Projects = New List(Of RpaProject)
             End If
-            Return Me._Solutions
+            Return Me._Projects
         End Get
-        Set(value As List(Of RpaSolution))
-            Me._Solutions = value
+        Set(value As List(Of RpaProject))
+            Me._Projects = value
         End Set
     End Property
 
-    Public Class RpaSolution
+    Public Class RpaProject
         Private _Architecture As Integer
         Public Property Architecture As Integer
             Get
@@ -53,13 +92,13 @@
             End Set
         End Property
 
-        Private _SolutionDirectory As String
-        Public Property SolutionDirectory As String
+        Private _ProjectDirectory As String
+        Public Property ProjectDirectory As String
             Get
-                Return Me._SolutionDirectory
+                Return Me._ProjectDirectory
             End Get
             Set(value As String)
-                Me._SolutionDirectory = value
+                Me._ProjectDirectory = value
             End Set
         End Property
 
@@ -73,4 +112,56 @@
             End Set
         End Property
     End Class
+
+    Public Shared ReadOnly Property MyCommandsJsonFileName As String
+        Get
+            Return $"{CommonProject.SystemDirectory}\mycommands.json"
+        End Get
+    End Property
+
+
+    Private _MyCommandDictionary As Dictionary(Of String, MyCommand)
+
+
+    Public Property MyCommandDictionary As Dictionary(Of String, MyCommand)
+        Get
+            If Me._MyCommandDictionary Is Nothing Then
+                Me._MyCommandDictionary = New Dictionary(Of String, MyCommand)
+            End If
+            Return Me._MyCommandDictionary
+        End Get
+        Set(value As Dictionary(Of String, MyCommand))
+            Me._MyCommandDictionary = value
+        End Set
+    End Property
+
+    Public Class MyCommand
+        Public [Alias] As String
+        Public IsEnabled As Boolean
+    End Class
+
+    Public Function BeginTransaction()
+        Call Save(RpaInitializer.SystemIniTempFileName, Me)
+        Return Me
+    End Function
+
+    Public Function TransactionRollBack() As RpaInitializer
+        Dim ini = Load(RpaInitializer.SystemIniTempFileName)
+        File.Delete(RpaInitializer.SystemIniTempFileName)
+        Return ini
+    End Function
+
+    Private Sub CreateChangedFile()
+        If Me.FirstLoad Then
+            Call RpaModule.CreateChangedFile(RpaInitializer.SystemIniChangedFileName)
+        End If
+    End Sub
+
+    Sub New()
+        AddHandler Me.PropertyChanged, AddressOf CreateChangedFile
+    End Sub
+
+    Protected Overrides Sub Finalize()
+        MyBase.Finalize()
+    End Sub
 End Class

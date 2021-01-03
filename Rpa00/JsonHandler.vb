@@ -8,7 +8,8 @@ Public Class JsonHandler(Of T As New)
     Private Const UTF8 As String = "utf-8"
     Public Shared MyEncoding As String = UTF8
 
-    'Private Property ModelFileName As String
+    <JsonIgnore>
+    Public Property FirstLoad As Boolean
 
     ' ロード可能かどうかのチェック
     Public Overloads Function CheckModel(Of T2 As New)(ByVal f As String) As Boolean
@@ -31,18 +32,17 @@ Public Class JsonHandler(Of T As New)
     Public Overloads Function Load(ByVal f As String) As T
         Dim txt As String
         Dim sr As StreamReader
-
-        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
-
-        Load = Nothing
+        Dim rtn As Object
 
         Try
             sr = New System.IO.StreamReader(
                 f, System.Text.Encoding.GetEncoding(MyEncoding))
             txt = sr.ReadToEnd()
 
-            Load = JsonConvert.DeserializeObject(Of T)(txt)
+            rtn = JsonConvert.DeserializeObject(Of T)(txt)
+            rtn.FirstLoad = True
         Catch ex As Exception
+            rtn = Nothing
             Console.WriteLine(ex.Message)
         Finally
             If sr IsNot Nothing Then
@@ -50,6 +50,7 @@ Public Class JsonHandler(Of T As New)
                 sr.Dispose()
             End If
         End Try
+        Return rtn
     End Function
 
     ' この関数は指定したジェネリックモデルをロードします

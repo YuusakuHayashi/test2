@@ -1,22 +1,34 @@
 ﻿Imports System.Reflection
 
 Public Class ChangeProjectPropertyCommand : Inherits RpaCommandBase
-    Public Overrides Function Execute(ByRef trn As RpaTransaction, ByRef rpa As Object, ByRef ini As RpaInitializer) As Integer
-        Dim pname As String = trn.Parameters(0)
-        Dim pi As PropertyInfo = rpa.GetType().GetProperty(pname)
+    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
+        Get
+            Return {2, 2}
+        End Get
+    End Property
+
+    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+        Dim pname As String = dat.Transaction.Parameters(0)
+        Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
         If pi Is Nothing Then
             Console.WriteLine($"プロパティ '{pname}' は存在しません")
             Console.WriteLine()
-            Return 1000
+            Return False
         End If
 
         If Not pi.CanWrite Then
             Console.WriteLine($"プロパティ '{pname}' は変更不可です")
             Console.WriteLine()
-            Return 1000
+            Return False
         End If
+        Return True
+    End Function
 
-        Dim ptext As String = trn.Parameters(1)
+    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+        Dim pname As String = dat.Transaction.Parameters(0)
+        Dim ptext As String = dat.Transaction.Parameters(1)
+        Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
+
         Dim pvalue As Object
         Select Case pi.PropertyType
             Case (New Integer).GetType             ' 数値
@@ -37,10 +49,10 @@ Public Class ChangeProjectPropertyCommand : Inherits RpaCommandBase
             Return 1000
         End If
 
-        pi.SetValue(rpa, pvalue)
+        pi.SetValue(dat.Project, pvalue)
         Console.WriteLine($"プロパティ '{pname}' を 値' {ptext}' に変更しました")
-        Call rpa.Save(rpa.SystemJsonFileName, rpa)
-        Console.WriteLine($"'{rpa.SystemJsonFileName}' を更新しました")
         Console.WriteLine()
+
+        Return 0
     End Function
 End Class
