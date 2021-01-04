@@ -400,9 +400,11 @@ Public Class RpaSystem
 
         Dim err2 As String = $"プロジェクトが存在しないため、実行できません"
         If Not cmd.ExecuteIfNoProject Then
-            Console.WriteLine(err2)
-            Console.WriteLine()
-            Exit Sub
+            If dat.Project Is Nothing Then
+                Console.WriteLine(err2)
+                Console.WriteLine()
+                Exit Sub
+            End If
         End If
 
 

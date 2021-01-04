@@ -57,8 +57,8 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
 
         pi.SetValue(dat.Initializer, pvalue)
         Console.WriteLine($"プロパティ '{pname}' を 値' {ptext}' に変更しました")
-        Call dat.Initializer.Save(RpaInitializer.SystemIniFileName, dat.Initializer)
-        Console.WriteLine($"'{RpaInitializer.SystemIniFileName}' を更新しました")
+        'Call dat.Initializer.Save(RpaInitializer.SystemIniFileName, dat.Initializer)
+        'Console.WriteLine($"'{RpaInitializer.SystemIniFileName}' を更新しました")
         Console.WriteLine()
 
         Return 0

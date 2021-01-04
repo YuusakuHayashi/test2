@@ -78,9 +78,11 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Public MustOverride ReadOnly Property SystemArchDirectory As String
     Public MustOverride ReadOnly Property SystemProjectDirectory As String
     Public MustOverride ReadOnly Property SystemJsonFileName As String
-    Public MustOverride ReadOnly Property SystemTempJsonFileName As String
+    Public MustOverride ReadOnly Property SystemJsonChangeFileName As String
     Public MustOverride ReadOnly Property SystemArchType As Integer
     Public MustOverride ReadOnly Property SystemArchTypeName As String
+    Protected MustOverride Sub CreateChangedFile()
+
 
     <JsonIgnore>
     Public Shared ReadOnly Property SystemDllDirectory As String
@@ -240,9 +242,4 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Public Function DeepCopy() As Object
         Return MemberwiseClone()
     End Function
-
-    Public MustOverride Sub BeginTransaction()
-
-    Public MustOverride Function TransactionRollBack() As RpaProjectBase(Of T)
-
 End Class

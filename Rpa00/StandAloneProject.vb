@@ -24,23 +24,15 @@
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemTempJsonFileName As String
-        Get
-            Throw New NotImplementedException()
-        End Get
-    End Property
-
     Public Overrides ReadOnly Property SystemProjectDirectory As String
         Get
             Throw New NotImplementedException()
         End Get
     End Property
 
-    Public Overrides Sub BeginTransaction()
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Function TransactionRollBack() As RpaProjectBase(Of StandAloneProject)
-        Throw New NotImplementedException()
-    End Function
+    Public Overrides ReadOnly Property SystemJsonChangeFileName As String
+        Get
+            Throw New NotImplementedException()
+        End Get
+    End Property
 End Class

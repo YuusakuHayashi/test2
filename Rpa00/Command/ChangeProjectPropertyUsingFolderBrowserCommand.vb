@@ -50,8 +50,8 @@ Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaComman
 
         pi.SetValue(dat.Project, pvalue)
         Console.WriteLine($"プロパティ '{pname}' を 値' {ptext}' に変更しました")
-        Call dat.Project.Save(dat.Project.SystemJsonFileName, dat.Project)
-        Console.WriteLine($"'{dat.Project.SystemJsonFileName}' を更新しました")
+        'Call dat.Project.Save(dat.Project.SystemJsonFileName, dat.Project)
+        'Console.WriteLine($"'{dat.Project.SystemJsonFileName}' を更新しました")
         Console.WriteLine()
         Return 0
     End Function

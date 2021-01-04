@@ -24,7 +24,7 @@
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemTempJsonFileName As String
+    Public Overrides ReadOnly Property SystemJsonChangeFileName As String
         Get
             Throw New NotImplementedException()
         End Get
@@ -36,11 +36,7 @@
         End Get
     End Property
 
-    Public Overrides Sub BeginTransaction()
+    Protected Overrides Sub CreateChangedFile()
         Throw New NotImplementedException()
     End Sub
-
-    Public Overrides Function TransactionRollBack() As RpaProjectBase(Of ClientServerProject)
-        Throw New NotImplementedException()
-    End Function
 End Class

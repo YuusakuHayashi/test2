@@ -1,7 +1,13 @@
-﻿Imports System.Windows.Forms
+﻿Imports System.IO
+Imports System.Windows.Forms
 
 Public Module RpaModule
     Public Const DEFUALTENCODING As String = "Shift-JIS"
+
+    Public Sub Save(ByVal savefile As String, ByRef obj As Object, ByVal chgfile As String)
+        obj.Save(savefile, obj)
+        File.Delete(chgfile)
+    End Sub
 
     Public Sub CreateChangedFile(ByVal f As String)
         Dim sw As System.IO.StreamWriter
@@ -57,8 +63,8 @@ Public Module RpaModule
         Dim fbd As FolderBrowserDialog
         Do
             yorn = vbNullString
-            Console.WriteLine($"'{propname}' の設定を行いますか (y/n)")
             Console.WriteLine()
+            Console.WriteLine($"'{propname}' の設定を行いますか (y/n)")
             yorn = dat.Transaction.ShowRpaIndicator(dat)
         Loop Until yorn = "y" Or yorn = "n"
 
@@ -72,8 +78,8 @@ Public Module RpaModule
                     .ShowNewFolderButton = True
                 }
                 If fbd.ShowDialog() = DialogResult.OK Then
-                    Console.WriteLine($"よろしいですか？ '{fbd.SelectedPath}' (y/n)")
                     Console.WriteLine()
+                    Console.WriteLine($"よろしいですか？ '{fbd.SelectedPath}' (y/n)")
                     yorn2 = dat.Transaction.ShowRpaIndicator(dat)
                 Else
                     yorn2 = vbNullString
@@ -82,6 +88,7 @@ Public Module RpaModule
 
             If yorn2 = "y" Then
                 [dir] = fbd.SelectedPath
+                Console.WriteLine()
                 Console.WriteLine($"'{propname}' が設定されました")
             Else
                 Console.WriteLine($"'{propname}' の設定は行いませんでした")

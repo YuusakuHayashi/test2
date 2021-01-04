@@ -21,6 +21,7 @@ Public Class ChangeProjectPropertyCommand : Inherits RpaCommandBase
             Console.WriteLine()
             Return False
         End If
+
         Return True
     End Function
 

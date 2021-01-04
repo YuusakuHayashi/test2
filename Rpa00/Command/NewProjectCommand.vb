@@ -3,6 +3,13 @@ Imports System.Reflection
 Imports System.Windows.Forms
 
 Public Class NewProjectCommand : Inherits RpaCommandBase
+
+    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
     Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
         Dim rpa As Object
 
@@ -52,9 +59,11 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
 
         Directory.CreateDirectory(rpa.SystemProjectDirectory)
         Console.WriteLine($"ディレクトリ '{rpa.SystemProjectDirectory}' を新規作成しました")
+        Call RpaModule.Save(rpa.SystemJsonFileName, rpa, rpa.SystemJsonChangeFileName)
         Call rpa.Save(rpa.SystemJsonFileName, rpa)
         Console.WriteLine($"ファイル     '{rpa.SystemJsonFileName}' を新規作成しました")
-        Call ini.Save(RpaInitializer.SystemIniFileName, ini)
+        Call RpaModule.Save(RpaInitializer.SystemIniFileName, ini, RpaInitializer.SystemIniChangedFileName)
+        'Call ini.Save(RpaInitializer.SystemIniFileName, ini)
         Console.WriteLine($"ファイル     '{RpaInitializer.SystemIniFileName}' を更新しました")
         Console.WriteLine()
         Return 0
@@ -70,6 +79,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
             Dim inp As String
             Do
                 iidx = -1 : eidx = -1
+                Console.WriteLine()
                 Console.WriteLine($"プロジェクト構成のインデックスを指定")
                 Dim idx As Integer = 1
                 eflg = True
@@ -85,7 +95,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
                     idx += 1
                 Loop Until (Not eflg)
 
-                inp = dat.Transaction.ShowRpaIndicator(Nothing)
+                inp = dat.Transaction.ShowRpaIndicator(dat)
                 If IsNumeric(inp) Then
                     iidx = Integer.Parse(inp)
                 Else
@@ -111,7 +121,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
             End If
             Do
                 Console.WriteLine($"よろしいですか？ '{inp} ... {rpa.SystemArchTypeName}' (y/n)")
-                yorn = dat.Transaction.ShowRpaIndicator(Nothing)
+                yorn = dat.Transaction.ShowRpaIndicator(dat)
                 Console.WriteLine()
             Loop Until yorn = "y" Or yorn = "n"
         Loop Until yorn = "y"

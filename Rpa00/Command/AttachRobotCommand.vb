@@ -1,6 +1,8 @@
 ﻿Imports Rpa00
 Imports System.IO
 
+' IntranetClientServerProject専用コマンド
+
 Public Class AttachRobotCommand : Inherits RpaCommandBase
     Public Overrides ReadOnly Property ExecutableProjectArchitectures As String()
         Get
@@ -48,7 +50,7 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
                 Return False
             End If
 
-            Dim err6 As String = $"'{rpa.RootRobotDirectory}' はRootRobotDirectoryではありません"
+            Dim err6 As String = $"'{rpa.RootRobotDirectory}' に '{rpa.RootRobotIniFileName}' がありません"
             If Not File.Exists(rpa.RootRobotIniFileName) Then
                 Console.WriteLine(err6)
                 Console.WriteLine()

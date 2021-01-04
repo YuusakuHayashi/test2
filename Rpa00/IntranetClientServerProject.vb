@@ -79,7 +79,7 @@ Public Class IntranetClientServerProject
 
     Public ReadOnly Property RootRobotIniFileName As String
         Get
-            Return $"{Me.RootRobotDirectory}\project.ini"
+            Return $"{Me.RootRobotDirectory}\robot.ini"
         End Get
     End Property
 
@@ -124,9 +124,10 @@ Public Class IntranetClientServerProject
     Public Property RootRobotIgnoreList As List(Of String)
         Get
             If Me._RootRobotIgnoreList Is Nothing Then
-                Me._RootRobotIgnoreList = New List(Of String)
                 If File.Exists(Me.RootRobotIgnoreFileName) Then
                     Me._RootRobotIgnoreList = _GetIgnoreList(Me.RootRobotIgnoreFileName)
+                Else
+                    Me._RootRobotIgnoreList = New List(Of String)
                 End If
             End If
             Return Me._RootRobotIgnoreList
@@ -231,9 +232,10 @@ Public Class IntranetClientServerProject
     Public Property MyRobotIgnoreList As List(Of String)
         Get
             If Me._MyRobotIgnoreList Is Nothing Then
-                Me._MyRobotIgnoreList = New List(Of String)
                 If File.Exists(Me.MyRobotIgnoreFileName) Then
                     Me._MyRobotIgnoreList = _GetIgnoreList(Me.MyRobotIgnoreFileName)
+                Else
+                    Me._MyRobotIgnoreList = New List(Of String)
                 End If
             End If
             Return Me._MyRobotIgnoreList
@@ -273,9 +275,9 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemTempJsonFileName As String
+    Public Overrides ReadOnly Property SystemJsonChangeFileName As String
         Get
-            Return $"{Me.SystemProjectDirectory}\rpa_project.tmp.json"
+            Return $"{Me.SystemProjectDirectory}\rpa_project.json.chg"
         End Get
     End Property
 
@@ -468,8 +470,8 @@ Public Class IntranetClientServerProject
 
             _GetIgnoreList = JsonConvert.DeserializeObject(Of List(Of String))(txt)
         Catch ex As Exception
-            Call _ConsoleWriteLine(ex.Message)
-            _GetIgnoreList = Nothing
+            Console.WriteLine(ex.Message)
+            _GetIgnoreList = New List(Of String)
         Finally
             If sr IsNot Nothing Then
                 sr.Close()
@@ -478,13 +480,9 @@ Public Class IntranetClientServerProject
         End Try
     End Function
 
-    Public Overrides Sub BeginTransaction()
-        Call Save(Me.SystemTempJsonFileName, Me)
+    Protected Overrides Sub CreateChangedFile()
+        If Me.FirstLoad Then
+            Call RpaModule.CreateChangedFile(Me.SystemJsonChangeFileName)
+        End If
     End Sub
-
-    Public Overrides Function TransactionRollBack() As RpaProjectBase(Of IntranetClientServerProject)
-        Dim rpa As IntranetClientServerProject = Load(Me.SystemTempJsonFileName)
-        File.Delete(Me.SystemTempJsonFileName)
-        Return rpa
-    End Function
 End Class
