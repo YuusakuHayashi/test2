@@ -78,7 +78,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Public MustOverride ReadOnly Property SystemArchDirectory As String
     Public MustOverride ReadOnly Property SystemProjectDirectory As String
     Public MustOverride ReadOnly Property SystemJsonFileName As String
-    Public MustOverride ReadOnly Property SystemJsonChangeFileName As String
+    Public MustOverride ReadOnly Property SystemJsonChangedFileName As String
     Public MustOverride ReadOnly Property SystemArchType As Integer
     Public MustOverride ReadOnly Property SystemArchTypeName As String
 
@@ -104,6 +104,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Get
         Set(value As String)
             Me._MyDirectory = value
+            RaisePropertyChanged("MyDirectory")
         End Set
     End Property
 
@@ -114,6 +115,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Get
         Set(value As String)
             Me._ProjectName = value
+            RaisePropertyChanged("ProjectName")
         End Set
     End Property
 
@@ -125,6 +127,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         Set(value As String)
             Me._RobotAlias = vbNullString
             Me._RobotName = value
+            RaisePropertyChanged("RobotName")
         End Set
     End Property
 
@@ -223,6 +226,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Get
         Set(value As String)
             Me._PrinterName = value
+            RaisePropertyChanged("PrinterName")
         End Set
     End Property
 
@@ -238,9 +242,11 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
-    Public Sub CreateChangedFile()
+    Public Sub CreateChangedFile(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If Me.FirstLoad Then
-            RpaModule.CreateChangedFile(Me.SystemJsonChangeFileName)
+            If Not File.Exists(Me.SystemJsonChangedFileName) Then
+                RpaModule.CreateChangedFile(Me.SystemJsonChangedFileName)
+            End If
         End If
     End Sub
 

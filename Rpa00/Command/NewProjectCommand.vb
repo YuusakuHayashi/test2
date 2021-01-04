@@ -60,12 +60,12 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         Directory.CreateDirectory(rpa.SystemProjectDirectory)
         Console.WriteLine($"ディレクトリ '{rpa.SystemProjectDirectory}' を新規作成しました")
         Call RpaModule.Save(rpa.SystemJsonFileName, rpa, rpa.SystemJsonChangeFileName)
-        Call rpa.Save(rpa.SystemJsonFileName, rpa)
-        Console.WriteLine($"ファイル     '{rpa.SystemJsonFileName}' を新規作成しました")
+        'Call rpa.Save(rpa.SystemJsonFileName, rpa)
+        'Console.WriteLine($"ファイル     '{rpa.SystemJsonFileName}' を新規作成しました")
         Call RpaModule.Save(RpaInitializer.SystemIniFileName, ini, RpaInitializer.SystemIniChangedFileName)
         'Call ini.Save(RpaInitializer.SystemIniFileName, ini)
-        Console.WriteLine($"ファイル     '{RpaInitializer.SystemIniFileName}' を更新しました")
-        Console.WriteLine()
+        'Console.WriteLine($"ファイル     '{RpaInitializer.SystemIniFileName}' を更新しました")
+        'Console.WriteLine()
         Return 0
     End Function
 

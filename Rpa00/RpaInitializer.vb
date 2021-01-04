@@ -140,20 +140,22 @@ Public Class RpaInitializer
         Public IsEnabled As Boolean
     End Class
 
-    Public Function BeginTransaction()
-        Call Save(RpaInitializer.SystemIniTempFileName, Me)
-        Return Me
-    End Function
+    'Public Function BeginTransaction()
+    '    Call Save(RpaInitializer.SystemIniTempFileName, Me)
+    '    Return Me
+    'End Function
 
-    Public Function TransactionRollBack() As RpaInitializer
-        Dim ini = Load(RpaInitializer.SystemIniTempFileName)
-        File.Delete(RpaInitializer.SystemIniTempFileName)
-        Return ini
-    End Function
+    'Public Function TransactionRollBack() As RpaInitializer
+    '    Dim ini = Load(RpaInitializer.SystemIniTempFileName)
+    '    File.Delete(RpaInitializer.SystemIniTempFileName)
+    '    Return ini
+    'End Function
 
-    Private Sub CreateChangedFile()
+    Private Sub CreateChangedFile(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If Me.FirstLoad Then
-            Call RpaModule.CreateChangedFile(RpaInitializer.SystemIniChangedFileName)
+            If Not File.Exists(RpaInitializer.SystemIniChangedFileName) Then
+                Call RpaModule.CreateChangedFile(RpaInitializer.SystemIniChangedFileName)
+            End If
         End If
     End Sub
 
@@ -162,6 +164,7 @@ Public Class RpaInitializer
     End Sub
 
     Protected Overrides Sub Finalize()
+        RemoveHandler Me.PropertyChanged, AddressOf CreateChangedFile
         MyBase.Finalize()
     End Sub
 End Class

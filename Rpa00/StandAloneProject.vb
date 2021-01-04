@@ -30,7 +30,7 @@
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemJsonChangeFileName As String
+    Public Overrides ReadOnly Property SystemJsonChangedFileName As String
         Get
             Throw New NotImplementedException()
         End Get

@@ -13,8 +13,8 @@ Public Class ShowInitializerPropertiesCommand : Inherits RpaCommandBase
         Dim pnamelen As Integer = 25
         Dim ptypelen As Integer = 15
         Console.WriteLine()
-        Console.WriteLine($"Property Name             | Get/Set | Property Type   | Value")
-        Console.WriteLine($"--------------------------+---------+-----------------+------")
+        Console.WriteLine($" Property Name             | Get/Set | Property Type   | Value")
+        Console.WriteLine($"______________________________________________________________")
 
         Dim props As PropertyInfo() = dat.Initializer.GetType.GetProperties()
         For Each prop In props
@@ -49,7 +49,7 @@ Public Class ShowInitializerPropertiesCommand : Inherits RpaCommandBase
                 'Nothing To Do
             End If
 
-            Console.Write($"{pname} | {getset} | {ptype} | ")
+            Console.Write($" {pname} | {getset} | {ptype} | ")
 
             Try
                 Console.WriteLine($"{prop.GetValue(dat.Initializer).ToString}")
@@ -57,6 +57,7 @@ Public Class ShowInitializerPropertiesCommand : Inherits RpaCommandBase
                 Console.WriteLine($"{e.Message}")
             End Try
         Next
+        Console.WriteLine($"______________________________________________________________")
         Console.WriteLine()
         Return 0
     End Function

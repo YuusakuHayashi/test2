@@ -284,7 +284,7 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    Public Overrides ReadOnly Property SystemJsonChangeFileName As String
+    Public Overrides ReadOnly Property SystemJsonChangedFileName As String
         Get
             Return $"{Me.SystemProjectDirectory}\rpa_project.json.chg"
         End Get
@@ -491,5 +491,10 @@ Public Class IntranetClientServerProject
 
     Sub New()
         AddHandler Me.PropertyChanged, AddressOf CreateChangedFile
+    End Sub
+
+    Protected Overrides Sub Finalize()
+        RemoveHandler Me.PropertyChanged, AddressOf CreateChangedFile
+        MyBase.Finalize()
     End Sub
 End Class

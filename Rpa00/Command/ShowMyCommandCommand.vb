@@ -10,8 +10,8 @@
         Dim truecmdlen As Integer = 20
         Dim aliascmdlen As Integer = 20
         Console.WriteLine()
-        Console.WriteLine($"Command              | Alias Command        | IsEnabled")
-        Console.WriteLine($"---------------------+----------------------+----------")
+        Console.WriteLine($" Command              | Alias Command        | IsEnabled")
+        Console.WriteLine($"________________________________________________________")
 
         For Each cmd In dat.Initializer.MyCommandDictionary
             Dim truecmd As String = cmd.Key
@@ -32,12 +32,13 @@
                 'Nothing To Do
             End If
 
-            Console.WriteLine($"{truecmd} | {aliascmd} | {cmd.Value.IsEnabled.ToString}")
+            Console.WriteLine($" {truecmd} | {aliascmd} | {cmd.Value.IsEnabled.ToString}")
         Next
 
         If dat.Initializer.MyCommandDictionary.Count = 0 Then
             Console.WriteLine($"コマンドの登録はありません")
         End If
+        Console.WriteLine($"________________________________________________________")
         Console.WriteLine()
         Return 0
     End Function

@@ -69,7 +69,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _IraishoDirectory As String
         Get
             If String.IsNullOrEmpty(Me.__IraishoDirectory) Then
-                Me.__IraishoDirectory = $"{Rpa.MyProjectDirectory}\iraisho"
+                Me.__IraishoDirectory = $"{Rpa.MyRobotDirectory}\iraisho"
                 If Not Directory.Exists(Me.__IraishoDirectory) Then
                     Directory.CreateDirectory(Me.__IraishoDirectory)
                 End If
@@ -82,7 +82,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _BackupDirectory As String
         Get
             If String.IsNullOrEmpty(Me.__BackupDirectory) Then
-                Me.__BackupDirectory = $"{Rpa.MyProjectDirectory}\backup"
+                Me.__BackupDirectory = $"{Rpa.MyRobotDirectory}\backup"
                 If Not Directory.Exists(Me.__BackupDirectory) Then
                     Directory.CreateDirectory(Me.__BackupDirectory)
                 End If
@@ -95,7 +95,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _Work2Directory As String
         Get
             If String.IsNullOrEmpty(Me.__Work2Directory) Then
-                Me.__Work2Directory = $"{Rpa.MyProjectDirectory}\work2"
+                Me.__Work2Directory = $"{Rpa.MyRobotDirectory}\work2"
                 If Not Directory.Exists(Me.__Work2Directory) Then
                     Directory.CreateDirectory(Me.__Work2Directory)
                 End If
@@ -108,7 +108,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _WorkDirectory As String
         Get
             If String.IsNullOrEmpty(Me.__WorkDirectory) Then
-                Me.__WorkDirectory = $"{Rpa.MyProjectDirectory}\work"
+                Me.__WorkDirectory = $"{Rpa.MyRobotDirectory}\work"
                 If Not Directory.Exists(Me.__WorkDirectory) Then
                     Directory.CreateDirectory(Me.__WorkDirectory)
                 End If
@@ -369,13 +369,13 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         ' プリンター名設定
         '-----------------------------------------------------------------------------------------'
         Rpa.UsePrinterName = Rpa.PrinterName
-        Rpa.UsePrinterName = Rpa.RootProjectObject.PrinterName
+        Rpa.UsePrinterName = Rpa.RootRobotObject.PrinterName
         Rpa.UsePrinterName = IIf(String.IsNullOrEmpty(Me.PrinterName), Rpa.UsePrinterName, Me.PrinterName)
         '-----------------------------------------------------------------------------------------'
 
         ' マスターファイルのチェック・コピー
         '-----------------------------------------------------------------------------------------'
-        Dim imaster_1 = $"{Rpa.MyProjectDirectory}\{Me.MasterCsvFileName}"
+        Dim imaster_1 = $"{Rpa.MyRobotDirectory}\{Me.MasterCsvFileName}"
         Dim wmaster_1 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
         Console.WriteLine("以下のファイルを用意したら、[Enter]キーをクリックしてください")
         Console.WriteLine("ファイル名 : " & Me.MasterCsvFileName)
@@ -424,7 +424,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         'End If
 
         ' TEST TEST
-        ixls_1 = $"{Rpa.MyProjectDirectory}\input.xls"
+        ixls_1 = $"{Rpa.MyRobotDirectory}\input.xls"
 
         ' ＣＳＶデータ生成
         [x] = mutil.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
@@ -520,32 +520,32 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim outxlsx_1 = $"{Me._BackupDirectory}\加工済送付明細.xlsx"
         Dim sheetname_2 = vbNullString
         Dim setting_v1(26) As Double
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnALength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnBLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnCLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnDLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnELength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnFLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnGLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnHLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnILength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnJLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnKLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnLLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnMLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnNLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnOLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnPLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnQLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnRLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnSLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnTLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnULength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnVLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnWLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnXLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnYLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootProjectObject.SofuMeisaiColumnZLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnALength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnBLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnCLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnDLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnELength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnFLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnGLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnHLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnILength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnJLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnKLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnLLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnMLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnNLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnOLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnPLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnQLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnRLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnSLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnTLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnULength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnVLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnWLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnXLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnYLength : idx_1 += 1
+        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnZLength : idx_1 += 1
 
         If Me.RestartCount = 1 Then
             File.Delete(outxlsx_1)
@@ -674,7 +674,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim simd As IraishoMeisai = Nothing
         Dim zimd As IraishoMeisai = Nothing
 
-        Dim R_obj = Rpa.RootProjectObject
+        Dim R_obj = Rpa.RootRobotObject
         Dim R_iraishos = CType(R_obj.IraishoDatas, List(Of Iraisho))
         Dim R_iraisho As Iraisho = Nothing
         Dim R_tb As Iraisho.BankInfo = Nothing
