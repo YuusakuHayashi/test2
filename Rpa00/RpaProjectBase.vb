@@ -1,21 +1,21 @@
 ﻿Imports System.IO
 Imports System.Text
 Imports System.Runtime.InteropServices
+Imports System.ComponentModel
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public MustInherit Class RpaProjectBase(Of T As {New})
     Inherits JsonHandler(Of T)
+    Implements INotifyPropertyChanged
 
-    Private _UserName As String
-    Public Property UserName As String
-        Get
-            Return Me._UserName
-        End Get
-        Set(value As String)
-            Me._UserName = value
-        End Set
-    End Property
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    Protected Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
+        RaiseEvent PropertyChanged(
+            Me, New PropertyChangedEventArgs(PropertyName)
+        )
+    End Sub
 
     <JsonIgnore>
     Public Shared ReadOnly Property SystemDirectory As String
@@ -81,7 +81,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Public MustOverride ReadOnly Property SystemJsonChangeFileName As String
     Public MustOverride ReadOnly Property SystemArchType As Integer
     Public MustOverride ReadOnly Property SystemArchTypeName As String
-    Protected MustOverride Sub CreateChangedFile()
 
 
     <JsonIgnore>
@@ -228,6 +227,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     End Property
 
     Private _UsePrinterName As String
+
     <JsonIgnore>
     Public Property UsePrinterName As String
         Get
@@ -238,6 +238,11 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
+    Public Sub CreateChangedFile()
+        If Me.FirstLoad Then
+            RpaModule.CreateChangedFile(Me.SystemJsonChangeFileName)
+        End If
+    End Sub
 
     Public Function DeepCopy() As Object
         Return MemberwiseClone()

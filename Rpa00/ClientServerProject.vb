@@ -35,8 +35,4 @@
             Throw New NotImplementedException()
         End Get
     End Property
-
-    Protected Overrides Sub CreateChangedFile()
-        Throw New NotImplementedException()
-    End Sub
 End Class

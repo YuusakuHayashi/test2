@@ -21,31 +21,40 @@ Public Class IntranetClientServerProject
 
     Private ReadOnly Property HelloFileName As String
         Get
-            Return $"{IntranetClientServerProject.ServerDirectory}\Hello.txt"
+            'Return $"{IntranetClientServerProject.ServerDirectory}\Hello.txt"
+            Return $"{Me.ServerDirectory}\Hello.txt"
         End Get
     End Property
 
-    Private Shared _RootDirectory As String
+    'Private Shared _RootDirectory As String
+    Private _RootDirectory As String
     Public Property RootDirectory As String
         Get
-            Return IntranetClientServerProject._RootDirectory
+            'Return IntranetClientServerProject._RootDirectory
+            Return Me._RootDirectory
         End Get
         Set(value As String)
-            If String.IsNullOrEmpty(IntranetClientServerProject._RootDirectory) Then
-                IntranetClientServerProject._RootDirectory = value
-            End If
+            'If String.IsNullOrEmpty(IntranetClientServerProject._RootDirectory) Then
+            'IntranetClientServerProject._RootDirectory = value            
+            'End If
+            Me._RootDirectory = value
+            RaisePropertyChanged("RootDirectory")
         End Set
     End Property
 
-    Private Shared _ServerDirectory As String
-    Public Shared Property ServerDirectory As String
+    'Private Shared _ServerDirectory As String
+    Private _ServerDirectory As String
+    Public Property ServerDirectory As String
         Get
-            Return IntranetClientServerProject._ServerDirectory
+            'Return IntranetClientServerProject._ServerDirectory
+            Return Me._ServerDirectory
         End Get
         Set(value As String)
-            If Not String.IsNullOrEmpty(value) Then
-                IntranetClientServerProject._ServerDirectory = value
-            End If
+            'If Not String.IsNullOrEmpty(value) Then
+            'IntranetClientServerProject._ServerDirectory = value
+            'End If
+            Me._ServerDirectory = value
+            RaisePropertyChanged("ServerDirectory")
         End Set
     End Property
 
@@ -480,9 +489,7 @@ Public Class IntranetClientServerProject
         End Try
     End Function
 
-    Protected Overrides Sub CreateChangedFile()
-        If Me.FirstLoad Then
-            Call RpaModule.CreateChangedFile(Me.SystemJsonChangeFileName)
-        End If
+    Sub New()
+        AddHandler Me.PropertyChanged, AddressOf CreateChangedFile
     End Sub
 End Class
