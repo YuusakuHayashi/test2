@@ -69,7 +69,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _IraishoDirectory As String
         Get
             If String.IsNullOrEmpty(Me.__IraishoDirectory) Then
-                Me.__IraishoDirectory = $"{Rpa.MyRobotDirectory}\iraisho"
+                Me.__IraishoDirectory = $"{Data.Project.MyRobotDirectory}\iraisho"
                 If Not Directory.Exists(Me.__IraishoDirectory) Then
                     Directory.CreateDirectory(Me.__IraishoDirectory)
                 End If
@@ -82,7 +82,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _BackupDirectory As String
         Get
             If String.IsNullOrEmpty(Me.__BackupDirectory) Then
-                Me.__BackupDirectory = $"{Rpa.MyRobotDirectory}\backup"
+                Me.__BackupDirectory = $"{Data.Project.MyRobotDirectory}\backup"
                 If Not Directory.Exists(Me.__BackupDirectory) Then
                     Directory.CreateDirectory(Me.__BackupDirectory)
                 End If
@@ -95,7 +95,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _Work2Directory As String
         Get
             If String.IsNullOrEmpty(Me.__Work2Directory) Then
-                Me.__Work2Directory = $"{Rpa.MyRobotDirectory}\work2"
+                Me.__Work2Directory = $"{Data.Project.MyRobotDirectory}\work2"
                 If Not Directory.Exists(Me.__Work2Directory) Then
                     Directory.CreateDirectory(Me.__Work2Directory)
                 End If
@@ -108,7 +108,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Private ReadOnly Property _WorkDirectory As String
         Get
             If String.IsNullOrEmpty(Me.__WorkDirectory) Then
-                Me.__WorkDirectory = $"{Rpa.MyRobotDirectory}\work"
+                Me.__WorkDirectory = $"{Data.Project.MyRobotDirectory}\work"
                 If Not Directory.Exists(Me.__WorkDirectory) Then
                     Directory.CreateDirectory(Me.__WorkDirectory)
                 End If
@@ -355,27 +355,23 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Throw New NotImplementedException()
     End Function
 
-    Public Overrides Function Execute() As Integer
+    Public Overrides Function Execute(ByRef dat As Object) As Integer
         Me.RestartCount = IIf(Me.RestartCount = 0, 1, Me.RestartCount)
 
-        Dim mutil = Rpa.SystemUtilities("MacroUtility").UtilityObject
-        Dim putil = Rpa.SystemUtilities("PrintUtility").UtilityObject
+        Dim mutil = Data.Project.SystemUtilities("MacroUtility").UtilityObject
+        Dim putil = Data.Project.SystemUtilities("PrinterUtility").UtilityObject
         Dim [x] As Integer
-
-        If Not mutil.IsMacroFileExists Then
-            Return 1000
-        End If
 
         ' プリンター名設定
         '-----------------------------------------------------------------------------------------'
-        Rpa.UsePrinterName = Rpa.PrinterName
-        Rpa.UsePrinterName = Rpa.RootRobotObject.PrinterName
-        Rpa.UsePrinterName = IIf(String.IsNullOrEmpty(Me.PrinterName), Rpa.UsePrinterName, Me.PrinterName)
+        Data.Project.UsePrinterName = Data.Project.PrinterName
+        Data.Project.UsePrinterName = Data.Project.RootRobotObject.PrinterName
+        Data.Project.UsePrinterName = IIf(String.IsNullOrEmpty(Me.PrinterName), Data.Project.UsePrinterName, Me.PrinterName)
         '-----------------------------------------------------------------------------------------'
 
         ' マスターファイルのチェック・コピー
         '-----------------------------------------------------------------------------------------'
-        Dim imaster_1 = $"{Rpa.MyRobotDirectory}\{Me.MasterCsvFileName}"
+        Dim imaster_1 = $"{Data.Project.MyRobotDirectory}\{Me.MasterCsvFileName}"
         Dim wmaster_1 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
         Console.WriteLine("以下のファイルを用意したら、[Enter]キーをクリックしてください")
         Console.WriteLine("ファイル名 : " & Me.MasterCsvFileName)
@@ -424,7 +420,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         'End If
 
         ' TEST TEST
-        ixls_1 = $"{Rpa.MyRobotDirectory}\input.xls"
+        ixls_1 = $"{Data.Project.MyRobotDirectory}\input.xls"
 
         ' ＣＳＶデータ生成
         [x] = mutil.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
@@ -470,10 +466,10 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' バックアップへコピー
         Me._UsePrintCreatedOnly = Me.PrintCreatedOnly
-        If Transaction.Parameters.Contains("createdonly=yes") Then
+        If Data.Transaction.Parameters.Contains("createdonly=yes") Then
             Me._UsePrintCreatedOnly = True
         End If
-        If Transaction.Parameters.Contains("createdonly=no") Then
+        If Data.Transaction.Parameters.Contains("createdonly=no") Then
             Me._UsePrintCreatedOnly = False
         End If
         If Me._UsePrintCreatedOnly Then
@@ -493,15 +489,15 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
 
         bookname_1 = vbNullString
-        If Not Transaction.Parameters.Contains("print=no") Then
+        If Not Data.Transaction.Parameters.Contains("print=no") Then
             For Each imd In Me.IraishoMeisaiDatas
                 If bookname_1 <> imd.BookName Then
-                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, imd.BookName, imd.DistinationSheetName})
                     bookname_1 = imd.BookName
                     sheetname_1 = imd.DistinationSheetName
                 End If
                 If sheetname_1 <> imd.DistinationSheetName Then
-                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, imd.BookName, imd.DistinationSheetName})
                     sheetname_1 = imd.DistinationSheetName
                 End If
             Next
@@ -520,32 +516,32 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim outxlsx_1 = $"{Me._BackupDirectory}\加工済送付明細.xlsx"
         Dim sheetname_2 = vbNullString
         Dim setting_v1(26) As Double
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnALength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnBLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnCLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnDLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnELength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnFLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnGLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnHLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnILength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnJLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnKLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnLLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnMLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnNLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnOLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnPLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnQLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnRLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnSLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnTLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnULength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnVLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnWLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnXLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnYLength : idx_1 += 1
-        setting_v1(idx_1) = Rpa.RootRobotObject.SofuMeisaiColumnZLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnALength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnBLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnCLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnDLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnELength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnFLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnGLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnHLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnILength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnJLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnKLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnLLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnMLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnNLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnOLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnPLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnQLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnRLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnSLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnTLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnULength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnVLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnWLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnXLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnYLength : idx_1 += 1
+        setting_v1(idx_1) = Data.Project.RootRobotObject.SofuMeisaiColumnZLength : idx_1 += 1
 
         If Me.RestartCount = 1 Then
             File.Delete(outxlsx_1)
@@ -554,8 +550,8 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         sheetname_2 = $"停止{Me.RestartCount.ToString}回目"
         [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {tincsv_v2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
 
-        If Not Transaction.Parameters.Contains("print=no") Then
-            [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Rpa.UsePrinterName, outxlsx_1, sheetname_2})
+        If Not Data.Transaction.Parameters.Contains("print=no") Then
+            [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, outxlsx_1, sheetname_2})
         End If
 
         Console.WriteLine("加工済送付明細作成完了！")
@@ -568,15 +564,15 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         Console.WriteLine("件数集計ファイルを作成中・・・")
         Call _CreateSummaryFile(outtxt_1)
-        If Not Transaction.Parameters.Contains("print=no") Then
+        If Not Data.Transaction.Parameters.Contains("print=no") Then
             Call putil.TextPrintRequest((New FileInfo(outtxt_1)), SHIFT_JIS)
         End If
         Console.WriteLine("件数集計ファイル作成完了！")
         '-----------------------------------------------------------------------------------------'
 
 
-        If Transaction.Parameters.Count > 0 Then
-            If Transaction.Parameters.Last = "end" Then
+        If Data.Transaction.Parameters.Count > 0 Then
+            If Data.Transaction.Parameters.Last = "end" Then
                 Me.RestartCode = vbNullString
                 Me.RestartCount = 1
             End If
@@ -674,7 +670,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim simd As IraishoMeisai = Nothing
         Dim zimd As IraishoMeisai = Nothing
 
-        Dim R_obj = Rpa.RootRobotObject
+        Dim R_obj = Data.Project.RootRobotObject
         Dim R_iraishos = CType(R_obj.IraishoDatas, List(Of Iraisho))
         Dim R_iraisho As Iraisho = Nothing
         Dim R_tb As Iraisho.BankInfo = Nothing
@@ -1195,16 +1191,30 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Return rtn
     End Function
 
-    Public Overrides Function CanExecute() As Boolean
-        Dim b = True
-        If Not Rpa.SystemUtilities.ContainsKey("MacroUtility") Then
+    Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+        Dim mutil As Object
+
+        If Not Data.Project.SystemUtilities.ContainsKey("MacroUtility") Then
             Console.WriteLine($"機能 'MacroUtiliity' が含まれていません")
-            b = False
+            Return False
         End If
-        If Not Rpa.SystemUtilities.ContainsKey("PrintUtility") Then
-            Console.WriteLine($"機能 'PrintUtiliity' が含まれていません")
-            b = False
+        mutil = Data.Project.SystemUtilities("MacroUtility").UtilityObject
+
+        If Not File.Exists(mutil.MacroFileName) Then
+            Console.WriteLine($"ファイル '{mutil.MacroFileName}' が存在しません")
+            Return False
         End If
-        Return b
+
+        If Not Data.Project.SystemUtilities.ContainsKey("PrinterUtility") Then
+            Console.WriteLine($"機能 'PrinterUtiliity' が含まれていません")
+            Return False
+        End If
+
+        If Not File.Exists(Me.AttacheCase) Then
+            Console.WriteLine($"ファイル '{Me.AttacheCase}' が存在しません")
+            Return False
+        End If
+
+        Return True
     End Function
 End Class

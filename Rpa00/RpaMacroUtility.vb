@@ -3,18 +3,18 @@ Imports System.IO
 Imports Rpa00
 
 Public Class RpaMacroUtility : Inherits RpaUtilityBase
-    Public Overrides ReadOnly Property ExecuteHandler(dat As Object) As Object
+    Public Overrides ReadOnly Property CommandHandler(dat As Object) As Object
         Get
             Dim cmd As Object
             Select Case dat.Transaction.MainCommand
-                Case "UpdateMacro" : cmd = New UpdateMacroCommand(Me)
+                Case "update" : cmd = New UpdateMacroCommand(Me)
                 Case Else : cmd = Nothing
             End Select
             Return cmd
         End Get
     End Property
 
-    Private ReadOnly Property _MacroUtilityDirectory As String
+    Public ReadOnly Property MacroUtilityDirectory As String
         Get
             Dim d = $"{CommonProject.SystemDirectory}\MacroUtility"
             If Not Directory.Exists(d) Then
@@ -24,9 +24,9 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Get
     End Property
 
-    Private ReadOnly Property _MacroFileName As String
+    Public ReadOnly Property MacroFileName As String
         Get
-            Dim f = $"{Me._MacroUtilityDirectory}\macro.xlsm"
+            Dim f = $"{Me.MacroUtilityDirectory}\macro.xlsm"
             Return f
         End Get
     End Property
@@ -40,8 +40,8 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Try
                 exbooks = exapp.Workbooks
                 Try
-                    exbook = exbooks.Open(Me._MacroFileName, 0)
-                    macrofile = Path.GetFileName(Me._MacroFileName)
+                    exbook = exbooks.Open(Me.MacroFileName, 0)
+                    macrofile = Path.GetFileName(Me.MacroFileName)
                     exapp.Run($"{macrofile}!{method}", args)
                 Finally
                     If exbook IsNot Nothing Then
@@ -69,8 +69,8 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Property
 
         Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
-            If Not File.Exists(Me.Parent._MacroFileName) Then
-                Console.WriteLine($"マクロファイル '{Me.Parent._MacroFileName}' が存在しません")
+            If Not File.Exists(Me.Parent.MacroFileName) Then
+                Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
                 Console.WriteLine($"開発者から入手してください")
                 Console.WriteLine()
                 Return False
@@ -81,7 +81,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         Private Parent As RpaMacroUtility
         Public Overrides Function Execute(ByRef dat As Object) As Integer
             For Each p In dat.Transaction.Parameters
-                Dim bas As String = $"{Parent._MacroUtilityDirectory}\{p}"
+                Dim bas As String = $"{Parent.MacroUtilityDirectory}\{p}"
                 If File.Exists(bas) Then
                     Console.WriteLine($"指定マクロ '{p}' をインストールします")
                     Call Parent.InvokeMacro("MacroImporter.Main", {bas})

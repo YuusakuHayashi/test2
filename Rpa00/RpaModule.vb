@@ -2,6 +2,19 @@
 Imports System.Windows.Forms
 
 Public Module RpaModule
+
+    Public Function Pop(Of T As {New, IList})(ByVal [old] As T) As T
+        Dim [new] As New T
+        Dim i As Integer = 0
+        For Each elm In old
+            If i <> 0 Then
+                [new].Add(elm)
+            End If
+            i += 1
+        Next
+        Return [new]
+    End Function
+
     Public Const DEFUALTENCODING As String = "Shift-JIS"
 
     Public Sub Save(ByVal savefile As String, ByRef obj As Object, ByVal chgfile As String)

@@ -6,7 +6,7 @@ Public Class RpaPrinterUtility : Inherits RpaUtilityBase
     Public PrintText As String
     Public PrintFile As FileInfo
 
-    Public Overrides ReadOnly Property ExecuteHandler(dat As Object) As Object
+    Public Overrides ReadOnly Property CommandHandler(dat As Object) As Object
         Get
             Return Nothing
         End Get

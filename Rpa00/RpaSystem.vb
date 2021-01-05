@@ -59,8 +59,21 @@ Public Class RpaSystem
                 Case "changeprojectpropertyusingfolderbrowser" : cmd = New ChangeProjectPropertyUsingFolderBrowserCommand
                 Case "showinitializerproperties" : cmd = New ShowInitializerPropertiesCommand
                 Case "changeinitializerproperty" : cmd = New ChangeInitializerPropertyCommand
+                Case "updatemyrobotjson" : cmd = New UpdateMyRobotJsonCommand
                 Case Else : cmd = Nothing
             End Select
+
+            ' ユーティリティコマンド
+            If dat.Project IsNot Nothing Then
+                If (dat.Project.SystemUtilities.Count > 0) And (cmd Is Nothing) Then
+                    If dat.Project.SystemUtilities.ContainsKey(dat.Transaction.MainCommand) Then
+                        dat.Transaction.MainCommand = dat.Transaction.Parameters(0)
+                        dat.Transaction.Parameters = RpaModule.Pop(Of List(Of String))(dat.Transaction.Parameters)
+                        cmd = dat.Project.SystemUtilities(cmdtxt).UtilityObject.CommandHandler(dat)
+                    End If
+                End If
+            End If
+
 
             ' コマンド無効化
             If dat.Initializer.MyCommandDictionary.ContainsKey(cmdtxt) Then
@@ -116,39 +129,39 @@ Public Class RpaSystem
 
     ' システムのセーブ
     '---------------------------------------------------------------------------------------------'
-    Private Function SaveSystem(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
-        Call rpa.Save(rpa.SystemJsonFileName, rpa)
-        Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' をセーブしました。")
-        Return 0
-    End Function
+    'Private Function SaveSystem(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
+    '    Call rpa.Save(rpa.SystemJsonFileName, rpa)
+    '    Console.WriteLine($"JsonFile '{rpa.SystemJsonFileName}' をセーブしました。")
+    '    Return 0
+    'End Function
     '---------------------------------------------------------------------------------------------'
 
     ' プロジェクトの確認
     '---------------------------------------------------------------------------------------------'
-    Private Function ShowProject(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
-        If trn.Parameters.Count = 0 Then
-            Console.WriteLine("パラメータが指定されていません")
-            Return 1000
-        End If
-        If trn.Parameters.Last = "Utilities" Then
-            Return _ShowProjectUtilities(trn, rpa)
-        End If
-        Return 1000
-    End Function
+    'Private Function ShowProject(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
+    '    If trn.Parameters.Count = 0 Then
+    '        Console.WriteLine("パラメータが指定されていません")
+    '        Return 1000
+    '    End If
+    '    If trn.Parameters.Last = "Utilities" Then
+    '        Return _ShowProjectUtilities(trn, rpa)
+    '    End If
+    '    Return 1000
+    'End Function
 
     ' ユーティリティの確認
-    Private Function _ShowProjectUtilities(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
-        Console.WriteLine(Strings.StrDup(100, "-"))
-        If rpa.SystemUtilities.Count > 0 Then
-            For Each util In rpa.SystemUtilities
-                Console.WriteLine($"{util.Key}")
-            Next
-        Else
-            Console.WriteLine("ユーティリティなし")
-        End If
-        Console.WriteLine(Strings.StrDup(100, "-"))
-        Return 0
-    End Function
+    'Private Function _ShowProjectUtilities(ByRef trn As RpaTransaction, ByRef rpa As IntranetClientServerProject) As Integer
+    '    Console.WriteLine(Strings.StrDup(100, "-"))
+    '    If rpa.SystemUtilities.Count > 0 Then
+    '        For Each util In rpa.SystemUtilities
+    '            Console.WriteLine($"{util.Key}")
+    '        Next
+    '    Else
+    '        Console.WriteLine("ユーティリティなし")
+    '    End If
+    '    Console.WriteLine(Strings.StrDup(100, "-"))
+    '    Return 0
+    'End Function
     '---------------------------------------------------------------------------------------------'
 
     ' Ｊｓｏｎのセーブ
@@ -371,14 +384,6 @@ Public Class RpaSystem
         Call dat.Transaction.CreateCommand()
 
         Dim cmd = CommandHandler(dat)
-
-        If dat.Project IsNot Nothing Then
-            If (dat.Project.SystemUtilities.Count > 0) And (cmd Is Nothing) Then
-                For Each util In dat.Project.SystemUtilities
-                    cmd = util.Value.UtilityObject.ExecuteHandler(dat)
-                Next
-            End If
-        End If
 
         If cmd Is Nothing Then
             Console.WriteLine($"コマンド : '{dat.Transaction.CommandText}' はありません")

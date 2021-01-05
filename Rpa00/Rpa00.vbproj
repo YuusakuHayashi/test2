@@ -100,6 +100,7 @@
     <Compile Include="Command\ShowMyCommandCommand.vb" />
     <Compile Include="Command\ShowInitializerPropertiesCommand.vb" />
     <Compile Include="Command\ShowProjectPropertiesCommand.vb" />
+    <Compile Include="Command\UpdateMyRobotJsonCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

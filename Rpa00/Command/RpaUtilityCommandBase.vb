@@ -2,7 +2,7 @@
 
     Public Overridable ReadOnly Property ExecutableProjectArchitectures As String() Implements RpaCommandInterface.ExecutableProjectArchitectures
         Get
-            Return {"AllArchType"}
+            Return {"AllArchitectures"}
         End Get
     End Property
 
