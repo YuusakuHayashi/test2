@@ -34,3 +34,26 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
     Set wsheet = Nothing
     Set wbook = Nothing
 End Sub
+
+Public Function IsModuleExist(ByRef v() As Variant) As Variant
+    Dim module As String: module = v(0)
+    Dim ck As Boolean: ck = False
+    For Each vbc In ThisWorkbook.VBProject.VBComponents
+        If vbc.Name = module Then
+            ck = True
+            Exit For
+        End If
+    Next
+    If ck Then
+        IsModuleExist = True
+    Else
+        IsModuleExist = False
+    End If
+End Function
+
+Public Sub test()
+    Dim v(1) As Variant
+    Dim ans As Variant
+    v(0) = "MacroImporter"
+    ans = IsModuleExist(v)
+End Sub

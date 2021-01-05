@@ -79,7 +79,7 @@ Public Module RpaModule
         Do
             yorn = vbNullString
             Console.WriteLine()
-            Console.WriteLine($"'{propname}' の設定を行いますか (y/n)")
+            Console.WriteLine($"'{propname}' を指定しますか？ (y/n)")
             yorn = dat.Transaction.ShowRpaIndicator(dat)
         Loop Until yorn = "y" Or yorn = "n"
 
@@ -112,5 +112,50 @@ Public Module RpaModule
         End If
 
         Return [dir]
+    End Function
+
+    Public Function SetFileFromDialog(ByRef dat As RpaDataWrapper, ByVal propname As String) As String
+        Dim [file] As String = vbNullString
+        Dim yorn As String = vbNullString
+        Dim yorn2 As String = vbNullString
+        Dim ofd As OpenFileDialog
+        Do
+            yorn = vbNullString
+            Console.WriteLine()
+            Console.WriteLine($"'{propname}' を指定しますか？ (y/n)")
+            yorn = dat.Transaction.ShowRpaIndicator(dat)
+        Loop Until yorn = "y" Or yorn = "n"
+
+        If yorn = "y" Then
+            Do
+                yorn2 = vbNullString
+                ofd = New OpenFileDialog With {
+                    .FileName = "hoge.json",
+                    .InitialDirectory = $"{CommonProject.SystemDirectory}",
+                    .Filter = "JSONファイル(*.json)|*.json|すべてのファイル(*.*)|*.*",
+                    .FilterIndex = 1,
+                    .Title = $"Select {propname}",
+                    .RestoreDirectory = True
+                }
+                If ofd.ShowDialog() = DialogResult.OK Then
+                    Console.WriteLine()
+                    Console.WriteLine($"よろしいですか？ '{ofd.FileName}' (y/n)")
+                    yorn2 = dat.Transaction.ShowRpaIndicator(dat)
+                Else
+                yorn2 = vbNullString
+                End If
+        Loop Until yorn2 = "y" Or yorn2 = vbNullString
+
+        If yorn2 = "y" Then
+            [file] = ofd.FileName
+            Console.WriteLine()
+            Console.WriteLine($"'{propname}' が指定されました")
+        Else
+            Console.WriteLine($"'{propname}' が指定されませんでした")
+        End If
+            Console.WriteLine()
+        End If
+
+        Return [file]
     End Function
 End Module

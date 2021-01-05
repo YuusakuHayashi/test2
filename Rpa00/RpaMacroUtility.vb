@@ -8,6 +8,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Dim cmd As Object
             Select Case dat.Transaction.MainCommand
                 Case "update" : cmd = New UpdateMacroCommand(Me)
+                Case "check" : cmd = New CheckMacroCommand(Me)
                 Case Else : cmd = Nothing
             End Select
             Return cmd
@@ -31,10 +32,12 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Get
     End Property
 
-    Public Function InvokeMacro(ByVal method As String, args() As Object)
+    Public Function InvokeMacro(ByVal method As String, args() As Object) As Integer
+        Dim rtn As Integer
         Dim exapp, exbooks, exbook
         Dim macrofile As String
 
+        rtn = -1
         Try
             exapp = CreateObject("Excel.Application")
             Try
@@ -52,13 +55,45 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Finally
                 Marshal.ReleaseComObject(exbooks)
             End Try
-            Return 0
+            rtn = 0
         Finally
             If exapp IsNot Nothing Then
                 exapp.Quit()
             End If
             Marshal.ReleaseComObject(exapp)
         End Try
+        Return rtn
+    End Function
+
+    Public Function CallMacro(ByVal method As String, args() As Object) As Object
+        Dim exapp, exbooks, exbook
+        Dim macrofile As String
+        Dim obj As Object = Nothing
+
+        Try
+            exapp = CreateObject("Excel.Application")
+            Try
+                exbooks = exapp.Workbooks
+                Try
+                    exbook = exbooks.Open(Me.MacroFileName, 0)
+                    macrofile = Path.GetFileName(Me.MacroFileName)
+                    obj = exapp.Run($"{macrofile}!{method}", args)
+                Finally
+                    If exbook IsNot Nothing Then
+                        exbook.Close()
+                    End If
+                    Marshal.ReleaseComObject(exbook)
+                End Try
+            Finally
+                Marshal.ReleaseComObject(exbooks)
+            End Try
+        Finally
+            If exapp IsNot Nothing Then
+                exapp.Quit()
+            End If
+            Marshal.ReleaseComObject(exapp)
+        End Try
+        Return obj
     End Function
 
     Private Class UpdateMacroCommand : Inherits RpaUtilityCommandBase

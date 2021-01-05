@@ -1205,6 +1205,24 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             Return False
         End If
 
+        Dim ck As Boolean = True
+        For Each [mod] In {"Rpa01", "RpaSystem", "RpaLibrary"}
+            Dim obj = mutil.CallMacro("RpaSystem.IsModuleExist", {[mod]})
+            If obj IsNot Nothing Then
+                Dim bool As Boolean = CType(obj, Boolean)
+                If Not bool Then
+                    Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
+                    ck = False
+                End If
+            Else
+                ck = False
+                Exit For
+            End If
+        Next
+        If Not ck Then
+            Return False
+        End If
+
         If Not Data.Project.SystemUtilities.ContainsKey("PrinterUtility") Then
             Console.WriteLine($"機能 'PrinterUtiliity' が含まれていません")
             Return False

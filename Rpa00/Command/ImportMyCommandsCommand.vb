@@ -46,6 +46,7 @@ Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
             Dim yorn As String = vbNullString
             Do
                 yorn = vbNullString
+                Console.WriteLine()
                 Console.WriteLine($"インポートを実行すると、現在のコマンド設定を上書きします")
                 Console.WriteLine($"よろしいですか？ (y/n)")
                 yorn = dat.Transaction.ShowRpaIndicator(dat)
@@ -57,7 +58,7 @@ Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
         End If
 
         Me._MyCommandJsonFileName = vbNullString
-        Me._MyCommandJsonFileName = RpaModule.SetDirectoryFromDialog(dat, "MyCommandFile")
+        Me._MyCommandJsonFileName = RpaModule.SetFileFromDialog(dat, "MyCommandFile")
 
         If String.IsNullOrEmpty(Me._MyCommandJsonFileName) Then
             Console.WriteLine("ファイルが指定されていません")
