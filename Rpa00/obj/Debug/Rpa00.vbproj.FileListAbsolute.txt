@@ -20,5 +20,4 @@ C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll
 C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.xml
 C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.pdb
-\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.vbprojResolveAssemblyReference.cache
 C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.vbprojAssemblyReference.cache

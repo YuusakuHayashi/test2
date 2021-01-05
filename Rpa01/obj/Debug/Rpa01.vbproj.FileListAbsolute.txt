@@ -9,7 +9,6 @@
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\RpaCui2.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\RpaCui2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Newtonsoft.Json.xml
-\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.vbprojResolveAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.vbproj.GenerateResource.Cache
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.dll
@@ -35,3 +34,4 @@ C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.dll
 C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.xml
 C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.vbprojResolveAssemblyReference.cache

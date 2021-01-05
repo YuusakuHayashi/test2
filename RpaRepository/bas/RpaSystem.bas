@@ -1,4 +1,5 @@
 Attribute VB_Name = "RpaSystem"
+Option Explicit
 
 Public Sub PrintOutSheet(ByRef v() As Variant)
     Dim printername As String: printername = v(0)
@@ -15,7 +16,7 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
     wbook.Application.DisplayAlerts = False
     wbook.Application.ScreenUpdating = False
 
-    Set wsheet = wb.Worksheets(sheetname)
+    Set wsheet = wbook.Worksheets(sheetname)
 
     If printername <> vbNullString Then
         wsheet.PrintOut ActivePrinter:=printername
@@ -35,26 +36,30 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
     Set wbook = Nothing
 End Sub
 
-Private Function IsModuleExist(ByRef v() As Variant) As Variant
-    Stop
+Private Function IsModuleExist(ByRef v() As Variant) As Boolean
     Dim module As String: module = v(0)
     Dim ck As Boolean: ck = False
+    Dim vbc As Object
+
     For Each vbc In ThisWorkbook.VBProject.VBComponents
         If vbc.Name = module Then
             ck = True
             Exit For
         End If
     Next
+
     If ck Then
         IsModuleExist = True
     Else
         IsModuleExist = False
     End If
+
+    Set vbc = Nothing
 End Function
 
 Public Sub test()
     Dim v(1) As Variant
     Dim ans As Variant
     v(0) = "MacroImporter"
-    ans = IsModuleExist(v)
+    Call IsModuleExist(v)
 End Sub

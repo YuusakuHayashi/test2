@@ -1,4 +1,11 @@
 ﻿Public Class RunRobotCommand : Inherits RpaCommandBase
+
+    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
+        Get
+            Return {0, 999}
+        End Get
+    End Property
+
     Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
         Dim i = 0
         'Call dat.Project.MyRobotObject.SetData(dat)

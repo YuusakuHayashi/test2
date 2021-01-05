@@ -409,10 +409,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         '' 添付ファイルを解凍
         'Console.WriteLine("添付ファイルを解凍します...")
-        'If Not File.Exists(Me.AttacheCase) Then
-        '    Console.WriteLine($"エラー：アタッシュケース '{Me.AttacheCase}' がありません")
-        '    Return 1000
-        'End If
         'Call rpa.RunShell(Me.AttacheCase, $"/c {afile_1} /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
         'If Not File.Exists(ixls_1) Then
         '    Console.WriteLine($"エラー：解凍後ファイル '{ixls_1}' がありません")
@@ -1201,7 +1197,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         mutil = Data.Project.SystemUtilities("MacroUtility").UtilityObject
 
         If Not File.Exists(mutil.MacroFileName) Then
-            Console.WriteLine($"ファイル '{mutil.MacroFileName}' が存在しません")
+            Console.WriteLine($"マクロファイル '{mutil.MacroFileName}' が存在しません")
             Return False
         End If
 
@@ -1209,40 +1205,21 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim [mod] As String
         Dim err As String = $"モジュールのチェックに失敗しました"
         Dim ck As Boolean = True
-        obj = mutil.CallMacro("RpaSystem.IsModuleExist", {"Rpa01"})
-        If obj IsNot Nothing Then
-            Dim ck2 = CType(obj, Boolean)
-            If Not ck2 Then
-                Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール 'Rpa01' が存在しません")
-                ck = False
-            End If
-        Else
-            Console.WriteLine(err)
-            ck = False
-        End If
-        obj = mutil.CallMacro("RpaSystem.IsModuleExist", {"RpaSystem"})
-        If obj IsNot Nothing Then
-            Dim ck3 = CType(obj, Boolean)
-            If Not ck3 Then
-                Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール 'RpaSystem' が存在しません")
-                ck = False
-            End If
-        Else
-            Console.WriteLine(err)
-            ck = False
-        End If
-        obj = mutil.CallMacro("RpaSystem.IsModuleExist", {"RpaLibrary"})
-        If obj IsNot Nothing Then
-            Dim ck4 = CType(obj, Boolean)
-            If Not ck4 Then
-                Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール 'RpaLibrary' が存在しません")
-                ck = False
-            End If
-        Else
-            Console.WriteLine(err)
-            ck = False
-        End If
 
+        For Each [mod] In {"Rpa01", "RpaSystem", "RpaLibrary"}
+            obj = mutil.InvokeMacroFunction("RpaSystem.IsModuleExist", {[mod]})
+            If obj IsNot Nothing Then
+                Dim ck2 = CType(obj, Boolean)
+                If Not ck2 Then
+                    Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
+                    ck = False
+                End If
+            Else
+                Console.WriteLine($"モジュールのチェックに失敗しました")
+                ck = False
+                Exit For
+            End If
+        Next
         If Not ck Then
             Return False
         End If
@@ -1253,7 +1230,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
 
         If Not File.Exists(Me.AttacheCase) Then
-            Console.WriteLine($"ファイル '{Me.AttacheCase}' が存在しません")
+            Console.WriteLine($"アタッシュケース '{Me.AttacheCase}' が存在しません")
             Return False
         End If
 
