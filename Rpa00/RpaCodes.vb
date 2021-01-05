@@ -9,8 +9,8 @@ Public Module RpaCodes
             Dim [type] As Object
             Select Case rpa.RobotName
                 Case "rpa01"
-                    'asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.dll")
-                    asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.dll")
+                    asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.dll")
+                    'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.dll")
                     'asm = Assembly.LoadFrom($"{CommonProject.SystemDllDirectory}\Rpa01.dll")
                     [mod] = asm.GetModule("Rpa01.dll")
                     [type] = [mod].GetType("Rpa01.Rpa01")

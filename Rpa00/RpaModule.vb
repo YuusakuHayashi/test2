@@ -2,6 +2,31 @@
 Imports System.Windows.Forms
 
 Public Module RpaModule
+    ' ファイルの存在確認応答をループして行う
+    Public Function FileCheckLoop(ByVal [file] As String, ByRef dat As RpaDataWrapper) As Boolean
+        Do
+            Console.WriteLine($"以下のファイルを用意したら、キーを押してください・・・")
+            Console.WriteLine($"ファイル名 : '{[file]}'")
+            dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            If IO.File.Exists([file]) Then
+                Return True
+            Else
+                Dim yorn As String = vbNullString
+                Do
+                    yorn = vbNullString
+                    Console.WriteLine($"ファイル '{[file]}' が存在しません。")
+                    Console.WriteLine($"'y'...再度確認  'n'...確認しないでチェックを終了")
+                    yorn = dat.Transaction.ShowRpaIndicator(dat)
+                    Console.WriteLine()
+                Loop Until yorn = "y" Or yorn = "n"
+                If yorn = "n" Then
+                    Return False
+                End If
+            End If
+        Loop Until True
+        Return False
+    End Function
 
     Public Function Pop(Of T As {New, IList})(ByVal [old] As T) As T
         Dim [new] As New T

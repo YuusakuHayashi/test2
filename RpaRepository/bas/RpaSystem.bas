@@ -12,9 +12,9 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
     Application.DisplayAlerts = False
 
     Set wbook = Workbooks.Open(bookname, 0)
-    wbook.Application.EnableEvents = False
-    wbook.Application.DisplayAlerts = False
-    wbook.Application.ScreenUpdating = False
+    'wbook.Application.EnableEvents = False
+    'wbook.Application.DisplayAlerts = False
+    'wbook.Application.ScreenUpdating = False
 
     Set wsheet = wbook.Worksheets(sheetname)
 
@@ -24,9 +24,9 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
         wsheet.PrintOut
     End If
 
-    wbook.Application.ScreenUpdating = True
-    wbook.Application.DisplayAlerts = True
-    wbook.Application.EnableEvents = True
+    'wbook.Application.ScreenUpdating = True
+    'wbook.Application.DisplayAlerts = True
+    'wbook.Application.EnableEvents = True
     wbook.Close
 
     Application.EnableEvents = True

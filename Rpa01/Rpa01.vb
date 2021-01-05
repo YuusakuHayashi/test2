@@ -48,7 +48,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
     Public PrinterName As String
     Public PrintCreatedOnly As Boolean
-    Private _UsePrintCreatedOnly As Boolean
 
     Private _ItakusyaCodeDictionary As Dictionary(Of String, String)
     Public Property ItakusyaCodeDictionary As Dictionary(Of String, String)
@@ -373,13 +372,12 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         '-----------------------------------------------------------------------------------------'
         Dim imaster_1 = $"{Data.Project.MyRobotDirectory}\{Me.MasterCsvFileName}"
         Dim wmaster_1 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
-        Console.WriteLine("以下のファイルを用意したら、[Enter]キーをクリックしてください")
-        Console.WriteLine("ファイル名 : " & Me.MasterCsvFileName)
-        Console.ReadLine()
-        If Not File.Exists(imaster_1) Then
-            Console.WriteLine($"エラー：ファイル '{imaster_1}' が存在しません")
+        If Not Rpa00.RpaModule.FileCheckLoop(imaster_1, dat) Then
+            Console.WriteLine($"中断しました")
+            Console.WriteLine()
             Return 1000
         End If
+
         File.Copy(imaster_1, wmaster_1, True)
         '-----------------------------------------------------------------------------------------'
 
@@ -461,14 +459,14 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         )
 
         ' バックアップへコピー
-        Me._UsePrintCreatedOnly = Me.PrintCreatedOnly
-        If Data.Transaction.Parameters.Contains("createdonly=yes") Then
-            Me._UsePrintCreatedOnly = True
+        'Me._UsePrintCreatedOnly = Me.PrintCreatedOnly
+        Dim creonly = Me.PrintCreatedOnly
+        If Data.Transaction.Parameters.Contains("createdonly") Then
+            creonly = True
+        Else
+            creonly = False
         End If
-        If Data.Transaction.Parameters.Contains("createdonly=no") Then
-            Me._UsePrintCreatedOnly = False
-        End If
-        If Me._UsePrintCreatedOnly Then
+        If creonly Then
             For Each imd In Me.IraishoMeisaiDatas
                 If bookname_1 <> imd.BookName Then
                     File.Copy(
@@ -485,7 +483,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
 
         bookname_1 = vbNullString
-        If Not Data.Transaction.Parameters.Contains("print=no") Then
+        If Not Data.Transaction.Parameters.Contains("noprint") Then
             For Each imd In Me.IraishoMeisaiDatas
                 If bookname_1 <> imd.BookName Then
                     [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, imd.BookName, imd.DistinationSheetName})
@@ -508,7 +506,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Console.WriteLine("加工済み送付明細を作成中・・・")
         Dim idx_1 = 0
         Dim wkmaster_v2 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
-        Dim tincsv_v2 = $"{Me._WorkDirectory}\t_input.csv"
+        Dim idata1_2 = $"{Me._WorkDirectory}\idata1.csv"
         Dim outxlsx_1 = $"{Me._BackupDirectory}\加工済送付明細.xlsx"
         Dim sheetname_2 = vbNullString
         Dim setting_v1(26) As Double
@@ -544,9 +542,9 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", "Shift-JIS"})
         End If
         sheetname_2 = $"停止{Me.RestartCount.ToString}回目"
-        [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {tincsv_v2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
+        [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {idata1_2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
 
-        If Not Data.Transaction.Parameters.Contains("print=no") Then
+        If Not Data.Transaction.Parameters.Contains("noprint") Then
             [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, outxlsx_1, sheetname_2})
         End If
 
@@ -560,23 +558,32 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         Console.WriteLine("件数集計ファイルを作成中・・・")
         Call _CreateSummaryFile(outtxt_1)
-        If Not Data.Transaction.Parameters.Contains("print=no") Then
+        If Not Data.Transaction.Parameters.Contains("noprint") Then
             Call putil.TextPrintRequest((New FileInfo(outtxt_1)), SHIFT_JIS)
         End If
         Console.WriteLine("件数集計ファイル作成完了！")
         '-----------------------------------------------------------------------------------------'
 
 
-        If Data.Transaction.Parameters.Count > 0 Then
-            If Data.Transaction.Parameters.Last = "end" Then
-                Me.RestartCode = vbNullString
-                Me.RestartCount = 1
-            End If
-        Else
+        ' 終了処理
+        '-----------------------------------------------------------------------------------------'
+        If (Data.Transaction.Parameters.Count > 0) And (Data.Transaction.Parameters.Contains("end")) Then
+            Me.RestartCode = vbNullString
+            Me.RestartCount = 1
+        End If
+        If (Data.Transaction.Parameters.Count > 0) And (Not Data.Transaction.Parameters.Contains("end")) Then
+            Me.RestartCount += 1
+        End If
+        If (Data.Transaction.Parameters.Count = 0) Then
             Me.RestartCount += 1
         End If
 
+        Call Me.Save(Data.Project.MyRobotJsonFileName, Me)
+        Console.WriteLine($"{Data.Project.MyRobotJsonFileName} を更新しました")
+        '-----------------------------------------------------------------------------------------'
+
         Console.WriteLine("処理終了！")
+        Console.WriteLine()
         Return 0
     End Function
 

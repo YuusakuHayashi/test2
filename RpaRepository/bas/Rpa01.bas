@@ -1309,12 +1309,12 @@ Private Sub CreateSofuMeisai(ByRef v() As Variant)
                 rng.Interior.ColorIndex = 6
             End If
         Next
-        vs = Split(v(4), ",")
-        For idx = Lbound(vs) To Ubound(vs)
-            If vs(idx) = "0" Then
+        'vs = Split(v(4), ",")
+        For idx = Lbound(v(4)) To Ubound(v(4))
+            If v(4)(idx) = "0" Then
                 osheet.Columns(idx + 1).Hidden = True
             Else
-                osheet.Columns(idx + 1).ColumnWidth = CDbl(vs(idx))
+                osheet.Columns(idx + 1).ColumnWidth = v(4)(idx)
             End If
         Next
     End If
