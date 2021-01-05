@@ -8,7 +8,6 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Dim cmd As Object
             Select Case dat.Transaction.MainCommand
                 Case "update" : cmd = New UpdateMacroCommand(Me)
-                Case "check" : cmd = New CheckMacroCommand(Me)
                 Case Else : cmd = Nothing
             End Select
             Return cmd

@@ -35,7 +35,8 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
     Set wbook = Nothing
 End Sub
 
-Public Function IsModuleExist(ByRef v() As Variant) As Variant
+Private Function IsModuleExist(ByRef v() As Variant) As Variant
+    Stop
     Dim module As String: module = v(0)
     Dim ck As Boolean: ck = False
     For Each vbc In ThisWorkbook.VBProject.VBComponents

@@ -1205,20 +1205,44 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             Return False
         End If
 
+        Dim obj As Object
+        Dim [mod] As String
+        Dim err As String = $"モジュールのチェックに失敗しました"
         Dim ck As Boolean = True
-        For Each [mod] In {"Rpa01", "RpaSystem", "RpaLibrary"}
-            Dim obj = mutil.CallMacro("RpaSystem.IsModuleExist", {[mod]})
-            If obj IsNot Nothing Then
-                Dim bool As Boolean = CType(obj, Boolean)
-                If Not bool Then
-                    Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
-                    ck = False
-                End If
-            Else
+        obj = mutil.CallMacro("RpaSystem.IsModuleExist", {"Rpa01"})
+        If obj IsNot Nothing Then
+            Dim ck2 = CType(obj, Boolean)
+            If Not ck2 Then
+                Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール 'Rpa01' が存在しません")
                 ck = False
-                Exit For
             End If
-        Next
+        Else
+            Console.WriteLine(err)
+            ck = False
+        End If
+        obj = mutil.CallMacro("RpaSystem.IsModuleExist", {"RpaSystem"})
+        If obj IsNot Nothing Then
+            Dim ck3 = CType(obj, Boolean)
+            If Not ck3 Then
+                Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール 'RpaSystem' が存在しません")
+                ck = False
+            End If
+        Else
+            Console.WriteLine(err)
+            ck = False
+        End If
+        obj = mutil.CallMacro("RpaSystem.IsModuleExist", {"RpaLibrary"})
+        If obj IsNot Nothing Then
+            Dim ck4 = CType(obj, Boolean)
+            If Not ck4 Then
+                Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール 'RpaLibrary' が存在しません")
+                ck = False
+            End If
+        Else
+            Console.WriteLine(err)
+            ck = False
+        End If
+
         If Not ck Then
             Return False
         End If
