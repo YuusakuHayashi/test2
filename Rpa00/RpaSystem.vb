@@ -36,6 +36,7 @@ Public Class RpaSystem
                 Case "setup" : cmd = New SetupRpaCommand
                 Case "saveproject" : cmd = New SaveProjectCommand
                 Case "saveinitializer" : cmd = New SaveInitializerCommand
+                Case "allsave" : cmd = New AllSaveCommand
                 Case "load" : cmd = New LoadCommand
                 Case "runrobot" : cmd = New RunRobotCommand
                 Case "clonerobot" : cmd = New CloneRobotCommand
@@ -60,6 +61,11 @@ Public Class RpaSystem
                 Case "showinitializerproperties" : cmd = New ShowInitializerPropertiesCommand
                 Case "changeinitializerproperty" : cmd = New ChangeInitializerPropertyCommand
                 Case "updatemyrobotjson" : cmd = New UpdateMyRobotJsonCommand
+                Case "updaterootrobotjson" : cmd = New UpdateRootRobotJsonCommand
+                Case "removemycommand" : cmd = New RemoveMyCommandCommand
+                Case "activatemycommand" : cmd = New ActivateMyCommandCommand
+                Case "showmyrobotjson" : cmd = New ShowMyRobotJsonCommand
+                Case "showmyrobotproperties" : cmd = New ShowMyRobotPropertiesCommand
                 Case Else : cmd = Nothing
             End Select
 
@@ -81,35 +87,6 @@ Public Class RpaSystem
                     cmd = Nothing
                 End If
             End If
-            'If dat.Transaction.Modes.Count > 0 Then
-            '    Select Case dat.Transaction.Modes.Last
-            '        Case (New SetupRpaCommand).GetType.Name
-            '            Select Case dat.Transaction.MainCommand
-            '                Case "newproject" : cmd = New NewProjectCommand
-            '                Case "setupproject" : cmd = New SetupProjectCommand
-            '                Case "setupinitializer" : cmd = New SetupInitializerCommand
-            '                Case "removeproject" : cmd = New RemoveProjectCommand
-            '                Case "exit" : cmd = New ExitCommand
-            '                Case Else : cmd = Nothing
-            '            End Select
-            '        Case (New SetupProjectCommand).GetType.Name
-            '            Select Case dat.Transaction.MainCommand
-            '                Case "changeprojectproperty" : cmd = New ChangeProjectPropertyCommand
-            '                Case "showprojectproperties" : cmd = New ShowProjectPropertiesCommand
-            '                Case "changeprojectpropertyusingfolderbrowser" : cmd = New ChangeProjectPropertyUsingFolderBrowserCommand
-            '                Case "exit" : cmd = New ExitCommand
-            '                Case Else : cmd = Nothing
-            '            End Select
-            '        Case (New SetupInitializerCommand).GetType.Name
-            '            Select Case dat.Transaction.MainCommand
-            '                Case "changeinitializerproperty" : cmd = New ChangeInitializerCommand
-            '                Case "showinitializerproperties" : cmd = New ShowInitializerPropertiesCommand
-            '                Case "exit" : cmd = New ExitCommand
-            '                Case Else : cmd = Nothing
-            '            End Select
-            '        Case Else : cmd = Nothing
-            '    End Select
-            'End If
 
             Return cmd
         End Get

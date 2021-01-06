@@ -6,12 +6,6 @@ Public Class RpaPrinterUtility : Inherits RpaUtilityBase
     Public PrintText As String
     Public PrintFile As FileInfo
 
-    Public Overrides ReadOnly Property CommandHandler(dat As Object) As Object
-        Get
-            Return Nothing
-        End Get
-    End Property
-
     Public Overloads Sub TextPrintRequest(ByVal txt As String)
         Me.PrintText = txt
         Dim pd As New Drawing.Printing.PrintDocument

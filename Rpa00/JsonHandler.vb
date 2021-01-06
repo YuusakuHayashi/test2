@@ -85,6 +85,16 @@ Public Class JsonHandler(Of T As New)
         ' Nothing To Do
     End Sub
 
+    Public Overloads Function GetSerializedText(ByVal m As T) As String
+        Dim txt As String = vbNullString
+        Try
+            txt = JsonConvert.SerializeObject(m, Formatting.Indented)
+        Catch ex As Exception
+            txt = vbNullString
+        End Try
+        Return txt
+    End Function
+
     Public Overloads Sub Save(ByVal f As String,
                                    ByVal m As T)
         Dim txt As String

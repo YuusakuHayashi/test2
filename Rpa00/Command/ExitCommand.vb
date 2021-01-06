@@ -9,19 +9,20 @@ Public Class ExitCommand : Inherits RpaCommandBase
     End Property
 
     Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
-
-        If File.Exists(dat.Project.SystemJsonChangedFileName) Then
-            Dim yorn As String = vbNullString
-            Do
-                yorn = vbNullString
-                Console.WriteLine()
-                Console.WriteLine($"Projectに変更があります。変更を保存しますか？ (y/n)")
-                yorn = dat.Transaction.ShowRpaIndicator(dat)
-            Loop Until yorn = "y" Or yorn = "n"
-            If yorn = "y" Then
-                RpaModule.Save(dat.Project.SystemJsonFileName, dat.Project, dat.Project.SystemJsonChangedFileName)
-            Else
-                File.Delete(dat.Project.SystemJsonChangedFileName)
+        If dat.Project IsNot Nothing Then
+            If File.Exists(dat.Project.SystemJsonChangedFileName) Then
+                Dim yorn As String = vbNullString
+                Do
+                    yorn = vbNullString
+                    Console.WriteLine()
+                    Console.WriteLine($"Projectに変更があります。変更を保存しますか？ (y/n)")
+                    yorn = dat.Transaction.ShowRpaIndicator(dat)
+                Loop Until yorn = "y" Or yorn = "n"
+                If yorn = "y" Then
+                    RpaModule.Save(dat.Project.SystemJsonFileName, dat.Project, dat.Project.SystemJsonChangedFileName)
+                Else
+                    File.Delete(dat.Project.SystemJsonChangedFileName)
+                End If
             End If
         End If
 

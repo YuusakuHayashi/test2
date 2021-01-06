@@ -72,15 +72,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientServerProject.vb" />
+    <Compile Include="Command\ActivateMyCommandCommand.vb" />
     <Compile Include="Command\AddCommandAliasCommand.vb" />
     <Compile Include="Command\AddRobotAliasCommand.vb" />
     <Compile Include="Command\AddUtilityCommand.vb" />
+    <Compile Include="Command\AllSaveCommand.vb" />
     <Compile Include="Command\ChangeInitializerPropertyCommand.vb" />
     <Compile Include="Command\ChangeProjectPropertyCommand.vb" />
     <Compile Include="Command\ChangeProjectPropertyUsingFolderBrowserCommand.vb" />
     <Compile Include="Command\ExportMyCommandsCommand.vb" />
     <Compile Include="Command\ImportMyCommandsCommand.vb" />
     <Compile Include="Command\ChangeCommandEnabledCommand.vb" />
+    <Compile Include="Command\RemoveMyCommandCommand.vb" />
     <Compile Include="Command\RemoveProjectCommand.vb" />
     <Compile Include="Command\RemoveRobotCommand.vb" />
     <Compile Include="Command\RpaCommandInterface.vb" />
@@ -99,8 +102,11 @@
     <Compile Include="Command\SetupRpaCommand.vb" />
     <Compile Include="Command\ShowMyCommandCommand.vb" />
     <Compile Include="Command\ShowInitializerPropertiesCommand.vb" />
+    <Compile Include="Command\ShowMyRobotJsonCommand.vb" />
+    <Compile Include="Command\ShowMyRobotPropertiesCommand.vb" />
     <Compile Include="Command\ShowProjectPropertiesCommand.vb" />
     <Compile Include="Command\UpdateMyRobotJsonCommand.vb" />
+    <Compile Include="Command\UpdateRootRobotJsonCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -125,11 +131,13 @@
     <Compile Include="RpaInitializer.vb" />
     <Compile Include="RpaMacroUtility.vb" />
     <Compile Include="RpaModule.vb" />
+    <Compile Include="RpaOutlookUtility.vb" />
     <Compile Include="RpaPackage.vb" />
     <Compile Include="RpaPrinterUtility.vb" />
     <Compile Include="IntranetClientServerProject.vb" />
     <Compile Include="RpaProjectBase.vb" />
     <Compile Include="RpaProjectInterface.vb" />
+    <Compile Include="RpaShellUtility.vb" />
     <Compile Include="RpaSystem.vb" />
     <Compile Include="RpaTransaction.vb" />
     <Compile Include="RpaUtility.vb" />

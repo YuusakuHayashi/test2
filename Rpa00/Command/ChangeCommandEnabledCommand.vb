@@ -1,6 +1,5 @@
 ﻿
 Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
-
     Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
         Get
             Return True
@@ -8,7 +7,6 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
     End Property
 
     Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
-
         ' 論理和
         If Not (Boolean.TryParse(dat.Transaction.Parameters(1), True) Or Boolean.TryParse(dat.Transaction.Parameters(1), False)) Then
             Console.WriteLine($"パラメタ '{dat.Transaction.Parameters(1)}' の論理値への変換に失敗しました")

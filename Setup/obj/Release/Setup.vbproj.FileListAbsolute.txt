@@ -1,0 +1,4 @@
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Release\Setup.vbprojResolveAssemblyReference.cache
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Release\Setup.Resources.resources
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Release\Setup.vbproj.GenerateResource.Cache
+\\Coral\個人情報-林祐\project\wpf\test2\Setup\obj\Release\Setup.xml

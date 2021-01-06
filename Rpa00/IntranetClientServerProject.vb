@@ -21,38 +21,27 @@ Public Class IntranetClientServerProject
 
     Private ReadOnly Property HelloFileName As String
         Get
-            'Return $"{IntranetClientServerProject.ServerDirectory}\Hello.txt"
             Return $"{Me.ServerDirectory}\Hello.txt"
         End Get
     End Property
 
-    'Private Shared _RootDirectory As String
     Private _RootDirectory As String
     Public Property RootDirectory As String
         Get
-            'Return IntranetClientServerProject._RootDirectory
             Return Me._RootDirectory
         End Get
         Set(value As String)
-            'If String.IsNullOrEmpty(IntranetClientServerProject._RootDirectory) Then
-            'IntranetClientServerProject._RootDirectory = value            
-            'End If
             Me._RootDirectory = value
             RaisePropertyChanged("RootDirectory")
         End Set
     End Property
 
-    'Private Shared _ServerDirectory As String
     Private _ServerDirectory As String
     Public Property ServerDirectory As String
         Get
-            'Return IntranetClientServerProject._ServerDirectory
             Return Me._ServerDirectory
         End Get
         Set(value As String)
-            'If Not String.IsNullOrEmpty(value) Then
-            'IntranetClientServerProject._ServerDirectory = value
-            'End If
             Me._ServerDirectory = value
             RaisePropertyChanged("ServerDirectory")
         End Set
@@ -383,91 +372,25 @@ Public Class IntranetClientServerProject
         'Next
     End Sub
 
-    'Public Overrides Sub CheckProject()
-    '    Dim [changed] As Boolean = False
-    '    Dim [old] As String = vbNullString
-    '    If Not Directory.Exists(Me.RootDirectory) Then
-    '        [old] = Me.RootDirectory
-    '        Call _ConsoleWriteLine($"RootDirectory '{Me.RootDirectory}' がありません")
-    '        Call _CreateProjectDirectory("RootDirectory")
-    '        If [old] <> Me.RootDirectory Then
-    '            [changed] = True
-    '        End If
-    '    End If
-    '    'If Not Directory.Exists(Me.MyDirectory) Then
-    '    '    [old] = Me.MyDirectory
-    '    '    Call _ConsoleWriteLine($"MyDirectory '{Me.MyDirectory}' がありません")
-    '    '    Call _CreateProjectDirectory("MyDirectory")
-    '    '    If [old] <> Me.RootDirectory Then
-    '    '        [changed] = True
-    '    '    End If
-    '    'End If
-    '    If [changed] Then
-    '        Call Save(Me.SystemJsonFileName, Me)
-    '    End If
-    'End Sub
-
-    'Private Sub _CreateProjectDirectory(ByVal dtype As String)
-    '    Dim yorn As String = vbNullString
-    '    Dim yorn2 As String = vbNullString
-    '    Dim fbd As FolderBrowserDialog
-    '    Do
-    '        yorn = vbNullString
-    '        Console.WriteLine($"{dtype} の設定を行いますか (y/n)")
-    '        Console.Write($">>> ")
-    '        yorn = Console.ReadLine()
-    '    Loop Until yorn = "y" Or yorn = "n"
-    '    If yorn = "y" Then
-    '        Do
-    '            yorn2 = vbNullString
-    '            fbd = New FolderBrowserDialog With {
-    '                .Description = $"Select {dtype}",
-    '                .RootFolder = Environment.SpecialFolder.Desktop,
-    '                .SelectedPath = Environment.SpecialFolder.Desktop,
-    '                .ShowNewFolderButton = True
-    '            }
-    '            If fbd.ShowDialog() = DialogResult.OK Then
-    '                Console.WriteLine($"よろしいですか？ '{fbd.SelectedPath}' (y/n)")
-    '                Console.Write($">>> ")
-    '                yorn2 = Console.ReadLine()
-    '            Else
-    '                yorn2 = "x"
-    '            End If
-    '        Loop Until yorn2 = "y" Or yorn2 = "x"
-    '        If yorn2 = "y" Then
-    '            If dtype = "RootDirectory" Then
-    '                Me.RootDirectory = fbd.SelectedPath
-    '            End If
-    '            If dtype = "MyDirectory" Then
-    '                Me.MyDirectory = fbd.SelectedPath
-    '            End If
-    '            Console.WriteLine($"{dtype} が初期設定されました")
-    '        End If
-    '        If yorn2 = "x" Then
-    '            Console.WriteLine($"{dtype} の初期設定は行いませんでした")
-    '        End If
-    '    End If
-    'End Sub
-
     Private Sub _ConsoleWriteLine(ByVal [line] As String)
         If Not Me.PrivateMode Then
             Console.WriteLine([line])
         End If
     End Sub
 
-    Public Sub RunShell(ByVal exe As String, ByVal arg As String)
-        Dim proc = New System.Diagnostics.Process()
-        'proc.StartInfo.FileName = System.Environment.GetEnvironmentVariable("ComSpec")
-        proc.StartInfo.FileName = exe
-        proc.StartInfo.UseShellExecute = False
-        proc.StartInfo.RedirectStandardOutput = True
-        proc.StartInfo.RedirectStandardInput = False
-        proc.StartInfo.CreateNoWindow = True
-        proc.StartInfo.Arguments = arg
-        proc.Start()
-        proc.WaitForExit()
-        proc.Close()
-    End Sub
+    'Public Sub RunShell(ByVal exe As String, ByVal arg As String)
+    '    Dim proc = New System.Diagnostics.Process()
+    '    'proc.StartInfo.FileName = System.Environment.GetEnvironmentVariable("ComSpec")
+    '    proc.StartInfo.FileName = exe
+    '    proc.StartInfo.UseShellExecute = False
+    '    proc.StartInfo.RedirectStandardOutput = True
+    '    proc.StartInfo.RedirectStandardInput = False
+    '    proc.StartInfo.CreateNoWindow = True
+    '    proc.StartInfo.Arguments = arg
+    '    proc.Start()
+    '    proc.WaitForExit()
+    '    proc.Close()
+    'End Sub
 
     Private Function _GetIgnoreList(ByVal f As String) As List(Of String)
         Dim txt As String

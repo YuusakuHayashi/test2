@@ -49,19 +49,32 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Public PrinterName As String
     Public PrintCreatedOnly As Boolean
 
-    Private _ItakusyaCodeDictionary As Dictionary(Of String, String)
-    Public Property ItakusyaCodeDictionary As Dictionary(Of String, String)
+    Private _BankSaffixes As List(Of String)
+    Public Property BankSaffixes As List(Of String)
         Get
-            If Me._ItakusyaCodeDictionary Is Nothing Then
-                Me._ItakusyaCodeDictionary = New Dictionary(Of String, String)
-                Me._ItakusyaCodeDictionary.Add("Moteki", "0029005")
+            If Me._BankSaffixes Is Nothing Then
+                Me._BankSaffixes = New List(Of String)
             End If
-            Return Me._ItakusyaCodeDictionary
+            Return Me._BankSaffixes
         End Get
-        Set(value As Dictionary(Of String, String))
-            Me._ItakusyaCodeDictionary = value
+        Set(value As List(Of String))
+            Me._BankSaffixes = value
         End Set
     End Property
+
+    'Private _ItakusyaCodeDictionary As Dictionary(Of String, String)
+    'Public Property ItakusyaCodeDictionary As Dictionary(Of String, String)
+    '    Get
+    '        If Me._ItakusyaCodeDictionary Is Nothing Then
+    '            Me._ItakusyaCodeDictionary = New Dictionary(Of String, String)
+    '            Me._ItakusyaCodeDictionary.Add("Moteki", "0029005")
+    '        End If
+    '        Return Me._ItakusyaCodeDictionary
+    '    End Get
+    '    Set(value As Dictionary(Of String, String))
+    '        Me._ItakusyaCodeDictionary = value
+    '    End Set
+    'End Property
 
     Private __IraishoDirectory As String
     <JsonIgnore>
@@ -266,7 +279,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End Set
     End Property
 
-    Private __AttachmentFileName As String
     Private _AttachmentFileName As String
     Public Property AttachmentFileName As String
         Get
@@ -357,8 +369,10 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Public Overrides Function Execute(ByRef dat As Object) As Integer
         Me.RestartCount = IIf(Me.RestartCount = 0, 1, Me.RestartCount)
 
-        Dim mutil = Data.Project.SystemUtilities("MacroUtility").UtilityObject
-        Dim putil = Data.Project.SystemUtilities("PrinterUtility").UtilityObject
+        Dim mutil As New Rpa00.RpaMacroUtility
+        Dim putil As New Rpa00.RpaPrinterUtility
+        Dim outil As New Rpa00.RpaOutlookUtility
+        Dim sutil As New Rpa00.RpaShellUtility
         Dim [x] As Integer
 
         ' プリンター名設定
@@ -384,37 +398,51 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' 添付ファイルの取得・解凍・ＣＳＶデータ生成
         '-----------------------------------------------------------------------------------------'
-        Dim afile_1 = vbNullString           ' 添付ファイル（フルパス）
-        Dim afile_1_base = vbNullString      ' 添付ファイル（ファイル名（拡張子除く）のみ）
-        Dim ixls_1 = vbNullString            ' 解凍後ファイル名
-        Dim icsv_1 = $"{Me._WorkDirectory}\input.csv"
+        ' Outlook内
+        Dim nameobj                                      '   添付ファイル名（オブジェクト型）
+        Dim attachmentfile_1 As String = vbNullString    '   添付ファイル名（ファイル名のみ） 
+        ' 添付ファイル保存後
+        Dim afile_1 = vbNullString                       '   添付ファイル（フルパス）
+        Dim afile_1_base = vbNullString                  '   添付ファイル（ファイル名（拡張子除く）のみ）
+        Dim ixls_1 = vbNullString                        '   解凍後ファイル名
+        Dim icsv_1 = $"{Me._WorkDirectory}\input.csv"    ' ＣＳＶ変換後ファイル名
 
-        'Console.WriteLine("添付ファイルを検索しています...")
 
-        '' 添付ファイルを保存し、その名前を取得
-        'Me.__AttachmentFileName = _GetAttachmentFile()
-        'For Each f In Directory.GetFiles(rpa.MyProjectWorkDirectory)
-        '    If Path.GetFileName(f) = Me.__AttachmentFileName Then
-        '        afile_1 = f
-        '    End If
-        'Next
-        'If String.IsNullOrEmpty(afile_1) Then
-        '    Console.WriteLine("エラー：添付ファイルが見つかりません")
-        '    Return 1000
-        'End If
-        'afile_1_base = Path.GetFileNameWithoutExtension(afile_1)
-        'ixls_1 = rpa.MyProjectWorkDirectory & "\" & afile_1_base & ".xls"
+        Console.WriteLine("添付ファイルを検索しています...")
 
-        '' 添付ファイルを解凍
-        'Console.WriteLine("添付ファイルを解凍します...")
-        'Call rpa.RunShell(Me.AttacheCase, $"/c {afile_1} /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
-        'If Not File.Exists(ixls_1) Then
-        '    Console.WriteLine($"エラー：解凍後ファイル '{ixls_1}' がありません")
-        '    Return 1000
-        'End If
+        ' 添付ファイルを保存し、その名前を取得
+        nameobj = outil.InvokeOutlookMacroFunction(AddressOf _GetAttachmentFile)
+        If nameobj IsNot Nothing Then
+            attachmentfile_1 = CType(nameobj, String)
+        End If
+        If String.IsNullOrEmpty(attachmentfile_1) Then
+            Console.WriteLine("エラー：添付ファイルが見つかりません")
+            Console.WriteLine()
+            Return 1000
+        End If
+
+        For Each f In Directory.GetFiles(Me._WorkDirectory)
+            If Path.GetFileName(f) = attachmentfile_1 Then
+                afile_1 = f
+            End If
+        Next
+        If String.IsNullOrEmpty(afile_1) Then
+            Console.WriteLine("エラー：添付ファイルが見つかりません")
+            Return 1000
+        End If
+        afile_1_base = Path.GetFileNameWithoutExtension(afile_1)
+        ixls_1 = $"{Me._WorkDirectory}\{afile_1_base}.xls"
+
+        ' 添付ファイルを解凍
+        Console.WriteLine("添付ファイルを解凍します...")
+        Call sutil.RunShell(Me.AttacheCase, $"/c {afile_1} /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
+        If Not File.Exists(ixls_1) Then
+            Console.WriteLine($"エラー：解凍後ファイル '{ixls_1}' がありません")
+            Return 1000
+        End If
 
         ' TEST TEST
-        ixls_1 = $"{Data.Project.MyRobotDirectory}\input.xls"
+        'ixls_1 = $"{Data.Project.MyRobotDirectory}\input.xls"
 
         ' ＣＳＶデータ生成
         [x] = mutil.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
@@ -423,7 +451,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' ＣＳＶから対象得意先（モテキ）のみ抜き出し・入力ＣＳＶとのマッチング
         '-----------------------------------------------------------------------------------------'
-        Dim target = Me.ItakusyaCodeDictionary("Moteki")
+        Dim target = "0029005"
         Dim wmaster_2 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
         Dim tmpcsv_1 = $"{Me._WorkDirectory}\tmp.csv"
         Dim icsv_2 = $"{Me._WorkDirectory}\input.csv"
@@ -441,8 +469,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim bookname_1 As String = vbNullString
         Dim sheetname_1 As String = vbNullString
         Dim cmp = StringComparer.Ordinal
-        Dim meisais() As IraishoMeisai
-        Dim b_1 As Boolean
 
         Console.WriteLine("停止依頼書を作成中・・・")
 
@@ -459,7 +485,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         )
 
         ' バックアップへコピー
-        'Me._UsePrintCreatedOnly = Me.PrintCreatedOnly
         Dim creonly = Me.PrintCreatedOnly
         If Data.Transaction.Parameters.Contains("createdonly") Then
             creonly = True
@@ -503,7 +528,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' 加工済送付明細の作成
         '-----------------------------------------------------------------------------------------'
-        Console.WriteLine("加工済み送付明細を作成中・・・")
+        Console.WriteLine("加工済送付明細を作成中・・・")
         Dim idx_1 = 0
         Dim wkmaster_v2 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
         Dim idata1_2 = $"{Me._WorkDirectory}\idata1.csv"
@@ -539,10 +564,10 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         If Me.RestartCount = 1 Then
             File.Delete(outxlsx_1)
-            [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", "Shift-JIS"})
+            [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", SHIFT_JIS})
         End If
         sheetname_2 = $"停止{Me.RestartCount.ToString}回目"
-        [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {idata1_2, outxlsx_1, sheetname_2, "utf-8", setting_v1})
+        [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {idata1_2, outxlsx_1, sheetname_2, SHIFT_JIS, setting_v1})
 
         If Not Data.Transaction.Parameters.Contains("noprint") Then
             [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, outxlsx_1, sheetname_2})
@@ -587,29 +612,27 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Return 0
     End Function
 
-    Private Function _GetGinkouSaffix(ByRef koumei As String) As String
-        If koumei.Contains("銀行") Then
-            Return "銀行"
-        ElseIf koumei.Contains("信用金庫") Then
-            Return "信用金庫"
-        ElseIf koumei.Contains("信用組合") Then
-            Return "信用組合"
-        ElseIf koumei.Contains("農業協同組") Then
-            Return "農業協同組合"
-        ElseIf koumei.Contains("農協") Then
-            Return "農協"
-        Else
-            Return vbNullString
+
+    Private Function _GetGinkouSaffix(ByVal koumei As String) As String
+        ' 一度、明示的にList(Of String)に代入しないと、例外が発生する
+        Dim saffixes As List(Of String) = Data.Project.RootRobotObject.BankSaffixes
+        Dim saffix As String = vbNullString
+        If saffixes.Count > 0 Then
+            saffix = saffixes.Find(
+                Function(sfx)
+                    Return koumei.Contains(sfx)
+                End Function
+            )
         End If
+        Return saffix
     End Function
 
     Private Function _GetGinkou(ByVal koumei As String) As String
-        koumei.Replace("銀行", vbNullString)
-        koumei.Replace("信用金庫", vbNullString)
-        koumei.Replace("信用組合", vbNullString)
-        koumei.Replace("農業協同組合", vbNullString)
-        koumei.Replace("農協", vbNullString)
-        Return koumei
+        Dim bankname As String = koumei
+        For Each saffix In Data.Project.RootRobotObject.BankSaffixes
+            bankname = bankname.Replace(saffix, vbNullString)
+        Next
+        Return bankname
     End Function
 
     Private Function _GetTuchoKigouBangou(ByVal kouza As String) As String
@@ -698,7 +721,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
 
         ' ストリームリーダ、ライター
-        sr = New StreamReader(infile, System.Text.Encoding.GetEncoding(MyEncoding))
+        sr = New StreamReader(infile, System.Text.Encoding.GetEncoding(SHIFT_JIS))
         sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         ' 今日の日付
@@ -1020,9 +1043,9 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         errmsg(14) = "振替金額不一致"
         errmsg(15) = "チェックＯＫ"
 
-        isr = New StreamReader(infile, System.Text.Encoding.GetEncoding(MyEncoding))
-        tsr = New StreamReader(tmpcsv, System.Text.Encoding.GetEncoding(MyEncoding))
-        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(MyEncoding))
+        isr = New StreamReader(infile, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        tsr = New StreamReader(tmpcsv, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         ' ヘッダー
         tline = tsr.ReadLine
@@ -1118,7 +1141,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim line As String
         Dim v() As String
         sr = New StreamReader(infile, System.Text.Encoding.GetEncoding(SHIFT_JIS))
-        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(MyEncoding))
+        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         ' ヘッダー
         line = sr.ReadLine
@@ -1144,64 +1167,71 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
     End Sub
 
-    Private Function _GetAttachmentFile() As String
-        Const MAPI = "MAPI"
-        Dim olapp, ns, inbox, sfolder, bfolder, [item]
-        Dim fnc As Func(Of Object, String)
+    Private Function _GetAttachmentFile(ByRef ns As Object) As Object
+        Dim inbox, inboxfolders, sfolder, bfolder, [item]
         Dim rtn = vbNullString
         Try
-            olapp = CreateObject("Outlook.Application")
-            ns = olapp.GetNamespace(MAPI)
             inbox = ns.GetDefaultFolder(6)
-            sfolder = inbox.Folders.Item(Me.OutlookSourceInboxName)
-            bfolder = inbox.Folders.Item(Me.OutlookBackupInboxName)
-            For Each i In sfolder.Items
-                If [item] Is Nothing Then
-                    [item] = i
-                Else
-                    If [item].CreationTime < i.CreationTime Then
-                        [item] = i
-                    End If
-                End If
-            Next
+            Try
+                inboxfolders = inbox.Folders
+                Try
+                    sfolder = inboxfolders.Item(Me.OutlookSourceInboxName)
+                    bfolder = inboxfolders.Item(Me.OutlookBackupInboxName)
 
-            ' 添付ファイルを保存し、その名前を得る
-            fnc = Function(atc As Object)
-                      Call atc.SaveAsFile($"{Me._WorkDirectory}\{atc.FileName}")
-                      Return atc.FileName
-                  End Function
-            If [item] IsNot Nothing Then
-                For Each attachment In item.Attachments
-                    If String.IsNullOrEmpty(Me.AttachmentFileName) Then
-                        rtn = fnc(attachment)
-                    Else
-                        If attachment.FileName = Me.AttachmentFileName Then
-                            rtn = fnc(attachment)
+                    For Each i In sfolder.Items
+                        If [item] Is Nothing Then
+                            [item] = i
+                        Else
+                            If [item].CreationTime < i.CreationTime Then
+                                [item] = i
+                            End If
                         End If
-                    End If
-                Next
-            End If
+                    Next
 
-            Do Until sfolder.Items.Count = 0
-                For Each i In sfolder.Items
-                    Call i.Move(bfolder)
-                    Exit For
-                Next
-            Loop
+                    If [item] IsNot Nothing Then
+                        For Each attachment In item.Attachments
+                            If String.IsNullOrEmpty(Me.AttachmentFileName) Then
+                                attachment.SaveAsFile($"{Me._WorkDirectory}\{attachment.FileName}")
+                                rtn = attachment.FileName
+                            End If
+                        Next
+                    End If
+
+                    Do Until sfolder.Items.Count = 0
+                        For Each i In sfolder.Items
+                            Call i.Move(bfolder)
+                            Exit For
+                        Next
+                    Loop
+                Catch ex As Exception
+                    Console.WriteLine(ex.Message)
+                    Console.WriteLine($"受信用フォルダー、または保管用フォルダーの取得に失敗しました")
+                    rtn = vbNullString
+                Finally
+                    Marshal.ReleaseComObject(sfolder)
+                    Marshal.ReleaseComObject(bfolder)
+                End Try
+            Catch ex As Exception
+                Console.WriteLine(ex.Message)
+                Console.WriteLine($"フォルダーコレクションの取得に失敗しました")
+                rtn = vbNullString
+            Finally
+                Marshal.ReleaseComObject(inboxfolders)
+            End Try
+        Catch ex As Exception
+            Console.WriteLine(ex.Message)
+            Console.WriteLine($"受信トレイの取得に失敗しました")
+            rtn = vbNullString
         Finally
-            Marshal.ReleaseComObject(olapp)
+            Marshal.ReleaseComObject(inbox)
         End Try
         Return rtn
     End Function
 
-    Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
-        Dim mutil As Object
 
-        If Not Data.Project.SystemUtilities.ContainsKey("MacroUtility") Then
-            Console.WriteLine($"機能 'MacroUtiliity' が含まれていません")
-            Return False
-        End If
-        mutil = Data.Project.SystemUtilities("MacroUtility").UtilityObject
+    Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+        Dim mutil As New Rpa00.RpaMacroUtility
+        Dim outil As New Rpa00.RpaOutlookUtility
 
         If Not File.Exists(mutil.MacroFileName) Then
             Console.WriteLine($"マクロファイル '{mutil.MacroFileName}' が存在しません")
@@ -1209,10 +1239,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
 
         Dim obj As Object
-        Dim [mod] As String
-        Dim err As String = $"モジュールのチェックに失敗しました"
         Dim ck As Boolean = True
-
         For Each [mod] In {"Rpa01", "RpaSystem", "RpaLibrary"}
             obj = mutil.InvokeMacroFunction("RpaSystem.IsModuleExist", {[mod]})
             If obj IsNot Nothing Then
@@ -1231,15 +1258,29 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             Return False
         End If
 
-        If Not Data.Project.SystemUtilities.ContainsKey("PrinterUtility") Then
-            Console.WriteLine($"機能 'PrinterUtiliity' が含まれていません")
+        If String.IsNullOrEmpty(Me.AttacheCase) Then
+            Console.WriteLine($"'MyRobotObject.AttacheCase' が指定されていません")
             Return False
         End If
-
         If Not File.Exists(Me.AttacheCase) Then
             Console.WriteLine($"アタッシュケース '{Me.AttacheCase}' が存在しません")
             Return False
         End If
+
+        If String.IsNullOrEmpty(Me.OutlookSourceInboxName) Then
+            Console.WriteLine($"'MyRobotObject.OutlookSourceInboxName' が指定されていません")
+            Return False
+        End If
+        If String.IsNullOrEmpty(Me.OutlookBackupInboxName) Then
+            Console.WriteLine($"'MyRobotObject.OutlookBackupInboxName' が指定されていません")
+            Return False
+        End If
+        For Each [folder] In {Me.OutlookSourceInboxName, Me.OutlookBackupInboxName}
+            If Not (outil.IsInboxFolderExist([folder])) Then
+                Console.WriteLine($"受信トレイに '{[folder]}' が存在しません")
+                Return False
+            End If
+        Next
 
         Return True
     End Function

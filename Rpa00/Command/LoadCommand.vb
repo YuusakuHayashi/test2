@@ -9,7 +9,7 @@ Public Class LoadCommand : Inherits RpaCommandBase
     End Property
 
     Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
-        If dat.Project.Count Is Nothing Then
+        If dat.Initializer.Projects Is Nothing Then
             Console.WriteLine($"プロジェクトがありません")
             Console.WriteLine()
             Return False
