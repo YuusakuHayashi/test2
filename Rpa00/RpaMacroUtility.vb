@@ -20,6 +20,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Case "install" : cmd = New InstallMacroCommand(Me)
                 Case "download" : cmd = New DownloadMacroFileCommand(Me)
                 Case "update" : cmd = New UpdateMacroCommand(Me)
+                Case "show" : cmd = New ShowMacrosCommand(Me)
                 Case Else : cmd = Nothing
             End Select
             Return cmd
@@ -69,8 +70,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                     obj = exapp.Run($"{macrofile}!{method}", args)
                 Catch ex As Exception
                     Console.WriteLine(ex.Message)
-                    Console.WriteLine($"Workbookオブジェクトの取得、")
-                    Console.WriteLine($"または、'{macrofile}!{method}' の実行に失敗しました")
+                    Console.WriteLine($"Workbookオブジェクトの取得、または、'{macrofile}!{method}' の実行に失敗しました")
                     obj = Nothing
                 Finally
                     If exbook IsNot Nothing Then
@@ -119,6 +119,34 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
     End Function
 
 
+    ' Show Command
+    '---------------------------------------------------------------------------------------------'
+    Private Class ShowMacrosCommand : Inherits RpaUtilityCommandBase
+        Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+            If Not File.Exists(Me.Parent.MacroFileName) Then
+                Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
+                Console.WriteLine($"開発者から入手してください")
+                Console.WriteLine()
+                Return False
+            End If
+            Return True
+        End Function
+
+        Private Parent As RpaMacroUtility
+        Public Overrides Function Execute(ByRef dat As Object) As Integer
+            Dim txt As String = Parent.InvokeMacroFunction("MacroImporter.ShowModules", {""})
+            Console.WriteLine($"インストール済マクロ一覧")
+            Console.WriteLine($"{txt}")
+            Console.WriteLine()
+            Return 0
+        End Function
+
+        Sub New(p As RpaMacroUtility)
+            Me.Parent = p
+        End Sub
+    End Class
+
+
     ' Update Command
     '---------------------------------------------------------------------------------------------'
     Public Class UpdateMacroCommand : Inherits RpaUtilityCommandBase
@@ -163,13 +191,18 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Dim dstdir As String = Parent.MacroUtilityDirectory
             For Each src In Directory.GetFiles(srcdir)
                 Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-                Dim [mod] As String = Path.GetFileNameWithoutExtension(dst)
+                Dim [mod] As String = Path.GetFileName(dst)
+                Dim [bas] As String = Path.GetFileNameWithoutExtension(dst)
                 If File.Exists(src) Then
                     File.Copy(src, dst, True)
                     Console.WriteLine($"ファイルをコピー  '{src}'")
                     Console.WriteLine($"               => '{dst}'")
-                    Console.WriteLine($"マクロ '{[mod]}' をインストールします")
-                    Call Parent.InvokeMacro("MacroImporter.Main", {dst})
+                    Console.WriteLine($"マクロ '{[bas]}' をインストールします")
+                    If [mod] = "MacroImporter.bas" Then
+                        Call Parent.InvokeMacro("MacroImporter2.Main", {dst})
+                    Else
+                        Call Parent.InvokeMacro("MacroImporter.Main", {dst})
+                    End If
                     Console.WriteLine()
                 Else
                     Console.WriteLine($"指定マクロ '{src}' は存在しません")
@@ -191,7 +224,11 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                     Console.WriteLine($"ファイルをコピー  '{src}'")
                     Console.WriteLine($"               => '{dst}'")
                     Console.WriteLine($"指定マクロ '{para}' をインストールします")
-                    Call Parent.InvokeMacro("MacroImporter.Main", {dst})
+                    If para = "MacroImporter.bas" Then
+                        Call Parent.InvokeMacro("MacroImporter2.Main", {dst})
+                    Else
+                        Call Parent.InvokeMacro("MacroImporter.Main", {dst})
+                    End If
                     Console.WriteLine()
                 Else
                     Console.WriteLine($"指定マクロ '{src}' は存在しません")
@@ -207,7 +244,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
     End Class
 
 
-    ' Install
+    ' Install Command
     '---------------------------------------------------------------------------------------------'
     Private Class InstallMacroCommand : Inherits RpaUtilityCommandBase
         Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
@@ -228,14 +265,18 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Parent As RpaMacroUtility
         Public Overrides Function Execute(ByRef dat As Object) As Integer
-            For Each p In dat.Transaction.Parameters
-                Dim bas As String = $"{Parent.MacroUtilityDirectory}\{p}"
+            For Each para In dat.Transaction.Parameters
+                Dim bas As String = $"{Parent.MacroUtilityDirectory}\{para}"
                 If File.Exists(bas) Then
-                    Console.WriteLine($"指定マクロ '{p}' をインストールします")
-                    Call Parent.InvokeMacro("MacroImporter.Main", {bas})
+                    Console.WriteLine($"指定マクロ '{para}' をインストールします")
+                    If para = "MacroImporter.bas" Then
+                        Call Parent.InvokeMacro("MacroImporter2.Main", {bas})
+                    Else
+                        Call Parent.InvokeMacro("MacroImporter.Main", {bas})
+                    End If
                     Console.WriteLine()
                 Else
-                    Console.WriteLine($"指定マクロ '{p}' は存在しません")
+                    Console.WriteLine($"指定マクロ '{para}' は存在しません")
                     Console.WriteLine()
                 End If
             Next

@@ -1,4 +1,4 @@
-Attribute VB_Name = "MacroImporter"
+Attribute VB_Name = "MacroImporter2"
 Option Explicit
 
 
@@ -43,18 +43,6 @@ Private Function IsModuleExist(ByRef v() As Variant) As Boolean
         IsModuleExist = False
     End If
 
-    Set vbc = Nothing
-End Function
-
-Private Function ShowModules(ByRef v() As Variant) As String
-    Dim vbc As Object
-    Dim txt As String: txt = vbNullString
-
-    For Each vbc In ThisWorkbook.VBProject.VBComponents
-        txt = txt & vbc.Name & vbCrLf
-    Next
-
-    ShowModules = txt
     Set vbc = Nothing
 End Function
 
