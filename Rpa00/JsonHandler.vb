@@ -6,7 +6,6 @@ Imports System.Text
 Public Class JsonHandler(Of T As New)
     Private Const SHIFT_JIS As String = "Shift-JIS"
     Private Const UTF8 As String = "utf-8"
-    Public Shared MyEncoding As String = UTF8
 
     <JsonIgnore>
     Public Property FirstLoad As Boolean
@@ -36,7 +35,7 @@ Public Class JsonHandler(Of T As New)
 
         Try
             sr = New System.IO.StreamReader(
-                f, System.Text.Encoding.GetEncoding(MyEncoding))
+                f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
 
             rtn = JsonConvert.DeserializeObject(Of T)(txt)
@@ -68,7 +67,7 @@ Public Class JsonHandler(Of T As New)
         Load = Nothing
         Try
             sr = New System.IO.StreamReader(
-                f, System.Text.Encoding.GetEncoding(MyEncoding))
+                f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
 
             Load = JsonConvert.DeserializeObject(Of T2)(txt)
@@ -95,14 +94,12 @@ Public Class JsonHandler(Of T As New)
         Return txt
     End Function
 
-    Public Overloads Sub Save(ByVal f As String,
-                                   ByVal m As T)
+    Public Overloads Sub Save(ByVal f As String, ByVal m As T)
         Dim txt As String
         Dim sw As System.IO.StreamWriter
-        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
         Try
             sw = New System.IO.StreamWriter(
-                f, False, System.Text.Encoding.GetEncoding(MyEncoding)
+                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
             )
 
             txt = JsonConvert.SerializeObject(m, Formatting.Indented)
@@ -110,7 +107,8 @@ Public Class JsonHandler(Of T As New)
             'ファイルへ保存
             sw.Write(txt)
         Catch ex As Exception
-            '
+            Console.WriteLine(ex.Message)
+            Console.WriteLine($"{m.GetType.Name} のセーブに失敗しました")
         Finally
             If sw IsNot Nothing Then
                 sw.Close()
@@ -119,16 +117,13 @@ Public Class JsonHandler(Of T As New)
         End Try
     End Sub
 
-    Public Overloads Sub Save(Of T2 As New)(ByVal f As String,
-                                          ByVal m As T2)
+    Public Overloads Sub Save(Of T2 As New)(ByVal f As String, ByVal m As T2)
         Dim txt As String
         Dim sw As System.IO.StreamWriter
 
-        'Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)
-
         Try
             sw = New System.IO.StreamWriter(
-                f, False, System.Text.Encoding.GetEncoding(MyEncoding)
+                f, False, System.Text.Encoding.GetEncoding(SHIFT_JIS)
             )
 
             txt = JsonConvert.SerializeObject(m, Formatting.Indented)

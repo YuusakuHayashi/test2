@@ -1,6 +1,6 @@
 ﻿Imports Rpa00
 
-Public Class UpdateRootRobotJsonCommand : Inherits RpaCommandBase
+Public Class ExportRootRobotJsonCommand : Inherits RpaCommandBase
     Public Overrides ReadOnly Property ExecutableProjectArchitectures As String()
         Get
             Return {(New IntranetClientServerProject).GetType.Name}
@@ -17,7 +17,7 @@ Public Class UpdateRootRobotJsonCommand : Inherits RpaCommandBase
 
     Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
         dat.Project.RootRobotObject.Save(dat.Project.RootRobotJsonFileName, dat.Project.RootRobotObject)
-        Console.WriteLine($"ファイル '{dat.Project.RootRobotJsonFileName}' を更新しました")
+        Console.WriteLine($"ファイル '{dat.Project.RootRobotJsonFileName}' にエクスポートしました")
         Console.WriteLine()
         Return 0
     End Function

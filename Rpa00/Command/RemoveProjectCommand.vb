@@ -59,8 +59,8 @@ Public Class RemoveProjectCommand : Inherits RpaCommandBase
         End If
         dat.Initializer.Projects.Remove(target)
 
-        dat.Initializer.Save(RpaInitializer.SystemIniFileName, dat.Initializer)
-        Console.WriteLine($"ファイル '{RpaInitializer.SystemIniFileName}' をセーブしました")
+        dat.Initializer.Save(RpaCui.SystemIniFileName, dat.Initializer)
+        Console.WriteLine($"ファイル '{RpaCui.SystemIniFileName}' をセーブしました")
         Console.WriteLine()
         Return 0
     End Function

@@ -4,7 +4,6 @@ Imports System.Runtime.InteropServices
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 Imports System.Windows.Forms
-Imports Rpa00
 
 'Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
 Public Class IntranetClientServerProject
@@ -49,38 +48,81 @@ Public Class IntranetClientServerProject
 
     ' Root Directory 関係
     '-----------------------------------------------------------------------------------'
+    <JsonIgnore>
     Public ReadOnly Property RootRobotDirectory As String
         Get
-            Return $"{Me.RootDirectory}\{Me.RobotName}"
-        End Get
-    End Property
-
-    Public ReadOnly Property IsRootRobotExists As Boolean
-        Get
-            If Directory.Exists(Me.RootRobotDirectory) Then
-                Return True
-            Else
-                Return False
+            Dim [dir] As String = vbNullString
+            If Not String.IsNullOrEmpty(Me.RootDirectory) Then
+                If Directory.Exists(Me.RootDirectory) Then
+                    If Not String.IsNullOrEmpty(Me.RobotName) Then
+                        [dir] = $"{Me.RootDirectory}\{Me.RobotName}"
+                    End If
+                End If
             End If
+            Return [dir]
         End Get
     End Property
 
+    '<JsonIgnore>
+    'Public ReadOnly Property IsRootRobotExists As Boolean
+    '    Get
+    '        If Directory.Exists(Me.RootRobotDirectory) Then
+    '            Return True
+    '        Else
+    '            Return False
+    '        End If
+    '    End Get
+    'End Property
+
+    <JsonIgnore>
     Public ReadOnly Property RootRobotJsonFileName As String
         Get
-            If Me.IsRootRobotExists Then
-                Return $"{Me.RootRobotDirectory}\rpa_project.json"
-            Else
-                Return vbNullString
+            Dim [fil] As String = vbNullString
+            If Directory.Exists(Me.RootRobotDirectory) Then
+                [fil] = $"{Me.RootRobotDirectory}\robot.ini"
             End If
+            Return [fil]
         End Get
     End Property
 
+    <JsonIgnore>
     Public ReadOnly Property RootRobotIniFileName As String
         Get
-            Return $"{Me.RootRobotDirectory}\robot.ini"
+            Dim [fil] As String = vbNullString
+            If Directory.Exists(Me.RootRobotDirectory) Then
+                [fil] = $"{Me.RootRobotDirectory}\robot.ini"
+            End If
+            Return [fil]
         End Get
     End Property
 
+    <JsonIgnore>
+    Public ReadOnly Property RootRobotRepositoryDirectory As String
+        Get
+            Dim [dir] As String = vbNullString
+            If Directory.Exists(Me.RootRobotDirectory) Then
+                [dir] = $"{Me.RootRobotDirectory}\repo"
+                If Not Directory.Exists([dir]) Then
+                    Directory.CreateDirectory([dir])
+                End If
+            End If
+            Return [dir]
+        End Get
+    End Property
+
+    <JsonIgnore>
+    Public ReadOnly Property RootRobotDllRepositoryDirectory As String
+        Get
+            Dim [dir] As String = vbNullString
+            If Directory.Exists(Me.RootRobotRepositoryDirectory) Then
+                [dir] = $"{Me.RootRobotRepositoryDirectory}\dll"
+                If Not Directory.Exists([dir]) Then
+                    Directory.CreateDirectory([dir])
+                End If
+            End If
+            Return [dir]
+        End Get
+    End Property
 
     Private Property _RootRobotObject As Object
     <JsonIgnore>
@@ -111,7 +153,11 @@ Public Class IntranetClientServerProject
 
     Public ReadOnly Property RootRobotIgnoreFileName As String
         Get
-            Return $"{Me.RootRobotDirectory}\ignore"
+            Dim [fil] As String = vbNullString
+            If Directory.Exists(Me.RootRobotDirectory) Then
+                [fil] = $"{Me.RootRobotDirectory}\ignore"
+            End If
+            Return [fil]
         End Get
     End Property
 
@@ -221,7 +267,11 @@ Public Class IntranetClientServerProject
 
     Public ReadOnly Property MyRobotIgnoreFileName As String
         Get
-            Return $"{Me.MyRobotDirectory}\ignore"
+            Dim [fil] As String = vbNullString
+            If Directory.Exists(Me.MyRobotDirectory) Then
+                [fil] = $"{Me.MyRobotDirectory}\ignore"
+            End If
+            Return [fil]
         End Get
     End Property
 
@@ -257,7 +307,8 @@ Public Class IntranetClientServerProject
 
     Public Overrides ReadOnly Property SystemArchDirectory As String
         Get
-            Return $"{CommonProject.SystemDirectory}\{Me.GetType.Name}"
+            'Return $"{CommonProject.SystemDirectory}\{Me.GetType.Name}"
+            Return $"{RpaCui.SystemDirectory}\{Me.GetType.Name}"
         End Get
     End Property
 
@@ -347,14 +398,14 @@ Public Class IntranetClientServerProject
     End Sub
 
     Private Sub _CheckProject()
-        Call _ConsoleWriteLine($"プロジェクト '{Me.RobotAlias}' のチェック....")
-        If Not Me.IsRootRobotExists Then
-            Call _ConsoleWriteLine($"RootRobotDirectory '{Me.RootRobotDirectory}' がありません")
-        End If
-        If Not Me.IsMyRobotExists Then
-            Call _ConsoleWriteLine($"MyRobotDirectory '{Me.MyRobotDirectory}' がありません")
-        End If
-        Call _ConsoleWriteLine("プロジェクトのチェック終了")
+        'Call _ConsoleWriteLine($"プロジェクト '{Me.RobotAlias}' のチェック....")
+        'If Not Me.IsRootRobotExists Then
+        '    Call _ConsoleWriteLine($"RootRobotDirectory '{Me.RootRobotDirectory}' がありません")
+        'End If
+        'If Not Me.IsMyRobotExists Then
+        '    Call _ConsoleWriteLine($"MyRobotDirectory '{Me.MyRobotDirectory}' がありません")
+        'End If
+        'Call _ConsoleWriteLine("プロジェクトのチェック終了")
 
         'Dim installed = False
         'Call _ConsoleWriteLine("アップデートパッケージを検索しています...")

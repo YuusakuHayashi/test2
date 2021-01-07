@@ -105,8 +105,9 @@
     <Compile Include="Command\ShowMyRobotJsonCommand.vb" />
     <Compile Include="Command\ShowMyRobotPropertiesCommand.vb" />
     <Compile Include="Command\ShowProjectPropertiesCommand.vb" />
-    <Compile Include="Command\UpdateMyRobotJsonCommand.vb" />
-    <Compile Include="Command\UpdateRootRobotJsonCommand.vb" />
+    <Compile Include="Command\UpdateRobotCommand.vb" />
+    <Compile Include="Command\ExportMyRobotJsonCommand.vb" />
+    <Compile Include="Command\ExportRootRobotJsonCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -166,6 +167,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Hello.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RpaCui\RpaCui.vbproj">
+      <Project>{54dce427-83b7-48af-8ddc-eedb87acd7e6}</Project>
+      <Name>RpaCui</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

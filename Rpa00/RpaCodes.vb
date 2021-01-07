@@ -7,11 +7,14 @@ Public Module RpaCodes
             Dim asm As Assembly
             Dim [mod] As [Module]
             Dim [type] As Object
+            Dim dpath As String = RpaModule.GetFileText($"{RpaCui.SystemDirectory}\debugpath")
             Select Case rpa.RobotName
                 Case "rpa01"
-                    asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.dll")
-                    'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.dll")
-                    'asm = Assembly.LoadFrom($"{CommonProject.SystemDllDirectory}\Rpa01.dll")
+                    If String.IsNullOrEmpty(dpath) Then
+                        asm = Assembly.LoadFrom($"{RpaCui.SystemDllDirectory}\Rpa01.dll")
+                    Else
+                        asm = Assembly.LoadFrom($"{dpath}\Rpa01\obj\Debug\Rpa01.dll")
+                    End If
                     [mod] = asm.GetModule("Rpa01.dll")
                     [type] = [mod].GetType("Rpa01.Rpa01")
                     If [type] IsNot Nothing Then

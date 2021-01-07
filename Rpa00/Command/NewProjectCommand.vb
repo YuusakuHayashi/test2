@@ -44,7 +44,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
 
         Dim yorn As String = vbNullString
         If dat.Project IsNot Nothing Then
-            Console.WriteLine($"現在起動しているソリューション '{dat.Project.ProjectName}' から切り替えますか？ (y/n)")
+            Console.WriteLine($"現在起動しているプロジェクト '{dat.Project.ProjectName}' から切り替えますか？ (y/n)")
             Do
                 yorn = vbNullString
                 yorn = dat.Transaction.ShowRpaIndicator(dat)
@@ -60,12 +60,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         Directory.CreateDirectory(rpa.SystemProjectDirectory)
         Console.WriteLine($"ディレクトリ '{rpa.SystemProjectDirectory}' を新規作成しました")
         Call RpaModule.Save(rpa.SystemJsonFileName, rpa, rpa.SystemJsonChangedFileName)
-        'Call rpa.Save(rpa.SystemJsonFileName, rpa)
-        'Console.WriteLine($"ファイル     '{rpa.SystemJsonFileName}' を新規作成しました")
-        Call RpaModule.Save(RpaInitializer.SystemIniFileName, ini, RpaInitializer.SystemIniChangedFileName)
-        'Call ini.Save(RpaInitializer.SystemIniFileName, ini)
-        'Console.WriteLine($"ファイル     '{RpaInitializer.SystemIniFileName}' を更新しました")
-        'Console.WriteLine()
+        Call RpaModule.Save(RpaCui.SystemIniFileName, ini, RpaInitializer.SystemIniChangedFileName)
         Return 0
     End Function
 
@@ -84,7 +79,8 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
                 Dim idx As Integer = 1
                 eflg = True
                 Do
-                    Dim rpa2 As Object = RpaModule.RpaObject(idx)
+                    'Dim rpa2 As Object = RpaModule.RpaObject(idx)
+                    Dim rpa2 As Object = dat.System.RpaObject(idx)
                     If rpa2 IsNot Nothing Then
                         Console.WriteLine($"{idx} ... {rpa2.SystemArchTypeName}")
                     Else
@@ -104,7 +100,8 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
                 Console.WriteLine()
             Loop Until iidx <= eidx
 
-            rpa = RpaModule.RpaObject(iidx)
+            'rpa = RpaModule.RpaObject(iidx)
+            rpa = dat.System.RpaObject(iidx)
 
             If iidx = eidx Then
                 rpa = Nothing

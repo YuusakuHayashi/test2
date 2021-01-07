@@ -1,6 +1,43 @@
 ﻿Imports System.IO
 
 Public Class RpaSystem
+    Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
+        Get
+            Dim ics As New IntranetClientServerProject
+            Dim sap As New StandAloneProject
+            Dim csp As New ClientServerProject
+            Select Case index
+                Case ics.SystemArchType : Return ics
+                Case sap.SystemArchType : Return sap
+                Case csp.SystemArchType : Return csp
+                Case Else : Return Nothing
+            End Select
+        End Get
+    End Property
+
+    Public Function LoadCurrentRpa(ByRef dat As Object) As Object
+        If Not dat.Initializer.AutoLoad Then
+            Return Nothing
+        End If
+        If dat.Initializer.CurrentProject Is Nothing Then
+            Console.WriteLine($"CurrentProject がないため、ロードしませんでした")
+            Console.WriteLine()
+            Return Nothing
+        End If
+
+        Dim rpa = RpaObject(dat.Initializer.CurrentProject.Architecture)
+        rpa = rpa.Load(dat.Initializer.CurrentProject.JsonFileName)
+        If rpa Is Nothing Then
+            Console.WriteLine($"ファイル '{dat.Initializer.CurrentProject.JsonFileName}' のロードに失敗しました")
+            Console.WriteLine()
+            Return Nothing
+        Else
+            Console.WriteLine($"ファイル '{dat.Initializer.CurrentProject.JsonFileName}' をロードしました")
+            Console.WriteLine()
+            Return rpa
+        End If
+    End Function
+
     ' 機能はここに追加
     ' ここでインスタンス化されたコマンドには、RpaDataWrapper型を持たせることが出来る
     ' (おそらく、コンパイル時に型の情報を検査するのだと思われる)
@@ -60,8 +97,9 @@ Public Class RpaSystem
                 Case "changeprojectpropertyusingfolderbrowser" : cmd = New ChangeProjectPropertyUsingFolderBrowserCommand
                 Case "showinitializerproperties" : cmd = New ShowInitializerPropertiesCommand
                 Case "changeinitializerproperty" : cmd = New ChangeInitializerPropertyCommand
-                Case "updatemyrobotjson" : cmd = New UpdateMyRobotJsonCommand
-                Case "updaterootrobotjson" : cmd = New UpdateRootRobotJsonCommand
+                Case "updaterobot" : cmd = New UpdateRobotCommand
+                Case "exportmyrobotjson" : cmd = New ExportMyRobotJsonCommand
+                Case "exportrootrobotjson" : cmd = New ExportRootRobotJsonCommand
                 Case "removemycommand" : cmd = New RemoveMyCommandCommand
                 Case "activatemycommand" : cmd = New ActivateMyCommandCommand
                 Case "showmyrobotjson" : cmd = New ShowMyRobotJsonCommand
@@ -408,5 +446,7 @@ Public Class RpaSystem
         End If
 
         dat.Transaction.ReturnCode = cmd.Execute(dat)
+
+        dat.Transaction.Parameters = New List(Of String)
     End Sub
 End Class

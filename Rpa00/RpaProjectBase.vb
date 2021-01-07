@@ -17,23 +17,27 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         )
     End Sub
 
-    <JsonIgnore>
-    Public Shared ReadOnly Property SystemDirectory As String
-        Get
-            Return System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
-        End Get
-    End Property
+    '<JsonIgnore>
+    'Public Shared ReadOnly Property SystemDirectory As String
+    '    Get
+    '        Dim [dir] As String = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
+    '        If Not Directory.Exists([dir]) Then
+    '            Directory.CreateDirectory([dir])
+    '        End If
+    '        Return [dir]
+    '    End Get
+    'End Property
 
-    <JsonIgnore>
-    Public Shared ReadOnly Property SystemUtilityDirectory As String
-        Get
-            Dim d = $"{RpaProjectBase(Of T).SystemDirectory}\util"
-            If Not Directory.Exists(d) Then
-                Directory.CreateDirectory(d)
-            End If
-            Return d
-        End Get
-    End Property
+    '<JsonIgnore>
+    'Public Shared ReadOnly Property SystemUtilityDirectory As String
+    '    Get
+    '        Dim d = $"{RpaProjectBase(Of T).SystemDirectory}\util"
+    '        If Not Directory.Exists(d) Then
+    '            Directory.CreateDirectory(d)
+    '        End If
+    '        Return d
+    '    End Get
+    'End Property
 
     Private _SystemUtilities As Dictionary(Of String, RpaUtility)
     Public Property SystemUtilities As Dictionary(Of String, RpaUtility)
@@ -83,19 +87,34 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Public MustOverride ReadOnly Property SystemArchTypeName As String
 
 
-    <JsonIgnore>
-    Public Shared ReadOnly Property SystemDllDirectory As String
-        Get
-            Return $"{RpaProjectBase(Of T).SystemDirectory}\dll"
-        End Get
-    End Property
+    '<JsonIgnore>
+    'Public Shared ReadOnly Property SystemDllDirectory As String
+    '    Get
+    '        Dim [dir] As String = $"{RpaProjectBase(Of T).SystemDirectory}\dll"
+    '        If Not Directory.Exists([dir]) Then
+    '            Directory.CreateDirectory([dir])
+    '        End If
+    '        Return [dir]
+    '    End Get
+    'End Property
 
-    <JsonIgnore>
-    Public Shared ReadOnly Property System00DllFileName As String
-        Get
-            Return $"{RpaProjectBase(Of T).SystemDllDirectory}\Rpa00.dll"
-        End Get
-    End Property
+    '<JsonIgnore>
+    'Public Shared ReadOnly Property SystemUpdateDllDirectory As String
+    '    Get
+    '        Dim [dir] As String = $"{RpaProjectBase(Of T).SystemDirectory}\updatedll"
+    '        If Not Directory.Exists([dir]) Then
+    '            Directory.CreateDirectory([dir])
+    '        End If
+    '        Return [dir]
+    '    End Get
+    'End Property
+
+    '<JsonIgnore>
+    'Public Shared ReadOnly Property System00DllFileName As String
+    '    Get
+    '        Return $"{RpaProjectBase(Of T).SystemDllDirectory}\Rpa00.dll"
+    '    End Get
+    'End Property
 
     Private _MyDirectory As String
     Public Property MyDirectory As String

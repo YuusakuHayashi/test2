@@ -15,23 +15,17 @@ Public Class RpaInitializer
         )
     End Sub
 
-    <JsonIgnore>
-    Public Shared ReadOnly Property SystemIniFileName As String
-        Get
-            Return $"{CommonProject.SystemDirectory}\rpa.ini"
-        End Get
-    End Property
+    '<JsonIgnore>
+    'Public Shared ReadOnly Property SystemIniFileName As String
+    '    Get
+    '        Return $"{RpaCui.SystemDirectory}\rpa.ini"
+    '    End Get
+    'End Property
 
     <JsonIgnore>
     Public Shared ReadOnly Property SystemIniChangedFileName As String
         Get
-            Return $"{CommonProject.SystemDirectory}\rpa.ini.chg"
-        End Get
-    End Property
-
-    Public Shared ReadOnly Property SystemIniTempFileName As String
-        Get
-            Return $"{CommonProject.SystemDirectory}\rpa.temp.ini"
+            Return $"{RpaCui.SystemDirectory}\rpa.ini.chg"
         End Get
     End Property
 
@@ -115,7 +109,7 @@ Public Class RpaInitializer
 
     Public Shared ReadOnly Property MyCommandsJsonFileName As String
         Get
-            Return $"{CommonProject.SystemDirectory}\mycommands.json"
+            Return $"{RpaCui.SystemDirectory}\mycommands.json"
         End Get
     End Property
 

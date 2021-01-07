@@ -2,6 +2,30 @@
 Imports System.Windows.Forms
 
 Public Module RpaModule
+
+    Public Const DEFUALTENCODING As String = "Shift-JIS"
+
+    Public Function GetFileText(ByVal filename As String) As String
+        Dim txt As String
+        Dim sr As IO.StreamReader
+        Try
+            If File.Exists(filename) Then
+                sr = New System.IO.StreamReader(filename, System.Text.Encoding.GetEncoding(DEFUALTENCODING))
+                txt = (sr.ReadToEnd()).Trim
+            Else
+                txt = vbNullString
+            End If
+        Catch ex As Exception
+            txt = vbNullString
+        Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
+        End Try
+        Return txt
+    End Function
+
     ' ファイルの存在確認応答をループして行う
     Public Function FileCheckLoop(ByVal [file] As String, ByRef dat As RpaDataWrapper) As Boolean
         Do
@@ -40,7 +64,6 @@ Public Module RpaModule
         Return [new]
     End Function
 
-    Public Const DEFUALTENCODING As String = "Shift-JIS"
 
     Public Sub Save(ByVal savefile As String, ByRef obj As Object, ByVal chgfile As String)
         obj.Save(savefile, obj)
@@ -59,42 +82,42 @@ Public Module RpaModule
     End Sub
 
 
-    Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
-        Get
-            Dim ics As New IntranetClientServerProject
-            Dim sap As New StandAloneProject
-            Dim csp As New ClientServerProject
-            Select Case index
-                Case ics.SystemArchType : Return ics
-                Case sap.SystemArchType : Return sap
-                Case csp.SystemArchType : Return csp
-                Case Else : Return Nothing
-            End Select
-        End Get
-    End Property
+    'Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
+    '    Get
+    '        Dim ics As New IntranetClientServerProject
+    '        Dim sap As New StandAloneProject
+    '        Dim csp As New ClientServerProject
+    '        Select Case index
+    '            Case ics.SystemArchType : Return ics
+    '            Case sap.SystemArchType : Return sap
+    '            Case csp.SystemArchType : Return csp
+    '            Case Else : Return Nothing
+    '        End Select
+    '    End Get
+    'End Property
 
-    Public Function LoadCurrentRpa(ByRef dat As Object) As Object
-        If Not dat.Initializer.AutoLoad Then
-            Return Nothing
-        End If
-        If dat.Initializer.CurrentProject Is Nothing Then
-            Console.WriteLine($"CurrentProject がないため、ロードしませんでした")
-            Console.WriteLine()
-            Return Nothing
-        End If
+    'Public Function LoadCurrentRpa(ByRef dat As Object) As Object
+    '    If Not dat.Initializer.AutoLoad Then
+    '        Return Nothing
+    '    End If
+    '    If dat.Initializer.CurrentProject Is Nothing Then
+    '        Console.WriteLine($"CurrentProject がないため、ロードしませんでした")
+    '        Console.WriteLine()
+    '        Return Nothing
+    '    End If
 
-        Dim rpa = RpaObject(dat.Initializer.CurrentProject.Architecture)
-        rpa = rpa.Load(dat.Initializer.CurrentProject.JsonFileName)
-        If rpa Is Nothing Then
-            Console.WriteLine($"ファイル '{dat.Initializer.CurrentProject.JsonFileName}' のロードに失敗しました")
-            Console.WriteLine()
-            Return Nothing
-        Else
-            Console.WriteLine($"ファイル '{dat.Initializer.CurrentProject.JsonFileName}' をロードしました")
-            Console.WriteLine()
-            Return rpa
-        End If
-    End Function
+    '    Dim rpa = RpaObject(dat.Initializer.CurrentProject.Architecture)
+    '    rpa = rpa.Load(dat.Initializer.CurrentProject.JsonFileName)
+    '    If rpa Is Nothing Then
+    '        Console.WriteLine($"ファイル '{dat.Initializer.CurrentProject.JsonFileName}' のロードに失敗しました")
+    '        Console.WriteLine()
+    '        Return Nothing
+    '    Else
+    '        Console.WriteLine($"ファイル '{dat.Initializer.CurrentProject.JsonFileName}' をロードしました")
+    '        Console.WriteLine()
+    '        Return rpa
+    '    End If
+    'End Function
 
     Public Function SetDirectoryFromDialog(ByRef dat As RpaDataWrapper, ByVal propname As String) As String
         Dim [dir] As String = vbNullString
@@ -156,7 +179,7 @@ Public Module RpaModule
                 yorn2 = vbNullString
                 ofd = New OpenFileDialog With {
                     .FileName = "hoge.json",
-                    .InitialDirectory = $"{CommonProject.SystemDirectory}",
+                    .InitialDirectory = $"{RpaCui.SystemDirectory}",
                     .Filter = "JSONファイル(*.json)|*.json|すべてのファイル(*.*)|*.*",
                     .FilterIndex = 1,
                     .Title = $"Select {propname}",
@@ -167,17 +190,17 @@ Public Module RpaModule
                     Console.WriteLine($"よろしいですか？ '{ofd.FileName}' (y/n)")
                     yorn2 = dat.Transaction.ShowRpaIndicator(dat)
                 Else
-                yorn2 = vbNullString
+                    yorn2 = vbNullString
                 End If
-        Loop Until yorn2 = "y" Or yorn2 = vbNullString
+            Loop Until yorn2 = "y" Or yorn2 = vbNullString
 
-        If yorn2 = "y" Then
-            [file] = ofd.FileName
-            Console.WriteLine()
-            Console.WriteLine($"'{propname}' が指定されました")
-        Else
-            Console.WriteLine($"'{propname}' が指定されませんでした")
-        End If
+            If yorn2 = "y" Then
+                [file] = ofd.FileName
+                Console.WriteLine()
+                Console.WriteLine($"'{propname}' が指定されました")
+            Else
+                Console.WriteLine($"'{propname}' が指定されませんでした")
+            End If
             Console.WriteLine()
         End If
 

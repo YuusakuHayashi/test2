@@ -6,7 +6,7 @@
     End Property
 
     Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
-        Call RpaModule.Save(RpaInitializer.SystemIniFileName, dat.Initializer, RpaInitializer.SystemIniChangedFileName)
+        Call RpaModule.Save(RpaCui.SystemIniFileName, dat.Initializer, RpaInitializer.SystemIniChangedFileName)
         Return 0
     End Function
 End Class

@@ -35,7 +35,7 @@ Public Class ExitCommand : Inherits RpaCommandBase
                 yorn2 = dat.Transaction.ShowRpaIndicator(dat)
             Loop Until yorn2 = "y" Or yorn2 = "n"
             If yorn2 = "y" Then
-                RpaModule.Save(RpaInitializer.SystemIniFileName, dat.Initializer, RpaInitializer.SystemIniChangedFileName)
+                RpaModule.Save(RpaCui.SystemIniFileName, dat.Initializer, RpaInitializer.SystemIniChangedFileName)
             Else
                 File.Delete(RpaInitializer.SystemIniChangedFileName)
             End If

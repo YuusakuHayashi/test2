@@ -27,20 +27,34 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Get
     End Property
 
-    Public ReadOnly Property RootRobotBasDirectory(dat As Object) As String
+    'Public ReadOnly Property RootRobotBasDirectory(dat As Object) As String
+    '    Get
+    '        If dat.Project IsNot Nothing Then
+    '            If (Not String.IsNullOrEmpty(dat.Project.ProjectName)) And Directory.Exists(dat.Project.RootRobotDirectory) Then
+    '                Return $"{dat.Project.RootRobotDirectory}\bas"
+    '            End If
+    '        End If
+    '        Return vbNullString
+    '    End Get
+    'End Property
+
+    Public ReadOnly Property RootRobotBasRepositoryDirectory(dat As Object) As String
         Get
-            If dat.Project IsNot Nothing Then
-                If (Not String.IsNullOrEmpty(dat.Project.ProjectName)) And Directory.Exists(dat.Project.RootRobotDirectory) Then
-                    Return $"{dat.Project.RootRobotDirectory}\bas"
+            If (Not String.IsNullOrEmpty(dat.Project.RootDirectory)) And Directory.Exists(dat.Project.RootRobotDirectory) Then
+                Dim [dir] As String = $"{dat.Project.RootRobotRepositoryDirectory}\bas"
+                If Not Directory.Exists([dir]) Then
+                    Directory.CreateDirectory([dir])
                 End If
+                Return [dir]
+            Else
+                Return vbNullString
             End If
-            Return vbNullString
         End Get
     End Property
 
     Public ReadOnly Property MacroUtilityDirectory As String
         Get
-            Dim d = $"{CommonProject.SystemDirectory}\MacroUtility"
+            Dim d = $"{RpaCui.SystemDirectory}\MacroUtility"
             If Not Directory.Exists(d) Then
                 Directory.CreateDirectory(d)
             End If
@@ -134,7 +148,8 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Parent As RpaMacroUtility
         Public Overrides Function Execute(ByRef dat As Object) As Integer
-            Dim txt As String = Parent.InvokeMacroFunction("MacroImporter.ShowModules", {""})
+            Dim txt As String = (Parent.InvokeMacroFunction("MacroImporter.ShowModules", {""})).ToString.TrimEnd
+            Console.WriteLine()
             Console.WriteLine($"インストール済マクロ一覧")
             Console.WriteLine($"{txt}")
             Console.WriteLine()
@@ -164,7 +179,24 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Return False
             End If
 
-            Dim basdir As String = Parent.RootRobotBasDirectory(dat)
+            If String.IsNullOrEmpty(dat.Project.RootDirectory) Then
+                Console.WriteLine($"'RootDirectory' が設定されていません")
+                Return False
+            End If
+            If Not Directory.Exists(dat.Project.RootDirectory) Then
+                Console.WriteLine($"RootDirectory '{dat.Project.RootDirectory}' は存在しません")
+                Return False
+            End If
+            If String.IsNullOrEmpty(dat.Project.RobotName) Then
+                Console.WriteLine($"'RobotName' が設定されていません")
+                Return False
+            End If
+            If Not Directory.Exists(dat.Project.RootRobotDirectory) Then
+                Console.WriteLine($"RootRobotDirectory '{dat.Project.RootRobotDirectory}' は存在しません")
+                Return False
+            End If
+
+            Dim basdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
             If Not Directory.Exists(basdir) Then
                 Console.WriteLine($"ディレクトリ '{basdir}' が存在しません")
                 Console.WriteLine()
@@ -187,54 +219,32 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Function AllUpdate(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasDirectory(dat)
+            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
-            For Each src In Directory.GetFiles(srcdir)
-                Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-                Dim [mod] As String = Path.GetFileName(dst)
-                Dim [bas] As String = Path.GetFileNameWithoutExtension(dst)
-                If File.Exists(src) Then
-                    File.Copy(src, dst, True)
-                    Console.WriteLine($"ファイルをコピー  '{src}'")
-                    Console.WriteLine($"               => '{dst}'")
-                    Console.WriteLine($"マクロ '{[bas]}' をインストールします")
-                    If [mod] = "MacroImporter.bas" Then
-                        Call Parent.InvokeMacro("MacroImporter2.Main", {dst})
-                    Else
-                        Call Parent.InvokeMacro("MacroImporter.Main", {dst})
-                    End If
-                    Console.WriteLine()
-                Else
-                    Console.WriteLine($"指定マクロ '{src}' は存在しません")
-                    Console.WriteLine()
-                End If
-            Next
+            Dim incmd As New InstallMacroCommand(Parent)
+            Dim dlcmd As New DownloadMacroFileCommand(Parent)
+            dlcmd.Execute(dat)
+            incmd.Execute(dat)
+            'For Each src In Directory.GetFiles(srcdir)
+            '    Dim srcname As String = Path.GetFileName(src)
+            '    If dat.Transaction.Parameters.Count = 0 Then
+            '        dat.Transaction.Parameters.Add(srcname)
+            '    Else
+            '        dat.Transaction.Parameters(0) = srcname
+            '    End If
+            '    dlcmd.Execute(dat)
+            '    incmd.Execute(dat)
+            'Next
             Return 0
         End Function
 
-
         Private Function SelectedUpdate(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasDirectory(dat)
+            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
-            For Each para In dat.Transaction.Parameters
-                Dim src As String = $"{srcdir}\{para}"
-                Dim dst As String = $"{dstdir}\{para}"
-                If File.Exists(src) Then
-                    File.Copy(src, dst, True)
-                    Console.WriteLine($"ファイルをコピー  '{src}'")
-                    Console.WriteLine($"               => '{dst}'")
-                    Console.WriteLine($"指定マクロ '{para}' をインストールします")
-                    If para = "MacroImporter.bas" Then
-                        Call Parent.InvokeMacro("MacroImporter2.Main", {dst})
-                    Else
-                        Call Parent.InvokeMacro("MacroImporter.Main", {dst})
-                    End If
-                    Console.WriteLine()
-                Else
-                    Console.WriteLine($"指定マクロ '{src}' は存在しません")
-                    Console.WriteLine()
-                End If
-            Next
+            Dim incmd As New InstallMacroCommand(Parent)
+            Dim dlcmd As New DownloadMacroFileCommand(Parent)
+            dlcmd.Execute(dat)
+            incmd.Execute(dat)
             Return 0
         End Function
 
@@ -249,7 +259,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
     Private Class InstallMacroCommand : Inherits RpaUtilityCommandBase
         Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
             Get
-                Return {1, 999}
+                Return {0, 999}
             End Get
         End Property
 
@@ -264,11 +274,48 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Parent As RpaMacroUtility
+
         Public Overrides Function Execute(ByRef dat As Object) As Integer
+            Dim i As Integer = -1
+            If dat.Transaction.Parameters.Count = 0 Then
+                i = AllInstall(dat)
+            Else
+                i = SelectedInstall(dat)
+            End If
+            Return i
+        End Function
+
+        Private Function AllInstall(ByRef dat As Object) As Integer
+            Dim srcdir As String = Parent.MacroUtilityDirectory
+            For Each src In Directory.GetFiles(srcdir)
+                Dim ext As String = Path.GetExtension(src)
+                Dim srcname As String = Path.GetFileName(src)
+                If File.Exists(src) And (ext = ".bas" Or ext = ".cls") Then
+                    Console.WriteLine($"マクロ '{srcname}' をインストールします")
+                    If srcname = "MacroImporter.bas" Then
+                        Call Parent.InvokeMacro("MacroImporter2.Main", {src})
+                    Else
+                        Call Parent.InvokeMacro("MacroImporter.Main", {src})
+                    End If
+                    Console.WriteLine()
+                Else
+                    Console.WriteLine($"マクロ '{srcname}' は存在しません")
+                    Console.WriteLine()
+                End If
+            Next
+            If Directory.GetFiles(srcdir).Count = 0 Then
+                Console.WriteLine($"ディレクトリ '{srcdir}' に対象のマクロは存在しませんでした")
+                Console.WriteLine()
+            End If
+            Return 0
+        End Function
+
+        Public Function SelectedInstall(ByRef dat As Object) As Integer
             For Each para In dat.Transaction.Parameters
                 Dim bas As String = $"{Parent.MacroUtilityDirectory}\{para}"
-                If File.Exists(bas) Then
-                    Console.WriteLine($"指定マクロ '{para}' をインストールします")
+                Dim ext As String = Path.GetExtension(bas)
+                If File.Exists(bas) And (ext = ".bas" Or ext = ".cls") Then
+                    Console.WriteLine($"マクロ '{para}' をインストールします")
                     If para = "MacroImporter.bas" Then
                         Call Parent.InvokeMacro("MacroImporter2.Main", {bas})
                     Else
@@ -276,7 +323,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                     End If
                     Console.WriteLine()
                 Else
-                    Console.WriteLine($"指定マクロ '{para}' は存在しません")
+                    Console.WriteLine($"マクロ '{para}' は存在しません")
                     Console.WriteLine()
                 End If
             Next
@@ -306,7 +353,24 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Return False
             End If
 
-            Dim basdir As String = Parent.RootRobotBasDirectory(dat)
+            If String.IsNullOrEmpty(dat.Project.RootDirectory) Then
+                Console.WriteLine($"'RootDirectory' が設定されていません")
+                Return False
+            End If
+            If Not Directory.Exists(dat.Project.RootDirectory) Then
+                Console.WriteLine($"RootDirectory '{dat.Project.RootDirectory}' は存在しません")
+                Return False
+            End If
+            If String.IsNullOrEmpty(dat.Project.RobotName) Then
+                Console.WriteLine($"'RobotName' が設定されていません")
+                Return False
+            End If
+            If Not Directory.Exists(dat.Project.RootRobotDirectory) Then
+                Console.WriteLine($"RootRobotDirectory '{dat.Project.RootRobotDirectory}' は存在しません")
+                Return False
+            End If
+
+            Dim basdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
             If Not Directory.Exists(basdir) Then
                 Console.WriteLine($"ディレクトリ '{basdir}' が存在しません")
                 Console.WriteLine()
@@ -329,29 +393,35 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Function AllDownload(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasDirectory(dat)
+            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             For Each src In Directory.GetFiles(srcdir)
+                Dim ext As String = Path.GetExtension(src)
                 Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-                If File.Exists(src) Then
+                If File.Exists(src) And (ext = ".bas" Or ext = ".cls") Then
                     File.Copy(src, dst, True)
                     Console.WriteLine($"ファイルをコピー  '{src}'")
                     Console.WriteLine($"               => '{dst}'")
                     Console.WriteLine()
                 Else
-                    Console.WriteLine($"指定マクロ '{src}' は存在しません")
+                    Console.WriteLine($"マクロ '{src}' は存在しません")
                     Console.WriteLine()
                 End If
             Next
+            If Directory.GetFiles(srcdir).Count = 0 Then
+                Console.WriteLine($"ディレクトリ '{srcdir}' に対象のマクロは存在しませんでした")
+                Console.WriteLine()
+            End If
             Return 0
         End Function
 
 
         Private Function SelectedDownload(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasDirectory(dat)
+            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             For Each para In dat.Transaction.Parameters
                 Dim src As String = $"{srcdir}\{para}"
+                Dim ext As String = Path.GetExtension(src)
                 Dim dst As String = $"{dstdir}\{para}"
                 If File.Exists(src) Then
                     File.Copy(src, dst, True)
@@ -359,7 +429,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                     Console.WriteLine($"               => '{dst}'")
                     Console.WriteLine()
                 Else
-                    Console.WriteLine($"指定マクロ '{src}' は存在しません")
+                    Console.WriteLine($"マクロ '{src}' は存在しません")
                     Console.WriteLine()
                 End If
             Next

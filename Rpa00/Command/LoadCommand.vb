@@ -51,7 +51,8 @@ Public Class LoadCommand : Inherits RpaCommandBase
             Return 0
         End If
 
-        Dim [load] As Object = RpaModule.RpaObject(dat.Initializer.Projects(idx2).Architecture)
+        'Dim [load] As Object = RpaModule.RpaObject(dat.Initializer.Projects(idx2).Architecture)
+        Dim [load] As Object = dat.System.RpaObject(dat.Initializer.Projects(idx2).Architecture)
         [load] = [load].Load(dat.Initializer.Projects(idx2).JsonFileName)
 
         If [load] Is Nothing Then
