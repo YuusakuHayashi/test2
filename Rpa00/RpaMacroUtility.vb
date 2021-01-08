@@ -346,12 +346,12 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Property
 
         Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
-            If Not File.Exists(Me.Parent.MacroFileName) Then
-                Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
-                Console.WriteLine($"開発者から入手してください")
-                Console.WriteLine()
-                Return False
-            End If
+            'If Not File.Exists(Me.Parent.MacroFileName) Then
+            '    Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
+            '    Console.WriteLine($"開発者から入手してください")
+            '    Console.WriteLine()
+            '    Return False
+            'End If
 
             If String.IsNullOrEmpty(dat.Project.RootDirectory) Then
                 Console.WriteLine($"'RootDirectory' が設定されていません")

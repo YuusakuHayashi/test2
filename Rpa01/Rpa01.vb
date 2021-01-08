@@ -377,9 +377,10 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' プリンター名設定
         '-----------------------------------------------------------------------------------------'
-        Data.Project.UsePrinterName = Data.Project.PrinterName
-        Data.Project.UsePrinterName = Data.Project.RootRobotObject.PrinterName
-        Data.Project.UsePrinterName = IIf(String.IsNullOrEmpty(Me.PrinterName), Data.Project.UsePrinterName, Me.PrinterName)
+        Dim prn As String = vbNullString
+        prn = IIf(String.IsNullOrEmpty(Data.Project.PrinterName), prn, Data.Project.PrinterName)
+        prn = IIf(String.IsNullOrEmpty(Data.Project.RootRobotObject.PrinterName), prn, Data.Project.RootRobotObject.PrinterName)
+        prn = IIf(String.IsNullOrEmpty(Me.PrinterName), prn, Me.PrinterName)
         '-----------------------------------------------------------------------------------------'
 
         ' マスターファイルのチェック・コピー
@@ -511,12 +512,12 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         If Not Data.Transaction.Parameters.Contains("noprint") Then
             For Each imd In Me.IraishoMeisaiDatas
                 If bookname_1 <> imd.BookName Then
-                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, imd.BookName, imd.DistinationSheetName})
                     bookname_1 = imd.BookName
                     sheetname_1 = imd.DistinationSheetName
                 End If
                 If sheetname_1 <> imd.DistinationSheetName Then
-                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, imd.BookName, imd.DistinationSheetName})
+                    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, imd.BookName, imd.DistinationSheetName})
                     sheetname_1 = imd.DistinationSheetName
                 End If
             Next
@@ -570,7 +571,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {idata1_2, outxlsx_1, sheetname_2, SHIFT_JIS, setting_v1})
 
         If Not Data.Transaction.Parameters.Contains("noprint") Then
-            [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {Data.Project.UsePrinterName, outxlsx_1, sheetname_2})
+            [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, outxlsx_1, sheetname_2})
         End If
 
         Console.WriteLine("加工済送付明細作成完了！")
@@ -1241,7 +1242,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim obj As Object
         Dim ck As Boolean = True
         For Each [mod] In {"Rpa01", "RpaSystem", "RpaLibrary"}
-            obj = mutil.InvokeMacroFunction("RpaSystem.IsModuleExist", {[mod]})
+            obj = mutil.InvokeMacroFunction("MacroImporter.IsModuleExist", {[mod]})
             If obj IsNot Nothing Then
                 Dim ck2 = CType(obj, Boolean)
                 If Not ck2 Then
@@ -1255,6 +1256,15 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             End If
         Next
         If Not ck Then
+            Return False
+        End If
+
+        Dim prn As String = vbNullString
+        prn = IIf(String.IsNullOrEmpty(dat.Project.PrinterName), prn, dat.Project.PrinterName)
+        prn = IIf(String.IsNullOrEmpty(dat.Project.RootRobotObject.PrinterName), prn, dat.Project.RootRobotObject.PrinterName)
+        prn = IIf(String.IsNullOrEmpty(Me.PrinterName), prn, Me.PrinterName)
+        If String.IsNullOrEmpty(prn) Then
+            Console.WriteLine($"プリンター名が指定されていません")
             Return False
         End If
 

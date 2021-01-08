@@ -249,18 +249,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
-    Private _UsePrinterName As String
-
-    <JsonIgnore>
-    Public Property UsePrinterName As String
-        Get
-            Return Me._UsePrinterName
-        End Get
-        Set(value As String)
-            Me._UsePrinterName = value
-        End Set
-    End Property
-
     Public Sub CreateChangedFile(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If Me.FirstLoad Then
             If Not File.Exists(Me.SystemJsonChangedFileName) Then

@@ -111,10 +111,9 @@
       <Project>{65b475cf-58f0-45a4-88b6-6dbd64e16519}</Project>
       <Name>Rpa00</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RpaCui2\RpaCui2.vbproj">
-      <Project>{b14145fa-7dcc-4ea8-b4b7-3b3bc7ec3978}</Project>
-      <Name>RpaCui2</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

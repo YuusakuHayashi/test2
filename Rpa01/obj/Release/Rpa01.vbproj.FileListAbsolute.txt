@@ -4,11 +4,14 @@
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\Rpa00.dll
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\RpaCui2.exe
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\RpaCui.exe
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\Rpa00.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\Rpa00.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\RpaCui2.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\RpaCui2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\Newtonsoft.Json.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\RpaCui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Release\RpaCui.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Release\Rpa01.vbprojResolveAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Release\Rpa01.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Release\Rpa01.vbproj.GenerateResource.Cache

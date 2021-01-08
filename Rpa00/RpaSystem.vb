@@ -63,6 +63,7 @@ Public Class RpaSystem
             Dim cmdtxt As String = dat.Transaction.MainCommand
 
             Select Case cmdtxt
+                Case "clearscreen" : cmd = New ClearScreenCommand
                     'Case "setup" : cmd = New SetupRpaCommand
                 Case "load" : cmd = New LoadCommand
                 Case "exit" : cmd = New ExitCommand

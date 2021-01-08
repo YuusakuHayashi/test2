@@ -21,3 +21,6 @@ C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa00\obj\Debug\Rpa00.vbprojResolveAssemblyReference.cache
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\RpaCui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\RpaCui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\RpaCui.xml

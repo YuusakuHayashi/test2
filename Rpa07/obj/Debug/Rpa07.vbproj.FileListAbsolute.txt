@@ -1,0 +1,3 @@
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\obj\Debug\Rpa07.vbprojResolveAssemblyReference.cache
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\obj\Debug\Rpa07.Resources.resources
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\obj\Debug\Rpa07.vbproj.GenerateResource.Cache

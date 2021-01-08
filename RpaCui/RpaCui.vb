@@ -1,47 +1,83 @@
 ﻿Imports System.Reflection
 Imports System.IO
-Imports Rpa00
 
-Module RpaCui
-    Public Sub Main()
+Public Module RpaCui
+    Public ReadOnly Property SystemDirectory As String
+        Get
+            Dim [dir] As String = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
+            If Not Directory.Exists([dir]) Then
+                Directory.CreateDirectory([dir])
+            End If
+            Return [dir]
+        End Get
+    End Property
+
+    Public ReadOnly Property SystemDllDirectory As String
+        Get
+            Dim [dir] As String = $"{RpaCui.SystemDirectory}\dll"
+            If Not Directory.Exists([dir]) Then
+                Directory.CreateDirectory([dir])
+            End If
+            Return [dir]
+        End Get
+    End Property
+
+    Public ReadOnly Property SystemUpdateDllDirectory As String
+        Get
+            Dim [dir] As String = $"{RpaCui.SystemDirectory}\updatedll"
+            If Not Directory.Exists([dir]) Then
+                Directory.CreateDirectory([dir])
+            End If
+            Return [dir]
+        End Get
+    End Property
+
+    Public ReadOnly Property SystemIniFileName As String
+        Get
+            Return $"{RpaCui.SystemDirectory}\rpa.ini"
+        End Get
+    End Property
+
+    Public Sub Main(ByVal args As String())
         Dim ptype As String = vbNullString
         Dim txt As String = vbNullString
         Dim inv As Boolean = False
+        Dim rpa00dll As String = $"{RpaCui.SystemDllDirectory}\Rpa00.dll"
 
-        If Not Directory.Exists(CommonProject.SystemDirectory) Then
-            Directory.CreateDirectory(CommonProject.SystemDirectory)
-        End If
-        If Not Directory.Exists(CommonProject.SystemDllDirectory) Then
-            Directory.CreateDirectory(CommonProject.SystemDllDirectory)
-        End If
-        If Not File.Exists(CommonProject.System00DllFileName) Then
-            Console.WriteLine($"ファイル     '{CommonProject.System00DllFileName}' が存在しません")
-            Console.ReadLine()
-            Exit Sub
-        End If
+        Try
+            ' アップデート適用
+            Do
+                If Not Directory.GetFiles(RpaCui.SystemUpdateDllDirectory).Count = 0 Then
+                    Dim updatedll As String = Directory.GetFiles(RpaCui.SystemUpdateDllDirectory)(0)
+                    Dim dst As String = $"{RpaCui.SystemDllDirectory}\{Path.GetFileName(updatedll)}"
+                    Console.WriteLine($"アップデートを適用しています...{dst}")
+                    File.Copy(updatedll, dst, True)
+                    File.Delete(updatedll)
+                Else
+                    Exit Do
+                End If
+            Loop Until False
 
-        Dim asm As Assembly = Nothing
-        Dim [mod] As [Module] = Nothing
-        'asm = Assembly.LoadFrom(CommonProject.System00DllFileName)
-        asm = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll")
-        'asm = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\Rpa00.dll")
-        [mod] = asm.GetModule("Rpa00.dll")
-        Dim dat_type = [mod].GetType("Rpa00.RpaDataWrapper")
-        Dim dat = Activator.CreateInstance(dat_type)
+            ' DLLロード
+            'Dim asm As Assembly = Assembly.LoadFrom(rpa00dll)
+            Dim asm As Assembly = Assembly.LoadFrom("\\Coral\個人情報-林祐\project\wpf\test2\Rpa00\bin\Debug\Rpa00.dll")
+            Dim [mod] As [Module] = asm.GetModule("Rpa00.dll")
+            Dim dat_type = [mod].GetType("Rpa00.RpaDataWrapper")
+            Dim dat = Activator.CreateInstance(dat_type)
 
-        If Not File.Exists(RpaInitializer.SystemIniFileName) Then
-            dat.Initializer.Save(RpaInitializer.SystemIniFileName, dat.Initializer)
-        End If
-        dat.Initializer = dat.Initializer.Load(RpaInitializer.SystemIniFileName)
+            ' セーブ情報読み込み
+            If Not File.Exists(RpaCui.SystemIniFileName) Then
+                dat.Initializer.Save(RpaCui.SystemIniFileName, dat.Initializer)
+            End If
+            dat.Initializer = dat.Initializer.Load(RpaCui.SystemIniFileName)
+            dat.Project = dat.System.LoadCurrentRpa(dat)
 
-        dat.Project = RpaModule.LoadCurrentRpa(dat)
-
-        'Call rpa.HelloProject()
-        'Call rpa.CheckProject()
-
-        ' 実行
-        Do Until dat.Transaction.ExitFlag
-            Call dat.System.Main(dat)
-        Loop
+            ' 実行
+            Do Until dat.Transaction.ExitFlag
+                Call dat.System.Main(dat)
+            Loop
+        Catch ex As Exception
+        Finally
+        End Try
     End Sub
 End Module

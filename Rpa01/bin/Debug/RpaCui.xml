@@ -2,21 +2,21 @@
 <doc>
 <assembly>
 <name>
-Rpa00
+RpaCui
 </name>
 </assembly>
 <members>
-<member name="T:Rpa00.My.Resources.Resources">
+<member name="T:RpaCui.My.Resources.Resources">
 <summary>
   ローカライズされた文字列などを検索するための、厳密に型指定されたリソース クラスです。
 </summary>
 </member>
-<member name="P:Rpa00.My.Resources.Resources.ResourceManager">
+<member name="P:RpaCui.My.Resources.Resources.ResourceManager">
 <summary>
   このクラスで使用されているキャッシュされた ResourceManager インスタンスを返します。
 </summary>
 </member>
-<member name="P:Rpa00.My.Resources.Resources.Culture">
+<member name="P:RpaCui.My.Resources.Resources.Culture">
 <summary>
   厳密に型指定されたこのリソース クラスを使用して、すべての検索リソースに対し、
   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
