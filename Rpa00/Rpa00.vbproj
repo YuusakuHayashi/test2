@@ -84,6 +84,8 @@
     <Compile Include="Command\ExportMyCommandsCommand.vb" />
     <Compile Include="Command\ImportMyCommandsCommand.vb" />
     <Compile Include="Command\ChangeCommandEnabledCommand.vb" />
+    <Compile Include="Command\InstallRobotCommand.vb" />
+    <Compile Include="Command\OpenExplorerCommand.vb" />
     <Compile Include="Command\RemoveMyCommandCommand.vb" />
     <Compile Include="Command\RemoveProjectCommand.vb" />
     <Compile Include="Command\RemoveRobotCommand.vb" />

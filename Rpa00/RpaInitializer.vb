@@ -22,6 +22,16 @@ Public Class RpaInitializer
     '    End Get
     'End Property
 
+    Private _ReleaseVersion As String
+    Public Property ReleaseVersion As String
+        Get
+            Return Me._ReleaseVersion
+        End Get
+        Set(value As String)
+            Me._ReleaseVersion = value
+        End Set
+    End Property
+
     <JsonIgnore>
     Public Shared ReadOnly Property SystemIniChangedFileName As String
         Get

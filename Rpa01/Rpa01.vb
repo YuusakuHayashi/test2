@@ -77,7 +77,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     'End Property
 
     Private __IraishoDirectory As String
-    <JsonIgnore>
     Private ReadOnly Property _IraishoDirectory As String
         Get
             If String.IsNullOrEmpty(Me.__IraishoDirectory) Then

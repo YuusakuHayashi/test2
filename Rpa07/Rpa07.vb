@@ -13,7 +13,6 @@ Public Class Rpa07 : Inherits RpaBase(Of Rpa07)
         End Set
     End Property
 
-
     Private _PatternsDirectory As String
     Public Property PatternsDirectory As String
         Get
@@ -26,41 +25,90 @@ Public Class Rpa07 : Inherits RpaBase(Of Rpa07)
 
 
     Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+        If String.IsNullOrEmpty(Me.PatternFile) Then
+            Me.PatternFile = dat.Project.RootRobotObject.PatternFile
+        End If
+        If String.IsNullOrEmpty(Me.PatternFile) Then
+            Console.WriteLine($"'PatternsDirectory' が設定されていません")
+            Return False
+        End If
+        If String.IsNullOrEmpty(Me.PatternsDirectory) Then
+            Me.PatternsDirectory = dat.Project.RootRobotObject.PatternsDirectory
+        End If
+        If String.IsNullOrEmpty(Me.PatternsDirectory) Then
+            Console.WriteLine($"'PatternsDirectory' が設定されていません")
+            Return False
+        End If
+        If Not File.Exists(Me.PatternFile) Then
+            Console.WriteLine($"ファイル 'PatternFile' が設定されていません")
+            Return False
+        End If
+        If Not Directory.Exists(Me.PatternsDirectory) Then
+            Console.WriteLine($"ディレクトリ '{Me.PatternsDirectory}' が設定されていません")
+            Return False
+        End If
         Return True
     End Function
 
+
     Public Overrides Function Execute(ByRef dat As Object) As Integer
+        Console.WriteLine()
+
+        Dim i As Integer = -1
+        If dat.Transaction.Parameters.Count = 0 Then
+            i = IntractiveModeExecute(dat)
+        Else
+            i = IndicatedModeExecute(dat, dat.Transaction.Parameters(0))
+        End If
+
+        Return i
+    End Function
+
+    Private Function IntractiveModeExecute(ByRef dat As Object) As Integer
         Do
             Console.WriteLine($"処理を選択してください")
             Console.WriteLine($"1...パターンファイルを更新  2...パターン定義ファイルの確認  9...終了")
-            Dim idxtext As String = vbNullString
+            Dim i As Integer
             Do
-                idxtext = vbNullString
+                Dim idxtext As String = vbNullString
                 idxtext = dat.Transaction.ShowRpaIndicator(dat)
                 Console.WriteLine()
-            Loop Until idxtext = "1" Or idxtext = "2" Or idxtext = "9"
+                i = IndicatedModeExecute(dat, idxtext)
+            Loop Until i > 0
 
-            If idxtext = "9" Then
+            If i = 9 Then
                 Exit Do
             End If
-
-            Dim i As Integer = -1
-            If idxtext = "1" Then
-                i = UpdatePattern(dat)
-            ElseIf idxtext = "2" Then
-                i = ConfirmPattern(dat)
-            End If
-
-            Dim yorn As String = vbNullString
         Loop Until False
 
         Return 0
     End Function
 
+    Private Function IndicatedModeExecute(ByRef dat As Object, ByVal mode As String) As Integer
+        Dim i As Integer = -1
+        If mode = "1" Then
+            i = UpdatePattern(dat)
+            i = 1
+        ElseIf mode = "2" Then
+            i = ConfirmPattern(dat)
+            i = 2
+        ElseIf mode = "9" Then
+            Console.WriteLine($"処理を終了しました")
+            Console.WriteLine()
+            i = 9
+        Else
+            Console.WriteLine($"指定 '{mode}' は不正です")
+            Console.WriteLine()
+            i = -1
+        End If
+        Return i
+    End Function
+
+
     Private Function UpdatePattern(ByRef dat As Object) As Integer
         Dim ptns As List(Of String) = Directory.GetFiles(Me.PatternsDirectory).ToList
         For Each ptn In ptns
-            Console.WriteLine($"{ptn.IndexOf(ptn)}  {Path.GetFileName(ptn)}")
+            Console.WriteLine($"{ptns.IndexOf(ptn)}  {Path.GetFileName(ptn)}")
         Next
 
         Dim idx As Integer = -1
@@ -86,28 +134,97 @@ Public Class Rpa07 : Inherits RpaBase(Of Rpa07)
             Dim yorn As String = vbNullString
             Do
                 yorn = vbNullString
-                Console.WriteLine($"よろしいですか？ {idx}  {Path.GetFileName(ptns(idx))}")
+                Console.WriteLine($"選択したファイル内容を確認しますか？ {idx}  {Path.GetFileName(ptns(idx))} (y/n)")
                 yorn = dat.Transaction.ShowRpaIndicator(dat)
                 Console.WriteLine()
                 If yorn = "y" Or yorn = "n" Then
                     Exit Do
                 End If
             Loop Until False
-
             If yorn = "y" Then
+                Dim i As Integer = ShowPattern(ptns(idx))
+            End If
+
+            Dim yorn2 As String = vbNullString
+            Do
+                yorn2 = vbNullString
+                Console.WriteLine($"よろしいですか？ {idx}  {Path.GetFileName(ptns(idx))} (y/n)")
+                yorn2 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn2 = "y" Or yorn2 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            If yorn2 = "y" Then
                 Exit Do
             End If
         Loop Until False
 
         File.Copy(ptns(idx), Me.PatternFile, True)
-        Console.WriteLine($"{Path.GetFileName(Me.PatternFile)} <- {Path.GetFileName(ptns(idx))}")
+        Console.WriteLine($"{Path.GetFileName(ptns(idx))} -> {Path.GetFileName(Me.PatternFile)}")
+        Console.WriteLine("パターンファイルを更新しました")
         Console.WriteLine()
 
         Return 0
     End Function
 
     Private Function ConfirmPattern(ByRef dat As Object) As Integer
+        Dim ptns As List(Of String) = Directory.GetFiles(Me.PatternsDirectory).ToList
+        For Each ptn In ptns
+            Console.WriteLine($"{ptns.IndexOf(ptn)}  {Path.GetFileName(ptn)}")
+        Next
+
+        Dim idx As Integer = -1
+        Console.WriteLine()
+        Do
+            Console.WriteLine($"インデックス番号を選択してください")
+            Dim idxtext As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            If Not IsNumeric(idxtext) Then
+                Console.WriteLine($"インデックス番号が不正です")
+                Console.WriteLine()
+                Continue Do
+            End If
+
+            idx = -1
+            idx = Integer.Parse(idxtext)
+
+            If idx < 0 Or idx > (ptns.Count - 1) Then
+                Console.WriteLine($"インデックス番号が不正です")
+                Console.WriteLine()
+                Continue Do
+            End If
+
+            Exit Do
+        Loop Until False
+
+        Dim i As Integer = ShowPattern(ptns(idx))
+
         Return 0
+    End Function
+
+    Private Function ShowPattern(ByVal pfile As String) As Integer
+        Dim sr As StreamReader
+        Dim txt As String = vbNullString
+        Dim rtn = -1
+        Try
+            sr = New System.IO.StreamReader(
+                pfile, System.Text.Encoding.GetEncoding(RpaModule.DEFUALTENCODING))
+            txt = sr.ReadToEnd.TrimEnd
+            Console.WriteLine(txt)
+            Console.WriteLine()
+            rtn = 0
+        Catch ex As Exception
+            Console.WriteLine(ex.Message)
+            Console.WriteLine()
+            rtn = 1000
+        Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
+        End Try
+        Return rtn
     End Function
 
     Public Overrides Function SetupProjectObject(project As String) As Object

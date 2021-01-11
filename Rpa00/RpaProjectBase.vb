@@ -257,6 +257,10 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End If
     End Sub
 
+    Public Overridable Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+        Return False
+    End Function
+
     Public Function DeepCopy() As Object
         Return MemberwiseClone()
     End Function

@@ -93,6 +93,7 @@
     End Sub
 
     Public Function ShowRpaIndicator(ByRef dat As RpaDataWrapper) As String
+        ' ガイド
         If Me.Modes.Count = 0 Then
             If dat.Project IsNot Nothing Then
                 Console.Write($"{dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
@@ -108,6 +109,141 @@
                 End If
             Next
         End If
-        Return Console.ReadLine()
+
+        Return ShowReader(dat)
+    End Function
+
+    Private Function ShowReader(ByRef dat As RpaDataWrapper) As String
+        ' 通常
+        If Not dat.Initializer.ReleaseVersion = "Experimental" Then
+            Return Console.ReadLine()
+        End If
+
+        ' 開発中
+        Dim txt As String = vbNullString
+        Dim cmptxt As String = vbNullString
+        Dim cnt As Integer = 0
+        Do
+            Dim cki As ConsoleKeyInfo = Console.ReadKey(True)
+
+            Select Case cki.Key
+                ' 1-9, A-Z
+                Case 48, 49, 50, 51, 52, 53, 54, 55, 56, 57,
+                     65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
+                     96, 97, 98, 99, 100, 101, 102, 103, 104, 105
+                    Console.Write(cki.KeyChar)
+                    txt &= cki.KeyChar
+                ' Space
+                Case ConsoleKey.Spacebar
+                    Console.Write(" "c)
+                    txt &= cki.KeyChar
+                ' BackSpace
+                Case ConsoleKey.Backspace
+                    If Not String.IsNullOrEmpty(txt) Then
+                        'Console.Write(cki.KeyChar)
+                        Console.Write(vbBack)
+                        Console.Write(" "c)
+                        Console.Write(vbBack)
+                        txt = txt.Trim(txt.Last)
+                    End If
+                ' Tab
+                Case ConsoleKey.Tab
+                    cmptxt = ComplementCommandFromSnippet(dat, txt)
+                    txt &= cmptxt
+                'Case ConsoleKey.DownArrow, ConsoleKey.UpArrow
+                '    Console.Write(cki.KeyChar)
+                ' Enter
+                Case ConsoleKey.Enter
+                    txt &= cki.KeyChar
+                Case Else
+                    ' Nothing To Do
+            End Select
+
+            If String.IsNullOrEmpty(txt) Then
+                Continue Do
+            End If
+
+            If txt.Last = vbCr Then
+                Console.WriteLine()
+                txt = txt.Trim(vbCr)
+                Exit Do
+            End If
+        Loop Until False
+
+        Return txt
+    End Function
+
+    ' Tab押下によるスニペット機能
+    Private Function ComplementCommandFromSnippet(ByRef dat As RpaDataWrapper, ByVal txt As String) As String
+        Dim baselen As Integer = txt.Length
+        Dim tabcnt As Integer = 0
+        Dim rtntxt As String = vbNullString
+
+        If baselen > 0 Then
+            Do
+                Dim cmptxt As String = vbNullString    ' 補完する文字列（例：入力 'ex' => cmptxt = 'ix')
+                Dim cmplen As Integer = 0              ' 補完する文字列の長さ
+                Dim hitcnt As Integer = 0              ' 辞書からヒットした数
+                For Each cmdpair In dat.System.CommandDictionary
+                    If Strings.Left(cmdpair.Key, baselen) = txt Then
+                        hitcnt += 1
+                        If tabcnt >= hitcnt Then
+                            Continue For
+                        End If
+
+                        cmptxt = cmdpair.Key.Substring(baselen)
+                        cmplen = cmptxt.Length()
+                        Console.Write(cmptxt)
+                        Exit For
+                    End If
+                Next
+
+                If String.IsNullOrEmpty(cmptxt) Then
+                    Exit Do
+                End If
+
+                ' 連続タブ入力
+                Dim cki As ConsoleKeyInfo = Console.ReadKey(True)
+                Select Case cki.Key
+                    Case 48, 49, 50, 51, 52, 53, 54, 55, 56, 57,
+                         65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
+                         96, 97, 98, 99, 100, 101, 102, 103, 104, 105
+                        ' 1-9, A-Z
+                        Console.Write(cki.KeyChar)
+                        rtntxt = cmptxt & cki.KeyChar
+                        Exit Do
+                    Case ConsoleKey.Backspace
+                        'Console.Write(cki.KeyChar)
+                        Console.Write(vbBack)
+                        Console.Write(" "c)
+                        Console.Write(vbBack)
+                        rtntxt = cmptxt.TrimEnd(cmptxt.Last)
+                        Exit Do
+                    Case ConsoleKey.Spacebar
+                        Console.Write(cki.KeyChar)
+                        rtntxt = cmptxt & cki.KeyChar
+                        Exit Do
+                    Case ConsoleKey.Tab
+                        Console.Write(Strings.StrDup(cmplen, vbBack))
+                        Console.Write(Strings.StrDup(cmplen, " "c))
+                        Console.Write(Strings.StrDup(cmplen, vbBack))
+                        tabcnt += 1
+                        Continue Do
+                    Case ConsoleKey.Escape
+                        Console.Write(Strings.StrDup(cmplen, vbBack))
+                        Console.Write(Strings.StrDup(cmplen, " "c))
+                        Console.Write(Strings.StrDup(cmplen, vbBack))
+                        rtntxt = vbNullString
+                        Exit Do
+                    Case ConsoleKey.Enter
+                        rtntxt = cmptxt & cki.KeyChar
+                        Exit Do
+                    Case Else
+                        Exit Do
+                End Select
+            Loop Until False
+        End If
+
+        Return rtntxt
     End Function
 End Class

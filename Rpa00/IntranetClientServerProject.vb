@@ -63,28 +63,18 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    '<JsonIgnore>
-    'Public ReadOnly Property IsRootRobotExists As Boolean
-    '    Get
-    '        If Directory.Exists(Me.RootRobotDirectory) Then
-    '            Return True
-    '        Else
-    '            Return False
-    '        End If
-    '    End Get
-    'End Property
-
     <JsonIgnore>
     Public ReadOnly Property RootRobotJsonFileName As String
         Get
             Dim [fil] As String = vbNullString
             If Directory.Exists(Me.RootRobotDirectory) Then
-                [fil] = $"{Me.RootRobotDirectory}\robot.ini"
+                [fil] = $"{Me.RootRobotDirectory}\rpa_project.json"
             End If
             Return [fil]
         End Get
     End Property
 
+    ' このファイルがRootRobotになければ、AttachRobotすることができない
     <JsonIgnore>
     Public ReadOnly Property RootRobotIniFileName As String
         Get
@@ -307,7 +297,6 @@ Public Class IntranetClientServerProject
 
     Public Overrides ReadOnly Property SystemArchDirectory As String
         Get
-            'Return $"{CommonProject.SystemDirectory}\{Me.GetType.Name}"
             Return $"{RpaCui.SystemDirectory}\{Me.GetType.Name}"
         End Get
     End Property
@@ -463,9 +452,52 @@ Public Class IntranetClientServerProject
         End Try
     End Function
 
+
+    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+        If String.IsNullOrEmpty(Me.RootDirectory) Then
+            Console.WriteLine($"'RootDirectory' がセットされていません")
+            Return False
+        End If
+        If Not Directory.Exists(Me.RootDirectory) Then
+            Console.WriteLine($"ディレクトリ '{Me.RootDirectory}' は存在しません")
+            Return False
+        End If
+        If String.IsNullOrEmpty(Me.MyDirectory) Then
+            Console.WriteLine($"'MyDirectory' がセットされていません")
+            Return False
+        End If
+        If Not Directory.Exists(Me.MyDirectory) Then
+            Console.WriteLine($"ディレクトリ '{Me.MyDirectory}' は存在しません")
+            Return False
+        End If
+        If String.IsNullOrEmpty(Me.RobotName) Then
+            Console.WriteLine($"'RobotName' がセットされていません")
+            Return False
+        End If
+        If String.IsNullOrEmpty(Me.RootRobotDirectory) Then
+            Console.WriteLine($"'RootRobotDirectory' がセットされていません")
+            Return False
+        End If
+        If Not Directory.Exists(Me.RootRobotDirectory) Then
+            Console.WriteLine($"ディレクトリ '{Me.RootRobotDirectory}' は存在しません")
+            Return False
+        End If
+        If String.IsNullOrEmpty(Me.MyRobotDirectory) Then
+            Console.WriteLine($"'MyRobotDirectory' がセットされていません")
+            Return False
+        End If
+        If Not Directory.Exists(Me.MyRobotDirectory) Then
+            Console.WriteLine($"ディレクトリ '{Me.MyRobotDirectory}' は存在しません")
+            Return False
+        End If
+        Return True
+    End Function
+
+
     Sub New()
         AddHandler Me.PropertyChanged, AddressOf CreateChangedFile
     End Sub
+
 
     Protected Overrides Sub Finalize()
         RemoveHandler Me.PropertyChanged, AddressOf CreateChangedFile

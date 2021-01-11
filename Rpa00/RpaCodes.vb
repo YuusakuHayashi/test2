@@ -14,7 +14,8 @@ Public Module RpaCodes
             Select Case rpa.RobotName
                 Case "rpa01"
                     'dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
-                    dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Rpa01.dll"
+                    'dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Rpa01.dll"
+                    dllpath = "C:\Users\yuusa\project\test2\Rpa01\bin\Debug\Rpa01.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)
                         [mod] = asm.GetModule("Rpa01.dll")
@@ -23,9 +24,22 @@ Public Module RpaCodes
                     Else
                         Return Nothing
                     End If
+                Case "rpa02"
+                    'dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
+                    'dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.dll"
+                    dllpath = "C:\Users\yuusa\project\test2\Rpa02\bin\Debug\Rpa02.dll"
+                    If File.Exists(dllpath) Then
+                        asm = Assembly.LoadFrom(dllpath)
+                        [mod] = asm.GetModule("Rpa02.dll")
+                        [type] = [mod].GetType("Rpa02.Rpa02")
+                        Return Activator.CreateInstance([type])
+                    Else
+                        Return Nothing
+                    End If
                 Case "rpa07"
                     'dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
-                    dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.dll"
+                    'dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.dll"
+                    dllpath = "C:\Users\yuusa\project\test2\Rpa07\bin\Debug\Rpa07.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)
                         [mod] = asm.GetModule("Rpa07.dll")
@@ -44,9 +58,9 @@ Public Module RpaCodes
     Public ReadOnly Property RpaUtilityObject(util As String) As Object
         Get
             Select Case util
-                Case "MacroUtility"
+                Case "macroutility"
                     Return (New RpaMacroUtility)
-                Case "PrinterUtility"
+                Case "printerutility"
                     Return (New RpaPrinterUtility)
                 Case Else
                     Return Nothing

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 14 for Windows Desktop
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "test2", "test2\test2.vbproj", "{176BEE86-D9E1-4237-BF9E-D16F81E80F0C}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "RpaRepository", "RpaRepository\RpaRepository.vbproj", "{68C94F06-7571-4EA1-9A21-FDE228452FA6}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Rpa07", "Rpa07\Rpa07.vbproj", "{D915EBA5-3270-40C5-B437-C79E4221AA6C}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Rpa02", "Rpa02\Rpa02.vbproj", "{F59FC7E2-FC0C-4E11-85F3-529E04589ACD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{D915EBA5-3270-40C5-B437-C79E4221AA6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D915EBA5-3270-40C5-B437-C79E4221AA6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D915EBA5-3270-40C5-B437-C79E4221AA6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F59FC7E2-FC0C-4E11-85F3-529E04589ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F59FC7E2-FC0C-4E11-85F3-529E04589ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F59FC7E2-FC0C-4E11-85F3-529E04589ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F59FC7E2-FC0C-4E11-85F3-529E04589ACD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
