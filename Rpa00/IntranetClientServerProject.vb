@@ -11,7 +11,6 @@ Public Class IntranetClientServerProject
 
     Private Const SHIFT_JIS As String = "Shift-JIS"
     Private Const UTF8 As String = "utf-8"
-    Public Shared MYENCODING As String = UTF8
 
     Private Const ARCHITECTURE_NAME As String = "IntranetClientServer"
 
@@ -375,7 +374,7 @@ Public Class IntranetClientServerProject
         Dim sr As StreamReader
 
         If File.Exists(Me.HelloFileName) Then
-            sr = New StreamReader(Me.HelloFileName, Encoding.GetEncoding(MYENCODING))
+            sr = New StreamReader(Me.HelloFileName, Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
             Call _ConsoleWriteLine($"{txt}")
         End If
@@ -437,7 +436,7 @@ Public Class IntranetClientServerProject
         Dim sr As StreamReader
         Try
             sr = New System.IO.StreamReader(
-                f, System.Text.Encoding.GetEncoding(MYENCODING))
+                f, System.Text.Encoding.GetEncoding(SHIFT_JIS))
             txt = sr.ReadToEnd()
 
             _GetIgnoreList = JsonConvert.DeserializeObject(Of List(Of String))(txt)

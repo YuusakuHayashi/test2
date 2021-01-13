@@ -138,58 +138,63 @@ Public Class RpaSystem
     '---------------------------------------------------------------------------------------------'
 
     Public Sub Main(ByRef dat As RpaDataWrapper)
-        dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
-        Call dat.Transaction.CreateCommand()
+        Try
+            dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
+            Call dat.Transaction.CreateCommand()
 
-        Dim cmd = CommandHandler(dat)
+            Dim cmd = CommandHandler(dat)
 
-        If cmd Is Nothing Then
-            Console.WriteLine($"コマンド : '{dat.Transaction.CommandText}' はありません")
-            Console.WriteLine()
-            Exit Sub
-        End If
-
-        Dim err1 As String = $"パラメータ数が範囲外です: 許容パラメータ数範囲={cmd.ExecutableParameterCount(0)}~{cmd.ExecutableParameterCount(1)}"
-        If cmd.ExecutableParameterCount(0) > dat.Transaction.Parameters.Count Then
-            Console.WriteLine(err1)
-            Console.WriteLine()
-            Exit Sub
-        End If
-        If cmd.ExecutableParameterCount(1) < dat.Transaction.Parameters.Count Then
-            Console.WriteLine(err1)
-            Console.WriteLine()
-            Exit Sub
-        End If
-
-        Dim err2 As String = $"プロジェクトが存在しないため、実行できません"
-        If Not cmd.ExecuteIfNoProject Then
-            If dat.Project Is Nothing Then
-                Console.WriteLine(err2)
+            If cmd Is Nothing Then
+                Console.WriteLine($"コマンド : '{dat.Transaction.CommandText}' はありません")
                 Console.WriteLine()
                 Exit Sub
             End If
-        End If
 
-
-        Dim err3 As String = $"このプロジェクト構成では、コマンド '{dat.Transaction.CommandText}' は実行できません"
-        Dim archs As String() = cmd.ExecutableProjectArchitectures
-        If Not archs.Contains("AllArchitectures") Then
-            If Not archs.Contains(dat.Project.SystemArchTypeName) Then
-                Console.WriteLine(err3)
+            Dim err1 As String = $"パラメータ数が範囲外です: 許容パラメータ数範囲={cmd.ExecutableParameterCount(0)}~{cmd.ExecutableParameterCount(1)}"
+            If cmd.ExecutableParameterCount(0) > dat.Transaction.Parameters.Count Then
+                Console.WriteLine(err1)
                 Console.WriteLine()
                 Exit Sub
             End If
-        End If
+            If cmd.ExecutableParameterCount(1) < dat.Transaction.Parameters.Count Then
+                Console.WriteLine(err1)
+                Console.WriteLine()
+                Exit Sub
+            End If
 
-        Dim err4 As String = $"コマンドは実行出来ませんでした"
-        If Not cmd.CanExecute(dat) Then
-            Console.WriteLine(err4)
-            Console.WriteLine()
-            Exit Sub
-        End If
+            Dim err2 As String = $"プロジェクトが存在しないため、実行できません"
+            If Not cmd.ExecuteIfNoProject Then
+                If dat.Project Is Nothing Then
+                    Console.WriteLine(err2)
+                    Console.WriteLine()
+                    Exit Sub
+                End If
+            End If
 
-        dat.Transaction.ReturnCode = cmd.Execute(dat)
 
-        dat.Transaction.Parameters = New List(Of String)
+            Dim err3 As String = $"このプロジェクト構成では、コマンド '{dat.Transaction.CommandText}' は実行できません"
+            Dim archs As String() = cmd.ExecutableProjectArchitectures
+            If Not archs.Contains("AllArchitectures") Then
+                If Not archs.Contains(dat.Project.SystemArchTypeName) Then
+                    Console.WriteLine(err3)
+                    Console.WriteLine()
+                    Exit Sub
+                End If
+            End If
+
+            Dim err4 As String = $"コマンドは実行出来ませんでした"
+            If Not cmd.CanExecute(dat) Then
+                Console.WriteLine(err4)
+                Console.WriteLine()
+                Exit Sub
+            End If
+
+            dat.Transaction.ReturnCode = cmd.Execute(dat)
+
+        Catch ex As Exception
+            Console.WriteLine($"({Me.GetType.Name}) {ex.Message}")
+        Finally
+            dat.Transaction.Parameters = New List(Of String)
+        End Try
     End Sub
 End Class

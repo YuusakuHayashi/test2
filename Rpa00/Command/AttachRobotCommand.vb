@@ -110,7 +110,7 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
             dat.Project.RobotAliasDictionary.Add(roboname, roboname)
         End If
         dat.Project.RobotName = roboname
-        Console.WriteLine($"プロジェクト '{dat.Project.RobotName}' を選択しました")
+        Console.WriteLine($"ロボット '{dat.Project.RobotName}' を選択しました")
         Console.WriteLine()
         Return 0
     End Function

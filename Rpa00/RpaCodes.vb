@@ -3,7 +3,6 @@ Imports System.Reflection
 Imports System.IO
 
 Public Module RpaCodes
-
     ' プラグインを追加する場合には、ここに記述
     Public ReadOnly Property RpaObject(rpa As Object) As Object
         Get
@@ -13,9 +12,7 @@ Public Module RpaCodes
             Dim dllpath As String = vbNullString
             Select Case rpa.RobotName
                 Case "rpa01"
-                    'dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
-                    'dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Rpa01.dll"
-                    dllpath = "C:\Users\yuusa\project\test2\Rpa01\bin\Debug\Rpa01.dll"
+                    dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)
                         [mod] = asm.GetModule("Rpa01.dll")
@@ -25,9 +22,7 @@ Public Module RpaCodes
                         Return Nothing
                     End If
                 Case "rpa02"
-                    'dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
-                    'dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.dll"
-                    dllpath = "C:\Users\yuusa\project\test2\Rpa02\bin\Debug\Rpa02.dll"
+                    dllpath = $"{RpaCui.SystemDllDirectory}\Rpa02.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)
                         [mod] = asm.GetModule("Rpa02.dll")
@@ -37,9 +32,7 @@ Public Module RpaCodes
                         Return Nothing
                     End If
                 Case "rpa07"
-                    'dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
-                    'dllpath = "\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.dll"
-                    dllpath = "C:\Users\yuusa\project\test2\Rpa07\bin\Debug\Rpa07.dll"
+                    dllpath = $"{RpaCui.SystemDllDirectory}\Rpa07.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)
                         [mod] = asm.GetModule("Rpa07.dll")

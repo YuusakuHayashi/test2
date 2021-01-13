@@ -56,14 +56,14 @@ Public Class LoadCommand : Inherits RpaCommandBase
         [load] = [load].Load(dat.Initializer.Projects(idx2).JsonFileName)
 
         If [load] Is Nothing Then
-            Console.WriteLine($"JsonFile '{dat.Project.SystemJsonFileName}' のロードに失敗しました。")
+            Console.WriteLine($"ファイル '{dat.Initializer.Projects(idx2).JsonFileName}' のロードに失敗しました。")
             Console.WriteLine()
             Return 1000
         End If
 
         dat.Initializer.CurrentProject = dat.Initializer.Projects(idx2)
         dat.Project = [load]
-        Console.WriteLine($"JsonFile '{dat.Project.SystemJsonFileName}' をロードしました。")
+        Console.WriteLine($"ファイル '{dat.Project.SystemJsonFileName}' をロードしました。")
         Console.WriteLine()
         Return 0
     End Function

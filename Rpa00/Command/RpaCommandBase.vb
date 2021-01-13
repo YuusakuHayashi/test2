@@ -37,4 +37,6 @@
     End Function
 
     Public MustOverride Overloads Function Execute(ByRef dat As RpaDataWrapper) As Integer
+
+    Private Delegate Function ExecuteDelegater(ByRef dat As RpaDataWrapper) As Integer
 End Class
