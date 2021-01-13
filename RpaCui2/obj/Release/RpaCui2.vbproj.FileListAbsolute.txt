@@ -19,10 +19,10 @@ C:\Users\yuusa\project\test2\RpaCui2\obj\Release\RpaCui2.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\bin\Release\RpaCui2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\bin\Release\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\bin\Release\Newtonsoft.Json.xml
-\\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.vbprojResolveAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.vbproj.ResolveComReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.vbproj.GenerateResource.Cache
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.exe
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Release\RpaCui2.vbprojResolveAssemblyReference.cache

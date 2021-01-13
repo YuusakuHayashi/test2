@@ -24,3 +24,4 @@ C:\Users\yuusa\project\test2\RpaCui2\obj\Debug\RpaCui2.vbproj.ResolveComReferenc
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.exe
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui2\obj\Debug\RpaCui2.vbprojResolveAssemblyReference.cache

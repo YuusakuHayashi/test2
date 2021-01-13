@@ -19,11 +19,8 @@ C:\Users\yuusa\project\test2\Rpa01\obj\Debug\Rpa01.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Rpa01.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Rpa00.dll
-\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\RpaCui2.exe
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Rpa00.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Rpa00.xml
-\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\RpaCui2.pdb
-\\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\RpaCui2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\bin\Debug\Newtonsoft.Json.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.vbprojResolveAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa01\obj\Debug\Rpa01.Resources.resources

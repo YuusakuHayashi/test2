@@ -21,3 +21,17 @@ C:\Users\yuusa\project\test2\Rpa07\obj\Debug\Rpa07.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\Rpa07\obj\Debug\Rpa07.dll
 C:\Users\yuusa\project\test2\Rpa07\obj\Debug\Rpa07.xml
 C:\Users\yuusa\project\test2\Rpa07\obj\Debug\Rpa07.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa00.dll
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Newtonsoft.Json.dll
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\RpaCui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa00.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa00.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Newtonsoft.Json.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\RpaCui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\RpaCui.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\obj\Debug\Rpa07.dll
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\obj\Debug\Rpa07.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\obj\Debug\Rpa07.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.dll
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.xml
