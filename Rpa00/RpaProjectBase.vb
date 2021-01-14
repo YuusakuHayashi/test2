@@ -6,7 +6,7 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public MustInherit Class RpaProjectBase(Of T As {New})
-    Inherits JsonHandler(Of T)
+    Inherits RpaCui.JsonHandler(Of T)
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged

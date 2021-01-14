@@ -5,7 +5,7 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 Imports System.Windows.Forms
 
-'Public Class RpaProject : Inherits RpaCui2.JsonHandler(Of RpaProject)
+'Public Class RpaProject : Inherits RpaCui.JsonHandler(Of RpaProject)
 Public Class IntranetClientServerProject
     Inherits RpaProjectBase(Of IntranetClientServerProject)
 

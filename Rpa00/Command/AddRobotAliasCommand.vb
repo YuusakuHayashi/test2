@@ -7,7 +7,7 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim [key] As String = dat.Transaction.Parameters(0)
         Dim [alias] As String = dat.Transaction.Parameters(1)
         If Not dat.Project.RobotAliasDictionary.ContainsKey([key]) Then
@@ -74,5 +74,6 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

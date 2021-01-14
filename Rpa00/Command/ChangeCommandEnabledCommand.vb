@@ -6,7 +6,7 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         ' 論理和
         If Not (Boolean.TryParse(dat.Transaction.Parameters(1), True) Or Boolean.TryParse(dat.Transaction.Parameters(1), False)) Then
             Console.WriteLine($"パラメタ '{dat.Transaction.Parameters(1)}' の論理値への変換に失敗しました")
@@ -44,5 +44,6 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

@@ -2,15 +2,15 @@
 Imports System.IO
 
 Public Module RpaCui
-    'Private _DebugMode As Boolean
-    'Private Property DebugMode As Boolean
-    '    Get
-    '        Return RpaCui._DebugMode
-    '    End Get
-    '    Set(value As Boolean)
-    '        RpaCui._DebugMode = value
-    '    End Set
-    'End Property
+    Private _DebugMode As Boolean
+    Private Property DebugMode As Boolean
+        Get
+            Return RpaCui._DebugMode
+        End Get
+        Set(value As Boolean)
+            RpaCui._DebugMode = value
+        End Set
+    End Property
 
     Public ReadOnly Property SystemDirectory As String
         Get
@@ -22,14 +22,30 @@ Public Module RpaCui
         End Get
     End Property
 
-    Public ReadOnly Property SystemDllDirectory As String
+    'Public ReadOnly Property SystemDllDirectory As String
+    '    Get
+    '        Dim [dir] As String = $"{RpaCui.SystemDirectory}\dll"
+    '        If Not Directory.Exists([dir]) Then
+    '            Directory.CreateDirectory([dir])
+    '        End If
+    '        Return [dir]
+    '    End Get
+    'End Property
+
+    Private _SystemDllDirectory As String
+    Public Property SystemDllDirectory As String
         Get
-            Dim [dir] As String = $"{RpaCui.SystemDirectory}\dll"
-            If Not Directory.Exists([dir]) Then
-                Directory.CreateDirectory([dir])
+            If String.IsNullOrEmpty(RpaCui._SystemDllDirectory) Then
+                RpaCui._SystemDllDirectory = $"{RpaCui.SystemDirectory}\dll"
+                If Not Directory.Exists(RpaCui._SystemDllDirectory) Then
+                    Directory.CreateDirectory(RpaCui._SystemDllDirectory)
+                End If
             End If
-            Return [dir]
+            Return RpaCui._SystemDllDirectory
         End Get
+        Set(value As String)
+            RpaCui._SystemDllDirectory = value
+        End Set
     End Property
 
     'Private _SystemDllDirectory As String
@@ -66,6 +82,10 @@ Public Module RpaCui
 
     Public Sub Main(ByVal args As String())
         Try
+            If args.Count > 0 Then
+                RpaCui.SystemDllDirectory = args(0)
+            End If
+
             Dim rpa00dll As String = $"{RpaCui.SystemDllDirectory}\Rpa00.dll"
 
             ' アップデート適用
@@ -102,6 +122,7 @@ Public Module RpaCui
         Catch ex As Exception
             Console.WriteLine(ex.Message)
             Console.WriteLine("RpaCui.exe は異常終了しました")
+            Console.ReadLine()
         Finally
         End Try
     End Sub

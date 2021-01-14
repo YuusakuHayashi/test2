@@ -14,7 +14,7 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim pname As String = dat.Transaction.Parameters(0)
         Dim pi As PropertyInfo = dat.Initializer.GetType().GetProperty(pname)
         If pi Is Nothing Then
@@ -64,5 +64,6 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

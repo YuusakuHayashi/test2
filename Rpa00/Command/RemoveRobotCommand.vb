@@ -7,7 +7,7 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim rpa = dat.Project.DeepCopy
         Dim err1 As String = $"'MyDirectory'が設定されていません"
         If String.IsNullOrEmpty(rpa.MyDirectory) Then
@@ -121,5 +121,6 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

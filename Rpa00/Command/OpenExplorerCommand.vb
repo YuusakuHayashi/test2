@@ -17,7 +17,7 @@ Public Class OpenExplorerCommand : Inherits RpaCommandBase
         End Set
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Me.OpenPath = vbNullString
         If dat.Project Is Nothing Then
             Me.OpenPath = RpaCui.SystemDirectory
@@ -47,5 +47,6 @@ Public Class OpenExplorerCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

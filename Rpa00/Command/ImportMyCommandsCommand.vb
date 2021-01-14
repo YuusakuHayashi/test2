@@ -41,7 +41,7 @@ Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
         Return rtn
     End Function
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Initializer.MyCommandDictionary.Count > 0 Then
             Dim yorn As String = vbNullString
             Do
@@ -83,5 +83,6 @@ Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

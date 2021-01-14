@@ -28,9 +28,39 @@
         Throw New NotImplementedException
     End Function
 
+    'Public Overridable Overloads Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    '    Return True
+    'End Function
+
     Public Overridable Overloads Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
-        Return True
+        Dim i As Boolean = False
+        Try
+            Dim dlg As CanExecuteDelegater = Me.CanExecuteHandler
+            If dlg Is Nothing Then
+                i = True
+            Else
+                i = dlg(dat)
+            End If
+        Catch ex As Exception
+            Console.WriteLine($"({Me.GetType.Name}.CanExecuteHandler) {ex.Message}")
+            Console.WriteLine()
+            i = False
+        End Try
+        Return i
     End Function
+
+    Public Delegate Function CanExecuteDelegater(ByRef dat As RpaDataWrapper) As Integer
+
+    Private _CanExecuteHandler As CanExecuteDelegater
+    Public Property CanExecuteHandler As CanExecuteDelegater
+        Get
+            Return Me._CanExecuteHandler
+        End Get
+        Set(value As CanExecuteDelegater)
+            Me._CanExecuteHandler = value
+        End Set
+    End Property
+
 
     Public Overloads Function Execute() As Integer Implements RpaCommandInterface.Execute
         Throw New NotImplementedException()
@@ -39,10 +69,14 @@
     Public Overridable Overloads Function Execute(ByRef dat As RpaDataWrapper) As Integer
         Dim i As Integer = -1
         Try
-            Dim exdlg As ExecuteDelegater = Me.ExecuteHandler
-            i = exdlg(dat)
+            Dim dlg As ExecuteDelegater = Me.ExecuteHandler
+            If dlg Is Nothing Then
+                Throw New NotImplementedException()
+            Else
+                i = dlg(dat)
+            End If
         Catch ex As Exception
-            Console.WriteLine($"({Me.GetType.Name}) {ex.Message}")
+            Console.WriteLine($"({Me.GetType.Name}.ExecuteHandler) {ex.Message}")
             Console.WriteLine()
             i = -1
         End Try

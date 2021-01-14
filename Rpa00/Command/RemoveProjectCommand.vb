@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Public Class RemoveProjectCommand : Inherits RpaCommandBase
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Initializer.Projects.Count = 0 Then
             Console.WriteLine($"プロジェクトの登録がありません")
             Console.WriteLine()
@@ -67,5 +67,6 @@ Public Class RemoveProjectCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

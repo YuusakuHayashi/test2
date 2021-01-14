@@ -10,7 +10,7 @@ Public Class ExportMyCommandsCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Initializer.MyCommandDictionary.Count = 0 Then
             Console.WriteLine($"コマンド登録簿に登録がありません")
             Return False
@@ -50,5 +50,6 @@ Public Class ExportMyCommandsCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

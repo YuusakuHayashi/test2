@@ -3,14 +3,6 @@
 
 ' SetupProjectCommand中に実行可能
 Public Class ShowProjectPropertiesCommand : Inherits RpaCommandBase
-    'Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
-    '    If dat.Project Is Nothing Then
-    '        Console.WriteLine($"現在のプロジェクトがありません")
-    '        Return False
-    '    End If
-    '    Return True
-    'End Function
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         ' 初回時にプロパティ一覧を表示
         Dim pnamelen As Integer = 25

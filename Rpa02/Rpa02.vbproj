@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\RpaCui\debugrobot\</OutputPath>
     <DocumentationFile>Rpa02.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -104,6 +104,10 @@
     <ProjectReference Include="..\Rpa00\Rpa00.vbproj">
       <Project>{65b475cf-58f0-45a4-88b6-6dbd64e16519}</Project>
       <Name>Rpa00</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RpaCui\RpaCui.vbproj">
+      <Project>{54dce427-83b7-48af-8ddc-eedb87acd7e6}</Project>
+      <Name>RpaCui</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

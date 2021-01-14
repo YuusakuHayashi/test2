@@ -1,6 +1,6 @@
 ﻿Public Class ExportMyRobotJsonCommand : Inherits RpaCommandBase
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Project.MyRobotObject Is Nothing Then
             Console.WriteLine($"'MyRobotObject' のインスタンスが設定されていません")
             Return False
@@ -17,5 +17,6 @@
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

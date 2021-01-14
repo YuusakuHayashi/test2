@@ -8,7 +8,7 @@ Public Class LoadCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Initializer.Projects Is Nothing Then
             Console.WriteLine($"プロジェクトがありません")
             Console.WriteLine()
@@ -69,5 +69,6 @@ Public Class LoadCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

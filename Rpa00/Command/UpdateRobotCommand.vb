@@ -8,7 +8,7 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If String.IsNullOrEmpty(dat.Project.RootDirectory) Then
             Console.WriteLine($"'RootDirectory' が設定されていません")
             Return False
@@ -98,5 +98,6 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class

@@ -29,3 +29,6 @@ C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.dll
 C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.xml
 C:\Users\yuusa\project\test2\Rpa00\obj\Debug\Rpa00.pdb
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Rpa00.dll
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Rpa00.pdb
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Rpa00.xml

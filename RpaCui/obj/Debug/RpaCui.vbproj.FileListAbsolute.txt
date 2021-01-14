@@ -17,3 +17,12 @@ C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbproj.CoreCompileInputs.ca
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.exe
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.xml
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.pdb
+C:\Users\yuusa\project\test2\RpaCui\bin\Debug\Newtonsoft.Json.dll
+C:\Users\yuusa\project\test2\RpaCui\bin\Debug\Newtonsoft.Json.xml
+C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbproj.CopyComplete
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaCui.exe.config
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaCui.exe
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaCui.pdb
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaCui.xml
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Newtonsoft.Json.dll
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Newtonsoft.Json.xml

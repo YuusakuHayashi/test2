@@ -4,7 +4,7 @@ Imports Newtonsoft.Json.Linq
 Imports System.ComponentModel
 
 Public Class RpaInitializer
-    Inherits JsonHandler(Of RpaInitializer)
+    Inherits RpaCui.JsonHandler(Of RpaInitializer)
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged

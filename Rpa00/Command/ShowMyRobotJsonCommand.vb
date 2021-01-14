@@ -2,7 +2,7 @@
 Imports System.IO
 
 Public Class ShowMyRobotJsonCommand : Inherits RpaCommandBase
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If Not File.Exists(dat.Project.MyRobotJsonFileName) Then
             Console.WriteLine($"ファイル '{dat.Project.MyRobotJsonFileName}' が存在しません")
             Console.WriteLine()
@@ -19,5 +19,6 @@ Public Class ShowMyRobotJsonCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
     End Sub
 End Class
