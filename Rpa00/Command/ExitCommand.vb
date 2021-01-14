@@ -8,7 +8,7 @@ Public Class ExitCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         If dat.Project IsNot Nothing Then
             If File.Exists(dat.Project.SystemJsonChangedFileName) Then
                 Dim yorn As String = vbNullString
@@ -46,4 +46,8 @@ Public Class ExitCommand : Inherits RpaCommandBase
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

@@ -8,10 +8,14 @@
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         dat.Project.MyRobotObject.Save(dat.Project.MyRobotJsonFileName, dat.Project.MyRobotObject)
         Console.WriteLine($"ファイル '{dat.Project.MyRobotJsonFileName}' にエクスポートしました")
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

@@ -7,8 +7,12 @@ Public Class ClearScreenCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Console.Clear()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

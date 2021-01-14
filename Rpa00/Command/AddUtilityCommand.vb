@@ -7,8 +7,7 @@ Public Class AddUtilityCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
-
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim util As String = dat.Transaction.Parameters(0)
         Dim uobj As Object = RpaCodes.RpaUtilityObject(util)
 
@@ -29,4 +28,8 @@ Public Class AddUtilityCommand : Inherits RpaCommandBase
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

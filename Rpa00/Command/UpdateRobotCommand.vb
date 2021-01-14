@@ -29,7 +29,7 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim i As Integer = -1
         If dat.Transaction.Parameters.Count = 0 Then
             i = AllUpdate(dat)
@@ -95,4 +95,8 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         End If
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

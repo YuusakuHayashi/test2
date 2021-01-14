@@ -11,7 +11,7 @@ Public Class ShowProjectPropertiesCommand : Inherits RpaCommandBase
     '    Return True
     'End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         ' 初回時にプロパティ一覧を表示
         Dim pnamelen As Integer = 25
         Dim ptypelen As Integer = 15
@@ -64,4 +64,8 @@ Public Class ShowProjectPropertiesCommand : Inherits RpaCommandBase
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

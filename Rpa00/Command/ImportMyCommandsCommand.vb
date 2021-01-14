@@ -12,7 +12,7 @@ Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
 
     Private _MyCommandJsonFileName As String
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim rtn As Integer = -1
         Dim sr As StreamReader
         Try
@@ -80,4 +80,8 @@ Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
 
         Return True
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

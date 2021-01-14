@@ -25,7 +25,7 @@ Public Class ChangeProjectPropertyCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim pname As String = dat.Transaction.Parameters(0)
         Dim ptext As String = dat.Transaction.Parameters(1)
         Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
@@ -56,4 +56,8 @@ Public Class ChangeProjectPropertyCommand : Inherits RpaCommandBase
 
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

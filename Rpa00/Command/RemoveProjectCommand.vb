@@ -9,7 +9,7 @@ Public Class RemoveProjectCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim idx As Integer = -1
         Dim lastidx As Integer = -1
         For Each prj As RpaInitializer.RpaProject In dat.Initializer.Projects
@@ -64,4 +64,8 @@ Public Class RemoveProjectCommand : Inherits RpaCommandBase
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

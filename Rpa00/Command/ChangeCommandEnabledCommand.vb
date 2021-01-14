@@ -22,7 +22,7 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim [key] As String = dat.Transaction.Parameters(0)
         Dim torf As Boolean = Boolean.Parse(dat.Transaction.Parameters(1))
         If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
@@ -41,4 +41,8 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
 
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

@@ -13,7 +13,7 @@ Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         For Each [key] In dat.Transaction.Parameters
             If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
                 dat.Initializer.MyCommandDictionary([key]).IsEnabled = True
@@ -32,4 +32,8 @@ Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
 
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

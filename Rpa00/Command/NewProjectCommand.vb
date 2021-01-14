@@ -10,7 +10,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim rpa As Object
 
         ' Solutionオブジェクト
@@ -193,4 +193,8 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
 
         Return dat.Initializer
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

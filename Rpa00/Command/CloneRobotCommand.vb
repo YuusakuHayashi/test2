@@ -14,7 +14,7 @@ Public Class CloneRobotCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         If dat.Transaction.Parameters.Count > 0 Then
             Call SelectedCopy(dat)
         Else
@@ -77,5 +77,9 @@ Public Class CloneRobotCommand : Inherits RpaCommandBase
                 End If
             End If
         Next
+    End Sub
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
     End Sub
 End Class

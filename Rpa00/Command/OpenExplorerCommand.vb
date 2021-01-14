@@ -40,8 +40,12 @@ Public Class OpenExplorerCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Diagnostics.Process.Start(Me.OpenPath)
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

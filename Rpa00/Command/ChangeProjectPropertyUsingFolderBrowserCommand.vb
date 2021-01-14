@@ -6,7 +6,7 @@ Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaComman
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim pname As String = dat.Transaction.Parameters(0)
         Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
         If pi Is Nothing Then
@@ -50,9 +50,11 @@ Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaComman
 
         pi.SetValue(dat.Project, pvalue)
         Console.WriteLine($"プロパティ '{pname}' を 値' {ptext}' に変更しました")
-        'Call dat.Project.Save(dat.Project.SystemJsonFileName, dat.Project)
-        'Console.WriteLine($"'{dat.Project.SystemJsonFileName}' を更新しました")
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

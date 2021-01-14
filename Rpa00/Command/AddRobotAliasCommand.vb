@@ -19,7 +19,7 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
         End If
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim oldrobo As String = dat.Project.RobotAlias
         Dim olddir As String = dat.Project.MyRobotDirectory
 
@@ -70,5 +70,9 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
                 Console.WriteLine($"                => {dst2}")
             End If
         Next
+    End Sub
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
     End Sub
 End Class

@@ -45,7 +45,7 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim roboname As String = vbNullString
 
         ' Parameters(0) = アタッチするロボットの指定の有無
@@ -118,4 +118,8 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
 
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

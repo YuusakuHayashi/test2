@@ -30,7 +30,7 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim pname As String = dat.Transaction.Parameters(0)
         Dim ptext As String = dat.Transaction.Parameters(1)
         Dim pi As PropertyInfo = dat.Initializer.GetType().GetProperty(pname)
@@ -57,10 +57,12 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
 
         pi.SetValue(dat.Initializer, pvalue)
         Console.WriteLine($"プロパティ '{pname}' を 値' {ptext}' に変更しました")
-        'Call dat.Initializer.Save(RpaInitializer.SystemIniFileName, dat.Initializer)
-        'Console.WriteLine($"'{RpaInitializer.SystemIniFileName}' を更新しました")
         Console.WriteLine()
 
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

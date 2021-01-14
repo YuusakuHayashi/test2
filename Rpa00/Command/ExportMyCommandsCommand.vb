@@ -18,7 +18,7 @@ Public Class ExportMyCommandsCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim txt As String
         Dim sw As System.IO.StreamWriter
         Dim rtn As Integer = -1
@@ -47,4 +47,8 @@ Public Class ExportMyCommandsCommand : Inherits RpaCommandBase
         End Try
         Return rtn
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class

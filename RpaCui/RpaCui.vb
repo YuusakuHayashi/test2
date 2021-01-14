@@ -82,8 +82,8 @@ Public Module RpaCui
             Loop Until False
 
             ' DLLロード
-            'Dim asm As Assembly = Assembly.LoadFrom(rpa00dll)
-            Dim asm As Assembly = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\bin\Debug\Rpa00.dll")
+            Dim asm As Assembly = Assembly.LoadFrom(rpa00dll)
+            'Dim asm As Assembly = Assembly.LoadFrom("C:\Users\yuusa\project\test2\Rpa00\bin\Debug\Rpa00.dll")
             Dim [mod] As [Module] = asm.GetModule("Rpa00.dll")
             Dim dat_type = [mod].GetType("Rpa00.RpaDataWrapper")
             Dim dat = Activator.CreateInstance(dat_type)

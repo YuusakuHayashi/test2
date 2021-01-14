@@ -6,7 +6,7 @@
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim truecmdlen As Integer = 20
         Dim aliascmdlen As Integer = 20
         Console.WriteLine()
@@ -42,4 +42,8 @@
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class
