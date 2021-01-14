@@ -1,0 +1,2 @@
+C:\Users\yuusa\project\test2\RpaRepository\obj\Debug\RpaRepository.vbprojAssemblyReference.cache
+C:\Users\yuusa\project\test2\RpaRepository\obj\Debug\RpaRepository.vbproj.CoreCompileInputs.cache

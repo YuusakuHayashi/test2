@@ -36,7 +36,28 @@
         Throw New NotImplementedException()
     End Function
 
-    Public MustOverride Overloads Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    Public Overridable Overloads Function Execute(ByRef dat As RpaDataWrapper) As Integer
+        Dim i As Integer = -1
+        Try
+            Dim exdlg As ExecuteDelegater = Me.ExecuteHandler
+            i = exdlg(dat)
+        Catch ex As Exception
+            Console.WriteLine($"({Me.GetType.Name}) {ex.Message}")
+            Console.WriteLine()
+            i = -1
+        End Try
+        Return i
+    End Function
 
-    Private Delegate Function ExecuteDelegater(ByRef dat As RpaDataWrapper) As Integer
+    Public Delegate Function ExecuteDelegater(ByRef dat As RpaDataWrapper) As Integer
+
+    Private _ExecuteHandler As ExecuteDelegater
+    Public Property ExecuteHandler As ExecuteDelegater
+        Get
+            Return Me._ExecuteHandler
+        End Get
+        Set(value As ExecuteDelegater)
+            Me._ExecuteHandler = value
+        End Set
+    End Property
 End Class

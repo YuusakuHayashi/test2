@@ -67,7 +67,55 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    'Public Overrides Function Execute(ByRef dat As RpaDataWrapper) As Integer
+    '    Dim roboname As String = vbNullString
+
+    '    ' Parameters(0) = アタッチするロボットの指定の有無
+    '    If dat.Transaction.Parameters.Count > 0 Then
+    '        roboname = dat.Transaction.Parameters(0)
+    '    Else
+    '        Dim idx As Integer = -1
+    '        Dim lastidx As Integer = -1
+    '        Dim dic As Dictionary(Of String, String) = dat.Project.RobotAliasDictionary
+    '        Dim pairs As List(Of KeyValuePair(Of String, String)) = dic.ToList
+    '        For Each robo In pairs
+    '            idx = pairs.IndexOf(robo)
+    '            Console.WriteLine($"{idx}   ロボット名:{robo.Key}   登録名:{robo.Value}")
+    '        Next
+    '        lastidx = idx + 1
+    '        Console.WriteLine($"{lastidx}   やっぱりやめる")
+    '        Console.WriteLine()
+
+    '        Dim idx2 As Integer = -1
+    '        Dim idxtext As String = vbNullString
+    '        Do
+    '            Console.WriteLine($"アタッチするロボットを選択してください")
+    '            idxtext = dat.Transaction.ShowRpaIndicator(dat)
+    '            Console.WriteLine()
+    '            If IsNumeric(idxtext) Then
+    '                idx2 = Integer.Parse(idxtext)
+    '            Else
+    '                idx2 = lastidx + 1
+    '            End If
+    '        Loop Until idx2 <= lastidx
+
+    '        If idx2 = lastidx Then
+    '            Return 0
+    '        Else
+    '            roboname = pairs(idx2).Key
+    '        End If
+    '    End If
+
+    '    If Not dat.Project.RobotAliasDictionary.ContainsKey(roboname) Then
+    '        dat.Project.RobotAliasDictionary.Add(roboname, roboname)
+    '    End If
+    '    dat.Project.RobotName = roboname
+    '    Console.WriteLine($"ロボット '{dat.Project.RobotName}' を選択しました")
+    '    Console.WriteLine()
+    '    Return 0
+    'End Function
+
+    Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim roboname As String = vbNullString
 
         ' Parameters(0) = アタッチするロボットの指定の有無
@@ -114,4 +162,8 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
         Console.WriteLine()
         Return 0
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+    End Sub
 End Class
