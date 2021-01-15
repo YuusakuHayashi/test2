@@ -22,6 +22,28 @@ Public Class RpaInitializer
     '    End Get
     'End Property
 
+    Private _UserName As String
+    Public Property UserName As String
+        Get
+            Return Me._UserName
+        End Get
+        Set(value As String)
+            Me._UserName = value
+            RaisePropertyChanged("UserName")
+        End Set
+    End Property
+
+    Private _UserLevel As String
+    Public Property UserLevel As String
+        Get
+            Return Me._UserLevel
+        End Get
+        Set(value As String)
+            Me._UserLevel = value
+            RaisePropertyChanged("UserLevel")
+        End Set
+    End Property
+
     Private _ReleaseVersion As String
     Public Property ReleaseVersion As String
         Get
@@ -29,6 +51,7 @@ Public Class RpaInitializer
         End Get
         Set(value As String)
             Me._ReleaseVersion = value
+            RaisePropertyChanged("ReleaseVersion")
         End Set
     End Property
 

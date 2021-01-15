@@ -35,3 +35,6 @@ C:\Users\yuusa\project\test2\Rpa01\bin\Debug\RpaCui.exe
 C:\Users\yuusa\project\test2\Rpa01\bin\Debug\RpaCui.pdb
 C:\Users\yuusa\project\test2\Rpa01\bin\Debug\RpaCui.xml
 C:\Users\yuusa\project\test2\Rpa01\bin\Debug\RpaCui.exe.config
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa01.dll
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa01.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa01.xml

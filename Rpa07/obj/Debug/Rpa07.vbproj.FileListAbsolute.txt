@@ -35,3 +35,6 @@ C:\Users\yuusa\project\test2\Rpa07\obj\Debug\Rpa07.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.dll
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa07\bin\Debug\Rpa07.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa07.dll
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa07.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa07.xml

@@ -159,7 +159,7 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
         Throw New NotImplementedException()
     End Function
 
-    Public Overrides Function Execute(ByRef dat As Object) As Integer
+    Private Function Main(ByRef dat As Object) As Integer
         Dim mutil As New RpaMacroUtility
 
         Dim months As List(Of String) = dat.Transaction.Parameters
@@ -376,7 +376,7 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
         Return dtstring
     End Function
 
-    Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+    Private Function Check(ByRef dat As Object) As Boolean
         Dim mutil As New RpaMacroUtility
         Dim outil As New RpaOutlookUtility
 
@@ -528,4 +528,9 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
 
         Return True
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
+    End Sub
 End Class

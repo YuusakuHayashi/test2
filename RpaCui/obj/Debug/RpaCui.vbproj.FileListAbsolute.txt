@@ -26,3 +26,9 @@ C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaCui.pdb
 C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaCui.xml
 C:\Users\yuusa\project\test2\RpaCui\debugrobot\Newtonsoft.Json.dll
 C:\Users\yuusa\project\test2\RpaCui\debugrobot\Newtonsoft.Json.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.exe.config
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Newtonsoft.Json.dll
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Newtonsoft.Json.xml

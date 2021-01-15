@@ -257,8 +257,36 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End If
     End Sub
 
-    Public Overridable Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
-        Return False
+    'Public Overridable Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    '    Return False
+    'End Function
+
+    Public Delegate Function CanExecuteDelegater(ByRef dat As RpaDataWrapper) As Boolean
+    Private _CanExecuteHandler As CanExecuteDelegater
+    Public Property CanExecuteHandler As CanExecuteDelegater
+        Get
+            Return Me._CanExecuteHandler
+        End Get
+        Set(value As CanExecuteDelegater)
+            Me._CanExecuteHandler = value
+        End Set
+    End Property
+
+    Public Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+        Dim b As Boolean = False
+        Try
+            Dim dlg As CanExecuteDelegater = Me.CanExecuteHandler
+            If dlg Is Nothing Then
+                Throw New NotImplementedException
+            Else
+                b = dlg(dat)
+            End If
+        Catch ex As Exception
+            Console.WriteLine($"({Me.GetType.Name}.CanExecute) {ex.Message}")
+            Console.WriteLine()
+            b = False
+        End Try
+        Return b
     End Function
 
     Public Function DeepCopy() As Object

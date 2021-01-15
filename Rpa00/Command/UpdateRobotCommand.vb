@@ -46,7 +46,7 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         For Each src In Directory.GetFiles(srcdir)
             Dim ext As String = Path.GetExtension(src)
             Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-            If File.Exists(src) Then
+            If File.Exists(src) And ext = "dll" Then
                 File.Copy(src, dst, True)
                 Console.WriteLine($"ファイルをコピー  '{src}'")
                 Console.WriteLine($"               => '{dst}'")
@@ -75,7 +75,7 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
             Dim src As String = $"{srcdir}\{para}"
             Dim ext As String = Path.GetExtension(src)
             Dim dst As String = $"{dstdir}\{para}"
-            If File.Exists(src) Then
+            If File.Exists(src) And ext = "dll" Then
                 File.Copy(src, dst, True)
                 Console.WriteLine($"ファイルをコピー  '{src}'")
                 Console.WriteLine($"               => '{dst}'")

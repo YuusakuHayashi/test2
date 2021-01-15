@@ -365,7 +365,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Throw New NotImplementedException()
     End Function
 
-    Public Overrides Function Execute(ByRef dat As Object) As Integer
+    Private Function Main(ByRef dat As Object) As Integer
         Me.RestartCount = IIf(Me.RestartCount = 0, 1, Me.RestartCount)
 
         Dim mutil As New Rpa00.RpaMacroUtility
@@ -1229,7 +1229,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     End Function
 
 
-    Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+    Private Function Check(ByRef dat As Object) As Boolean
         Dim mutil As New Rpa00.RpaMacroUtility
         Dim outil As New Rpa00.RpaOutlookUtility
 
@@ -1293,4 +1293,9 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         Return True
     End Function
+
+    Sub New()
+        Me.ExecuteHandler = AddressOf Main
+        Me.CanExecuteHandler = AddressOf Check
+    End Sub
 End Class

@@ -452,7 +452,7 @@ Public Class IntranetClientServerProject
     End Function
 
 
-    Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
+    Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If String.IsNullOrEmpty(Me.RootDirectory) Then
             Console.WriteLine($"'RootDirectory' がセットされていません")
             Return False
@@ -494,6 +494,7 @@ Public Class IntranetClientServerProject
 
 
     Sub New()
+        Me.CanExecuteHandler = AddressOf Check
         AddHandler Me.PropertyChanged, AddressOf CreateChangedFile
     End Sub
 

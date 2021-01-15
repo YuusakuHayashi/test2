@@ -182,9 +182,19 @@ Public Class RpaSystem
                 End If
             End If
 
-            Dim err4 As String = $"コマンドは実行出来ませんでした"
+            Dim err4 As String = $"このユーザでは、コマンド '{dat.Transaction.CommandText}' は実行できません"
+            Dim users() As String() = cmd.ExecutableUser
+            If Not users.Contains("AllArchitectures") Then
+                If Not users.Contains(dat.Initializer.UserLevel) Then
+                    Console.WriteLine(err4)
+                    Console.WriteLine()
+                    Exit Sub
+                End If
+            End If
+
+            Dim err5 As String = $"コマンドは実行出来ませんでした"
             If Not cmd.CanExecute(dat) Then
-                Console.WriteLine(err4)
+                Console.WriteLine(err5)
                 Console.WriteLine()
                 Exit Sub
             End If
@@ -193,6 +203,7 @@ Public Class RpaSystem
 
         Catch ex As Exception
             Console.WriteLine($"({Me.GetType.Name}) {ex.Message}")
+            Console.WriteLine()
         Finally
             dat.Transaction.Parameters = New List(Of String)
         End Try
