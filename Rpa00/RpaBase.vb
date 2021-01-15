@@ -7,6 +7,7 @@ Public MustInherit Class RpaBase(Of T As {New}) : Inherits RpaCui.JsonHandler(Of
 
     Public Delegate Function ExecuteDelegater(ByRef dat As Object) As Integer
     Private _ExecuteHandler As ExecuteDelegater
+    <JsonIgnore>
     Public Property ExecuteHandler As ExecuteDelegater
         Get
             Return Me._ExecuteHandler
@@ -36,6 +37,7 @@ Public MustInherit Class RpaBase(Of T As {New}) : Inherits RpaCui.JsonHandler(Of
 
     Public Delegate Function CanExecuteDelegater(ByRef dat As Object) As Boolean
     Private _CanExecuteHandler As CanExecuteDelegater
+    <JsonIgnore>
     Public Property CanExecuteHandler As CanExecuteDelegater
         Get
             Return Me._CanExecuteHandler

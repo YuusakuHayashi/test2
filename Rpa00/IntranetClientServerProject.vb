@@ -170,11 +170,29 @@ Public Class IntranetClientServerProject
         End Set
     End Property
 
-    'Public ReadOnly Property RootRobotUpdateDirectory As String
-    '    Get
-    '        Return Me.RootRobotDirectory & "\updates"
-    '    End Get
-    'End Property
+    <JsonIgnore>
+    Public ReadOnly Property RootRobotUpdatesFile As String
+        Get
+            Dim fil As String = $"{Me.RootRobotDirectory}\updates"
+            Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+            If Not File.Exists(fil) Then
+                Call jh.Save(fil, (New List(Of RpaUpdater)))
+            End If
+            Return fil
+        End Get
+    End Property
+
+    ' Robot毎に切り替える
+    Private _RootRobotUpdatedHistories As List(Of RpaUpdater)
+    <JsonIgnore>
+    Public Property RootRobotUpdatedHistories As List(Of RpaUpdater)
+        Get
+            Return Me._RootRobotUpdatedHistories
+        End Get
+        Set(value As List(Of RpaUpdater))
+            Me._RootRobotUpdatedHistories = value
+        End Set
+    End Property
 
     'Private _RootRobotUpdatePackages As List(Of RpaPackage)
     'Public ReadOnly Property RootRobotUpdatePackages As List(Of RpaPackage)
@@ -318,34 +336,29 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
+    <JsonIgnore>
+    Public ReadOnly Property MyRobotUpdatesFile As String
+        Get
+            Dim fil As String = $"{Me.MyRobotDirectory}\updates"
+            Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+            If Not File.Exists(fil) Then
+                Call jh.Save(fil, (New List(Of RpaUpdater)))
+            End If
+            Return fil
+        End Get
+    End Property
 
-    'Public ReadOnly Property MyRobotUpdatedDirectory As String
-    '    Get
-    '        Return Me.MyRobotDirectory & "\updated"
-    '    End Get
-    'End Property
-
-    'Private _MyRobotUpdatedPackages As List(Of RpaPackage)
-    'Public ReadOnly Property MyRobotUpdatedPackages As List(Of RpaPackage)
-    '    Get
-    '        Dim pack As RpaPackage
-    '        Dim jh As New RpaCui2.JsonHandler(Of Object)
-    '        If Me._MyRobotUpdatedPackages Is Nothing Then
-    '            Me._MyRobotUpdatedPackages = New List(Of RpaPackage)
-    '            If Directory.Exists(Me.MyRobotUpdatedDirectory) Then
-    '                For Each f In Directory.GetFiles(Me.MyRobotUpdatedDirectory)
-    '                    If Path.GetFileName(f) = "RpaPackage.json" Then
-    '                        pack = jh.Load(Of RpaPackage)(f)
-    '                        If pack Is Nothing Then
-    '                            Me._MyRobotUpdatedPackages.Add(pack)
-    '                        End If
-    '                    End If
-    '                Next
-    '            End If
-    '        End If
-    '        Return Me._MyRobotUpdatedPackages
-    '    End Get
-    'End Property
+    ' Robot毎に切り替える
+    Private _MyRobotUpdatedHistories As List(Of RpaUpdater)
+    <JsonIgnore>
+    Public Property MyRobotUpdatedHistories As List(Of RpaUpdater)
+        Get
+            Return Me._MyRobotUpdatedHistories
+        End Get
+        Set(value As List(Of RpaUpdater))
+            Me._MyRobotUpdatedHistories = value
+        End Set
+    End Property
     '-----------------------------------------------------------------------------------'
 
     'Private _PrinterName As String
@@ -416,20 +429,6 @@ Public Class IntranetClientServerProject
             Console.WriteLine([line])
         End If
     End Sub
-
-    'Public Sub RunShell(ByVal exe As String, ByVal arg As String)
-    '    Dim proc = New System.Diagnostics.Process()
-    '    'proc.StartInfo.FileName = System.Environment.GetEnvironmentVariable("ComSpec")
-    '    proc.StartInfo.FileName = exe
-    '    proc.StartInfo.UseShellExecute = False
-    '    proc.StartInfo.RedirectStandardOutput = True
-    '    proc.StartInfo.RedirectStandardInput = False
-    '    proc.StartInfo.CreateNoWindow = True
-    '    proc.StartInfo.Arguments = arg
-    '    proc.Start()
-    '    proc.WaitForExit()
-    '    proc.Close()
-    'End Sub
 
     Private Function _GetIgnoreList(ByVal f As String) As List(Of String)
         Dim txt As String

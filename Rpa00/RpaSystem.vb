@@ -183,8 +183,8 @@ Public Class RpaSystem
             End If
 
             Dim err4 As String = $"このユーザでは、コマンド '{dat.Transaction.CommandText}' は実行できません"
-            Dim users() As String() = cmd.ExecutableUser
-            If Not users.Contains("AllArchitectures") Then
+            Dim users As String() = cmd.ExecutableUser
+            If Not users.Contains("AllUser") Then
                 If Not users.Contains(dat.Initializer.UserLevel) Then
                     Console.WriteLine(err4)
                     Console.WriteLine()

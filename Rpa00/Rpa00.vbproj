@@ -135,7 +135,7 @@
     <Compile Include="RpaMacroUtility.vb" />
     <Compile Include="RpaModule.vb" />
     <Compile Include="RpaOutlookUtility.vb" />
-    <Compile Include="RpaPackage.vb" />
+    <Compile Include="RpaUpdater.vb" />
     <Compile Include="RpaPrinterUtility.vb" />
     <Compile Include="IntranetClientServerProject.vb" />
     <Compile Include="RpaProjectBase.vb" />

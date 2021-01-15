@@ -22,3 +22,4 @@ C:\Users\yuusa\project\test2\RpaCui\bin\Release\Newtonsoft.Json.xml
 C:\Users\yuusa\project\test2\RpaCui\obj\Release\RpaCui.vbproj.CopyComplete
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\bin\Release\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\bin\Release\Newtonsoft.Json.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\obj\Release\RpaCui.vbprojResolveAssemblyReference.cache

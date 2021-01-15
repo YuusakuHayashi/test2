@@ -25,5 +25,6 @@ Public Class ExportRootRobotJsonCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecutableUser = {"RootUser"}
     End Sub
 End Class

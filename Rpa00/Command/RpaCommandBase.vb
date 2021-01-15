@@ -12,10 +12,17 @@
         End Get
     End Property
 
-    Public Overridable ReadOnly Property ExecutableUser As String() Implements RpaCommandInterface.ExecutableUser
+    Private _ExecutableUser As String()
+    Public Property ExecutableUser As String() Implements RpaCommandInterface.ExecutableUser
         Get
-            Return {"AllUser"}
+            If Me._ExecutableUser Is Nothing Then
+                Me._ExecutableUser = {"AllUser"}
+            End If
+            Return Me._ExecutableUser
         End Get
+        Set(value As String())
+            Me._ExecutableUser = value 
+        End Set
     End Property
 
     Public Overridable ReadOnly Property ExecuteIfNoProject As Boolean Implements RpaCommandInterface.ExecuteIfNoProject

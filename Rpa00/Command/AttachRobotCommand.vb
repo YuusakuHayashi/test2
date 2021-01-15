@@ -111,6 +111,26 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
         End If
         dat.Project.RobotName = roboname
         Console.WriteLine($"ロボット '{dat.Project.RobotName}' を選択しました")
+
+        Dim ck As Boolean = False
+        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        dat.Project.RootRobotUpdatedHistories = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotUpdatesFile)
+        dat.Project.MyRobotUpdatedHistories = jh.Load(Of List(Of RpaUpdater))(dat.Project.MyRobotUpdatesFile)
+        If dat.Project.RootRobotUpdatedHistories.Count > 0 Then
+            If dat.Project.MyRobotUpdatedHistories.Count = 0 Then
+                ck = True
+            Else
+                If dat.Project.MyRobotUpdatedHistories.Last.ReleaseDate < dat.Project.RootRobotUpdatedHistories.Last.ReleaseDate Then
+                    ck = True
+                End If
+            End If
+        End If
+
+        If ck Then
+            Console.WriteLine($"最新のアップデートが適用されていません")
+            Console.WriteLine()
+        End If
+
         Console.WriteLine()
         Return 0
     End Function
