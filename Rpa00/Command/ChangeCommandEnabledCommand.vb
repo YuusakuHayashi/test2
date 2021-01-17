@@ -16,12 +16,6 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
         Return True
     End Function
 
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {2, 2}
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim [key] As String = dat.Transaction.Parameters(0)
         Dim torf As Boolean = Boolean.Parse(dat.Transaction.Parameters(1))
@@ -45,5 +39,6 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecutableParameterCount = {2, 2}
     End Sub
 End Class

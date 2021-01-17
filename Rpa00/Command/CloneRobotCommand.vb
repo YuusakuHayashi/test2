@@ -1,19 +1,6 @@
 ﻿Imports System.IO
 
 Public Class CloneRobotCommand : Inherits RpaCommandBase
-
-    Public Overrides ReadOnly Property ExecutableProjectArchitectures As String()
-        Get
-            Return {(New IntranetClientServerProject).GetType.Name}
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {0, 999}
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         If dat.Transaction.Parameters.Count > 0 Then
             Call SelectedCopy(dat)
@@ -81,5 +68,7 @@ Public Class CloneRobotCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecutableProjectArchitectures = {(New IntranetClientServerProject).GetType.Name}
+        Me.ExecutableParameterCount = {0, 999}
     End Sub
 End Class

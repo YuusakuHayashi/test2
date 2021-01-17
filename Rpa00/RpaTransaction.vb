@@ -1,4 +1,16 @@
-﻿Public Class RpaTransaction
+﻿Imports System.IO
+Public Class RpaTransaction
+    Public ReadOnly Property CommandTextLogFileName As String
+        Get
+            Dim [fil] As String = $"{RpaCui.SystemDirectory}\command.log"
+            Dim jh As New RpaCui.JsonHandler(Of List(Of CommandLogData))
+            If Not File.Exists([fil]) Then
+                Call jh.Save(Of List(Of CommandLogData))([fil], (New List(Of CommandLogData)))
+            End If
+            Return [fil]
+        End Get
+    End Property
+
     Private _ReturnCode As Integer
     Public Property ReturnCode As Integer
         Get
@@ -74,6 +86,54 @@
             Me._ExitFlag = value
         End Set
     End Property
+
+    Private _CommandLogs As List(Of CommandLogData)
+    Public Property CommandLogs As List(Of CommandLogData)
+        Get
+            If Me._CommandLogs Is Nothing Then
+                Me._CommandLogs = New List(Of CommandLogData)
+            End If
+            Return Me._CommandLogs
+        End Get
+        Set(value As List(Of CommandLogData))
+            Me._CommandLogs = value
+        End Set
+    End Property
+
+    Public Class CommandLogData
+        Private _RunDate As String
+        Public Property RunDate As String
+            Get
+                If String.IsNullOrEmpty(Me._RunDate) Then
+                    Me._RunDate = (DateTime.Now).ToString
+                End If
+                Return Me._RunDate
+            End Get
+            Set(value As String)
+                Me._RunDate = value
+            End Set
+        End Property
+
+        Private _CommandText As String
+        Public Property CommandText As String
+            Get
+                Return Me._CommandText
+            End Get
+            Set(value As String)
+                Me._CommandText = value
+            End Set
+        End Property
+    End Class
+
+    Public Sub SaveCommandLogs()
+        Dim jh As New RpaCui.JsonHandler(Of List(Of CommandLogData))
+        Dim [olds] As List(Of CommandLogData) = jh.Load(Of List(Of CommandLogData))(Me.CommandTextLogFileName)
+        For Each [new] In Me.CommandLogs
+            olds.Add([new])
+        Next
+        Call jh.Save(Of List(Of CommandLogData))(Me.CommandTextLogFileName, [olds])
+        Me.CommandLogs = New List(Of CommandLogData)
+    End Sub
 
     Public Sub CreateCommand()
         Dim texts() As String

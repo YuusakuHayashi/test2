@@ -262,8 +262,8 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     'End Function
 
     Public Delegate Function CanExecuteDelegater(ByRef dat As RpaDataWrapper) As Boolean
-    <JsonIgnore>
     Private _CanExecuteHandler As CanExecuteDelegater
+    <JsonIgnore>
     Public Property CanExecuteHandler As CanExecuteDelegater
         Get
             Return Me._CanExecuteHandler

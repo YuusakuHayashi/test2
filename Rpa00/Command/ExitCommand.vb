@@ -9,6 +9,9 @@ Public Class ExitCommand : Inherits RpaCommandBase
     End Property
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
+
+        Call dat.Transaction.SaveCommandLogs()
+
         If dat.Project IsNot Nothing Then
             If File.Exists(dat.Project.SystemJsonChangedFileName) Then
                 Dim yorn As String = vbNullString

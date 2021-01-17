@@ -7,12 +7,6 @@ Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {1, 999}
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         For Each [key] In dat.Transaction.Parameters
             If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
@@ -35,5 +29,6 @@ Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecutableParameterCount = {1, 999}
     End Sub
 End Class

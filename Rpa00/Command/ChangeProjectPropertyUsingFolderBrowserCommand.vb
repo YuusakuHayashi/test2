@@ -1,11 +1,5 @@
 ﻿Imports System.Reflection
 Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {1, 1}
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim pname As String = dat.Transaction.Parameters(0)
         Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
@@ -56,5 +50,6 @@ Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaComman
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecutableParameterCount = {1, 1}
     End Sub
 End Class

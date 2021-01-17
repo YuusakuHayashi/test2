@@ -29,3 +29,6 @@ C:\Users\yuusa\project\test2\Rpa00\bin\Release\RpaCui.xml
 C:\Users\yuusa\project\test2\Rpa00\bin\Release\RpaCui.exe.config
 C:\Users\yuusa\project\test2\Rpa00\bin\Release\Newtonsoft.Json.xml
 C:\Users\yuusa\project\test2\Rpa00\obj\Release\Rpa00.vbproj.CopyComplete
+C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa00.dll
+C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa00.pdb
+C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa00.xml

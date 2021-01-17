@@ -1,12 +1,6 @@
 ﻿Imports Rpa00
 
 Public Class AddUtilityCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {1, 1}
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim util As String = dat.Transaction.Parameters(0)
         Dim uobj As Object = RpaCodes.RpaUtilityObject(util)
@@ -31,5 +25,6 @@ Public Class AddUtilityCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecutableParameterCount = {1, 1}
     End Sub
 End Class

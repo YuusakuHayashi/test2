@@ -1,12 +1,6 @@
 ﻿Imports System.IO
 
 Public Class AddRobotAliasCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {2, 2}
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim [key] As String = dat.Transaction.Parameters(0)
         Dim [alias] As String = dat.Transaction.Parameters(1)
@@ -26,23 +20,27 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
         Dim [key] As String = dat.Transaction.Parameters(0)
         Dim [alias] As String = dat.Transaction.Parameters(1)
         dat.Project.RobotAliasDictionary([key]) = [alias]
+        Console.WriteLine($"ロボット '{[key]}' に '{[alias]}' を登録しました")
 
         ' 前のフォルダから移行する
         Dim yorn As String = vbNullString
         Dim newrobo As String = dat.Project.RobotAlias
         Dim newdir As String = dat.Project.MyRobotDirectory
-        Do
-            yorn = vbNullString
-            Console.WriteLine()
-            Console.WriteLine($"'{oldrobo}' 各ファイルを '{newrobo}' へ移行しますか？ (y/n)")
-            yorn = dat.Transaction.ShowRpaIndicator(dat)
-        Loop Until yorn = "y" Or yorn = "n"
-        If yorn = "y" Then
-            Call AllCopy(dat, olddir, newdir)
-            Directory.Delete(olddir, True)
+        If Directory.Exists(olddir) Then
+            Do
+                yorn = vbNullString
+                Console.WriteLine()
+                Console.WriteLine($"'{oldrobo}' 各ファイルを '{newrobo}' へ移行しますか？ (y/n)")
+                yorn = dat.Transaction.ShowRpaIndicator(dat)
+            Loop Until yorn = "y" Or yorn = "n"
+            If yorn = "y" Then
+                Call AllCopy(dat, olddir, newdir)
+                Directory.Delete(olddir, True)
+            End If
         End If
 
-        Console.WriteLine($"ロボット '{[key]}' に '{[alias]}' を登録しました")
+        RpaModule.Save(dat.Project.SystemJsonFileName, dat.Project, dat.Project.SystemJsonChangedFileName)
+
         Console.WriteLine()
 
         Return 0
@@ -75,5 +73,6 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecutableParameterCount = {2, 2}
     End Sub
 End Class

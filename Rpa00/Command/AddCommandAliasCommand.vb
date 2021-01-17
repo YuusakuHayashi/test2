@@ -6,12 +6,6 @@
         End Get
     End Property
 
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {2, 2}
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim [key] As String = dat.Transaction.Parameters(0)
         Dim [alias] As String = dat.Transaction.Parameters(1)
@@ -34,5 +28,6 @@
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecutableParameterCount = {2, 2}
     End Sub
 End Class

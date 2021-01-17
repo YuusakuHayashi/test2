@@ -1,15 +1,34 @@
 ﻿Public MustInherit Class RpaCommandBase : Implements RpaCommandInterface
 
-    Public Overridable ReadOnly Property ExecutableProjectArchitectures As String() Implements RpaCommandInterface.ExecutableProjectArchitectures
+    Private _ExecutableProjectArchitectures As String()
+    Public Property ExecutableProjectArchitectures As String() Implements RpaCommandInterface.ExecutableProjectArchitectures
         Get
-            Return {"AllArchitectures"}
+            If Me._ExecutableProjectArchitectures Is Nothing Then
+                Me._ExecutableProjectArchitectures = {"AllArchitectures"}
+            End If
+            Return Me._ExecutableProjectArchitectures
         End Get
+        Set(value As String())
+            Me._ExecutableProjectArchitectures = value 
+        End Set
     End Property
 
-    Public Overridable ReadOnly Property ExecutableParameterCount() As Integer() Implements RpaCommandInterface.ExecutableParameterCount
+    'Public Overridable ReadOnly Property ExecutableParameterCount() As Integer() Implements RpaCommandInterface.ExecutableParameterCount
+    '    Get
+    '        Return {0, 0}
+    '    End Get
+    'End Property
+    Private _ExecutableParameterCount As Integer()
+    Public Property ExecutableParameterCount As Integer() Implements RpaCommandInterface.ExecutableParameterCount
         Get
-            Return {0, 0}
+            If Me._ExecutableParameterCount Is Nothing Then
+                Me._ExecutableParameterCount = {0, 0}
+            End If
+            Return Me._ExecutableParameterCount
         End Get
+        Set(value As Integer())
+            Me._ExecutableParameterCount = value 
+        End Set
     End Property
 
     Private _ExecutableUser As String()

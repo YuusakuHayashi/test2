@@ -1,12 +1,6 @@
 ﻿Imports System.IO
 
 Public Class RemoveRobotCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {0, 1}
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim rpa = dat.Project.DeepCopy
         Dim err1 As String = $"'MyDirectory'が設定されていません"
@@ -122,5 +116,6 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecutableParameterCount = {0, 1}
     End Sub
 End Class

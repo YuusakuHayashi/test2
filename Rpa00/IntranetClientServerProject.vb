@@ -14,15 +14,23 @@ Public Class IntranetClientServerProject
 
     Private Const ARCHITECTURE_NAME As String = "IntranetClientServer"
 
-    <JsonIgnore>
-    Public PrivateMode As Boolean
-
-    Private ReadOnly Property HelloFileName As String
+    'Private ReadOnly Property HelloFileName As String
+    '    Get
+    '        Return $"{Me.ServerDirectory}\Hello.txt"
+    '    End Get
+    'End Property
+    Private _ReleaseRobotDirectory As String
+    Public Property ReleaseRobotDirectory As String
         Get
-            Return $"{Me.ServerDirectory}\Hello.txt"
+            Return Me._ReleaseRobotDirectory
         End Get
+        Set(value As String)
+            Me._ReleaseRobotDirectory = value
+        End Set
     End Property
 
+    ' Root Directory 関係
+    '-----------------------------------------------------------------------------------'
     Private _RootDirectory As String
     Public Property RootDirectory As String
         Get
@@ -34,19 +42,20 @@ Public Class IntranetClientServerProject
         End Set
     End Property
 
-    Private _ServerDirectory As String
-    Public Property ServerDirectory As String
+    <JsonIgnore>
+    Public ReadOnly Property RootDllDirectory As String
         Get
-            Return Me._ServerDirectory
+            Dim [dir] As String = vbNullString
+            If Directory.Exists(Me.RootDirectory) Then
+                [dir] = $"{Me.RootDirectory}\dll"
+                If Not Directory.Exists([dir]) Then
+                    Directory.CreateDirectory([dir])
+                End If
+            End If
+            Return [dir]
         End Get
-        Set(value As String)
-            Me._ServerDirectory = value
-            RaisePropertyChanged("ServerDirectory")
-        End Set
     End Property
 
-    ' Root Directory 関係
-    '-----------------------------------------------------------------------------------'
     <JsonIgnore>
     Public ReadOnly Property RootRobotDirectory As String
         Get
@@ -85,33 +94,33 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    <JsonIgnore>
-    Public ReadOnly Property RootRobotRepositoryDirectory As String
-        Get
-            Dim [dir] As String = vbNullString
-            If Directory.Exists(Me.RootRobotDirectory) Then
-                [dir] = $"{Me.RootRobotDirectory}\repo"
-                If Not Directory.Exists([dir]) Then
-                    Directory.CreateDirectory([dir])
-                End If
-            End If
-            Return [dir]
-        End Get
-    End Property
+    '<JsonIgnore>
+    'Public ReadOnly Property RootRobotRepositoryDirectory As String
+    '    Get
+    '        Dim [dir] As String = vbNullString
+    '        If Directory.Exists(Me.RootRobotDirectory) Then
+    '            [dir] = $"{Me.RootRobotDirectory}\repo"
+    '            If Not Directory.Exists([dir]) Then
+    '                Directory.CreateDirectory([dir])
+    '            End If
+    '        End If
+    '        Return [dir]
+    '    End Get
+    'End Property
 
-    <JsonIgnore>
-    Public ReadOnly Property RootRobotDllRepositoryDirectory As String
-        Get
-            Dim [dir] As String = vbNullString
-            If Directory.Exists(Me.RootRobotRepositoryDirectory) Then
-                [dir] = $"{Me.RootRobotRepositoryDirectory}\dll"
-                If Not Directory.Exists([dir]) Then
-                    Directory.CreateDirectory([dir])
-                End If
-            End If
-            Return [dir]
-        End Get
-    End Property
+    '<JsonIgnore>
+    'Public ReadOnly Property RootRobotDllRepositoryDirectory As String
+    '    Get
+    '        Dim [dir] As String = vbNullString
+    '        If Directory.Exists(Me.RootRobotRepositoryDirectory) Then
+    '            [dir] = $"{Me.RootRobotRepositoryDirectory}\dll"
+    '            If Not Directory.Exists([dir]) Then
+    '                Directory.CreateDirectory([dir])
+    '            End If
+    '        End If
+    '        Return [dir]
+    '    End Get
+    'End Property
 
     Private Property _RootRobotObject As Object
     <JsonIgnore>
@@ -173,26 +182,29 @@ Public Class IntranetClientServerProject
     <JsonIgnore>
     Public ReadOnly Property RootRobotUpdatesFile As String
         Get
-            Dim fil As String = $"{Me.RootRobotDirectory}\updates"
+            Dim fil As String = vbNullString
             Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
-            If Not File.Exists(fil) Then
-                Call jh.Save(fil, (New List(Of RpaUpdater)))
+            If Not String.IsNullOrEmpty(Me.RootRobotDirectory) Then
+                fil = $"{Me.RootRobotDirectory}\updates"
+                If Not File.Exists(fil) Then
+                    Call jh.Save(fil, (New List(Of RpaUpdater)))
+                End If
             End If
             Return fil
         End Get
     End Property
 
-    ' Robot毎に切り替える
-    Private _RootRobotUpdatedHistories As List(Of RpaUpdater)
-    <JsonIgnore>
-    Public Property RootRobotUpdatedHistories As List(Of RpaUpdater)
-        Get
-            Return Me._RootRobotUpdatedHistories
-        End Get
-        Set(value As List(Of RpaUpdater))
-            Me._RootRobotUpdatedHistories = value
-        End Set
-    End Property
+    '' Robot毎に切り替える
+    'Private _RootRobotUpdatedHistories As List(Of RpaUpdater)
+    '<JsonIgnore>
+    'Public Property RootRobotUpdatedHistories As List(Of RpaUpdater)
+    '    Get
+    '        Return Me._RootRobotUpdatedHistories
+    '    End Get
+    '    Set(value As List(Of RpaUpdater))
+    '        Me._RootRobotUpdatedHistories = value
+    '    End Set
+    'End Property
 
     'Private _RootRobotUpdatePackages As List(Of RpaPackage)
     'Public ReadOnly Property RootRobotUpdatePackages As List(Of RpaPackage)
@@ -339,10 +351,15 @@ Public Class IntranetClientServerProject
     <JsonIgnore>
     Public ReadOnly Property MyRobotUpdatesFile As String
         Get
-            Dim fil As String = $"{Me.MyRobotDirectory}\updates"
+            Dim fil As String = vbNullString
             Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
-            If Not File.Exists(fil) Then
-                Call jh.Save(fil, (New List(Of RpaUpdater)))
+            If Not String.IsNullOrEmpty(Me.MyRobotDirectory) Then
+                If Directory.Exists(Me.MyRobotDirectory) Then
+                    fil = $"{Me.MyRobotDirectory}\updates"
+                    If Not File.Exists(fil) Then
+                        Call jh.Save(fil, (New List(Of RpaUpdater)))
+                    End If
+                End If
             End If
             Return fil
         End Get
@@ -382,21 +399,21 @@ Public Class IntranetClientServerProject
     '    End Set
     'End Property
 
-    Public Sub HelloProject()
-        Dim txt As String
-        Dim sr As StreamReader
+    'Public Sub HelloProject()
+    '    Dim txt As String
+    '    Dim sr As StreamReader
 
-        If File.Exists(Me.HelloFileName) Then
-            sr = New StreamReader(Me.HelloFileName, Encoding.GetEncoding(SHIFT_JIS))
-            txt = sr.ReadToEnd()
-            Call _ConsoleWriteLine($"{txt}")
-        End If
+    '    If File.Exists(Me.HelloFileName) Then
+    '        sr = New StreamReader(Me.HelloFileName, Encoding.GetEncoding(SHIFT_JIS))
+    '        txt = sr.ReadToEnd()
+    '        Call _ConsoleWriteLine($"{txt}")
+    '    End If
 
-        If sr IsNot Nothing Then
-            sr.Close()
-            sr.Dispose()
-        End If
-    End Sub
+    '    If sr IsNot Nothing Then
+    '        sr.Close()
+    '        sr.Dispose()
+    '    End If
+    'End Sub
 
     Private Sub _CheckProject()
         'Call _ConsoleWriteLine($"プロジェクト '{Me.RobotAlias}' のチェック....")
@@ -422,12 +439,6 @@ Public Class IntranetClientServerProject
         '        Call _ConsoleWriteLine("パッケージ : " & rp.Name & " をインストールしていません")
         '    End If
         'Next
-    End Sub
-
-    Private Sub _ConsoleWriteLine(ByVal [line] As String)
-        If Not Me.PrivateMode Then
-            Console.WriteLine([line])
-        End If
     End Sub
 
     Private Function _GetIgnoreList(ByVal f As String) As List(Of String)

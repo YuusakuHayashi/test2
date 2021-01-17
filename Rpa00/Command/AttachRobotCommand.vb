@@ -4,12 +4,6 @@ Imports System.IO
 ' IntranetClientServerProject専用コマンド
 
 Public Class AttachRobotCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecutableProjectArchitectures As String()
-        Get
-            Return {(New IntranetClientServerProject).GetType.Name}
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim rpa = dat.Project.DeepCopy
         Dim err1 As String = $"'MyDirectory'が設定されていません"
@@ -33,7 +27,9 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
                 Console.WriteLine()
                 Return False
             End If
-        Else
+        End If
+
+        If dat.Transaction.Parameters.Count > 0 Then
             rpa.RobotName = dat.Transaction.Parameters(0)
 
             Dim err4 As String = $"'RootRobotDirectory'が設定されていません"
@@ -60,12 +56,6 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
 
         Return True
     End Function
-
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {0, 1}
-        End Get
-    End Property
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim roboname As String = vbNullString
@@ -114,13 +104,13 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
 
         Dim ck As Boolean = False
         Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
-        dat.Project.RootRobotUpdatedHistories = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotUpdatesFile)
+        Dim rruh As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotUpdatesFile)
         dat.Project.MyRobotUpdatedHistories = jh.Load(Of List(Of RpaUpdater))(dat.Project.MyRobotUpdatesFile)
-        If dat.Project.RootRobotUpdatedHistories.Count > 0 Then
+        If rruh.Count > 0 Then
             If dat.Project.MyRobotUpdatedHistories.Count = 0 Then
                 ck = True
             Else
-                If dat.Project.MyRobotUpdatedHistories.Last.ReleaseDate < dat.Project.RootRobotUpdatedHistories.Last.ReleaseDate Then
+                If dat.Project.MyRobotUpdatedHistories.Last.ReleaseDate < rruh.Last.ReleaseDate Then
                     ck = True
                 End If
             End If
@@ -138,5 +128,7 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecutableProjectArchitectures = {(New IntranetClientServerProject).GetType.Name}
+        Me.ExecutableParameterCount = {0, 1}
     End Sub
 End Class

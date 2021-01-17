@@ -77,6 +77,7 @@ Public Class RpaSystem
                 Me._CommandDictionary.Add("activatemycommand", (New ActivateMyCommandCommand))
                 Me._CommandDictionary.Add("showmyrobotjson", (New ShowMyRobotJsonCommand))
                 Me._CommandDictionary.Add("showmyrobotproperties", (New ShowMyRobotPropertiesCommand))
+                Me._CommandDictionary.Add("pushrobot", (New PushRobotCommand))
             End If
             Return Me._CommandDictionary
         End Get
@@ -140,6 +141,14 @@ Public Class RpaSystem
     Public Sub Main(ByRef dat As RpaDataWrapper)
         Try
             dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
+
+            dat.Transaction.CommandLogs.Add(
+                New RpaTransaction.CommandLogData With {
+                    .CommandText = dat.Transaction.CommandText,
+                    .RunDate = (DateTime.Now).ToString
+                }
+            )
+
             Call dat.Transaction.CreateCommand()
 
             Dim cmd = CommandHandler(dat)

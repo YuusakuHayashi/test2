@@ -64,7 +64,6 @@ Public Module RpaModule
         Return [new]
     End Function
 
-
     Public Sub Save(ByVal savefile As String, ByRef obj As Object, ByVal chgfile As String)
         obj.Save(savefile, obj)
         File.Delete(chgfile)

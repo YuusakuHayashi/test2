@@ -8,12 +8,6 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
         End Get
     End Property
 
-    Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-        Get
-            Return {2, 2}
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim pname As String = dat.Transaction.Parameters(0)
         Dim pi As PropertyInfo = dat.Initializer.GetType().GetProperty(pname)
@@ -65,5 +59,6 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecutableParameterCount = {2, 2}
     End Sub
 End Class

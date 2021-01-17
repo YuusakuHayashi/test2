@@ -35,3 +35,6 @@ C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.dll
 C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.xml
 C:\Users\yuusa\project\test2\Rpa01\obj\Release\Rpa01.pdb
 C:\Users\yuusa\project\test2\Rpa01\bin\Release\RpaCui.exe.config
+C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa01.dll
+C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa01.pdb
+C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa01.xml
