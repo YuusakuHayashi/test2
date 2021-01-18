@@ -180,12 +180,12 @@ Public Class IntranetClientServerProject
     End Property
 
     <JsonIgnore>
-    Public ReadOnly Property RootRobotUpdatesFile As String
+    Public ReadOnly Property RootRobotsUpdateFile As String
         Get
             Dim fil As String = vbNullString
             Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
-            If Not String.IsNullOrEmpty(Me.RootRobotDirectory) Then
-                fil = $"{Me.RootRobotDirectory}\updates"
+            If Not String.IsNullOrEmpty(Me.RootDirectory) Then
+                fil = $"{Me.RootDirectory}\robotsupdate"
                 If Not File.Exists(fil) Then
                     Call jh.Save(fil, (New List(Of RpaUpdater)))
                 End If
@@ -193,96 +193,6 @@ Public Class IntranetClientServerProject
             Return fil
         End Get
     End Property
-
-    '' Robot毎に切り替える
-    'Private _RootRobotUpdatedHistories As List(Of RpaUpdater)
-    '<JsonIgnore>
-    'Public Property RootRobotUpdatedHistories As List(Of RpaUpdater)
-    '    Get
-    '        Return Me._RootRobotUpdatedHistories
-    '    End Get
-    '    Set(value As List(Of RpaUpdater))
-    '        Me._RootRobotUpdatedHistories = value
-    '    End Set
-    'End Property
-
-    'Private _RootRobotUpdatePackages As List(Of RpaPackage)
-    'Public ReadOnly Property RootRobotUpdatePackages As List(Of RpaPackage)
-    '    Get
-    '        Dim pack As RpaPackage
-    '        Dim jh As New RpaCui2.JsonHandler(Of Object)
-    '        If Me._RootRobotUpdatePackages Is Nothing Then
-    '            Me._RootRobotUpdatePackages = New List(Of RpaPackage)
-    '            If Directory.Exists(Me.RootRobotUpdateDirectory) Then
-    '                For Each d In Directory.GetDirectories(Me.RootRobotUpdateDirectory)
-    '                    If Directory.GetFiles(d).Contains(d & "\RpaPackage.json") Then
-    '                        pack = jh.Load(Of RpaPackage)(d & "\RpaPackage.json")
-    '                        If pack Is Nothing Then
-    '                            Me._RootRobotUpdatePackages.Add(pack)
-    '                        End If
-    '                    End If
-    '                Next
-    '            End If
-    '        End If
-    '        Return Me._RootRobotUpdatePackages
-    '    End Get
-    'End Property
-    '-----------------------------------------------------------------------------------'
-
-    ' MyRobot Directory 関係
-    '-----------------------------------------------------------------------------------'
-    'Public ReadOnly Property IsMyRobotExists As Boolean
-    '    Get
-    '        If Directory.Exists(Me.MyRobotDirectory) Then
-    '            Return True
-    '        Else
-    '            Return False
-    '        End If
-    '    End Get
-    'End Property
-
-    'Public ReadOnly Property MyRobotDirectory As String
-    '    Get
-    '        Return $"{Me.MyDirectory}\{Me.RobotAlias}"
-    '    End Get
-    'End Property
-
-    'Private _MyRobotJsonFileName As String
-    'Public ReadOnly Property MyRobotJsonFileName As String
-    '    Get
-    '        If String.IsNullOrEmpty(Me._MyRobotJsonFileName) Then
-    '            Me._MyRobotJsonFileName = $"{Me.MyRobotDirectory}\rpa_project.json"
-    '        End If
-    '        Return Me._MyRobotJsonFileName
-    '    End Get
-    'End Property
-
-    'Private Property _MyRobotObject As Object
-    '<JsonIgnore>
-    'Public Property MyRobotObject As Object
-    '    Get
-    '        If Me._MyRobotObject Is Nothing Then
-    '            Dim obj = RpaCodes.RpaObject(Me)
-    '            Dim obj2 = Nothing
-    '            If obj Is Nothing Then
-    '                Me._MyRobotObject = Nothing
-    '            Else
-    '                If File.Exists(Me.MyRobotJsonFileName) Then
-    '                    obj2 = obj.Load(Me.MyRobotJsonFileName)
-    '                End If
-    '                If obj2 Is Nothing Then
-    '                    Me._MyRobotObject = obj
-    '                Else
-    '                    Me._MyRobotObject = obj2
-    '                End If
-    '            End If
-    '        End If
-    '        Return Me._MyRobotObject
-    '    End Get
-    '    Set(value As Object)
-    '        Me._MyRobotObject = value
-    '    End Set
-    'End Property
 
     Public ReadOnly Property MyRobotIgnoreFileName As String
         Get
@@ -349,33 +259,28 @@ Public Class IntranetClientServerProject
     End Property
 
     <JsonIgnore>
-    Public ReadOnly Property MyRobotUpdatesFile As String
+    Public ReadOnly Property SystemRobotsUpdateFile As String
         Get
-            Dim fil As String = vbNullString
             Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
-            If Not String.IsNullOrEmpty(Me.MyRobotDirectory) Then
-                If Directory.Exists(Me.MyRobotDirectory) Then
-                    fil = $"{Me.MyRobotDirectory}\updates"
-                    If Not File.Exists(fil) Then
-                        Call jh.Save(fil, (New List(Of RpaUpdater)))
-                    End If
-                End If
+            Dim fil As String = $"{RpaCui.SystemDirectory}\robotsupdate"
+            If Not File.Exists(fil) Then
+                Call jh.Save(fil, (New List(Of RpaUpdater)))
             End If
             Return fil
         End Get
     End Property
 
-    ' Robot毎に切り替える
-    Private _MyRobotUpdatedHistories As List(Of RpaUpdater)
-    <JsonIgnore>
-    Public Property MyRobotUpdatedHistories As List(Of RpaUpdater)
-        Get
-            Return Me._MyRobotUpdatedHistories
-        End Get
-        Set(value As List(Of RpaUpdater))
-            Me._MyRobotUpdatedHistories = value
-        End Set
-    End Property
+    '' Robot毎に切り替える
+    'Private _MyRobotUpdatedHistories As List(Of RpaUpdater)
+    '<JsonIgnore>
+    'Public Property MyRobotUpdatedHistories As List(Of RpaUpdater)
+    '    Get
+    '        Return Me._MyRobotUpdatedHistories
+    '    End Get
+    '    Set(value As List(Of RpaUpdater))
+    '        Me._MyRobotUpdatedHistories = value
+    '    End Set
+    'End Property
     '-----------------------------------------------------------------------------------'
 
     'Private _PrinterName As String

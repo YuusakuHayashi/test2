@@ -102,23 +102,78 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
         dat.Project.RobotName = roboname
         Console.WriteLine($"ロボット '{dat.Project.RobotName}' を選択しました")
 
+
         Dim ck As Boolean = False
         Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
-        Dim rruh As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotUpdatesFile)
-        dat.Project.MyRobotUpdatedHistories = jh.Load(Of List(Of RpaUpdater))(dat.Project.MyRobotUpdatesFile)
-        If rruh.Count > 0 Then
-            If dat.Project.MyRobotUpdatedHistories.Count = 0 Then
+
+        Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
+        ' ロボット名でフィルター
+        rrus = rrus.FindAll(
+            Function(ru)
+                Return ru.ReleaseTargets.Contains(roboname)
+            End Function
+        )
+        ' リリース日でソート
+        rrus.Sort(
+            Function(before, after)
+                Return (before.ReleaseDate < after.ReleaseDate)
+            End Function
+        )
+
+        Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
+        ' ロボット名でフィルター
+        srus = srus.FindAll(
+            Function(ru)
+                Return ru.ReleaseTargets.Contains(roboname)
+            End Function
+        )
+        ' リリース日でソート
+        srus.Sort(
+            Function(before, after)
+                Return (before.ReleaseDate < after.ReleaseDate)
+            End Function
+        )
+
+        If rrus.Count > 0 Then
+            If srus.Count = 0 Then
                 ck = True
             Else
-                If dat.Project.MyRobotUpdatedHistories.Last.ReleaseDate < rruh.Last.ReleaseDate Then
+                If srus.Last.ReleaseDate < rrus.Last.ReleaseDate Then
                     ck = True
                 End If
             End If
         End If
 
+        Dim targetrobots As New List(Of String)
+        Dim cmdstr As String = vbNullString
+        Dim cmdidf As String = vbNullString
         If ck Then
-            Console.WriteLine($"最新のアップデートが適用されていません")
             Console.WriteLine()
+            Console.WriteLine($"最新のアップデートが適用されていません")
+            For Each rru In rrus
+                Console.WriteLine($"ReleaseDate  : {rru.ReleaseDate.ToString}")
+                Console.WriteLine($"ReleaseTitle : {rru.ReleaseTitle}")
+                Console.WriteLine($"ReleaseNote  : {rru.ReleaseNote}")
+                Console.WriteLine()
+                For Each targetrobot In rru.ReleaseTargets
+                    If Not targetrobots.Contains(targetrobot) Then
+                        targetrobots.Add(targetrobot)
+                    End If
+                Next
+            Next
+
+            Console.WriteLine($"アップデートを適用するには、以下のコマンドを実行してください")
+            cmdidf = dat.System.CommandDictionary.Where(
+                Function(pair)
+                    Return (pair.Value.GetType.Name = (New UpdateRobotCommand).GetType.Name)
+                End Function
+            )(0).Key
+            cmdstr = cmdidf
+            For Each targetrobot In targetrobots
+                cmdstr &= $" {targetrobot}"
+            Next
+            Console.WriteLine($"       '{cmdstr}'")
+            Console.WriteLine($"または '{cmdidf}'")
         End If
 
         Console.WriteLine()

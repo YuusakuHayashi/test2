@@ -12,7 +12,7 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
             Return False
         End If
         If Not Directory.Exists(dat.Project.RootRobotDirectory) Then
-            Console.WriteLine($"RootRobotDirectory '{dat.Project.RootDllDirectory}' は存在しません")
+            Console.WriteLine($"RootDllDirectory '{dat.Project.RootDllDirectory}' は存在しません")
             Return False
         End If
         If dat.Project.RobotAliasDictionary.Count = 0 Then

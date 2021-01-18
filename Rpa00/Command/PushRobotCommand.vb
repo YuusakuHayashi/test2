@@ -10,8 +10,8 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             Console.WriteLine($"RootDirectory '{dat.Project.RootDirectory}' は存在しません")
             Return False
         End If
-        If Not Directory.Exists(dat.Project.RootRobotDirectory) Then
-            Console.WriteLine($"RootRobotDirectory '{dat.Project.RootDllDirectory}' は存在しません")
+        If Not Directory.Exists(dat.Project.RootDllDirectory) Then
+            Console.WriteLine($"RootDllDirectory '{dat.Project.RootDllDirectory}' は存在しません")
             Return False
         End If
         If String.IsNullOrEmpty(dat.Project.ReleaseRobotDirectory) Then
@@ -22,67 +22,178 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             Console.WriteLine($"ReleaseRobotDirectory '{dat.Project.ReleaseRobotDirectory}' は存在しません")
             Return False
         End If
+
+        Dim ck As Boolean = False
+        For Each fil In Directory.GetFiles(dat.Project.ReleaseRobotDirectory)
+            If Path.GetExtension(fil) = ".dll" Then
+                ck = True
+                Exit For
+            End If
+        Next
+        If Not ck Then
+            Console.WriteLine($"ディレクトリ '{dat.Project.ReleaseRobotDirectory}' には、アップデート可能なファイルが存在しませんでした")
+            Return False
+        End If
+
+        Dim ck2 As Boolean = True
+        If dat.Transaction.Parameters.Count > 0 Then
+            For Each para In dat.Transaction.Parameters
+                Dim src As String = $"{dat.Project.ReleaseRobotDirectory}\{para}"
+                If Not File.Exists(src) Then
+                    Console.WriteLine($"ファイル '{src}' は存在しません")
+                    ck2 = False
+                End If
+            Next
+        End If
+        If Not ck2 Then
+            Return False
+        End If
+
         Return True
     End Function
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim i As Integer = -1
+
+        Dim pdname As String = WriteReleaseInfo(dat)
+
         If dat.Transaction.Parameters.Count = 0 Then
-            i = AllPush(dat)
+            i = AllPush(dat, pdname)
         Else
-            i = SelectedPush(dat)
+            i = SelectedPush(dat, pdname)
         End If
+
         Return i
     End Function
 
-    Private Function AllPush(ByRef dat As RpaDataWrapper) As Integer
+    Private Function AllPush(ByRef dat As RpaDataWrapper, ByVal pdir As String) As Integer
         Dim srcdir As String = dat.Project.ReleaseRobotDirectory
-        Dim dstdir As String = dat.Project.RootDllDirectory
-        Dim hit As Integer = 0
+        Dim dstdir As String = pdir
 
         For Each src In Directory.GetFiles(srcdir)
             Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-            If Path.GetExtension(src) = ".dll" Then
-                File.Copy(src, dst, True)
-                Console.WriteLine($"ファイルをコピー  '{src}'")
-                Console.WriteLine($"               => '{dst}'")
-                Console.WriteLine()
-                hit += 1
-            End If
+            File.Copy(src, dst, True)
+            Console.WriteLine($"ファイルをコピー  '{src}'")
+            Console.WriteLine($"               => '{dst}'")
+            Console.WriteLine()
         Next
 
-        If hit = 0 Then
-            Console.WriteLine($"ディレクトリ '{srcdir}' に対象ファイルは存在しませんでした")
-            Console.WriteLine()
-        End If
         Return 0
     End Function
 
-    Private Function SelectedPush(ByRef dat As RpaDataWrapper) As Integer
+    Private Function SelectedPush(ByRef dat As RpaDataWrapper, ByVal pdir As String) As Integer
         Dim srcdir As String = dat.Project.ReleaseRobotDirectory
-        Dim dstdir As String = dat.Project.RootDllDirectory
-        Dim hit As Integer = 0
+        Dim dstdir As String = pdir
 
         For Each para In dat.Transaction.Parameters
             Dim src As String = $"{srcdir}\{para}"
             Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-            If File.Exists(src) And (Path.GetExtension(src) = ".dll") Then
-                File.Copy(src, dst, True)
-                Console.WriteLine($"ファイルをコピー  '{src}'")
-                Console.WriteLine($"               => '{dst}'")
-                Console.WriteLine()
-                hit += 1
-            Else
-                Console.WriteLine($"ファイル '{src}' は存在しません")
-                Console.WriteLine()
-            End If
+            File.Copy(src, dst, True)
+            Console.WriteLine($"ファイルをコピー  '{src}'")
+            Console.WriteLine($"               => '{dst}'")
+            Console.WriteLine()
         Next
 
-        If hit = 0 Then
-            Console.WriteLine($"ディレクトリ '{srcdir}' に対象ファイルは存在しませんでした")
-            Console.WriteLine()
-        End If
         Return 0
+    End Function
+
+    Private Function WriteReleaseInfo(ByRef dat As RpaDataWrapper) As String
+        Dim ru As New RpaUpdater With {
+            .ReleaseDate = DateTime.Now.ToString("yyyyMMdd")
+        }
+
+        Dim yorn As String = vbNullString
+        Dim pdname As String = vbNullString
+        Do
+            yorn = vbNullString
+            Console.WriteLine($"Please Input ReleaseTitle :")
+            Dim ttl As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            pdname = $"{dat.Project.RootDllDirectory}\{ru.ReleaseDate}_{ttl}"
+            If Directory.Exists(pdname) Then
+                Console.WriteLine($"Directory '{pdname}' is Already Exists,")
+                Console.WriteLine($"Please Input Other ReleaseTitle.")
+                Console.WriteLine()
+                Continue Do
+            End If
+            Do
+                Console.WriteLine($"ReleaseTitle : '{ttl}' ok? (y/n)")
+                yorn = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn = "y" Or yorn = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            ru.ReleaseTitle = ttl
+            If yorn = "y" Then
+                Exit Do
+            End If
+        Loop Until False
+
+        Dim yorn2 As String = vbNullString
+        Do
+            yorn2 = vbNullString
+            Console.WriteLine($"Please Input ReleaseNote :")
+            Dim note As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            Do
+                Console.WriteLine($"ReleaseNote : '{note}' ok? (y/n)")
+                yorn2 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn2 = "y" Or yorn2 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            ru.ReleaseNote = note
+            If yorn2 = "y" Then
+                Exit Do
+            End If
+        Loop Until False
+
+        Dim yorn3 As String = vbNullString
+        Dim yorn4 As String = vbNullString
+        Do
+            yorn3 = vbNullString
+            yorn4 = vbNullString
+            Console.WriteLine($"Please Input ReleaseTargets :")
+            Dim tgt As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            Do
+                Console.WriteLine($"ReleaseTarget : '{tgt}' add? (y/n)")
+                yorn3 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn3 = "y" Or yorn3 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            If yorn3 = "n" Then
+                Continue Do
+            End If
+            ru.ReleaseTargets.Add(tgt)
+            Do
+                Console.WriteLine($"continue? (y/n)")
+                yorn4 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn4 = "y" Or yorn4 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            If yorn4 = "n" Then
+                Exit Do
+            End If
+        Loop Until False
+
+        Directory.CreateDirectory(pdname)
+
+        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim [old] As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
+        [old].Add(ru)
+
+        Call jh.Save(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile, [old])
+        Console.WriteLine($"'{dat.Project.RootRobotsUpdateFile}' Updated!")
+        Console.WriteLine()
+
+        Return pdname
     End Function
 
     Sub New()
