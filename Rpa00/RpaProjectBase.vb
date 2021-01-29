@@ -17,28 +17,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         )
     End Sub
 
-    '<JsonIgnore>
-    'Public Shared ReadOnly Property SystemDirectory As String
-    '    Get
-    '        Dim [dir] As String = System.Environment.GetEnvironmentVariable("USERPROFILE") & "\rpa_project"
-    '        If Not Directory.Exists([dir]) Then
-    '            Directory.CreateDirectory([dir])
-    '        End If
-    '        Return [dir]
-    '    End Get
-    'End Property
-
-    '<JsonIgnore>
-    'Public Shared ReadOnly Property SystemUtilityDirectory As String
-    '    Get
-    '        Dim d = $"{RpaProjectBase(Of T).SystemDirectory}\util"
-    '        If Not Directory.Exists(d) Then
-    '            Directory.CreateDirectory(d)
-    '        End If
-    '        Return d
-    '    End Get
-    'End Property
-
     Private _SystemUtilities As Dictionary(Of String, RpaUtility)
     Public Property SystemUtilities As Dictionary(Of String, RpaUtility)
         Get
@@ -78,43 +56,12 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Property
     End Class
 
-
     Public MustOverride ReadOnly Property SystemArchDirectory As String
     Public MustOverride ReadOnly Property SystemProjectDirectory As String
     Public MustOverride ReadOnly Property SystemJsonFileName As String
     Public MustOverride ReadOnly Property SystemJsonChangedFileName As String
     Public MustOverride ReadOnly Property SystemArchType As Integer
     Public MustOverride ReadOnly Property SystemArchTypeName As String
-
-
-    '<JsonIgnore>
-    'Public Shared ReadOnly Property SystemDllDirectory As String
-    '    Get
-    '        Dim [dir] As String = $"{RpaProjectBase(Of T).SystemDirectory}\dll"
-    '        If Not Directory.Exists([dir]) Then
-    '            Directory.CreateDirectory([dir])
-    '        End If
-    '        Return [dir]
-    '    End Get
-    'End Property
-
-    '<JsonIgnore>
-    'Public Shared ReadOnly Property SystemUpdateDllDirectory As String
-    '    Get
-    '        Dim [dir] As String = $"{RpaProjectBase(Of T).SystemDirectory}\updatedll"
-    '        If Not Directory.Exists([dir]) Then
-    '            Directory.CreateDirectory([dir])
-    '        End If
-    '        Return [dir]
-    '    End Get
-    'End Property
-
-    '<JsonIgnore>
-    'Public Shared ReadOnly Property System00DllFileName As String
-    '    Get
-    '        Return $"{RpaProjectBase(Of T).SystemDllDirectory}\Rpa00.dll"
-    '    End Get
-    'End Property
 
     Private _MyDirectory As String
     Public Property MyDirectory As String
@@ -144,7 +91,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
             Return Me._RobotName
         End Get
         Set(value As String)
-            Me._RobotAlias = vbNullString
+            'Me._RobotAlias = vbNullString
             Me._RobotName = value
             RaisePropertyChanged("RobotName")
         End Set
@@ -179,28 +126,32 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Get
     End Property
 
-    Public ReadOnly Property IsMyRobotExists As Boolean
-        Get
-            If Directory.Exists(Me.MyRobotDirectory) Then
-                Return True
-            Else
-                Return False
-            End If
-        End Get
-    End Property
-
+    <JsonIgnore>
     Public ReadOnly Property MyRobotDirectory As String
         Get
             Return $"{Me.MyDirectory}\{Me.RobotAlias}"
         End Get
     End Property
 
+    <JsonIgnore>
     Public ReadOnly Property MyRobotJsonFileName As String
         Get
             Return $"{Me.MyRobotDirectory}\rpa_project.json"
         End Get
     End Property
 
+    <JsonIgnore>
+    Public ReadOnly Property MyRobotReadMeFileName As String
+        Get
+            Dim [fil] As String = vbNullString
+            If Directory.Exists(Me.MyRobotDirectory) Then
+                [fil] = $"{Me.MyRobotDirectory}\readme"
+            End If
+            Return [fil]
+        End Get
+    End Property
+
+    ' ロボット本体
     Private Property _MyRobotObject As Object
     <JsonIgnore>
     Public Property MyRobotObject As Object
@@ -228,7 +179,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
-
     Public Sub AddUtility(ByVal util As String)
         Me.SystemUtilities.Add(
             util, (New RpaUtility With {
@@ -249,6 +199,14 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
+    ' RobotNameアクセサ
+    Public Overridable Function SwitchRobot(ByVal [name] As String) As Integer
+        Me.RobotName = [name]
+        Me.MyRobotObject = Nothing
+
+        Return 0
+    End Function
+
     Public Sub CreateChangedFile(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If Me.FirstLoad Then
             If Not File.Exists(Me.SystemJsonChangedFileName) Then
@@ -256,10 +214,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
             End If
         End If
     End Sub
-
-    'Public Overridable Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
-    '    Return False
-    'End Function
 
     Public Delegate Function CanExecuteDelegater(ByRef dat As RpaDataWrapper) As Boolean
     Private _CanExecuteHandler As CanExecuteDelegater

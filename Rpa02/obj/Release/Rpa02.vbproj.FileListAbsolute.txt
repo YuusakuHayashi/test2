@@ -38,3 +38,6 @@ C:\Users\yuusa\project\test2\Rpa02\bin\Release\RpaCui.exe.config
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa02.dll
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa02.pdb
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa02.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Rpa02.dll
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Rpa02.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Rpa02.xml

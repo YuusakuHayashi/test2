@@ -108,6 +108,7 @@
     <Compile Include="Command\ShowMyRobotJsonCommand.vb" />
     <Compile Include="Command\ShowMyRobotPropertiesCommand.vb" />
     <Compile Include="Command\ShowProjectPropertiesCommand.vb" />
+    <Compile Include="Command\ShowRobotReadMeCommand.vb" />
     <Compile Include="Command\UpdateRobotCommand.vb" />
     <Compile Include="Command\ExportMyRobotJsonCommand.vb" />
     <Compile Include="Command\ExportRootRobotJsonCommand.vb" />

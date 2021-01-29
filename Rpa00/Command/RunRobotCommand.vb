@@ -1,6 +1,10 @@
 ﻿Public Class RunRobotCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim i = 0
+
+        'MyRobotObjectのリロード用
+        Dim j As Integer = dat.Project.SwitchRobot(dat.Project.RobotName)
+
         dat.Project.MyRobotObject.Data = dat
         Console.WriteLine()
         Console.WriteLine($"プロジェクトの起動条件を確認しています・・・")

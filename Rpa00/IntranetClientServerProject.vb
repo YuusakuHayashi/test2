@@ -19,6 +19,18 @@ Public Class IntranetClientServerProject
     '        Return $"{Me.ServerDirectory}\Hello.txt"
     '    End Get
     'End Property
+
+    Private _UpdateChecked As Boolean
+    <JsonIgnore>
+    Public Property UpdateChecked As Boolean
+        Get
+            Return Me._UpdateChecked
+        End Get
+        Set(value As Boolean)
+            Me._UpdateChecked = value
+        End Set
+    End Property
+
     Private _ReleaseRobotDirectory As String
     Public Property ReleaseRobotDirectory As String
         Get
@@ -94,6 +106,18 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
+    ' このファイルがRootRobotになければ、AttachRobotすることができない
+    <JsonIgnore>
+    Public ReadOnly Property RootRobotReadMeFileName As String
+        Get
+            Dim [fil] As String = vbNullString
+            If Directory.Exists(Me.RootRobotDirectory) Then
+                [fil] = $"{Me.RootRobotDirectory}\readme"
+            End If
+            Return [fil]
+        End Get
+    End Property
+
     '<JsonIgnore>
     'Public ReadOnly Property RootRobotRepositoryDirectory As String
     '    Get
@@ -161,23 +185,23 @@ Public Class IntranetClientServerProject
 
     ' セーブ？ロード？するたびに、リストが重複するためＩＧＮＯＲＥするようにした。
     ' 原因が分かったら、ＩＧＮＯＲＥは解除する？しなくてもいいか・・・
-    Private _RootRobotIgnoreList As List(Of String)
-    <JsonIgnore>
-    Public Property RootRobotIgnoreList As List(Of String)
-        Get
-            If Me._RootRobotIgnoreList Is Nothing Then
-                If File.Exists(Me.RootRobotIgnoreFileName) Then
-                    Me._RootRobotIgnoreList = _GetIgnoreList(Me.RootRobotIgnoreFileName)
-                Else
-                    Me._RootRobotIgnoreList = New List(Of String)
-                End If
-            End If
-            Return Me._RootRobotIgnoreList
-        End Get
-        Set(value As List(Of String))
-            Me._RootRobotIgnoreList = value
-        End Set
-    End Property
+    'Private _RootRobotIgnoreList As List(Of String)
+    '<JsonIgnore>
+    'Public Property RootRobotIgnoreList As List(Of String)
+    '    Get
+    '        If Me._RootRobotIgnoreList Is Nothing Then
+    '            If File.Exists(Me.RootRobotIgnoreFileName) Then
+    '                Me._RootRobotIgnoreList = _GetIgnoreList(Me.RootRobotIgnoreFileName)
+    '            Else
+    '                Me._RootRobotIgnoreList = New List(Of String)
+    '            End If
+    '        End If
+    '        Return Me._RootRobotIgnoreList
+    '    End Get
+    '    Set(value As List(Of String))
+    '        Me._RootRobotIgnoreList = value
+    '    End Set
+    'End Property
 
     <JsonIgnore>
     Public ReadOnly Property RootRobotsUpdateFile As String
@@ -204,23 +228,23 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    Private _MyRobotIgnoreList As List(Of String)
-    <JsonIgnore>
-    Public Property MyRobotIgnoreList As List(Of String)
-        Get
-            If Me._MyRobotIgnoreList Is Nothing Then
-                If File.Exists(Me.MyRobotIgnoreFileName) Then
-                    Me._MyRobotIgnoreList = _GetIgnoreList(Me.MyRobotIgnoreFileName)
-                Else
-                    Me._MyRobotIgnoreList = New List(Of String)
-                End If
-            End If
-            Return Me._MyRobotIgnoreList
-        End Get
-        Set(value As List(Of String))
-            Me._MyRobotIgnoreList = value
-        End Set
-    End Property
+    'Private _MyRobotIgnoreList As List(Of String)
+    '<JsonIgnore>
+    'Public Property MyRobotIgnoreList As List(Of String)
+    '    Get
+    '        If Me._MyRobotIgnoreList Is Nothing Then
+    '            If File.Exists(Me.MyRobotIgnoreFileName) Then
+    '                Me._MyRobotIgnoreList = _GetIgnoreList(Me.MyRobotIgnoreFileName)
+    '            Else
+    '                Me._MyRobotIgnoreList = New List(Of String)
+    '            End If
+    '        End If
+    '        Return Me._MyRobotIgnoreList
+    '    End Get
+    '    Set(value As List(Of String))
+    '        Me._MyRobotIgnoreList = value
+    '    End Set
+    'End Property
 
     Public Overrides ReadOnly Property SystemProjectDirectory As String
         Get
@@ -319,6 +343,13 @@ Public Class IntranetClientServerProject
     '        sr.Dispose()
     '    End If
     'End Sub
+
+    Public Overrides Function SwitchRobot(name As String) As Integer
+        Dim i As Integer = MyBase.SwitchRobot(name)
+        Me.RootRobotObject = Nothing
+
+        Return 0
+    End Function
 
     Private Sub _CheckProject()
         'Call _ConsoleWriteLine($"プロジェクト '{Me.RobotAlias}' のチェック....")

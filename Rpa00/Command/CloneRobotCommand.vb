@@ -1,12 +1,48 @@
 ﻿Imports System.IO
 
 Public Class CloneRobotCommand : Inherits RpaCommandBase
+
+    ' 高速化のため（多分、そこまで違いはない）
+    Private _RootRobotIgnoreList As List(Of String)
+    Private Property RootRobotIgnoreList As List(Of String)
+        Get
+            Return Me._RootRobotIgnoreList
+        End Get
+        Set(value As List(Of String))
+            Me._RootRobotIgnoreList = value
+        End Set
+    End Property
+
+    ' 高速化のため（多分、そこまで違いはない）
+    Private _MyRobotIgnoreList As List(Of String)
+    Private Property MyRobotIgnoreList As List(Of String)
+        Get
+            Return Me._MyRobotIgnoreList
+        End Get
+        Set(value As List(Of String))
+            Me._MyRobotIgnoreList = value
+        End Set
+    End Property
+
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
+        Dim jh As New RpaCui.JsonHandler(Of List(Of String))
+
         If dat.Transaction.Parameters.Count > 0 Then
             Call SelectedCopy(dat)
         Else
+            If File.Exists(dat.Project.RootRobotIgnoreFileName) Then
+                Me._RootRobotIgnoreList = jh.Load(Of List(Of String))(dat.Project.RootRobotIgnoreFileName)
+            Else
+                Me._RootRobotIgnoreList = New List(Of String)
+            End If
+            If File.Exists(dat.Project.MyRobotIgnoreFileName) Then
+                Me._MyRobotIgnoreList = jh.Load(Of List(Of String))(dat.Project.MyRobotIgnoreFileName)
+            Else
+                Me._MyRobotIgnoreList = New List(Of String)
+            End If
             Call AllCopy(dat, dat.Project.RootRobotDirectory, dat.Project.MyRobotDirectory)
         End If
+
         Console.WriteLine("コピーが完了しました")
         Console.WriteLine()
 
@@ -48,12 +84,13 @@ Public Class CloneRobotCommand : Inherits RpaCommandBase
         Dim fsis As FileSystemInfo()
         Dim sdi = New DirectoryInfo(src)
         Dim ddi = New DirectoryInfo(dst)
+
         fsis = sdi.GetFileSystemInfos
         For Each fsi In fsis
             Dim src2 = $"{fsi.FullName}"
             Dim dst2 = $"{ddi.FullName}\{fsi.Name}"
-            If Not dat.Project.RootRobotIgnoreList.Contains(src2) Then
-                If Not dat.Project.MyRobotIgnoreList.Contains(src2) Then
+            If Not Me.RootRobotIgnoreList.Contains(src2) Then
+                If Not Me.MyRobotIgnoreList.Contains(src2) Then
                     If ((fsi.Attributes And FileAttributes.Directory) = FileAttributes.Directory) Then
                         Call AllCopy(dat, src2, dst2)
                     Else

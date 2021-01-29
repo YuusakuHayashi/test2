@@ -32,3 +32,6 @@ C:\Users\yuusa\project\test2\Rpa00\obj\Release\Rpa00.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa00.dll
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa00.pdb
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Rpa00.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Rpa00.dll
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Rpa00.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Rpa00.xml

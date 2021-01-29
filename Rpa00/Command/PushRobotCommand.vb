@@ -35,19 +35,19 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             Return False
         End If
 
-        Dim ck2 As Boolean = True
-        If dat.Transaction.Parameters.Count > 0 Then
-            For Each para In dat.Transaction.Parameters
-                Dim src As String = $"{dat.Project.ReleaseRobotDirectory}\{para}"
-                If Not File.Exists(src) Then
-                    Console.WriteLine($"ファイル '{src}' は存在しません")
-                    ck2 = False
-                End If
-            Next
-        End If
-        If Not ck2 Then
-            Return False
-        End If
+        'Dim ck2 As Boolean = True
+        'If dat.Transaction.Parameters.Count > 0 Then
+        '    For Each para In dat.Transaction.Parameters
+        '        Dim src As String = $"{dat.Project.ReleaseRobotDirectory}\{para}"
+        '        If Not File.Exists(src) Then
+        '            Console.WriteLine($"ファイル '{src}' は存在しません")
+        '            ck2 = False
+        '        End If
+        '    Next
+        'End If
+        'If Not ck2 Then
+        '    Return False
+        'End If
 
         Return True
     End Function
@@ -56,12 +56,13 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
         Dim i As Integer = -1
 
         Dim pdname As String = WriteReleaseInfo(dat)
+        i = AllPush(dat, pdname)
 
-        If dat.Transaction.Parameters.Count = 0 Then
-            i = AllPush(dat, pdname)
-        Else
-            i = SelectedPush(dat, pdname)
-        End If
+        'If dat.Transaction.Parameters.Count = 0 Then
+        '    i = AllPush(dat, pdname)
+        'Else
+        '    i = SelectedPush(dat, pdname)
+        'End If
 
         Return i
     End Function
@@ -72,36 +73,41 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
 
         For Each src In Directory.GetFiles(srcdir)
             Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-            File.Copy(src, dst, True)
-            Console.WriteLine($"ファイルをコピー  '{src}'")
-            Console.WriteLine($"               => '{dst}'")
-            Console.WriteLine()
+            If Path.GetExtension(src) = ".dll" Then
+                File.Copy(src, dst, True)
+                Console.WriteLine($"ファイルをコピー  '{src}'")
+                Console.WriteLine($"               => '{dst}'")
+                Console.WriteLine()
+            End If
         Next
 
         Return 0
     End Function
 
-    Private Function SelectedPush(ByRef dat As RpaDataWrapper, ByVal pdir As String) As Integer
-        Dim srcdir As String = dat.Project.ReleaseRobotDirectory
-        Dim dstdir As String = pdir
+    'Private Function SelectedPush(ByRef dat As RpaDataWrapper, ByVal pdir As String) As Integer
+    '    Dim srcdir As String = dat.Project.ReleaseRobotDirectory
+    '    Dim dstdir As String = pdir
 
-        For Each para In dat.Transaction.Parameters
-            Dim src As String = $"{srcdir}\{para}"
-            Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-            File.Copy(src, dst, True)
-            Console.WriteLine($"ファイルをコピー  '{src}'")
-            Console.WriteLine($"               => '{dst}'")
-            Console.WriteLine()
-        Next
+    '    For Each para In dat.Transaction.Parameters
+    '        Dim src As String = $"{srcdir}\{para}"
+    '        Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
+    '        If Path.GetExtension(src) = ".dll" Then
+    '            File.Copy(src, dst, True)
+    '            Console.WriteLine($"ファイルをコピー  '{src}'")
+    '            Console.WriteLine($"               => '{dst}'")
+    '            Console.WriteLine()
+    '        End If
+    '    Next
 
-        Return 0
-    End Function
+    '    Return 0
+    'End Function
 
     Private Function WriteReleaseInfo(ByRef dat As RpaDataWrapper) As String
         Dim ru As New RpaUpdater With {
-            .ReleaseDate = DateTime.Now.ToString("yyyyMMdd")
+            .ReleaseDate = DateTime.Now.ToString("yyyyMMddHHmmss")
         }
 
+        Console.WriteLine()
         Dim yorn As String = vbNullString
         Dim pdname As String = vbNullString
         Do
@@ -125,6 +131,7 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
                 End If
             Loop Until False
             ru.ReleaseTitle = ttl
+            ru.PackageDirectory = pdname
             If yorn = "y" Then
                 Exit Do
             End If
@@ -150,38 +157,41 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             End If
         Loop Until False
 
-        Dim yorn3 As String = vbNullString
-        Dim yorn4 As String = vbNullString
-        Do
-            yorn3 = vbNullString
-            yorn4 = vbNullString
-            Console.WriteLine($"Please Input ReleaseTargets :")
-            Dim tgt As String = dat.Transaction.ShowRpaIndicator(dat)
-            Console.WriteLine()
-            Do
-                Console.WriteLine($"ReleaseTarget : '{tgt}' add? (y/n)")
-                yorn3 = dat.Transaction.ShowRpaIndicator(dat)
-                Console.WriteLine()
-                If yorn3 = "y" Or yorn3 = "n" Then
-                    Exit Do
-                End If
-            Loop Until False
-            If yorn3 = "n" Then
-                Continue Do
-            End If
-            ru.ReleaseTargets.Add(tgt)
-            Do
-                Console.WriteLine($"continue? (y/n)")
-                yorn4 = dat.Transaction.ShowRpaIndicator(dat)
-                Console.WriteLine()
-                If yorn4 = "y" Or yorn4 = "n" Then
-                    Exit Do
-                End If
-            Loop Until False
-            If yorn4 = "n" Then
-                Exit Do
-            End If
-        Loop Until False
+        'Dim yorn4 As String = vbNullString
+        'Dim yorn5 As String = vbNullString
+        'Do
+        '    yorn4 = vbNullString
+        '    yorn5 = vbNullString
+        '    Console.WriteLine($"Please Input ReleaseTargets :")
+        '    Dim targetsstr As String = dat.Transaction.ShowRpaIndicator(dat)
+        '    Dim targets() As String = targetsstr.Split(" "c)
+        '    Console.WriteLine()
+        '    Do
+        '        Console.WriteLine($"ReleaseTarget : '{targetsstr}' add? (y/n)")
+        '        yorn4 = dat.Transaction.ShowRpaIndicator(dat)
+        '        Console.WriteLine()
+        '        If yorn4 = "y" Or yorn4 = "n" Then
+        '            Exit Do
+        '        End If
+        '    Loop Until False
+        '    If yorn4 = "n" Then
+        '        Continue Do
+        '    End If
+        '    For Each target In targets
+        '        ru.ReleaseTargets.Add(target)
+        '    Next
+        '    Do
+        '        Console.WriteLine($"continue? (y/n)")
+        '        yorn5 = dat.Transaction.ShowRpaIndicator(dat)
+        '        Console.WriteLine()
+        '        If yorn5 = "y" Or yorn5 = "n" Then
+        '            Exit Do
+        '        End If
+        '    Loop Until False
+        '    If yorn5 = "n" Then
+        '        Exit Do
+        '    End If
+        'Loop Until False
 
         Directory.CreateDirectory(pdname)
 
@@ -197,7 +207,7 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
     End Function
 
     Sub New()
-        Me.ExecutableParameterCount = {0, 999}
+        Me.ExecutableParameterCount = {0, 0}
         Me.ExecutableProjectArchitectures = {(New IntranetClientServerProject).GetType.Name}
         Me.ExecutableUser = {"RootDeveloper"}
         Me.CanExecuteHandler = AddressOf Check

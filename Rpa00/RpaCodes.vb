@@ -11,7 +11,7 @@ Public Module RpaCodes
             Dim [type] As Object
             Dim dllpath As String = vbNullString
             Select Case rpa.RobotName
-                Case "rpa01"
+                Case "Rpa01"
                     dllpath = $"{RpaCui.SystemDllDirectory}\Rpa01.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)
@@ -21,7 +21,7 @@ Public Module RpaCodes
                     Else
                         Return Nothing
                     End If
-                Case "rpa02"
+                Case "Rpa02"
                     dllpath = $"{RpaCui.SystemDllDirectory}\Rpa02.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)
@@ -31,7 +31,7 @@ Public Module RpaCodes
                     Else
                         Return Nothing
                     End If
-                Case "rpa07"
+                Case "Rpa07"
                     dllpath = $"{RpaCui.SystemDllDirectory}\Rpa07.dll"
                     If File.Exists(dllpath) Then
                         asm = Assembly.LoadFrom(dllpath)

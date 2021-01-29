@@ -22,7 +22,6 @@ C:\Users\yuusa\project\test2\RpaCui\bin\Release\Newtonsoft.Json.xml
 C:\Users\yuusa\project\test2\RpaCui\obj\Release\RpaCui.vbproj.CopyComplete
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\bin\Release\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\bin\Release\Newtonsoft.Json.xml
-\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\obj\Release\RpaCui.vbprojResolveAssemblyReference.cache
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\RpaCui.exe.config
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\RpaCui.exe
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\RpaCui.pdb
@@ -30,3 +29,9 @@ C:\Users\yuusa\project\test2\RpaCui\releaserobot\RpaCui.xml
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Newtonsoft.Json.dll
 C:\Users\yuusa\project\test2\RpaCui\releaserobot\Newtonsoft.Json.xml
 C:\Users\yuusa\project\test2\RpaCui\obj\Release\RpaCui.vbprojAssemblyReference.cache
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaCui.exe.config
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaCui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaCui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaCui.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Newtonsoft.Json.dll
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Newtonsoft.Json.xml

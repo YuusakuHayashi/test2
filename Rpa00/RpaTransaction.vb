@@ -154,20 +154,19 @@ Public Class RpaTransaction
 
     Public Function ShowRpaIndicator(ByRef dat As RpaDataWrapper) As String
         ' ガイド
-        If Me.Modes.Count = 0 Then
-            If dat.Project IsNot Nothing Then
-                Console.Write($"{dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
+        If dat.Project IsNot Nothing Then
+            ' ここの記述は見直し予定
+            If dat.Project.SystemArchTypeName = (New IntranetClientServerProject).GetType.Name Then
+                If dat.Project.UpdateChecked Then
+                    Console.Write($"(!){dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
+                Else
+                    Console.Write($"{dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
+                End If
             Else
-                Console.Write("NoRpa>")
+                Console.Write($"{dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
             End If
         Else
-            For Each mode In Me.Modes
-                If Me.Modes.Last = mode Then
-                    Console.Write($"{mode}>")
-                Else
-                    Console.Write($"{mode}\")
-                End If
-            Next
+            Console.Write("NoRpa>")
         End If
 
         Return ShowReader(dat)

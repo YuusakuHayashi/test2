@@ -22,16 +22,6 @@ Public Module RpaCui
         End Get
     End Property
 
-    'Public ReadOnly Property SystemDllDirectory As String
-    '    Get
-    '        Dim [dir] As String = $"{RpaCui.SystemDirectory}\dll"
-    '        If Not Directory.Exists([dir]) Then
-    '            Directory.CreateDirectory([dir])
-    '        End If
-    '        Return [dir]
-    '    End Get
-    'End Property
-
     Private _SystemDllDirectory As String
     Public Property SystemDllDirectory As String
         Get
@@ -48,25 +38,19 @@ Public Module RpaCui
         End Set
     End Property
 
-    'Private _SystemDllDirectory As String
-    'Public Property SystemDllDirectory As String
-    '    Get
-    '        If String.IsNullOrEmpty(RpaCui._SystemDllDirectory) Then
-    '            RpaCui._SystemDllDirectory = $"{RpaCui.SystemDirectory}\dll"
-    '        End If
-    '        If Not Directory.Exists(RpaCui._SystemDllDirectory) Then
-    '            Directory.CreateDirectory(RpaCui._SystemDllDirectory)
-    '        End If
-    '        Return RpaCui._SystemDllDirectory
-    '    End Get
-    '    Set(value As String)
-    '        RpaCui._SystemDllDirectory = value
-    '    End Set
-    'End Property
-
     Public ReadOnly Property SystemUpdateDllDirectory As String
         Get
             Dim [dir] As String = $"{RpaCui.SystemDirectory}\updatedll"
+            If Not Directory.Exists([dir]) Then
+                Directory.CreateDirectory([dir])
+            End If
+            Return [dir]
+        End Get
+    End Property
+
+    Public ReadOnly Property SystemPointUpdateDllDirectory As String
+        Get
+            Dim [dir] As String = $"{RpaCui.SystemDirectory}\pointupdatedll"
             If Not Directory.Exists([dir]) Then
                 Directory.CreateDirectory([dir])
             End If
@@ -88,18 +72,46 @@ Public Module RpaCui
 
             Dim rpa00dll As String = $"{RpaCui.SystemDllDirectory}\Rpa00.dll"
 
-            ' アップデート適用
-            Do
-                If Not Directory.GetFiles(RpaCui.SystemUpdateDllDirectory).Count = 0 Then
-                    Dim updatedll As String = Directory.GetFiles(RpaCui.SystemUpdateDllDirectory)(0)
-                    Dim dst As String = $"{RpaCui.SystemDllDirectory}\{Path.GetFileName(updatedll)}"
-                    Console.WriteLine($"アップデートを適用しています...{dst}")
-                    File.Copy(updatedll, dst, True)
-                    File.Delete(updatedll)
-                Else
-                    Exit Do
-                End If
-            Loop Until False
+            If Not Directory.GetFiles(RpaCui.SystemUpdateDllDirectory).Count = 0 Then
+                Dim srcs1 As List(Of String) = Directory.GetFiles(RpaCui.SystemUpdateDllDirectory).ToList
+                For Each src In srcs1
+                    Dim dst As String = $"{RpaCui.SystemDllDirectory}\{Path.GetFileName(src)}"
+                    Console.WriteLine($"アップグレードを適用しています... Update --> {dst}")
+                    File.Copy(src, dst, True)
+                    File.Delete(src)
+                Next
+            End If
+
+            If Not Directory.GetFiles(RpaCui.SystemPointUpdateDllDirectory).Count = 0 Then
+                Dim srcs2 As List(Of String) = Directory.GetFiles(RpaCui.SystemPointUpdateDllDirectory).ToList
+
+                ' 削除のため差集合的なものを求める
+                Dim dsts As List(Of String) = Directory.GetFiles(RpaCui.SystemDllDirectory).ToList
+                Dim srcs3 As New List(Of String)
+                For Each src In srcs2
+                    srcs3.Add(Path.GetFileName(src))
+                Next
+                Dim subs As List(Of String) = dsts.FindAll(Function(d)
+                                                               Dim b As Boolean = False
+                                                               If Path.GetExtension(d) = ".dll" Then
+                                                                   If Not srcs3.Contains(Path.GetFileName(d)) Then
+                                                                       b = True
+                                                                   End If
+                                                               End If
+                                                               Return b
+                                                           End Function)
+                For Each [sub] In subs
+                    Console.WriteLine($"特定時点へのアップグレード／ダウングレードを適用しています... Delete --> {[sub]}")
+                    File.Delete([sub])
+                Next
+
+                For Each src In srcs2
+                    Dim dst As String = $"{RpaCui.SystemDllDirectory}\{Path.GetFileName(src)}"
+                    Console.WriteLine($"特定時点へのアップグレード／ダウングレードを適用しています... Update --> {dst}")
+                    File.Copy(src, dst, True)
+                    File.Delete(src)
+                Next
+            End If
 
             ' DLLロード
             Dim asm As Assembly = Assembly.LoadFrom(rpa00dll)

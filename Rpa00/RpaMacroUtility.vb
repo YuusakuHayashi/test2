@@ -38,13 +38,10 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
     '    End Get
     'End Property
 
-    Public ReadOnly Property RootRobotBasRepositoryDirectory(dat As Object) As String
+    Public ReadOnly Property RootBasDirectory(dat As Object) As String
         Get
-            If (Not String.IsNullOrEmpty(dat.Project.RootDirectory)) And Directory.Exists(dat.Project.RootRobotDirectory) Then
-                Dim [dir] As String = $"{dat.Project.RootRobotRepositoryDirectory}\bas"
-                If Not Directory.Exists([dir]) Then
-                    Directory.CreateDirectory([dir])
-                End If
+            If Not String.IsNullOrEmpty(dat.Project.RootDirectory) Then
+                Dim [dir] As String = $"{dat.Project.RootDirectory}\bas"
                 Return [dir]
             Else
                 Return vbNullString
@@ -196,7 +193,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Return False
             End If
 
-            Dim basdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
+            Dim basdir As String = Parent.RootBasDirectory(dat)
             If Not Directory.Exists(basdir) Then
                 Console.WriteLine($"ディレクトリ '{basdir}' が存在しません")
                 Console.WriteLine()
@@ -219,7 +216,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Function AllUpdate(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
+            Dim srcdir As String = Parent.RootBasDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             Dim incmd As New InstallMacroCommand(Parent)
             Dim dlcmd As New DownloadMacroFileCommand(Parent)
@@ -239,7 +236,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Function SelectedUpdate(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
+            Dim srcdir As String = Parent.RootBasDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             Dim incmd As New InstallMacroCommand(Parent)
             Dim dlcmd As New DownloadMacroFileCommand(Parent)
@@ -370,7 +367,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Return False
             End If
 
-            Dim basdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
+            Dim basdir As String = Parent.RootBasDirectory(dat)
             If Not Directory.Exists(basdir) Then
                 Console.WriteLine($"ディレクトリ '{basdir}' が存在しません")
                 Console.WriteLine()
@@ -393,7 +390,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Function AllDownload(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
+            Dim srcdir As String = Parent.RootBasDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             For Each src In Directory.GetFiles(srcdir)
                 Dim ext As String = Path.GetExtension(src)
@@ -417,7 +414,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
 
         Private Function SelectedDownload(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootRobotBasRepositoryDirectory(dat)
+            Dim srcdir As String = Parent.RootBasDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             For Each para In dat.Transaction.Parameters
                 Dim src As String = $"{srcdir}\{para}"

@@ -29,8 +29,9 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Do
             idxtext = vbNullString
             Console.WriteLine($"   処理を選択してください")
-            Console.WriteLine($"0  最新までアップデート")
-            Console.WriteLine($"1  特定時点へアップデート／ダウングレード")
+            Console.WriteLine($"0  カレントロボットの最新アップデート")
+            Console.WriteLine($"1  カレントロボットの特定アップデート (作成中...)")
+            Console.WriteLine($"2  全てのロボットの最新アップデート")
             Console.WriteLine($"9  中止する")
             idxtext = dat.Transaction.ShowRpaIndicator(dat)
             Console.WriteLine()
@@ -45,15 +46,18 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
 
         Select Case idxtext
             Case "0"
-                i = LatestUpdate(dat)
+                i = CurrentLatestUpdate(dat)
             Case "1"
-                i = PointUpdate(dat)
+                i = 0
+                'i = CurrentPointUpdate(dat)
+            Case "2"
+                i = AllLatestUpdate(dat)
         End Select
 
         Return i
     End Function
 
-    Private Function LatestUpdate(ByRef dat As Object) As Integer
+    Private Function CurrentLatestUpdate(ByRef dat As Object) As Integer
         Dim robotname As String = dat.Project.RobotName
         Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
@@ -65,15 +69,20 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
                 Return (before.ReleaseDate < after.ReleaseDate)
             End Function
         )
-        Dim srus2 As List(Of RpaUpdater) = srus
+        Dim srus2 As List(Of RpaUpdater)
+        Dim srus2 As List(Of RpaUpdateer) = srus.FindAll(
+            Function(ru)
+                Return ru.ReleaseDate > rrus2.Last.ReleaseDate
+            End Function
+        )
         srus2.Sort(
             Function(before, after)
                 Return (before.ReleaseDate < after.ReleaseDate)
             End Function
         )
 
-        DIm ck As Boolean = False
-        If rrus2.Count > 0
+        Dim ck As Boolean = False
+        If rrus2.Count > 0 Then
             If srus2.Count = 0 Then
                 ck = True
             Else
@@ -83,19 +92,26 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
             End If
         End If
 
-        'Dim rrus3 As List(Of RpaUpdater) = rrus2
-        'If srus2.Count > 0 Then
-        '    rrus3.FindAll(
-        '        Function(rru)
-        '            Return (rru.ReleaseDate > srus2.Last.ReleaseDate)
-        '        End Function
-        '    )
-        'End If
-
-        'If rrus3.Count > 0 Then
-        Dim uru As RpaUpdater
         If ck Then
-            uru = rrus2.Last
+            For Each uru In rrus2
+                Console.WriteLine($"アップデートを適用")
+                Console.WriteLine($"Release Title : {uru.ReleaseTitle}")
+                Console.WriteLine($"Release Date  : {uru.ReleaseDate}")
+                For Each src In Directory.GetFiles(uru.PackageDirectory)
+                    Dim dst As String = $"{RpaCui.SystemUpdateDllDirectory}\{Path.GetFileName(src)}"
+                    File.Copy(src, dst, True)
+                    Console.WriteLine($"ファイルをコピー  src: '{src}'")
+                    Console.WriteLine($"               => dst: '{dst}'")
+                Next
+                srus.Add(uru)
+                jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
+            Next
+            Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
+            Console.WriteLine()
+        End If
+
+        If ck Then
+            Dim uru As RpaUpdater = rrus2.Last
             Console.WriteLine($"アップデートを適用")
             Console.WriteLine($"Release Title : {uru.ReleaseTitle}")
             Console.WriteLine($"Release Date  : {uru.ReleaseDate}")
@@ -110,93 +126,80 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
             Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
             Console.WriteLine()
         Else
-            Console.WriteLine($"アップデートの適用対象は存在しませんでした")
+            Console.WriteLine($"アップデート対象は存在しませんでした")
             Console.WriteLine()
         End If
 
         Return 0
     End Function
 
-    Private Function PointUpdate(ByRef dat As Object) As Integer
+    Private Function AllLatestUpdate(ByRef dat As Object) As Integer
         Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
         Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
+        Dim urus As List(Of RpaUpdater) = New List(Of RpaUpdater)
 
-        Dim rrus2 As List(Of RpaUpdater) = rrus
-        rrus2.Sort(
-            Function(before, after)
-                Return (before.ReleaseDate < after.ReleaseDate)
-            End Function
-        )
-        For Each rru In rrus2
-            Console.WriteLine($"Release Index : {rrus2.IndexOf(rru)}")
-            Console.WriteLine($"Release Title : {rru.ReleaseTitle}")
-            Console.WriteLine($"Release Date  : {rru.ReleaseDate}")
-            Console.WriteLine($"Release Note  : {rru.ReleaseNote}")
+        For Each robotname In dat.Project.RobotAliasDictionary.Keys
+            Dim rrus2 As List(Of RpaUpdater) = rrus.FindAll(
+                Function(ru)
+                    Return ru.ReleaseTargets.Contains(robotname)
+                End Function
+            )
+            rrus2.Sort(
+                Function(before, after)
+                    Return (before.ReleaseDate < after.ReleaseDate)
+                End Function
+            )
+            Dim srus2 As List(Of RpaUpdater) = srus.FindAll(
+                Function(ru)
+                    Return ru.ReleaseTargets.Contains(robotname)
+                End Function
+            )
+            srus2.Sort(
+                Function(before, after)
+                    Return (before.ReleaseDate < after.ReleaseDate)
+                End Function
+            )
+
+            If rrus2.Count = 0 Then
+                Continue For
+            End If
+            If rrus2.Count > 0 And srus2.Count = 0 Then
+                urus.Add(rrus2.Last)
+                Continue For
+            End If
+            If rrus2.Last.ReleaseDate > srus2.Last.ReleaseDate Then
+                urus.Add(rrus2.Last)
+                Continue For
+            End If
+        Next
+
+        If urus.Count > 0 Then
+            Console.WriteLine($"アップデートを適用")
+            urus.Distinct()
+            urus.Sort(
+                Function(before, after)
+                    Return (before.ReleaseDate < after.ReleaseDate)
+                End Function
+            )
+            For Each uru In urus
+                Console.WriteLine($"Release Title : {uru.ReleaseTitle}")
+                Console.WriteLine($"Release Date  : {uru.ReleaseDate}")
+                For Each src In Directory.GetFiles(uru.PackageDirectory)
+                    Dim dst As String = $"{RpaCui.SystemUpdateDllDirectory}\{Path.GetFileName(src)}"
+                    File.Copy(src, dst, True)
+                    Console.WriteLine($"ファイルをコピー  src: '{src}'")
+                    Console.WriteLine($"               => dst: '{dst}'")
+                Next
+                srus.Add(uru)
+            Next
+            jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
+            Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
             Console.WriteLine()
-        Next
-
-        Dim idx As Integer = -1
-        Do
-            idx = -1
-            Dim idxtext As String = vbNullString
-            Console.WriteLine($"アップデート／ダウングレードを適用する 'ReleaseIndex' を指定してください")
-            idxtext = dat.Transaction.ShowRpaIndicator(dat)
+        Else
+            Console.WriteLine($"アップデート対象は存在しませんでした")
             Console.WriteLine()
-
-            Dim idx2 As Integer = -1
-            If IsNumeric(idxtext) Then
-                idx2 = Integer.Parse(idxtext)
-                If idx2 <= (rrus2.Count - 1) Then
-                    idx = idx2
-                End If
-            End If
-            If idx < 0 Then
-                Console.WriteLine($"'ReleaseIndex' : {idxtext} は不正です")
-                Console.WriteLine()
-                Continue Do
-            End If
-
-            Dim yorn As String = vbNullString
-            Do
-                Console.WriteLine($"よろしいですか？  'ReleaseIndex' : {idxtext} (y/n)")
-                yorn = dat.Transaction.ShowRpaIndicator(dat)
-                If yorn = "y" Or yorn = "n" Then
-                    Exit Do
-                End If
-            Loop Until False
-            If yorn = "y" Then
-                Exit Do
-            End If
-        Loop Until False
-
-        Dim uru As RpaUpdater = rrus2(idx)
-        For Each src In Directory.GetFiles(uru.PackageDirectory)
-            Dim dst As String = $"{RpaCui.SystemPointUpdateDllDirectory}\{Path.GetFileName(src)}"
-            File.Copy(src, dst, True)
-            Console.WriteLine($"ファイルをコピー  src: '{src}'")
-            Console.WriteLine($"               => dst: '{dst}'")
-        Next
-
-        Dim srus2 As List(Of RpaUpdater) = srus.FindAll(
-            Function(ru)
-                Return ru.ReleaseDate >= uru.ReleaseDate
-            End Function
-        )
-        srus2.Sort(
-            Function(before, after)
-                Return (before.ReleaseDate < after.ReleaseDate)
-            End Function
-        )
-        For Each sru In srus2
-            srus.Remove(sru)
-        Next
-        srus.Add(uru)
-
-        jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
-        Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
-        Console.WriteLine()
-
+        End If
         Return 0
     End Function
 

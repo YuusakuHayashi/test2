@@ -78,6 +78,7 @@ Public Class RpaSystem
                 Me._CommandDictionary.Add("showmyrobotjson", (New ShowMyRobotJsonCommand))
                 Me._CommandDictionary.Add("showmyrobotproperties", (New ShowMyRobotPropertiesCommand))
                 Me._CommandDictionary.Add("pushrobot", (New PushRobotCommand))
+                Me._CommandDictionary.Add("showrobotreadme", (New ShowRobotReadMeCommand))
             End If
             Return Me._CommandDictionary
         End Get
