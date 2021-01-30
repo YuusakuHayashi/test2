@@ -17,6 +17,14 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         )
     End Sub
 
+    ' コマンドラインのガイド表示
+    Public Overridable ReadOnly Property GuideString As String
+        Get
+            Return $"{Me.ProjectName}\{Me.RobotAlias}>"
+        End Get
+    End Property
+
+
     Private _SystemUtilities As Dictionary(Of String, RpaUtility)
     Public Property SystemUtilities As Dictionary(Of String, RpaUtility)
         Get

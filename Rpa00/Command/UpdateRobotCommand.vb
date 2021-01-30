@@ -83,16 +83,6 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
             End If
         End If
 
-        'Dim rrus3 As List(Of RpaUpdater) = rrus2
-        'If srus2.Count > 0 Then
-        '    rrus3.FindAll(
-        '        Function(rru)
-        '            Return (rru.ReleaseDate > srus2.Last.ReleaseDate)
-        '        End Function
-        '    )
-        'End If
-
-        'If rrus3.Count > 0 Then
         Dim uru As RpaUpdater
         If ck Then
             uru = rrus2.Last
@@ -199,70 +189,6 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
 
         Return 0
     End Function
-
-    'Private Function AllUpdate(ByRef dat As Object) As Integer
-    '    Dim srcdir As String = dat.Project.RootDllDirectory
-    '    Dim dstdir As String = RpaCui.SystemUpdateDllDirectory
-    '    Dim hit As Integer = 0
-
-    '    For Each pair In dat.Project.RobotAliasDictionary
-    '        Dim src As String = $"{srcdir}\{pair.Key}.dll"
-    '        Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-    '        If Not File.Exists(src) Then
-    '            Console.WriteLine($"ファイル '{src}' は存在しません")
-    '            Console.WriteLine()
-    '            Continue For
-    '        End If
-    '        File.Copy(src, dst, True)
-    '        Console.WriteLine($"ファイルをコピー  '{src}'")
-    '        Console.WriteLine($"               => '{dst}'")
-    '        Console.WriteLine()
-    '        hit += 1
-    '    Next
-
-    '    If hit = 0 Then
-    '        Console.WriteLine($"ディレクトリ '{srcdir}' に対象ファイルは存在しませんでした")
-    '        Console.WriteLine()
-    '    Else
-    '        Console.WriteLine($"アップデートを適用するには、再起動してください")
-    '        Console.WriteLine()
-    '    End If
-    '    Return 0
-    'End Function
-
-    'Private Function SelectedUpdate(ByRef dat As Object) As Integer
-    '    Dim srcdir As String = dat.Project.RootDllDirectory
-    '    Dim dstdir As String = RpaCui.SystemUpdateDllDirectory
-    '    Dim hit As Integer = 0
-    '    For Each para In dat.Transaction.Parameters
-    '        Dim src As String = $"{srcdir}\{para}.dll"
-    '        Dim ext As String = Path.GetExtension(src)
-    '        Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-    '        If Not dat.Project.RobotAliasDictionary.ContainsKey(para) Then
-    '            Console.WriteLine($"指定のアップデート対象ロボット '{para}' はプロジェクトに存在しません")
-    '            Console.WriteLine()
-    '            Continue For
-    '        End If
-    '        If Not File.Exists(src) Then
-    '            Console.WriteLine($"ファイル '{src}' は存在しません")
-    '            Console.WriteLine()
-    '            Continue For
-    '        End If
-    '        File.Copy(src, dst, True)
-    '        Console.WriteLine($"ファイルをコピー  '{src}'")
-    '        Console.WriteLine($"               => '{dst}'")
-    '        Console.WriteLine()
-    '        hit += 1
-    '    Next
-    '    If hit = 0 Then
-    '        Console.WriteLine($"ディレクトリ '{srcdir}' に対象ファイルは存在しませんでした")
-    '        Console.WriteLine()
-    '    Else
-    '        Console.WriteLine($"アップデートを適用するには、再起動してください")
-    '        Console.WriteLine()
-    '    End If
-    '    Return 0
-    'End Function
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main

@@ -155,16 +155,7 @@ Public Class RpaTransaction
     Public Function ShowRpaIndicator(ByRef dat As RpaDataWrapper) As String
         ' ガイド
         If dat.Project IsNot Nothing Then
-            ' ここの記述は見直し予定
-            If dat.Project.SystemArchTypeName = (New IntranetClientServerProject).GetType.Name Then
-                If dat.Project.UpdateChecked Then
-                    Console.Write($"(!){dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
-                Else
-                    Console.Write($"{dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
-                End If
-            Else
-                Console.Write($"{dat.Project.ProjectName}\{dat.Project.RobotAlias}>")
-            End If
+            Console.Write($"{dat.Project.GuideString}")
         Else
             Console.Write("NoRpa>")
         End If

@@ -143,12 +143,15 @@ Public Class RpaSystem
         Try
             dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
 
+            ' コマンドログ
+            '-------------------------------------------------------------------------------------'
             dat.Transaction.CommandLogs.Add(
                 New RpaTransaction.CommandLogData With {
                     .CommandText = dat.Transaction.CommandText,
                     .RunDate = (DateTime.Now).ToString
                 }
             )
+            '-------------------------------------------------------------------------------------'
 
             Call dat.Transaction.CreateCommand()
 

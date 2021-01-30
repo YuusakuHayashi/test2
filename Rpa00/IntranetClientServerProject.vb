@@ -4,6 +4,7 @@ Imports System.Runtime.InteropServices
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 Imports System.Windows.Forms
+Imports System.ComponentModel
 
 'Public Class RpaProject : Inherits RpaCui.JsonHandler(Of RpaProject)
 Public Class IntranetClientServerProject
@@ -14,22 +15,46 @@ Public Class IntranetClientServerProject
 
     Private Const ARCHITECTURE_NAME As String = "IntranetClientServer"
 
-    'Private ReadOnly Property HelloFileName As String
-    '    Get
-    '        Return $"{Me.ServerDirectory}\Hello.txt"
-    '    End Get
-    'End Property
-
-    Private _UpdateChecked As Boolean
-    <JsonIgnore>
-    Public Property UpdateChecked As Boolean
+    Public Overrides ReadOnly Property GuideString As String
         Get
-            Return Me._UpdateChecked
+            Dim upck As String = vbNullString
+            If Me.UpdateAvaileble Then
+                upck = "(!)"
+            End If
+            Return $"{upck}{Me.ProjectName}\{Me.RobotAlias}>"
+        End Get
+    End Property
+
+    ' Update 関係
+    '-----------------------------------------------------------------------------------'
+    ' Updateフラグ
+    Private _UpdateAvaileble As Boolean
+    <JsonIgnore>
+    Public Property UpdateAvaileble As Boolean
+        Get
+            Return Me._UpdateAvaileble
         End Get
         Set(value As Boolean)
-            Me._UpdateChecked = value
+            Me._UpdateAvaileble = value
         End Set
     End Property
+
+    ' 自動更新タスク(CheckUpdateAvailable()) を起動するためのチェック
+    ' 条件を満たした初回時のみTrueにする
+    Private FirstUpdateAvailable As Boolean
+    Private ReadOnly Property IsUpdateAvailable() As Boolean
+        Get
+            Dim b As Boolean = False
+            If File.Exists(Me.RootRobotsUpdateFile) And File.Exists(Me.SystemRobotsUpdateFile) Then
+                If Not FirstUpdateAvailable Then
+                    FirstUpdateAvailable = True
+                    b = True
+                End If
+            End If
+            Return b
+        End Get
+    End Property
+    '-----------------------------------------------------------------------------------'
 
     Private _ReleaseRobotDirectory As String
     Public Property ReleaseRobotDirectory As String
@@ -118,34 +143,6 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    '<JsonIgnore>
-    'Public ReadOnly Property RootRobotRepositoryDirectory As String
-    '    Get
-    '        Dim [dir] As String = vbNullString
-    '        If Directory.Exists(Me.RootRobotDirectory) Then
-    '            [dir] = $"{Me.RootRobotDirectory}\repo"
-    '            If Not Directory.Exists([dir]) Then
-    '                Directory.CreateDirectory([dir])
-    '            End If
-    '        End If
-    '        Return [dir]
-    '    End Get
-    'End Property
-
-    '<JsonIgnore>
-    'Public ReadOnly Property RootRobotDllRepositoryDirectory As String
-    '    Get
-    '        Dim [dir] As String = vbNullString
-    '        If Directory.Exists(Me.RootRobotRepositoryDirectory) Then
-    '            [dir] = $"{Me.RootRobotRepositoryDirectory}\dll"
-    '            If Not Directory.Exists([dir]) Then
-    '                Directory.CreateDirectory([dir])
-    '            End If
-    '        End If
-    '        Return [dir]
-    '    End Get
-    'End Property
-
     Private Property _RootRobotObject As Object
     <JsonIgnore>
     Public Property RootRobotObject As Object
@@ -183,26 +180,6 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    ' セーブ？ロード？するたびに、リストが重複するためＩＧＮＯＲＥするようにした。
-    ' 原因が分かったら、ＩＧＮＯＲＥは解除する？しなくてもいいか・・・
-    'Private _RootRobotIgnoreList As List(Of String)
-    '<JsonIgnore>
-    'Public Property RootRobotIgnoreList As List(Of String)
-    '    Get
-    '        If Me._RootRobotIgnoreList Is Nothing Then
-    '            If File.Exists(Me.RootRobotIgnoreFileName) Then
-    '                Me._RootRobotIgnoreList = _GetIgnoreList(Me.RootRobotIgnoreFileName)
-    '            Else
-    '                Me._RootRobotIgnoreList = New List(Of String)
-    '            End If
-    '        End If
-    '        Return Me._RootRobotIgnoreList
-    '    End Get
-    '    Set(value As List(Of String))
-    '        Me._RootRobotIgnoreList = value
-    '    End Set
-    'End Property
-
     <JsonIgnore>
     Public ReadOnly Property RootRobotsUpdateFile As String
         Get
@@ -227,24 +204,6 @@ Public Class IntranetClientServerProject
             Return [fil]
         End Get
     End Property
-
-    'Private _MyRobotIgnoreList As List(Of String)
-    '<JsonIgnore>
-    'Public Property MyRobotIgnoreList As List(Of String)
-    '    Get
-    '        If Me._MyRobotIgnoreList Is Nothing Then
-    '            If File.Exists(Me.MyRobotIgnoreFileName) Then
-    '                Me._MyRobotIgnoreList = _GetIgnoreList(Me.MyRobotIgnoreFileName)
-    '            Else
-    '                Me._MyRobotIgnoreList = New List(Of String)
-    '            End If
-    '        End If
-    '        Return Me._MyRobotIgnoreList
-    '    End Get
-    '    Set(value As List(Of String))
-    '        Me._MyRobotIgnoreList = value
-    '    End Set
-    'End Property
 
     Public Overrides ReadOnly Property SystemProjectDirectory As String
         Get
@@ -294,56 +253,6 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    '' Robot毎に切り替える
-    'Private _MyRobotUpdatedHistories As List(Of RpaUpdater)
-    '<JsonIgnore>
-    'Public Property MyRobotUpdatedHistories As List(Of RpaUpdater)
-    '    Get
-    '        Return Me._MyRobotUpdatedHistories
-    '    End Get
-    '    Set(value As List(Of RpaUpdater))
-    '        Me._MyRobotUpdatedHistories = value
-    '    End Set
-    'End Property
-    '-----------------------------------------------------------------------------------'
-
-    'Private _PrinterName As String
-    'Public Property PrinterName As String
-    '    Get
-    '        Return Me._PrinterName
-    '    End Get
-    '    Set(value As String)
-    '        Me._PrinterName = value
-    '    End Set
-    'End Property
-
-    'Private _UsePrinterName As String
-    '<JsonIgnore>
-    'Public Property UsePrinterName As String
-    '    Get
-    '        Return Me._UsePrinterName
-    '    End Get
-    '    Set(value As String)
-    '        Me._UsePrinterName = value
-    '    End Set
-    'End Property
-
-    'Public Sub HelloProject()
-    '    Dim txt As String
-    '    Dim sr As StreamReader
-
-    '    If File.Exists(Me.HelloFileName) Then
-    '        sr = New StreamReader(Me.HelloFileName, Encoding.GetEncoding(SHIFT_JIS))
-    '        txt = sr.ReadToEnd()
-    '        Call _ConsoleWriteLine($"{txt}")
-    '    End If
-
-    '    If sr IsNot Nothing Then
-    '        sr.Close()
-    '        sr.Dispose()
-    '    End If
-    'End Sub
-
     Public Overrides Function SwitchRobot(name As String) As Integer
         Dim i As Integer = MyBase.SwitchRobot(name)
         Me.RootRobotObject = Nothing
@@ -352,29 +261,6 @@ Public Class IntranetClientServerProject
     End Function
 
     Private Sub _CheckProject()
-        'Call _ConsoleWriteLine($"プロジェクト '{Me.RobotAlias}' のチェック....")
-        'If Not Me.IsRootRobotExists Then
-        '    Call _ConsoleWriteLine($"RootRobotDirectory '{Me.RootRobotDirectory}' がありません")
-        'End If
-        'If Not Me.IsMyRobotExists Then
-        '    Call _ConsoleWriteLine($"MyRobotDirectory '{Me.MyRobotDirectory}' がありません")
-        'End If
-        'Call _ConsoleWriteLine("プロジェクトのチェック終了")
-
-        'Dim installed = False
-        'Call _ConsoleWriteLine("アップデートパッケージを検索しています...")
-        'For Each rp In Me.RootRobotUpdatePackages
-        '    installed = False
-        '    For Each mp In Me.MyRobotUpdatedPackages
-        '        If rp.Name = mp.Name Then
-        '            installed = True
-        '            Exit For
-        '        End If
-        '    Next
-        '    If Not installed Then
-        '        Call _ConsoleWriteLine("パッケージ : " & rp.Name & " をインストールしていません")
-        '    End If
-        'Next
     End Sub
 
     Private Function _GetIgnoreList(ByVal f As String) As List(Of String)
@@ -397,6 +283,54 @@ Public Class IntranetClientServerProject
         End Try
     End Function
 
+    Private Sub CheckUpdateAvailable(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
+        If Me.IsUpdateAvailable Then
+            Call _CheckUpdateAvailable()
+        End If
+    End Sub
+
+    Private Async Sub _CheckUpdateAvailable()
+        Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
+        Dim rrus As List(Of RpaUpdater)
+        Dim srus As List(Of RpaUpdater)
+        Dim t As Task = Task.Run(
+            Sub()
+                Do
+                    rrus = jh.Load(Of List(Of RpaUpdater))(Me.RootRobotsUpdateFile)
+                    srus = jh.Load(Of List(Of RpaUpdater))(Me.SystemRobotsUpdateFile)
+
+                    If rrus.Count > 0 Then
+                        rrus.Sort(
+                            Function(before, after)
+                                Return (before.ReleaseDate < after.ReleaseDate)
+                            End Function
+                        )
+                    End If
+
+                    If srus.Count > 0 Then
+                        srus.Sort(
+                            Function(before, after)
+                                Return (before.ReleaseDate < after.ReleaseDate)
+                            End Function
+                        )
+                    End If
+
+                    If rrus.Count > 0 Then
+                        If srus.Count = 0 Then
+                            Me.UpdateAvaileble = True
+                        Else
+                            If rrus.Last.ReleaseDate > srus.Last.ReleaseDate Then
+                                Me.UpdateAvaileble = True
+                            End If
+                        End If
+                    End If
+
+                    Threading.Thread.Sleep(60000)
+                Loop Until Me.UpdateAvaileble
+            End Sub
+        )
+        Await t
+    End Sub
 
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If String.IsNullOrEmpty(Me.RootDirectory) Then
@@ -438,10 +372,10 @@ Public Class IntranetClientServerProject
         Return True
     End Function
 
-
     Sub New()
         Me.CanExecuteHandler = AddressOf Check
         AddHandler Me.PropertyChanged, AddressOf CreateChangedFile
+        AddHandler Me.PropertyChanged, AddressOf CheckUpdateAvailable
     End Sub
 
 

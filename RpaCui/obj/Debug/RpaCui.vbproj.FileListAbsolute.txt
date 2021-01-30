@@ -32,3 +32,4 @@ C:\Users\yuusa\project\test2\RpaCui\debugrobot\Newtonsoft.Json.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Newtonsoft.Json.xml
+C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbprojAssemblyReference.cache
