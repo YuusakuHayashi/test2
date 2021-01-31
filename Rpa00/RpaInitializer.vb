@@ -22,6 +22,16 @@ Public Class RpaInitializer
     '    End Get
     'End Property
 
+    Private _LastActiveDate As Date
+    Public Property LastActiveDate As Date
+        Get
+            Return Me._LastActiveDate
+        End Get
+        Set(value As Date)
+            Me._LastActiveDate = value
+        End Set
+    End Property
+
     Private _UserName As String
     Public Property UserName As String
         Get

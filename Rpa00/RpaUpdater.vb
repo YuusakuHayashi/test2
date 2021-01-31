@@ -1,4 +1,24 @@
 ﻿Public Class RpaUpdater
+    Private _IsCritical As Boolean
+    Public Property IsCritical As Boolean
+        Get
+            Return Me._IsCritical
+        End Get
+        Set(value As Boolean)
+            Me._IsCritical = value
+        End Set
+    End Property
+
+    Private _ReleaseId As String
+    Public Property ReleaseId As String
+        Get
+            Return Me._ReleaseId
+        End Get
+        Set(value As String)
+            Me._ReleaseId = value
+        End Set
+    End Property
+
     Private _ReleaseDate As String
     Public Property ReleaseDate As String
         Get

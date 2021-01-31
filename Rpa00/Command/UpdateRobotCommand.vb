@@ -24,6 +24,16 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim i As Integer = -1
+        If dat.Transaction.Parameters.Count = 0 Then
+            i = IntaractiveUpdate(dat)
+        Else
+            i = SelectedUpdate(dat)
+        End If
+        Return i
+    End Function
+
+    Private Function IntaractiveUpdate(ByRef dat As RpaDataWrapper) As Integer
+        Dim i As Integer = -1
         Dim idxtext As String = vbNullString
         Console.WriteLine()
         Do
@@ -51,6 +61,74 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         End Select
 
         Return i
+    End Function
+
+    Private Function SelectedUpdate(ByRef dat As RpaDataWrapper) As Integer
+        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
+
+        If rrus.Count = 0 Then
+            Console.WriteLine($"更新元が存在しません")
+            Console.WriteLine()
+            Return 0
+        End If
+
+        Dim id As String = dat.Transaction.Parameters(0)
+        Dim rru As RpaUpdater
+        rru = rrus.Find(
+            Function(upd)
+                Return upd.ReleaseId = id
+            End Function
+        )
+        If rru Is Nothing Then
+            Console.WriteLine($"指定した更新元 '{id}' が存在しません")
+            Console.WriteLine()
+            Return 0
+        End If
+
+        Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
+        srus.Sort(
+            Function(before, after)
+                Return (before.ReleaseDate < after.ReleaseDate)
+            End Function
+        )
+        If (srus.Last).ReleaseId = id Then
+            Console.WriteLine($"指定した更新 '{id}' は適用されています")
+            Console.WriteLine()
+            Return 0
+        End If
+
+        Dim uru As RpaUpdater = rru
+        ' 指定したアップデートを適用するロジック（共通化を検討）
+        '-----------------------------------------------------------------------------------------'
+        For Each src In Directory.GetFiles(uru.PackageDirectory)
+            Dim dst As String = $"{RpaCui.SystemPointUpdateDllDirectory}\{Path.GetFileName(src)}"
+            File.Copy(src, dst, True)
+            Console.WriteLine($"ファイルをコピー  src: '{src}'")
+            Console.WriteLine($"               => dst: '{dst}'")
+        Next
+
+        Dim srus2 As List(Of RpaUpdater) = srus.FindAll(
+            Function(ru)
+                Return ru.ReleaseDate >= uru.ReleaseDate
+            End Function
+        )
+        srus2.Sort(
+            Function(before, after)
+                Return (before.ReleaseDate < after.ReleaseDate)
+            End Function
+        )
+        For Each sru In srus2
+            srus.Remove(sru)
+        Next
+        srus.Add(uru)
+
+        jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
+        Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
+        Console.WriteLine()
+        '-----------------------------------------------------------------------------------------'
+
+        Return 0
     End Function
 
     Private Function LatestUpdate(ByRef dat As Object) As Integer
@@ -161,6 +239,8 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Loop Until False
 
         Dim uru As RpaUpdater = rrus2(idx)
+        ' 指定したアップデートを適用するロジック（共通化を検討）
+        '-----------------------------------------------------------------------------------------'
         For Each src In Directory.GetFiles(uru.PackageDirectory)
             Dim dst As String = $"{RpaCui.SystemPointUpdateDllDirectory}\{Path.GetFileName(src)}"
             File.Copy(src, dst, True)
@@ -186,6 +266,7 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
         Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
         Console.WriteLine()
+        '-----------------------------------------------------------------------------------------'
 
         Return 0
     End Function
@@ -194,6 +275,6 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
         Me.ExecutableProjectArchitectures = {(New IntranetClientServerProject).GetType.Name}
-        Me.ExecutableParameterCount = {0, 0}
+        Me.ExecutableParameterCount = {0, 1}
     End Sub
 End Class

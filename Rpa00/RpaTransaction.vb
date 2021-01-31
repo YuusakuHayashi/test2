@@ -11,6 +11,49 @@ Public Class RpaTransaction
         End Get
     End Property
 
+    Public ReadOnly Property SystemLogsDirectory As String
+        Get
+            Dim [dir] As String = $"{RpaCui.SystemDirectory}\logs"
+            If Not Directory.Exists([dir]) Then
+                Directory.CreateDirectory([dir])
+            End If
+            Return [dir]
+        End Get
+    End Property
+
+    Private _SystemMonthlyLogDirectories As String()
+    Public ReadOnly Property SystemMonthlyLogDirectories As String()
+        Get
+            Dim dirs(12) As String
+            If Me._SystemMonthlyLogDirectories Is Nothing Then
+                dirs(0) = vbNullString
+                For i As Integer = 1 To 12
+                    dirs(i) = $"{Me.SystemLogsDirectory}\{String.Format("{0:00}", i)}"
+                    If Not Directory.Exists(dirs(i)) Then
+                        Directory.CreateDirectory(dirs(i))
+                    End If
+                Next
+                Me._SystemMonthlyLogDirectories = dirs
+            End If
+            Return Me._SystemMonthlyLogDirectories
+        End Get
+    End Property
+
+    Private _SystemMonthlyLogFiles As String()
+    Public ReadOnly Property SystemMonthlyLogFiles As String()
+        Get
+            Dim fils(12) As String
+            If Me._SystemMonthlyLogFiles Is Nothing Then
+                fils(0) = vbNullString
+                For i As Integer = 1 To 12
+                    fils(i) = $"{Me.SystemMonthlyLogDirectories(i)}\commands.log"
+                Next
+                Me._SystemMonthlyLogFiles = fils
+            End If
+            Return Me._SystemMonthlyLogFiles
+        End Get
+    End Property
+
     Private _ReturnCode As Integer
     Public Property ReturnCode As Integer
         Get
@@ -38,6 +81,19 @@ Public Class RpaTransaction
         End Get
         Set(value As String)
             Me._CommandText = value
+        End Set
+    End Property
+
+    Private _AutoCommandText As List(Of String)
+    Public Property AutoCommandText As List(Of String)
+        Get
+            If Me._AutoCommandText Is Nothing Then
+                Me._AutoCommandText = New List(Of String)
+            End If
+            Return Me._AutoCommandText
+        End Get
+        Set(value As List(Of String))
+            Me._AutoCommandText = value
         End Set
     End Property
 
@@ -101,12 +157,49 @@ Public Class RpaTransaction
     End Property
 
     Public Class CommandLogData
+        Private _UserName As String
+        Public Property UserName As String
+            Get
+                Return Me._UserName
+            End Get
+            Set(value As String)
+                Me._UserName = value
+            End Set
+        End Property
+
+        Private _ProjectArchTypeName As String
+        Public Property ProjectArchTypeName As String
+            Get
+                Return Me._ProjectArchTypeName
+            End Get
+            Set(value As String)
+                Me._ProjectArchTypeName = value
+            End Set
+        End Property
+
+        Private _ProjectName As String
+        Public Property ProjectName As String
+            Get
+                Return Me._ProjectName
+            End Get
+            Set(value As String)
+                Me._ProjectName = value
+            End Set
+        End Property
+
+        Private _RobotName As String
+        Public Property RobotName As String
+            Get
+                Return Me._RobotName
+            End Get
+            Set(value As String)
+                Me._RobotName = value
+            End Set
+        End Property
+
         Private _RunDate As String
         Public Property RunDate As String
             Get
-                If String.IsNullOrEmpty(Me._RunDate) Then
-                    Me._RunDate = (DateTime.Now).ToString
-                End If
                 Return Me._RunDate
             End Get
             Set(value As String)
@@ -123,15 +216,73 @@ Public Class RpaTransaction
                 Me._CommandText = value
             End Set
         End Property
+
+        Private _Result As String
+        Public Property Result As String
+            Get
+                Return Me._Result
+            End Get
+            Set(value As String)
+                Me._Result = value
+            End Set
+        End Property
+
+        Private _ResultString As String
+        Public Property ResultString As String
+            Get
+                Return Me._ResultString
+            End Get
+            Set(value As String)
+                Me._ResultString = value
+            End Set
+        End Property
+
+        Private _AutoCommandFlag As Boolean
+        Public Property AutoCommandFlag As Boolean
+            Get
+                Return Me._AutoCommandFlag
+            End Get
+            Set(value As Boolean)
+                Me._AutoCommandFlag = value
+            End Set
+        End Property
+
+        Private _ExecuteTime As TimeSpan
+        Public Property ExecuteTime As TimeSpan
+            Get
+                Return Me._ExecuteTime
+            End Get
+            Set(value As TimeSpan)
+                Me._ExecuteTime = value
+            End Set
+        End Property
     End Class
 
     Public Sub SaveCommandLogs()
-        Dim jh As New RpaCui.JsonHandler(Of List(Of CommandLogData))
-        Dim [olds] As List(Of CommandLogData) = jh.Load(Of List(Of CommandLogData))(Me.CommandTextLogFileName)
-        For Each [new] In Me.CommandLogs
-            olds.Add([new])
+        Dim sw As New StreamWriter(
+            Me.CommandTextLogFileName,
+            True,
+            Text.Encoding.GetEncoding(RpaModule.DEFUALTENCODING)
+        )
+
+        For Each [log] In Me.CommandLogs
+            Dim line As String = vbNullString
+            line &= $"{[log].RunDate},"
+            line &= $"{[log].UserName},"
+            line &= $"{[log].ProjectArchTypeName},"
+            line &= $"{[log].ProjectName},"
+            line &= $"{[log].RobotName},"
+            line &= $"{[log].CommandText},"
+            line &= $"{[log].Result},"
+            line &= $"{[log].ResultString},"
+            line &= $"{IIf([log].AutoCommandFlag, "1", "0")},"
+            line &= $"{[log].ExecuteTime.ToString}"
+            sw.WriteLine(line)
         Next
-        Call jh.Save(Of List(Of CommandLogData))(Me.CommandTextLogFileName, [olds])
+
+        sw.Close()
+        sw.Dispose()
+
         Me.CommandLogs = New List(Of CommandLogData)
     End Sub
 

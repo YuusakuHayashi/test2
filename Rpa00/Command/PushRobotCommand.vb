@@ -35,20 +35,6 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             Return False
         End If
 
-        'Dim ck2 As Boolean = True
-        'If dat.Transaction.Parameters.Count > 0 Then
-        '    For Each para In dat.Transaction.Parameters
-        '        Dim src As String = $"{dat.Project.ReleaseRobotDirectory}\{para}"
-        '        If Not File.Exists(src) Then
-        '            Console.WriteLine($"ファイル '{src}' は存在しません")
-        '            ck2 = False
-        '        End If
-        '    Next
-        'End If
-        'If Not ck2 Then
-        '    Return False
-        'End If
-
         Return True
     End Function
 
@@ -57,12 +43,6 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
 
         Dim pdname As String = WriteReleaseInfo(dat)
         i = AllPush(dat, pdname)
-
-        'If dat.Transaction.Parameters.Count = 0 Then
-        '    i = AllPush(dat, pdname)
-        'Else
-        '    i = SelectedPush(dat, pdname)
-        'End If
 
         Return i
     End Function
@@ -109,13 +89,15 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
 
         Console.WriteLine()
         Dim yorn As String = vbNullString
+        Dim id As String = vbNullString
         Dim pdname As String = vbNullString
         Do
             yorn = vbNullString
             Console.WriteLine($"Please Input ReleaseTitle :")
             Dim ttl As String = dat.Transaction.ShowRpaIndicator(dat)
             Console.WriteLine()
-            pdname = $"{dat.Project.RootDllDirectory}\{ru.ReleaseDate}_{ttl}"
+            id = $"{ru.ReleaseDate}_{ttl}"
+            pdname = $"{dat.Project.RootDllDirectory}\{id}"
             If Directory.Exists(pdname) Then
                 Console.WriteLine($"Directory '{pdname}' is Already Exists,")
                 Console.WriteLine($"Please Input Other ReleaseTitle.")
@@ -131,6 +113,7 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
                 End If
             Loop Until False
             ru.ReleaseTitle = ttl
+            ru.ReleaseId = id
             ru.PackageDirectory = pdname
             If yorn = "y" Then
                 Exit Do

@@ -58,7 +58,6 @@ C:\Users\yuusa\project\test2\test2\bin\Debug\test2.pdb
 C:\Users\yuusa\project\test2\test2\bin\Debug\test2.xml
 C:\Users\yuusa\project\test2\test2\bin\Debug\Newtonsoft.Json.dll
 C:\Users\yuusa\project\test2\test2\bin\Debug\Newtonsoft.Json.xml
-C:\Users\yuusa\project\test2\test2\obj\Debug\test2.vbprojAssemblyReference.cache
 C:\Users\yuusa\project\test2\test2\obj\Debug\MainWin.g.vb
 C:\Users\yuusa\project\test2\test2\obj\Debug\MainWindow.g.vb
 C:\Users\yuusa\project\test2\test2\obj\Debug\Window1.g.vb

@@ -127,9 +127,7 @@ Public Module RpaCui
             dat.Project = dat.System.LoadCurrentRpa(dat)
 
             ' 実行
-            Do Until dat.Transaction.ExitFlag
-                Call dat.System.Main(dat)
-            Loop
+            Call dat.System.Main(dat)
         Catch ex As Exception
             Console.WriteLine(ex.Message)
             Console.WriteLine("RpaCui.exe は異常終了しました")

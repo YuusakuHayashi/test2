@@ -15,10 +15,11 @@ Public Class IntranetClientServerProject
 
     Private Const ARCHITECTURE_NAME As String = "IntranetClientServer"
 
+    <JsonIgnore>
     Public Overrides ReadOnly Property GuideString As String
         Get
             Dim upck As String = vbNullString
-            If Me.UpdateAvaileble Then
+            If Me.IsUpdateAvailable Then
                 upck = "(!)"
             End If
             Return $"{upck}{Me.ProjectName}\{Me.RobotAlias}>"
@@ -27,32 +28,58 @@ Public Class IntranetClientServerProject
 
     ' Update 関係
     '-----------------------------------------------------------------------------------'
-    ' Updateフラグ
-    Private _UpdateAvaileble As Boolean
-    <JsonIgnore>
-    Public Property UpdateAvaileble As Boolean
+    ' 自動更新フラグ。真の時、終了時の更新有無を確認しない
+    Private _AutoUpdate As Boolean
+    Public Property AutoUpdate As Boolean
         Get
-            Return Me._UpdateAvaileble
+            Return Me._AutoUpdate
         End Get
         Set(value As Boolean)
-            Me._UpdateAvaileble = value
+            Me._AutoUpdate = value
+        End Set
+    End Property
+
+    ' Updateフラグ
+    Private _IsUpdateAvailable As Boolean
+    <JsonIgnore>
+    Public Property IsUpdateAvailable As Boolean
+        Get
+            Return Me._IsUpdateAvailable
+        End Get
+        Set(value As Boolean)
+            Me._IsUpdateAvailable = value
         End Set
     End Property
 
     ' 自動更新タスク(CheckUpdateAvailable()) を起動するためのチェック
     ' 条件を満たした初回時のみTrueにする
-    Private FirstUpdateAvailable As Boolean
-    Private ReadOnly Property IsUpdateAvailable() As Boolean
+    Private FirstUpdateChecked As Boolean
+    <JsonIgnore>
+    Private ReadOnly Property IsUpdateChecked() As Boolean
         Get
             Dim b As Boolean = False
             If File.Exists(Me.RootRobotsUpdateFile) And File.Exists(Me.SystemRobotsUpdateFile) Then
-                If Not FirstUpdateAvailable Then
-                    FirstUpdateAvailable = True
+                If Not FirstUpdateChecked Then
+                    FirstUpdateChecked = True
                     b = True
                 End If
             End If
             Return b
         End Get
+    End Property
+
+    ' UpdateCheckのインターバル
+    Private _UpdateCheckInterval As TimeSpan
+    Public Property UpdateCheckInterval As TimeSpan
+        Get
+            If Me._UpdateCheckInterval = Nothing Then
+                Me._UpdateCheckInterval = New TimeSpan(0, 0, 0, 0)
+            End If
+            Return Me._UpdateCheckInterval
+        End Get
+        Set(value As TimeSpan)
+            Me._UpdateCheckInterval = value
+        End Set
     End Property
     '-----------------------------------------------------------------------------------'
 
@@ -74,9 +101,42 @@ Public Class IntranetClientServerProject
             Return Me._RootDirectory
         End Get
         Set(value As String)
-            Me._RootDirectory = value
-            RaisePropertyChanged("RootDirectory")
+            If Directory.Exists(value) Then
+                Me._RootDirectory = value
+            Else
+                Me._RootDirectory = vbNullString
+            End If
         End Set
+    End Property
+
+    <JsonIgnore>
+    Public ReadOnly Property RootLogsDirectory As String
+        Get
+            Dim [dir] As String = $"{Me._RootDirectory}\logs"
+            If Directory.Exists([dir]) Then
+                Directory.CreateDirectory([dir])
+            End If
+            Return [dir]
+        End Get
+    End Property
+
+    Private _RootMonthlyLogDirectories As String()
+    <JsonIgnore>
+    Public ReadOnly Property RootMonthlyLogDirectories As String()
+        Get
+            Dim dirs(12) As String
+            If Me._RootMonthlyLogDirectories Is Nothing Then
+                dirs(0) = vbNullString
+                For i As Integer = 1 To 12
+                    dirs(i) = $"{Me.RootLogsDirectory}\{String.Format("{0:00}", i)}"
+                    If Not Directory.Exists(dirs(i)) Then
+                        Directory.CreateDirectory(dirs(i))
+                    End If
+                Next
+                Me._RootMonthlyLogDirectories = dirs
+            End If
+            Return Me._RootMonthlyLogDirectories
+        End Get
     End Property
 
     <JsonIgnore>
@@ -284,18 +344,26 @@ Public Class IntranetClientServerProject
     End Function
 
     Private Sub CheckUpdateAvailable(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
-        If Me.IsUpdateAvailable Then
-            Call _CheckUpdateAvailable()
+        If Not Me.IsUpdateChecked Then
+            Exit Sub
         End If
+        If Not Me.UpdateCheckInterval.TotalSeconds = 0 Then
+            Exit Sub
+        End If
+        Call _CheckUpdateAvailable()
     End Sub
 
+    ' アップデートありを確認するまでチェックをループする
+    ' アップデートありを確認したら、ループを終了し、その後チェックはしない
     Private Async Sub _CheckUpdateAvailable()
-        Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
-        Dim rrus As List(Of RpaUpdater)
-        Dim srus As List(Of RpaUpdater)
         Dim t As Task = Task.Run(
             Sub()
+                Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
+                Dim rrus As List(Of RpaUpdater)
+                Dim srus As List(Of RpaUpdater)
+                Dim ck1 As Boolean = False
                 Do
+                    ck1 = False
                     rrus = jh.Load(Of List(Of RpaUpdater))(Me.RootRobotsUpdateFile)
                     srus = jh.Load(Of List(Of RpaUpdater))(Me.SystemRobotsUpdateFile)
 
@@ -317,16 +385,26 @@ Public Class IntranetClientServerProject
 
                     If rrus.Count > 0 Then
                         If srus.Count = 0 Then
-                            Me.UpdateAvaileble = True
+                            ck1 = True
                         Else
                             If rrus.Last.ReleaseDate > srus.Last.ReleaseDate Then
-                                Me.UpdateAvaileble = True
+                                ck1 = True
                             End If
                         End If
                     End If
 
-                    Threading.Thread.Sleep(60000)
-                Loop Until Me.UpdateAvaileble
+                    If ck1 Then
+                        If rrus.Last.IsCritical Then
+                            Me.IsUpdateAvailable = True
+                        End If
+                    End If
+
+                    Threading.Thread.Sleep(Me.UpdateCheckInterval)
+
+                    If Me.IsUpdateAvailable Then
+                        Exit Do
+                    End If
+                Loop Until False
             End Sub
         )
         Await t
