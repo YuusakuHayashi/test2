@@ -176,6 +176,26 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
         '    End If
         'Loop Until False
 
+        Dim yorn6 As String = vbNullString
+        Do
+            yorn6 = vbNullString
+            Console.WriteLine($"Is this Critical? (y/n) :")
+            Dim yorn7 As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            Do
+                Console.WriteLine($"IsCritical : '{yorn7}' ok? (y/n)")
+                yorn6 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn6 = "y" Or yorn6 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            ru.IsCritical = IIf(yorn7 = "y", True, False)
+            If yorn6 = "y" Then
+                Exit Do
+            End If
+        Loop Until False
+
         Directory.CreateDirectory(pdname)
 
         Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))

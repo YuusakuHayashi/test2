@@ -434,7 +434,9 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' 添付ファイルを解凍
         Console.WriteLine("添付ファイルを解凍します...")
-        Call sutil.RunShell(Me.AttacheCase, $"/c {afile_1} /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
+        'Call sutil.RunShell(Me.AttacheCase, $"/c '{afile_1}' /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
+        'Call sutil.RunShell(Me.AttacheCase, vbNullString)
+        Call sutil.RunShell(Me.AttacheCase, $"""{afile_1}"" /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
         If Not File.Exists(ixls_1) Then
             Console.WriteLine($"エラー：解凍後ファイル '{ixls_1}' がありません")
             Return 1000

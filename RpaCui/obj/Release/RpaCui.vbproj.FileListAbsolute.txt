@@ -35,3 +35,4 @@ C:\Users\yuusa\project\test2\RpaCui\obj\Release\RpaCui.vbprojAssemblyReference.c
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaCui.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Newtonsoft.Json.dll
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\Newtonsoft.Json.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\obj\Release\RpaCui.vbprojResolveAssemblyReference.cache

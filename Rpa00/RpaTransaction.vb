@@ -84,6 +84,16 @@ Public Class RpaTransaction
         End Set
     End Property
 
+    Private _IsAutoCommand As Boolean
+    Public Property IsAutoCommand As Boolean
+        Get
+            Return Me._IsAutoCommand
+        End Get
+        Set(value As Boolean)
+            Me._IsAutoCommand = value
+        End Set
+    End Property
+
     Private _AutoCommandText As List(Of String)
     Public Property AutoCommandText As List(Of String)
         Get

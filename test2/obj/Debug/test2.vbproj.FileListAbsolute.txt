@@ -140,4 +140,3 @@ C:\Users\yuusa\project\test2\test2\obj\Debug\Window.baml
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.exe
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.pdb
-\\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.vbprojResolveAssemblyReference.cache

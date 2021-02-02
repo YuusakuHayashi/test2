@@ -208,7 +208,7 @@ Public Class IntranetClientServerProject
     Public Property RootRobotObject As Object
         Get
             If Me._RootRobotObject Is Nothing Then
-                Dim obj = RpaCodes.RpaObject(Me)
+                Dim obj = RpaCodes.CreateRobotObject(Me)
                 Dim obj2 = Nothing
                 If obj Is Nothing Then
                     Me._RootRobotObject = Nothing
@@ -347,7 +347,7 @@ Public Class IntranetClientServerProject
         If Not Me.IsUpdateChecked Then
             Exit Sub
         End If
-        If Not Me.UpdateCheckInterval.TotalSeconds = 0 Then
+        If Me.UpdateCheckInterval.TotalSeconds = 0 Then
             Exit Sub
         End If
         Call _CheckUpdateAvailable()

@@ -52,7 +52,11 @@ Private Function GetInputDatas(ByRef v() As Variant) As String()
     Application.EnableEvents = True
 End Function
 
-Private Sub CreatePunchData(ByRef v() As Variant)
+' HISTORY
+'     2021-02-01: ゼロ値の空白置換対応
+'     ＶＢ側で出力データを作成する際にゼロ値を空白置換するのは難しかったので、
+'     エクセル側で行う 
+Private Sub WriteOutputData(ByRef v() As Variant)
     Application.EnableEvents = False
     Application.DisplayAlerts = False
 
@@ -69,7 +73,9 @@ Private Sub CreatePunchData(ByRef v() As Variant)
 
         For i = 1 To Ubound(indatas) Step 2
             osheet.Range(indatas(i)).Value = indatas(i + 1)
-            osheet.Range(indatas(i)).Value = indatas(i + 1)
+            If osheet.Range(indatas(i)).Value = 0 Then
+                osheet.Range(indatas(i)).Value = vbNullString
+            End If
         Next 
     Next
 

@@ -165,7 +165,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Public Property MyRobotObject As Object
         Get
             If Me._MyRobotObject Is Nothing Then
-                Dim obj = RpaCodes.RpaObject(Me)
+                Dim obj = RpaCodes.CreateRobotObject(Me)
                 Dim obj2 = Nothing
                 If obj Is Nothing Then
                     Me._MyRobotObject = Nothing

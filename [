@@ -168,13 +168,13 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
         'Dim siosc As Dictionary(Of String, String) = Data.Project.RootRobotObject.SingleMonthBookDatas.InputOutputSheetCorrespondence
         'Dim miosc As Dictionary(Of String, String) = Data.Project.RootRobotObject.MultiMonthBookDatas.InputOutputSheetCorrespondence
 
-        ' 入力ファイルチェック (廃止)
-        'Console.WriteLine()
-        'If Not Rpa00.RpaModule.FileCheckLoop(Me.DOBookDatas.BookName, dat) Then
-        '    Console.WriteLine($"中断しました")
-        '    Console.WriteLine()
-        '    Return 1000
-        'End If
+        ' 入力ファイルチェック
+        Console.WriteLine()
+        If Not Rpa00.RpaModule.FileCheckLoop(Me.DOBookDatas.BookName, dat) Then
+            Console.WriteLine($"中断しました")
+            Console.WriteLine()
+            Return 1000
+        End If
 
         Dim sorgbook As String = $"{Me.SingleMonthBookDatas.BookName}"
         Dim morgbook As String = $"{Me.MultiMonthBookDatas.BookName}"
@@ -259,40 +259,41 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
                 indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.ZininKindCell}{vbTab}2"
             End If
             For [y] As Integer = 0 To (rtndatas.GetLength(1) - 1)
-                Dim rtn0 As String = rtndatas([x], [y], 0)
-                Dim rtn1 As String = rtndatas([x], [y], 1)
-                Dim rtn2 As String = rtndatas([x], [y], 2)
-                Dim rtn3 As String = rtndatas([x], [y], 3)
-                Dim rtn4 As String = rtndatas([x], [y], 4)
-                Dim rtn5 As String = rtndatas([x], [y], 5)
-                Dim rtn6 As String = rtndatas([x], [y], 6)
-                Dim rtn7 As String = rtndatas([x], [y], 7)
-                Dim rtn8 As String = rtndatas([x], [y], 8)
-                Dim rtn9 As String = rtndatas([x], [y], 9)
                 If months.Count = 1 Then
                     indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).NengetsuCell}{vbTab}{GetNengetsuString(months([y]))}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).ZinkenhiValueCell}{vbTab}{rtn0}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).KeihiValueCell}{vbTab}{rtn1}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).BumonhiValueCell}{vbTab}{rtn2}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).BumonriekiValueCell}{vbTab}{rtn3}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).HonsyahiValueCell}{vbTab}{rtn4}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).KeijoriekiValueCell}{vbTab}{rtn5}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).ArariValueCell}{vbTab}{rtn6}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).AverageBumonriekiValueCell}{vbTab}{rtn7}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).RoudoubunpairituValueCell}{vbTab}{rtn8}"
-                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).ZininValueCell}{vbTab}{rtn9}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).ZinkenhiValueCell}{vbTab}{rtndatas([x], [y], 0)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).KeihiValueCell}{vbTab}{rtndatas([x], [y], 1)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).BumonhiValueCell}{vbTab}{rtndatas([x], [y], 2)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).BumonriekiValueCell}{vbTab}{rtndatas([x], [y], 3)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).HonsyahiValueCell}{vbTab}{rtndatas([x], [y], 4)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).KeijoriekiValueCell}{vbTab}{rtndatas([x], [y], 5)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).ArariValueCell}{vbTab}{rtndatas([x], [y], 6)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).AverageBumonriekiValueCell}{vbTab}{rtndatas([x], [y], 7)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).RoudoubunpairituValueCell}{vbTab}{rtndatas([x], [y], 8)}"
+                    indatasstring &= $"{vbTab}{Me.SingleMonthBookDatas.MonthCellDatas(0).ZininValueCell}{vbTab}{rtndatas([x], [y], 9)}"
                 Else
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).NengetsuCell}{vbTab}{GetNengetsuString(months([y]))}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).ZinkenhiValueCell}{vbTab}{rtndatas([x], [y], 0)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).KeihiValueCell}{vbTab}{rtndatas([x], [y], 1)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).BumonhiValueCell}{vbTab}{rtndatas([x], [y], 2)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).BumonriekiValueCell}{vbTab}{rtndatas([x], [y], 3)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).HonsyahiValueCell}{vbTab}{rtndatas([x], [y], 4)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).KeijoriekiValueCell}{vbTab}{rtndatas([x], [y], 5)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).ArariValueCell}{vbTab}{rtndatas([x], [y], 6)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).AverageBumonriekiValueCell}{vbTab}{rtndatas([x], [y], 7)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).RoudoubunpairituValueCell}{vbTab}{rtndatas([x], [y], 8)}"
+                    'indatasstring &= $"{vbTab}{Data.Project.RootRobotObject.MultiMonthBookDatas.MonthCellDatas([y]).ZininValueCell}{vbTab}{rtndatas([x], [y], 9)}"
                     indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).NengetsuCell}{vbTab}{GetNengetsuString(months([y]))}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).ZinkenhiValueCell}{vbTab}{rtn0}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).KeihiValueCell}{vbTab}{rtn1}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).BumonhiValueCell}{vbTab}{rtn2}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).BumonriekiValueCell}{vbTab}{rtn3}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).HonsyahiValueCell}{vbTab}{rtn4}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).KeijoriekiValueCell}{vbTab}{rtn5}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).ArariValueCell}{vbTab}{rtn6}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).AverageBumonriekiValueCell}{vbTab}{rtn7}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).RoudoubunpairituValueCell}{vbTab}{rtn8}"
-                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).ZininValueCell}{vbTab}{rtn9}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).ZinkenhiValueCell}{vbTab}{rtndatas([x], [y], 0)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).KeihiValueCell}{vbTab}{rtndatas([x], [y], 1)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).BumonhiValueCell}{vbTab}{rtndatas([x], [y], 2)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).BumonriekiValueCell}{vbTab}{rtndatas([x], [y], 3)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).HonsyahiValueCell}{vbTab}{rtndatas([x], [y], 4)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).KeijoriekiValueCell}{vbTab}{rtndatas([x], [y], 5)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).ArariValueCell}{vbTab}{rtndatas([x], [y], 6)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).AverageBumonriekiValueCell}{vbTab}{rtndatas([x], [y], 7)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).RoudoubunpairituValueCell}{vbTab}{rtndatas([x], [y], 8)}"
+                    indatasstring &= $"{vbTab}{Me.MultiMonthBookDatas.MonthCellDatas([y]).ZininValueCell}{vbTab}{rtndatas([x], [y], 9)}"
                 End If
             Next
             indatas([x]) = indatasstring
@@ -300,9 +301,9 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
 
         Dim [k] As Integer = -1
         If months.Count = 1 Then
-            [k] = mutil.InvokeMacro("Rpa02.WriteOutputData", {sdstbook, indatas})
+            [k] = mutil.InvokeMacro("Rpa02.CreatePunchData", {sdstbook, indatas})
         Else
-            [k] = mutil.InvokeMacro("Rpa02.WriteOutputData", {mdstbook, indatas})
+            [k] = mutil.InvokeMacro("Rpa02.CreatePunchData", {mdstbook, indatas})
         End If
 
         Console.WriteLine($"処理完了！")
@@ -334,21 +335,8 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
         Dim mutil As New RpaMacroUtility
         Dim outil As New RpaOutlookUtility
 
-        Dim [new] As List(Of String)
-        If dat.Transaction.Parameters.Contains("nocheck") Then
-            'dat.Transaction.Parameters = Rpa00.RpaModule.Pop(Of List(Of String))(dat.Transaction.Parameters)
-            [new] = dat.Transaction.Parameters
-            [new].Remove("nocheck")
-            dat.Transaction.Parameters = [new]
-            Return True
-        End If
-
         If String.IsNullOrEmpty(Me.DOBookDatas.BookName) Then
             Console.WriteLine($" 'DOBookDatas.BookName' が設定されていません")
-            Return False
-        End If
-        If Not File.Exists(Me.DOBookDatas.BookName) Then
-            Console.WriteLine($"ファイル '{Me.DOBookDatas.BookName}' が存在しません")
             Return False
         End If
         If String.IsNullOrEmpty(Me.SingleMonthBookDatas.BookName) Then

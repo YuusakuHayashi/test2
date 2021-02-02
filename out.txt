@@ -1,0 +1,20 @@
+バイナリファイル Rpa00/bin/Debug/Rpa00.dll に一致しました
+バイナリファイル Rpa00/bin/Debug/Rpa00.pdb に一致しました
+バイナリファイル Rpa00/bin/Release/Rpa00.dll に一致しました
+バイナリファイル Rpa00/bin/Release/Rpa00.pdb に一致しました
+Rpa00/Command/LoadCommand.vb:        Dim [load] As Object = dat.System.RpaObject(dat.Initializer.Projects(idx2).Architecture)
+Rpa00/Command/NewProjectCommand.vb:                    'Dim rpa2 As Object = RpaModule.RpaObject(idx)
+Rpa00/Command/NewProjectCommand.vb:                    Dim rpa2 As Object = dat.System.RpaObject(idx)
+Rpa00/Command/NewProjectCommand.vb:            'rpa = RpaModule.RpaObject(iidx)
+Rpa00/Command/NewProjectCommand.vb:            rpa = dat.System.RpaObject(iidx)
+Rpa00/IntranetClientServerProject.vb:                Dim obj = RpaCodes.RpaObject(Me)
+バイナリファイル Rpa00/obj/Debug/Rpa00.dll に一致しました
+バイナリファイル Rpa00/obj/Debug/Rpa00.pdb に一致しました
+バイナリファイル Rpa00/obj/Release/Rpa00.dll に一致しました
+バイナリファイル Rpa00/obj/Release/Rpa00.pdb に一致しました
+Rpa00/RpaCodes.vb:    Public ReadOnly Property RpaObject(rpa As Object) As Object
+Rpa00/RpaModule.vb:    'Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
+Rpa00/RpaModule.vb:    '    Dim rpa = RpaObject(dat.Initializer.CurrentProject.Architecture)
+Rpa00/RpaProjectBase.vb:                Dim obj = RpaCodes.RpaObject(Me)
+Rpa00/RpaSystem.vb:    Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
+Rpa00/RpaSystem.vb:        Dim rpa = RpaObject(dat.Initializer.CurrentProject.Architecture)

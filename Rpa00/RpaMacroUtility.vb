@@ -27,17 +27,6 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Get
     End Property
 
-    'Public ReadOnly Property RootRobotBasDirectory(dat As Object) As String
-    '    Get
-    '        If dat.Project IsNot Nothing Then
-    '            If (Not String.IsNullOrEmpty(dat.Project.ProjectName)) And Directory.Exists(dat.Project.RootRobotDirectory) Then
-    '                Return $"{dat.Project.RootRobotDirectory}\bas"
-    '            End If
-    '        End If
-    '        Return vbNullString
-    '    End Get
-    'End Property
-
     Public ReadOnly Property RootBasDirectory(dat As Object) As String
         Get
             If Not String.IsNullOrEmpty(dat.Project.RootDirectory) Then
@@ -222,16 +211,6 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Dim dlcmd As New DownloadMacroFileCommand(Parent)
             dlcmd.Execute(dat)
             incmd.Execute(dat)
-            'For Each src In Directory.GetFiles(srcdir)
-            '    Dim srcname As String = Path.GetFileName(src)
-            '    If dat.Transaction.Parameters.Count = 0 Then
-            '        dat.Transaction.Parameters.Add(srcname)
-            '    Else
-            '        dat.Transaction.Parameters(0) = srcname
-            '    End If
-            '    dlcmd.Execute(dat)
-            '    incmd.Execute(dat)
-            'Next
             Return 0
         End Function
 
