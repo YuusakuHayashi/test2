@@ -94,18 +94,18 @@ Public Class RpaTransaction
         End Set
     End Property
 
-    Private _LateBindingCommandText As List(Of String)
-    Public Property LateBindingCommandText As List(Of String)
-        Get
-            If Me._LateBindingCommandText Is Nothing Then
-                Me._LateBindingCommandText = New List(Of String)
-            End If
-            Return Me._LateBindingCommandText
-        End Get
-        Set(value As List(Of String))
-            Me._LateBindingCommandText = value
-        End Set
-    End Property
+    'Private _LateBindingCommands As List(Of String)
+    'Public Property LateBindingCommands As List(Of String)
+    '    Get
+    '        If Me._LateBindingCommands Is Nothing Then
+    '            Me._LateBindingCommands = New List(Of String)
+    '        End If
+    '        Return Me._LateBindingCommands
+    '    End Get
+    '    Set(value As List(Of String))
+    '        Me._LateBindingCommands = value
+    '    End Set
+    'End Property
 
     Private _UtilityCommand As String
     Public Property UtilityCommand As String

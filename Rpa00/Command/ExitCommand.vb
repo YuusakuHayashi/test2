@@ -42,7 +42,7 @@ Public Class ExitCommand : Inherits RpaCommandBase
 
         ' リテラル部分は後で修正する（面倒なので、リテラルで仮置きしている）
         '-----------------------------------------------------------------------------------------'
-        dat.Transaction.LateBindingCommandText.Add($"updaterobot {uru.ReleaseId}")
+        dat.System.LateBindingCommands.Add($"updateproject {uru.ReleaseId}")
         '-----------------------------------------------------------------------------------------'
 
         Return 0

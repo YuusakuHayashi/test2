@@ -100,13 +100,16 @@
 
     ' アップデート後実行コマンド
     ' 実行したらNullStiringにして実行抑制する
-    Private _UpdatedBindingCommand As String
-    Public Property UpdatedBindingCommand As String
+    Private _UpdatedBindingCommands As List(Of String)
+    Public Property UpdatedBindingCommands As List(Of String)
         Get
-            Return Me._UpdatedBindingCommand
+            If Me._UpdatedBindingCommands Is Nothing Then
+                Me._UpdatedBindingCommands = New List(Of String)
+            End If
+            Return Me._UpdatedBindingCommands
         End Get
-        Set(value As String)
-            Me._UpdatedBindingCommand = value
+        Set(value As List(Of String))
+            Me._UpdatedBindingCommands = value
         End Set
     End Property
 

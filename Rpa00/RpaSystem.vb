@@ -1,15 +1,46 @@
 ﻿Imports System.IO
 
 Public Class RpaSystem
-    Private IsUpdatedBindingCommandExecuted As Boolean
-    Private IsUpdatedBindingCommandCreated As Boolean
-    Private _UpdatedBindingCommand As String
-    Private Property UpdatedBindingCommand As String
+    ' アップデート後コマンドをファストコマンドにするためのロジック(CreateFastBindingCommand())を
+    ' 通過したかの判定フラグ
+    Private IsUpdatedBindingCommandsCreated As Boolean
+
+    ' １度でもファストコマンドが実行されたかどうかのフラグ
+    Private IsFastBindingCommandsExecuted As Boolean
+
+    Private _IsUpdatedBindingCommandsFailed As Boolean
+    Private Property IsUpdatedBindingCommandsFailed As Boolean
         Get
-            Return Me._UpdatedBindingCommand
+            Return Me._IsUpdatedBindingCommandsFailed
         End Get
-        Set(value As String)
-            Me._UpdatedBindingCommand = value
+        Set(value As Boolean)
+            Me._IsUpdatedBindingCommandsFailed = value
+        End Set
+    End Property
+
+    Private _FastBindingCommands As List(Of String)
+    Private Property FastBindingCommands As List(Of String)
+        Get
+            If Me._FastBindingCommands Is Nothing Then
+                Me._FastBindingCommands = New List(Of String)
+            End If
+            Return Me._FastBindingCommands
+        End Get
+        Set(value As List(Of String))
+            Me._FastBindingCommands = value
+        End Set
+    End Property
+
+    Private _LateBindingCommands As List(Of String)
+    Public Property LateBindingCommands As List(Of String)
+        Get
+            If Me._LateBindingCommands Is Nothing Then
+                Me._LateBindingCommands = New List(Of String)
+            End If
+            Return Me._LateBindingCommands
+        End Get
+        Set(value As List(Of String))
+            Me._LateBindingCommands = value
         End Set
     End Property
 
@@ -330,7 +361,7 @@ Public Class RpaSystem
     End Sub
 
 
-    Private Function CreateUpdatedBindingCommand(ByRef dat As RpaDataWrapper) As Integer
+    Private Function CreateFastBindingCommands(ByRef dat As RpaDataWrapper) As Integer
         If dat.Project Is Nothing Then
             Return 0
         End If
@@ -338,23 +369,37 @@ Public Class RpaSystem
             Return 0
         End If
 
+        Me.IsUpdatedBindingCommandsCreated = True
+
         Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
         Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
-        Dim srus2 As List(Of RpaUpdater) = srus
-        srus.Sort(
+        Dim srus2 As List(Of RpaUpdater)
+        srus2 = srus.FindAll(
+            Function(sru)
+                Return (sru.UpdatedBindingCommands.Count > 0)
+            End Function
+        )
+        srus2.Sort(
             Function(before, after)
                 Return (before.ReleaseDate < after.ReleaseDate)
             End Function
         )
 
-        If srus.Last.UpdaterProcessId = dat.Initializer.ProcessId Then
+        If srus2.Count = 0 Then
             Return 0
         End If
 
-        If Not String.IsNullOrEmpty(srus.Last.UpdatedBindingCommand) Then
-            Me.UpdatedBindingCommand = srus.Last.UpdatedBindingCommand
-            Me.IsUpdatedBindingCommandCreated = True
+        If srus2.Last.UpdaterProcessId = dat.Initializer.ProcessId Then
+            Return 0
         End If
+
+        ' コマンド生成
+        For Each sru In srus2
+            For Each ubc In sru.UpdatedBindingCommands
+                Me.FastBindingCommands.Add(ubc)
+            Next
+        Next
+
 
         Return 0
     End Function
@@ -367,180 +412,156 @@ Public Class RpaSystem
                 Return (before.ReleaseDate < after.ReleaseDate)
             End Function
         )
-        srus.Last.UpdatedBindingCommand = vbNullString
+        For Each sru In srus
+            If sru.UpdatedBindingCommands.Count > 0 Then
+                sru.UpdatedBindingCommands = New List(Of String)
+            End If
+        Next
         Call jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
 
         Return 0
     End Function
 
-    ' コマンドオブジェクト生成後のトランザクションデータの再構成
-    'Private Sub ReCheckMainCommand()
-    '    Dim texts() As String
-    '    Me.MainCommand = vbNullString
-    '    Me.ParametersText = vbNullString
-    '    Me.Parameters = New List(Of String)
-
-    '    texts = Me.CommandText.Split(" ")
-    '    Me.MainCommand = texts(0)
-
-    '    Dim i As Integer = 0
-    '    For Each p In texts
-    '        If i <> 0 Then
-    '            Me.Parameters.Add(p)
-    '            Me.ParametersText &= $"{p} "
-    '        End If
-    '        i += 1
-    '    Next
-    '    If Not String.IsNullOrEmpty(Me.ParametersText) Then
-    '        Me.ParametersText.TrimEnd()
-    '    End If
-    'End Sub
-
     Private Sub CuiLoop(ByRef dat As RpaDataWrapper)
+        Dim cmdlog As RpaTransaction.CommandLogData = Nothing
         Const RESULT_S As String = "Success"
         Const RESULT_F As String = "Failed"
         Const RESULT_E As String = "Exception"
-
-        Dim cmdlog As RpaTransaction.CommandLogData = Nothing
-        Dim autocmdflag As Boolean = False
-
+        Dim fastcmdflag As Boolean = False
+        Dim latecmdflag As Boolean = False
         Try
-            Dim a As Integer = -1
+            Dim autocmdflag As Boolean = False
 
             ' 一度のみ実行
-            If Not Me.IsUpdatedBindingCommandCreated Then
-                a = CreateUpdatedBindingCommand(dat)
+            If Not Me.IsUpdatedBindingCommandsCreated Then
+                Dim a As Integer = CreateFastBindingCommands(dat)
             End If
 
-            If String.IsNullOrEmpty(Me.UpdatedBindingCommand) Then
-                dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
-            Else
-                dat.Transaction.CommandText = Me.UpdatedBindingCommand
-                Console.WriteLine($"更新プログラムを実行します・・・")
-                Console.WriteLine()
-            End If
-
-            Do
-                cmdlog = New RpaTransaction.CommandLogData With {
-                    .UserName = dat.Initializer.UserName,
-                    .RunDate = (DateTime.Now).ToString,
-                    .CommandText = dat.Transaction.CommandText,
-                    .AutoCommandFlag = autocmdflag
-                }
-
-                If dat.Project Is Nothing Then
-                    cmdlog.ProjectArchTypeName = vbNullString
-                    cmdlog.ProjectName = vbNullString
-                    cmdlog.RobotName = vbNullString
-                Else
-                    cmdlog.ProjectArchTypeName = dat.Project.SystemArchTypeName
-                    cmdlog.ProjectName = dat.Project.ProjectName
-                    cmdlog.RobotName = dat.Project.RobotName
-                End If
-
-                dat.Transaction.CommandText _
-                    = dat.Transaction.CommandText.TrimEnd(" ")
-
-                Dim i As Integer = CheckMainCommand(dat)
-                Dim j As Integer = CheckTrueCommand(dat)
-                Dim k As Integer = CheckUtilityCommand(dat)
-                Dim h As Integer = CheckCommandParameters(dat)
-                Dim cmd = CreateCommand(dat)
-
-                cmdlog.UtilityCommand = dat.Transaction.UtilityCommand
-
-                ' コマンドチェック
-                '---------------------------------------------------------------------------------'
-                Dim err0 As String = $"コマンド  '{dat.Transaction.CommandText}' はありません"
-                If cmd Is Nothing Then
-                    Console.WriteLine(err0)
-                    Console.WriteLine()
-                    cmdlog.Result = RESULT_F
-                    cmdlog.ResultString = err0
-                    Throw (New Exception)
-                End If
-
-                Dim err1 As String = $"パラメータ数が範囲外です: 許容パラメータ数範囲={cmd.ExecutableParameterCount(0)}~{cmd.ExecutableParameterCount(1)}"
-                If cmd.ExecutableParameterCount(0) > dat.Transaction.Parameters.Count Then
-                    Console.WriteLine(err1)
-                    Console.WriteLine()
-                    cmdlog.Result = RESULT_F
-                    cmdlog.ResultString = err1
-                    Throw (New Exception)
-                End If
-                If cmd.ExecutableParameterCount(1) < dat.Transaction.Parameters.Count Then
-                    Console.WriteLine(err1)
-                    Console.WriteLine()
-                    cmdlog.Result = RESULT_F
-                    cmdlog.ResultString = err1
-                    Throw (New Exception)
-                End If
-
-                Dim err2 As String = $"プロジェクトが存在しないため、実行できません"
-                If Not cmd.ExecuteIfNoProject Then
-                    If dat.Project Is Nothing Then
-                        Console.WriteLine(err2)
-                        Console.WriteLine()
-                        cmdlog.Result = RESULT_F
-                        cmdlog.ResultString = err2
-                        Throw (New Exception)
-                    End If
-                End If
-
-                Dim err3 As String = $"このプロジェクト構成では、コマンド '{dat.Transaction.CommandText}' は実行できません"
-                Dim archs As String() = cmd.ExecutableProjectArchitectures
-                If Not archs.Contains("AllArchitectures") Then
-                    If Not archs.Contains(dat.Project.SystemArchTypeName) Then
-                        Console.WriteLine(err3)
-                        Console.WriteLine()
-                        cmdlog.Result = RESULT_F
-                        cmdlog.ResultString = err3
-                        Throw (New Exception)
-                    End If
-                End If
-
-                Dim err4 As String = $"このユーザでは、コマンド '{dat.Transaction.CommandText}' は実行できません"
-                Dim users As String() = cmd.ExecutableUser
-                If Not users.Contains("AllUser") Then
-                    If Not users.Contains(dat.Initializer.UserLevel) Then
-                        Console.WriteLine(err4)
-                        Console.WriteLine()
-                        cmdlog.Result = RESULT_F
-                        cmdlog.ResultString = err4
-                        Throw (New Exception)
-                    End If
-                End If
-
-                Dim err5 As String = $"コマンドは実行出来ませんでした"
-                If Not cmd.CanExecute(dat) Then
-                    Console.WriteLine(err5)
-                    Console.WriteLine()
-                    cmdlog.Result = RESULT_F
-                    cmdlog.ResultString = err5
-                    Throw (New Exception)
-                End If
-                '---------------------------------------------------------------------------------'
-
-                Dim [from] As DateTime = DateTime.Now
-                dat.Transaction.ReturnCode = cmd.Execute(dat)
-                Dim [to] As DateTime = DateTime.Now
-                cmdlog.ExecuteTime = [to] - [from]
-
-                cmdlog.Result = RESULT_S
-                cmdlog.ResultString = vbNullString
-                dat.Transaction.CommandLogs.Add(cmdlog)
-
-                ' 自動生成コマンド
-                '---------------------------------------------------------------------------------'
-                If dat.Transaction.LateBindingCommandText.Count = 0 Then
-                    Exit Do
-                End If
-
+            If Me.LateBindingCommands.Count > 0 Then
                 autocmdflag = True
-                dat.Transaction.CommandText = dat.Transaction.LateBindingCommandText(0)
-                dat.Transaction.LateBindingCommandText = RpaModule.Pop(Of List(Of String))(dat.Transaction.LateBindingCommandText)
-                '---------------------------------------------------------------------------------'
-            Loop Until False
+                latecmdflag = True
+                dat.Transaction.CommandText = Me.LateBindingCommands(0)
+                Me.LateBindingCommands = RpaModule.Pop(Of List(Of String))(Me.LateBindingCommands)
+            ElseIf Me.FastBindingCommands.Count > 0 Then
+                Console.WriteLine($"更新プログラムを実行中・・・")
+                autocmdflag = True
+                fastcmdflag = True
+                If Not IsFastBindingCommandsExecuted Then
+                    IsFastBindingCommandsExecuted = True
+                End If
+                dat.Transaction.CommandText = Me.FastBindingCommands(0)
+                Me.FastBindingCommands = RpaModule.Pop(Of List(Of String))(Me.FastBindingCommands)
+            Else
+                dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
+            End If
+
+            cmdlog = New RpaTransaction.CommandLogData With {
+                .UserName = dat.Initializer.UserName,
+                .RunDate = (DateTime.Now).ToString,
+                .CommandText = dat.Transaction.CommandText,
+                .AutoCommandFlag = autocmdflag
+            }
+
+            If dat.Project Is Nothing Then
+                cmdlog.ProjectArchTypeName = vbNullString
+                cmdlog.ProjectName = vbNullString
+                cmdlog.RobotName = vbNullString
+            Else
+                cmdlog.ProjectArchTypeName = dat.Project.SystemArchTypeName
+                cmdlog.ProjectName = dat.Project.ProjectName
+                cmdlog.RobotName = dat.Project.RobotName
+            End If
+
+            dat.Transaction.CommandText _
+                = dat.Transaction.CommandText.TrimEnd(" ")
+
+            Dim i As Integer = CheckMainCommand(dat)
+            Dim j As Integer = CheckTrueCommand(dat)
+            Dim k As Integer = CheckUtilityCommand(dat)
+            Dim h As Integer = CheckCommandParameters(dat)
+            Dim cmd = CreateCommand(dat)
+
+            cmdlog.UtilityCommand = dat.Transaction.UtilityCommand
+
+            ' コマンドチェック
+            '---------------------------------------------------------------------------------'
+            Dim err0 As String = $"コマンド  '{dat.Transaction.CommandText}' はありません"
+            If cmd Is Nothing Then
+                Console.WriteLine(err0)
+                Console.WriteLine()
+                cmdlog.Result = RESULT_F
+                cmdlog.ResultString = err0
+                Throw (New Exception)
+            End If
+
+            Dim err1 As String = $"パラメータ数が範囲外です: 許容パラメータ数範囲={cmd.ExecutableParameterCount(0)}~{cmd.ExecutableParameterCount(1)}"
+            If cmd.ExecutableParameterCount(0) > dat.Transaction.Parameters.Count Then
+                Console.WriteLine(err1)
+                Console.WriteLine()
+                cmdlog.Result = RESULT_F
+                cmdlog.ResultString = err1
+                Throw (New Exception)
+            End If
+            If cmd.ExecutableParameterCount(1) < dat.Transaction.Parameters.Count Then
+                Console.WriteLine(err1)
+                Console.WriteLine()
+                cmdlog.Result = RESULT_F
+                cmdlog.ResultString = err1
+                Throw (New Exception)
+            End If
+
+            Dim err2 As String = $"プロジェクトが存在しないため、実行できません"
+            If Not cmd.ExecuteIfNoProject Then
+                If dat.Project Is Nothing Then
+                    Console.WriteLine(err2)
+                    Console.WriteLine()
+                    cmdlog.Result = RESULT_F
+                    cmdlog.ResultString = err2
+                    Throw (New Exception)
+                End If
+            End If
+
+            Dim err3 As String = $"このプロジェクト構成では、コマンド '{dat.Transaction.CommandText}' は実行できません"
+            Dim archs As String() = cmd.ExecutableProjectArchitectures
+            If Not archs.Contains("AllArchitectures") Then
+                If Not archs.Contains(dat.Project.SystemArchTypeName) Then
+                    Console.WriteLine(err3)
+                    Console.WriteLine()
+                    cmdlog.Result = RESULT_F
+                    cmdlog.ResultString = err3
+                    Throw (New Exception)
+                End If
+            End If
+
+            Dim err4 As String = $"このユーザでは、コマンド '{dat.Transaction.CommandText}' は実行できません"
+            Dim users As String() = cmd.ExecutableUser
+            If Not users.Contains("AllUser") Then
+                If Not users.Contains(dat.Initializer.UserLevel) Then
+                    Console.WriteLine(err4)
+                    Console.WriteLine()
+                    cmdlog.Result = RESULT_F
+                    cmdlog.ResultString = err4
+                    Throw (New Exception)
+                End If
+            End If
+
+            Dim err5 As String = $"コマンドは実行出来ませんでした"
+            If Not cmd.CanExecute(dat) Then
+                Console.WriteLine(err5)
+                Console.WriteLine()
+                cmdlog.Result = RESULT_F
+                cmdlog.ResultString = err5
+                Throw (New Exception)
+            End If
+            '---------------------------------------------------------------------------------'
+
+            Dim [from] As DateTime = DateTime.Now
+            dat.Transaction.ReturnCode = cmd.Execute(dat)
+            Dim [to] As DateTime = DateTime.Now
+            cmdlog.ExecuteTime = [to] - [from]
+
+            cmdlog.Result = RESULT_S
+            cmdlog.ResultString = vbNullString
         Catch ex As Exception
             ' Exceptionを利用するのは気持ち悪いので、修正するかも・・・
             ' cmdlog.Result が空文字の場合、例外が発生する場合
@@ -550,19 +571,28 @@ Public Class RpaSystem
                 cmdlog.Result = RESULT_E
                 cmdlog.ResultString = ex.Message
             End If
-            dat.Transaction.CommandLogs.Add(cmdlog)
-        Finally
-            dat.Transaction.Parameters = New List(Of String)
-            Dim z As Integer = -1
-            If Not String.IsNullOrEmpty(Me.UpdatedBindingCommand) Then
-                If cmdlog.Result = RESULT_S Then
-                    z = CompleteUpdate(dat)
-                Else
-                    Console.WriteLine($"更新プログラムの実行に失敗しました")
-                    Console.WriteLine()
-                End If
-                Me.UpdatedBindingCommand = vbNullString
+            If latecmdflag Then
+                Console.WriteLine($"自動生成されたコマンド '{dat.Transaction.CommandText}' は失敗しました")
+                Console.WriteLine()
+                Me.LateBindingCommands = New List(Of String)
             End If
+
+            If fastcmdflag Then
+                Console.WriteLine($"自動生成されたコマンド '{dat.Transaction.CommandText}' は失敗しました")
+                Console.WriteLine()
+                Me.FastBindingCommands = New List(Of String)
+
+                ' 今のところファストコマンドはアップデート後コマンドしかないので通用するが・・・
+                Me.IsUpdatedBindingCommandsFailed = True
+            End If
+        Finally
+            ' 今のところファストコマンドはアップデート後コマンドしかないので通用するが・・・
+            If Me.IsFastBindingCommandsExecuted And Me.FastBindingCommands.Count = 0 And (Not Me.IsUpdatedBindingCommandsFailed) Then
+                Dim a As Integer = CompleteUpdate(dat)
+            End If
+
+            dat.Transaction.CommandLogs.Add(cmdlog)
+            dat.Transaction.Parameters = New List(Of String)
         End Try
     End Sub
 End Class

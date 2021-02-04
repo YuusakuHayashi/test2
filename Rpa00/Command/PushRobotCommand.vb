@@ -302,25 +302,74 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             End If
         Loop Until False
 
-        Dim yorn9 As String = vbNullString
+        'Dim yorn9 As String = vbNullString
+        'Do
+        '    yorn9 = vbNullString
+        '    Console.WriteLine($"UpdatedBindingCommand ? :")
+        '    Dim ubc As String = dat.Transaction.ShowRpaIndicator(dat)
+        '    Console.WriteLine()
+        '    If String.IsNullOrEmpty(ubc) Then
+        '        ubc = vbNullString
+        '    End If
+        '    Do
+        '        Console.WriteLine($"UpdatedBindingCommand : '{ubc}' ok? (y/n)")
+        '        yorn9 = dat.Transaction.ShowRpaIndicator(dat)
+        '        Console.WriteLine()
+        '        If yorn9 = "y" Or yorn9 = "n" Then
+        '            Exit Do
+        '        End If
+        '    Loop Until False
+        '    ru.UpdatedBindingCommand = ubc
+        '    If yorn9 = "y" Then
+        '        Exit Do
+        '    End If
+        'Loop Until False
+
+        ' バインディングコマンドの入力
         Do
-            yorn9 = vbNullString
-            Console.WriteLine($"UpdatedBindingCommand ? :")
-            Dim ubc As String = dat.Transaction.ShowRpaIndicator(dat)
+            Dim yorn4 As String = vbNullString
+            Dim yorn5 As String = vbNullString
+            Dim yorn6 As String = vbNullString
+            Console.WriteLine($"Please Input Updated Binding Commands :")
+            Dim ubcsstr As String = dat.Transaction.ShowRpaIndicator(dat)
             Console.WriteLine()
-            If String.IsNullOrEmpty(ubc) Then
-                ubc = vbNullString
+            If String.IsNullOrEmpty(ubcsstr) Then
+                Do
+                    Console.WriteLine($"No Updated Binding Commands? (y/n)")
+                    yorn5 = dat.Transaction.ShowRpaIndicator(dat)
+                    Console.WriteLine()
+                    If yorn5 = "y" Or yorn5 = "n" Then
+                        Exit Do
+                    End If
+                Loop Until False
+                If yorn5 = "y" Then
+                    Exit Do
+                End If
             End If
+            Dim ubcs() As String = ubcsstr.Split(" "c)
             Do
-                Console.WriteLine($"UpdatedBindingCommand : '{ubc}' ok? (y/n)")
-                yorn9 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine($"Updated Binding Commands : '{ubcsstr}' ok? (y/n)")
+                yorn4 = dat.Transaction.ShowRpaIndicator(dat)
                 Console.WriteLine()
-                If yorn9 = "y" Or yorn9 = "n" Then
+                If yorn4 = "y" Or yorn4 = "n" Then
                     Exit Do
                 End If
             Loop Until False
-            ru.UpdatedBindingCommand = ubc
-            If yorn9 = "y" Then
+            If yorn4 = "n" Then
+                Continue Do
+            End If
+            For Each ubc In ubcs
+                ru.UpdatedBindingCommands.Add(ubc)
+            Next
+            Do
+                Console.WriteLine($"continue? (y/n)")
+                yorn6 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn6 = "y" Or yorn6 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            If yorn6 = "n" Then
                 Exit Do
             End If
         Loop Until False

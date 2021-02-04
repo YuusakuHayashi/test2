@@ -204,8 +204,8 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             'Dim srcdir As String = Parent.RootBasDirectory(dat)
             'Dim dstdir As String = Parent.MacroUtilityDirectory
             Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
-            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} download")
-            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} install")
+            dat.System.LateBindingCommands.Add($"{utilpfx} download")
+            dat.System.LateBindingCommands.Add($"{utilpfx} install")
             'dlcmd.Execute(dat)
             'incmd.Execute(dat)
             Return 0
@@ -215,8 +215,8 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             'Dim srcdir As String = Parent.RootBasDirectory(dat)
             'Dim dstdir As String = Parent.MacroUtilityDirectory
             Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
-            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} download {dat.Transaction.ParametersText}")
-            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} install {dat.Transaction.ParametersText}")
+            dat.System.LateBindingCommands.Add($"{utilpfx} download {dat.Transaction.ParametersText}")
+            dat.System.LateBindingCommands.Add($"{utilpfx} install {dat.Transaction.ParametersText}")
             'dlcmd.Execute(dat)
             'incmd.Execute(dat)
             Return 0
