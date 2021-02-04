@@ -1,8 +1,33 @@
 ﻿Imports System.IO
 
 Public Class PushRobotCommand : Inherits RpaCommandBase
+    ' Pushを禁止するファイル名
+    Private _ProhibitedPushRobots As List(Of String)
+    Private ReadOnly Property ProhibitedPushRobots As List(Of String)
+        Get
+            If Me._ProhibitedPushRobots Is Nothing Then
+                Me._ProhibitedPushRobots = New List(Of String)
+                Me._ProhibitedPushRobots.Add("RpaCui.exe")
+            End If
+            Return Me._ProhibitedPushRobots
+        End Get
+    End Property
+
+    ' Pushを許すファイル拡張子
+    Private _AllowPushExtensions As List(Of String)
+    Private ReadOnly Property AllowPushExtensions As List(Of String)
+        Get
+            If Me._AllowPushExtensions Is Nothing Then
+                Me._AllowPushExtensions = New List(Of String)
+                Me._AllowPushExtensions.Add(".dll")
+                Me._AllowPushExtensions.Add(".exe")
+            End If
+            Return Me._AllowPushExtensions
+        End Get
+    End Property
+
     Private _Updater As RpaUpdater
-    Public Property Updater As RpaUpdater
+    Private Property Updater As RpaUpdater
         Get
             Return Me._Updater
         End Get
@@ -33,18 +58,6 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             Return False
         End If
 
-        Dim ck As Boolean = False
-        For Each fil In Directory.GetFiles(dat.Project.ReleaseRobotDirectory)
-            If Path.GetExtension(fil) = ".dll" Then
-                ck = True
-                Exit For
-            End If
-        Next
-        If Not ck Then
-            Console.WriteLine($"ディレクトリ '{dat.Project.ReleaseRobotDirectory}' には、アップデート可能なファイルが存在しませんでした")
-            Return False
-        End If
-
         Return True
     End Function
 
@@ -60,35 +73,21 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
         Dim dstdir As String = Me.Updater.PackageDirectory
 
         For Each src In Directory.GetFiles(srcdir)
-            Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-            If Path.GetExtension(src) = ".dll" Then
-                File.Copy(src, dst, True)
-                Console.WriteLine($"ファイルをコピー  '{src}'")
-                Console.WriteLine($"               => '{dst}'")
-                Console.WriteLine()
+            Dim ext As String = Path.GetExtension(src)
+            Dim srcname As String = Path.GetFileName(src)
+            If Me.AllowPushExtensions.Contains(ext) Then
+                If Not Me.ProhibitedPushRobots.Contains(srcname) Then
+                    Dim dst As String = $"{dstdir}\{srcname}"
+                    File.Copy(src, dst, True)
+                    Console.WriteLine($"ファイルをコピー  '{src}'")
+                    Console.WriteLine($"               => '{dst}'")
+                    Console.WriteLine()
+                End If
             End If
         Next
 
         Return 0
     End Function
-
-    'Private Function SelectedPush(ByRef dat As RpaDataWrapper, ByVal pdir As String) As Integer
-    '    Dim srcdir As String = dat.Project.ReleaseRobotDirectory
-    '    Dim dstdir As String = pdir
-
-    '    For Each para In dat.Transaction.Parameters
-    '        Dim src As String = $"{srcdir}\{para}"
-    '        Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
-    '        If Path.GetExtension(src) = ".dll" Then
-    '            File.Copy(src, dst, True)
-    '            Console.WriteLine($"ファイルをコピー  '{src}'")
-    '            Console.WriteLine($"               => '{dst}'")
-    '            Console.WriteLine()
-    '        End If
-    '    Next
-
-    '    Return 0
-    'End Function
 
     Private Function WriteReleaseInfo(ByRef dat As RpaDataWrapper) As Integer
         Dim ru As New RpaUpdater With {

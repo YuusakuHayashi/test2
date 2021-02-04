@@ -230,6 +230,7 @@ Public Class IntranetClientServerProject
         End Set
     End Property
 
+    <JsonIgnore>
     Public ReadOnly Property RootRobotIgnoreFileName As String
         Get
             Dim [fil] As String = vbNullString
@@ -255,6 +256,7 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
+    <JsonIgnore>
     Public ReadOnly Property MyRobotIgnoreFileName As String
         Get
             Dim [fil] As String = vbNullString
@@ -265,36 +267,42 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
+    <JsonIgnore>
     Public Overrides ReadOnly Property SystemProjectDirectory As String
         Get
             Return $"{Me.SystemArchDirectory}\{Me.ProjectName}"
         End Get
     End Property
 
+    <JsonIgnore>
     Public Overrides ReadOnly Property SystemJsonFileName As String
         Get
             Return $"{Me.SystemProjectDirectory}\rpa_project.json"
         End Get
     End Property
 
+    <JsonIgnore>
     Public Overrides ReadOnly Property SystemArchDirectory As String
         Get
             Return $"{RpaCui.SystemDirectory}\{Me.GetType.Name}"
         End Get
     End Property
 
+    <JsonIgnore>
     Public Overrides ReadOnly Property SystemArchType As Integer
         Get
             Return 1
         End Get
     End Property
 
+    <JsonIgnore>
     Public Overrides ReadOnly Property SystemArchTypeName As String
         Get
             Return Me.GetType.Name
         End Get
     End Property
 
+    <JsonIgnore>
     Public Overrides ReadOnly Property SystemJsonChangedFileName As String
         Get
             Return $"{Me.SystemProjectDirectory}\rpa_project.json.chg"

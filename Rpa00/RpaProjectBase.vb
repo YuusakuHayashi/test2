@@ -50,7 +50,6 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Property
 
         Private _UtilityObject As Object
-        <JsonIgnore>
         Public Property UtilityObject As Object
             Get
                 If Me._UtilityObject Is Nothing Then

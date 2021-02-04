@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.IO
 Imports Rpa00
+Imports Newtonsoft.Json
 
 ' Note : 
 '     いつごろからか分からないが、マクロを呼び出ししようとすると、例外を出すようになった(0x8002005 (DISP_E_TYPEMISMATCH))
@@ -13,6 +14,14 @@ Imports Rpa00
 '     Object のため、メソッド定義が分からず、実行時例外が発生しているのか？・・・
 
 Public Class RpaMacroUtility : Inherits RpaUtilityBase
+
+    Friend Const MACROIMPORTER_BAS As String = "MacroImporter.bas"
+    Friend Const MACROIMPORTER As String = "MacroImporter"
+    Friend Const MACROIMPORTER2 As String = "MacroImporter2"
+    Friend Const MAIN_FUNC As String = "Main"
+    Friend Const SHOWMODULES_FUNC As String = "ShowModules"
+
+    <JsonIgnore>
     Public Overrides ReadOnly Property CommandHandler(ByVal cmdtxt As String) As Object
         Get
             Dim cmd As Object
@@ -21,15 +30,17 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Case "download" : cmd = New DownloadMacroFileCommand(Me)
                 Case "update" : cmd = New UpdateMacroCommand(Me)
                 Case "show" : cmd = New ShowMacrosCommand(Me)
+                Case "push" : cmd = New PushMacrosCommand(Me)
                 Case Else : cmd = Nothing
             End Select
             Return cmd
         End Get
     End Property
 
+    <JsonIgnore>
     Public ReadOnly Property RootBasDirectory(dat As RpaDataWrapper) As String
         Get
-            If Not String.IsNullOrEmpty(dat.Project.RootDirectory) Then
+            If Directory.Exists(dat.Project.RootDirectory) Then
                 Dim [dir] As String = $"{dat.Project.RootDirectory}\bas"
                 Return [dir]
             Else
@@ -38,21 +49,41 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Get
     End Property
 
-    Public ReadOnly Property MacroUtilityDirectory As String
-        Get
-            Dim d = $"{RpaCui.SystemDirectory}\MacroUtility"
-            If Not Directory.Exists(d) Then
-                Directory.CreateDirectory(d)
-            End If
-            Return d
-        End Get
-    End Property
-
+    <JsonIgnore>
     Public ReadOnly Property MacroFileName As String
         Get
             Dim f = $"{Me.MacroUtilityDirectory}\macro.xlsm"
             Return f
         End Get
+    End Property
+
+    Private _MacroUtilityDirectory As String
+    Public Property MacroUtilityDirectory As String
+        Get
+            If String.IsNullOrEmpty(Me._MacroUtilityDirectory) Then
+                Me._MacroUtilityDirectory = $"{RpaCui.SystemDirectory}\MacroUtility"
+            End If
+            If Not Directory.Exists(Me._MacroUtilityDirectory) Then
+                Directory.CreateDirectory(Me._MacroUtilityDirectory)
+            End If
+            Return Me._MacroUtilityDirectory
+        End Get
+        Set(value As String)
+            Me._MacroUtilityDirectory = value
+        End Set
+    End Property
+
+    Private _ReleaseBasDirectory As String
+    Public Property ReleaseBasDirectory As String
+        Get
+            If String.IsNullOrEmpty(Me._ReleaseBasDirectory) Then
+                Me._ReleaseBasDirectory = vbNullString
+            End If
+            Return Me._ReleaseBasDirectory
+        End Get
+        Set(value As String)
+            Me._ReleaseBasDirectory = value
+        End Set
     End Property
 
     Private Function CallMacro(ByVal method As String, ByRef args() As Object) As Object
@@ -98,7 +129,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         Return obj
     End Function
 
-    Private Function ConvertObjectArgs(ByRef args() As Object) As Object()
+    Private Function ConvertArgsOfObjectType(ByRef args() As Object) As Object()
         Dim objs As New List(Of Object)
         For Each arg In args
             objs.Add(CType(arg, Object))
@@ -107,16 +138,65 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
     End Function
 
     Public Function InvokeMacro(ByVal method As String, ByRef args() As Object) As Integer
-        Dim newargs() = ConvertObjectArgs(args)
+        Dim newargs() = ConvertArgsOfObjectType(args)
         Dim obj = Me.CallMacro(method, newargs)
         Return IIf((obj Is Nothing), 0, 1000)
     End Function
 
     Public Function InvokeMacroFunction(ByVal method As String, ByRef args() As Object) As Object
-        Dim newargs() = ConvertObjectArgs(args)
+        Dim newargs() = ConvertArgsOfObjectType(args)
         Dim obj = Me.CallMacro(method, newargs)
         Return obj
     End Function
+
+
+    ' Push Command
+    '---------------------------------------------------------------------------------------------'
+    Private Class PushMacrosCommand : Inherits RpaCommandBase
+        Private Parent As RpaMacroUtility
+
+        Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
+            If String.IsNullOrEmpty(Parent.RootBasDirectory(dat)) Then
+                Console.WriteLine($"'RootBasDirectory' は存在しません")
+                Return False
+            End If
+            If Not Directory.Exists(Parent.RootBasDirectory(dat)) Then
+                Console.WriteLine($"ディレクトリ '{Parent.RootBasDirectory(dat)}' は存在しません")
+                Return False
+            End If
+            If String.IsNullOrEmpty(Parent.ReleaseBasDirectory) Then
+                Console.WriteLine($"'ReleaseBasDirectory' は存在しません")
+                Return False
+            End If
+            If Not Directory.Exists(Parent.ReleaseBasDirectory) Then
+                Console.WriteLine($"ディレクトリ '{Parent.ReleaseBasDirectory}' は存在しません")
+                Return False
+            End If
+
+            Return True
+        End Function
+
+        Private Function Main(ByRef dat As RpaDataWrapper) As Integer
+            Dim srcdir As String = Parent.ReleaseBasDirectory
+            Dim dstdir As String = Parent.RootBasDirectory(dat)
+            For Each src In Directory.GetFiles(srcdir)
+                Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
+                File.Copy(src, dst, True)
+                Console.WriteLine($"Copy '{src}'")
+                Console.WriteLine($" --> '{dst}'")
+                Console.WriteLine()
+            Next
+            Return 0
+        End Function
+
+        Sub New(p As RpaMacroUtility)
+            Me.Parent = p
+            Me.ExecutableProjectArchitectures = {(New IntranetClientServerProject).GetType.Name}
+            Me.ExecutableUser = {"RootDeveloper"}
+            Me.ExecuteHandler = AddressOf Main
+            Me.CanExecuteHandler = AddressOf Check
+        End Sub
+    End Class
 
 
     ' Show Command
@@ -134,7 +214,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Parent As RpaMacroUtility
         Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-            Dim txt As String = (Parent.InvokeMacroFunction("MacroImporter.ShowModules", {""})).ToString.TrimEnd
+            Dim txt As String = (Parent.InvokeMacroFunction($"{MACROIMPORTER}.{SHOWMODULES_FUNC}", {""})).ToString.TrimEnd
             Console.WriteLine()
             Console.WriteLine($"インストール済マクロ一覧")
             Console.WriteLine($"{txt}")
@@ -152,7 +232,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
     ' Update Command
     '---------------------------------------------------------------------------------------------'
-    Public Class UpdateMacroCommand : Inherits RpaCommandBase
+    Private Class UpdateMacroCommand : Inherits RpaCommandBase
         Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
             If Not File.Exists(Me.Parent.MacroFileName) Then
                 Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
@@ -201,24 +281,16 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Function AllUpdate(ByRef dat As RpaDataWrapper) As Integer
-            'Dim srcdir As String = Parent.RootBasDirectory(dat)
-            'Dim dstdir As String = Parent.MacroUtilityDirectory
             Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
             dat.System.LateBindingCommands.Add($"{utilpfx} download")
             dat.System.LateBindingCommands.Add($"{utilpfx} install")
-            'dlcmd.Execute(dat)
-            'incmd.Execute(dat)
             Return 0
         End Function
 
         Private Function SelectedUpdate(ByRef dat As RpaDataWrapper) As Integer
-            'Dim srcdir As String = Parent.RootBasDirectory(dat)
-            'Dim dstdir As String = Parent.MacroUtilityDirectory
             Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
             dat.System.LateBindingCommands.Add($"{utilpfx} download {dat.Transaction.ParametersText}")
             dat.System.LateBindingCommands.Add($"{utilpfx} install {dat.Transaction.ParametersText}")
-            'dlcmd.Execute(dat)
-            'incmd.Execute(dat)
             Return 0
         End Function
 
@@ -263,10 +335,10 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Dim srcname As String = Path.GetFileName(src)
                 If File.Exists(src) And (ext = ".bas" Or ext = ".cls") Then
                     Console.WriteLine($"マクロ '{srcname}' をインストールします")
-                    If srcname = "MacroImporter.bas" Then
-                        Call Parent.InvokeMacro("MacroImporter2.Main", {src})
+                    If srcname = MACROIMPORTER_BAS Then
+                        Call Parent.InvokeMacro($"{MACROIMPORTER2}.{MAIN_FUNC}", {src})
                     Else
-                        Call Parent.InvokeMacro("MacroImporter.Main", {src})
+                        Call Parent.InvokeMacro($"{MACROIMPORTER}.{MAIN_FUNC}", {src})
                     End If
                     Console.WriteLine()
                 Else
@@ -287,10 +359,10 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
                 Dim ext As String = Path.GetExtension(bas)
                 If File.Exists(bas) And (ext = ".bas" Or ext = ".cls") Then
                     Console.WriteLine($"マクロ '{para}' をインストールします")
-                    If para = "MacroImporter.bas" Then
-                        Call Parent.InvokeMacro("MacroImporter2.Main", {bas})
+                    If para = MACROIMPORTER_BAS Then
+                        Call Parent.InvokeMacro($"{MACROIMPORTER2}.{MAIN_FUNC}", {bas})
                     Else
-                        Call Parent.InvokeMacro("MacroImporter.Main", {bas})
+                        Call Parent.InvokeMacro($"{MACROIMPORTER}.{MAIN_FUNC}", {bas})
                     End If
                     Console.WriteLine()
                 Else
