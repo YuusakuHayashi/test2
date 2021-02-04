@@ -1,6 +1,17 @@
 ﻿Imports System.IO
 
 Public Class RpaSystem
+    ' 自動
+    Private _LateExitFlag As Boolean
+    Private Property LateExitFlag As Boolean
+        Get
+            Return Me._LateExitFlag
+        End Get
+        Set(value As Boolean)
+            Me._LateExitFlag = value
+        End Set
+    End Property
+
     ' アップデート後コマンドをファストコマンドにするためのロジック(CreateFastBindingCommand())を
     ' 通過したかの判定フラグ
     Private IsUpdatedBindingCommandsCreated As Boolean
@@ -562,6 +573,12 @@ Public Class RpaSystem
 
             cmdlog.Result = RESULT_S
             cmdlog.ResultString = vbNullString
+
+            If dat.Transaction.ExitFlag Then
+                Me.LateExitFlag = True
+                dat.Transaction.ExitFlag = False
+            End If
+            If Me.LateExitFlag
         Catch ex As Exception
             ' Exceptionを利用するのは気持ち悪いので、修正するかも・・・
             ' cmdlog.Result が空文字の場合、例外が発生する場合
@@ -571,19 +588,20 @@ Public Class RpaSystem
                 cmdlog.Result = RESULT_E
                 cmdlog.ResultString = ex.Message
             End If
-            If latecmdflag Then
+
+            If latecmdflag Or fastcmdflag Then
                 Console.WriteLine($"自動生成されたコマンド '{dat.Transaction.CommandText}' は失敗しました")
                 Console.WriteLine()
                 Me.LateBindingCommands = New List(Of String)
+                Me.FastBindingCommands = New List(Of String)
             End If
 
             If fastcmdflag Then
-                Console.WriteLine($"自動生成されたコマンド '{dat.Transaction.CommandText}' は失敗しました")
-                Console.WriteLine()
-                Me.FastBindingCommands = New List(Of String)
-
                 ' 今のところファストコマンドはアップデート後コマンドしかないので通用するが・・・
                 Me.IsUpdatedBindingCommandsFailed = True
+            End If
+            If Me.LateExitFlag Then
+                dat.Transaction.ExitFlag = True
             End If
         Finally
             ' 今のところファストコマンドはアップデート後コマンドしかないので通用するが・・・
