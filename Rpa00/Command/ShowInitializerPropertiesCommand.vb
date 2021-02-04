@@ -1,12 +1,6 @@
 ﻿Imports System.Reflection
 
 Public Class ShowInitializerPropertiesCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         ' 初回時にプロパティ一覧を表示
         Dim pnamelen As Integer = 25
@@ -60,8 +54,9 @@ Public Class ShowInitializerPropertiesCommand : Inherits RpaCommandBase
         Console.WriteLine()
         Return 0
     End Function
-    
+
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

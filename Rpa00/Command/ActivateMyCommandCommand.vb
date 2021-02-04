@@ -1,12 +1,6 @@
 ﻿Imports Rpa00
 
 Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         For Each [key] In dat.Transaction.Parameters
             If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
@@ -30,5 +24,6 @@ Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.ExecutableParameterCount = {1, 999}
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

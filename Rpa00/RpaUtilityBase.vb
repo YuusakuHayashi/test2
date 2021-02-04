@@ -1,5 +1,5 @@
 ﻿Public MustInherit Class RpaUtilityBase
-    Public Overridable ReadOnly Property CommandHandler(dat As Object) As Object
+    Public Overridable ReadOnly Property CommandHandler(ByVal cmdtxt As String) As Object
         Get
             Return Nothing
         End Get

@@ -1,13 +1,6 @@
 ﻿Imports System.IO
 
 Public Class LoadCommand : Inherits RpaCommandBase
-
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Initializer.Projects Is Nothing Then
             Console.WriteLine($"プロジェクトがありません")
@@ -70,5 +63,6 @@ Public Class LoadCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

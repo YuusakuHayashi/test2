@@ -3,13 +3,6 @@ Imports System.Reflection
 Imports System.Windows.Forms
 
 Public Class NewProjectCommand : Inherits RpaCommandBase
-
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim rpa As Object
 
@@ -196,5 +189,6 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

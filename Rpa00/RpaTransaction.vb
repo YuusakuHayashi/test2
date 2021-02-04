@@ -94,16 +94,36 @@ Public Class RpaTransaction
         End Set
     End Property
 
-    Private _AutoCommandText As List(Of String)
-    Public Property AutoCommandText As List(Of String)
+    Private _LateBindingCommandText As List(Of String)
+    Public Property LateBindingCommandText As List(Of String)
         Get
-            If Me._AutoCommandText Is Nothing Then
-                Me._AutoCommandText = New List(Of String)
+            If Me._LateBindingCommandText Is Nothing Then
+                Me._LateBindingCommandText = New List(Of String)
             End If
-            Return Me._AutoCommandText
+            Return Me._LateBindingCommandText
         End Get
         Set(value As List(Of String))
-            Me._AutoCommandText = value
+            Me._LateBindingCommandText = value
+        End Set
+    End Property
+
+    Private _UtilityCommand As String
+    Public Property UtilityCommand As String
+        Get
+            Return Me._UtilityCommand
+        End Get
+        Set(value As String)
+            Me._UtilityCommand = value
+        End Set
+    End Property
+
+    Private _TrueCommand As String
+    Public Property TrueCommand As String
+        Get
+            Return Me._TrueCommand
+        End Get
+        Set(value As String)
+            Me._TrueCommand = value
         End Set
     End Property
 
@@ -140,6 +160,16 @@ Public Class RpaTransaction
         End Get
         Set(value As List(Of String))
             Me._Parameters = value
+        End Set
+    End Property
+
+    Private _ParametersText As String
+    Public Property ParametersText As String
+        Get
+            Return Me._ParametersText
+        End Get
+        Set(value As String)
+            Me._ParametersText = value
         End Set
     End Property
 
@@ -227,6 +257,16 @@ Public Class RpaTransaction
             End Set
         End Property
 
+        Private _UtilityCommand As String
+        Public Property UtilityCommand As String
+            Get
+                Return Me._UtilityCommand
+            End Get
+            Set(value As String)
+                Me._UtilityCommand = value
+            End Set
+        End Property
+
         Private _Result As String
         Public Property Result As String
             Get
@@ -283,6 +323,7 @@ Public Class RpaTransaction
             line &= $"{[log].ProjectName},"
             line &= $"{[log].RobotName},"
             line &= $"{[log].CommandText},"
+            line &= $"{[log].UtilityCommand},"
             line &= $"{[log].Result},"
             line &= $"{[log].ResultString},"
             line &= $"{IIf([log].AutoCommandFlag, "1", "0")},"
@@ -294,23 +335,6 @@ Public Class RpaTransaction
         sw.Dispose()
 
         Me.CommandLogs = New List(Of CommandLogData)
-    End Sub
-
-    Public Sub CreateCommand()
-        Dim texts() As String
-        Me.MainCommand = vbNullString
-        Me.Parameters = New List(Of String)
-
-        texts = Me.CommandText.Split(" ")
-        Me.MainCommand = texts(0)
-
-        Dim i As Integer = 0
-        For Each p In texts
-            If i <> 0 Then
-                Me.Parameters.Add(p)
-            End If
-            i += 1
-        Next
     End Sub
 
     Public Function ShowRpaIndicator(ByRef dat As RpaDataWrapper) As String

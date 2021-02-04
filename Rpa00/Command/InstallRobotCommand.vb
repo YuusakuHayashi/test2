@@ -1,11 +1,5 @@
 ﻿' 開発保留中
 Public Class InstallRobotCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Public Overrides Function CanExecute(ByRef dat As RpaDataWrapper) As Boolean
         Return MyBase.CanExecute(dat)
     End Function

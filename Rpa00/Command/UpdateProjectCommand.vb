@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports Rpa00
 
-Public Class UpdateRobotCommand : Inherits RpaCommandBase
+Public Class UpdateProjectCommand : Inherits RpaCommandBase
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If String.IsNullOrEmpty(dat.Project.RootDirectory) Then
             Console.WriteLine($"'RootDirectory' が設定されていません")
@@ -38,10 +38,10 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Console.WriteLine()
         Do
             idxtext = vbNullString
-            Console.WriteLine($"   処理を選択してください")
-            Console.WriteLine($"0  最新までアップデート")
-            Console.WriteLine($"1  特定時点へアップデート／ダウングレード")
-            Console.WriteLine($"9  中止する")
+            Console.WriteLine($"処理Ｎｏを選択してください")
+            Console.WriteLine($"0.  最新の更新を適用")
+            Console.WriteLine($"1.  特定の更新を適用・特定の更新へダウングレード")
+            Console.WriteLine($"9.  中止する")
             idxtext = dat.Transaction.ShowRpaIndicator(dat)
             Console.WriteLine()
             If idxtext = "0" Or idxtext = "1" Or idxtext = "2" Or idxtext = "9" Then
@@ -63,6 +63,8 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Return i
     End Function
 
+    ' IDを指定したアップデート
+    ' 自動アップデートなどで使用
     Private Function SelectedUpdate(ByRef dat As RpaDataWrapper) As Integer
         Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
@@ -121,8 +123,9 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         For Each sru In srus2
             srus.Remove(sru)
         Next
-        srus.Add(uru)
 
+        uru.UpdaterProcessId = dat.Initializer.ProcessId
+        srus.Add(uru)
         jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
         Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
         Console.WriteLine()
@@ -131,13 +134,41 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Return 0
     End Function
 
-    Private Function LatestUpdate(ByRef dat As Object) As Integer
+    ' 最新アップデート
+    Private Function LatestUpdate(ByRef dat As RpaDataWrapper) As Integer
+
+        Dim rdic As Dictionary(Of String, String) = dat.Project.RobotAliasDictionary
+        Dim udic As Dictionary(Of String, IntranetClientServerProject.RpaUtility) = dat.Project.SystemUtilities
+        Dim robots As List(Of String) = rdic.Keys.ToList()
+        Dim utils As List(Of String) = udic.Keys.ToList()
+
         Dim robotname As String = dat.Project.RobotName
         Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
         Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
 
-        Dim rrus2 As List(Of RpaUpdater) = rrus
+        Dim rrus2 As List(Of RpaUpdater)
+        ' .netには部分集合を判定する方法がなさそう・・・
+        rrus2 = rrus.FindAll(
+            Function(rru)
+                For Each rdep In rru.RobotDependencies
+                    If Not robots.Contains(rdep) Then
+                        Return False
+                    End If
+                Next
+                Return True
+            End Function
+        )
+        rrus2 = rrus2.FindAll(
+            Function(rru)
+                For Each udep In rru.UtilityDependencies
+                    If Not utils.Contains(udep) Then
+                        Return False
+                    End If
+                Next
+                Return True
+            End Function
+        )
         rrus2.Sort(
             Function(before, after)
                 Return (before.ReleaseDate < after.ReleaseDate)
@@ -150,8 +181,9 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
             End Function
         )
 
-        DIm ck As Boolean = False
-        If rrus2.Count > 0
+        Dim ck As Boolean = False
+        If rrus2.Count > 0 Then
+
             If srus2.Count = 0 Then
                 ck = True
             Else
@@ -173,6 +205,8 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
                 Console.WriteLine($"ファイルをコピー  src: '{src}'")
                 Console.WriteLine($"               => dst: '{dst}'")
             Next
+
+            uru.UpdaterProcessId = dat.Initializer.ProcessId
             srus.Add(uru)
             jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
             Console.WriteLine($"アップデートを適用するためには、再起動を行う必要があります")
@@ -185,12 +219,39 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         Return 0
     End Function
 
+    ' インタラクティブモードから特定時点のアップデートを適用
     Private Function PointUpdate(ByRef dat As Object) As Integer
         Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
+
+        Dim rdic As Dictionary(Of String, String) = dat.Project.RobotAliasDictionary
+        Dim udic As Dictionary(Of String, IntranetClientServerProject.RpaUtility) = dat.Project.SystemUtilities
+        Dim robots As List(Of String) = rdic.Keys.ToList()
+        Dim utils As List(Of String) = udic.Keys.ToList()
+
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
         Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
 
-        Dim rrus2 As List(Of RpaUpdater) = rrus
+        Dim rrus2 As List(Of RpaUpdater)
+        rrus2 = rrus.FindAll(
+            Function(rru)
+                For Each rdep In rru.RobotDependencies
+                    If Not robots.Contains(rdep) Then
+                        Return False
+                    End If
+                Next
+                Return True
+            End Function
+        )
+        rrus2 = rrus2.FindAll(
+            Function(rru)
+                For Each udep In rru.UtilityDependencies
+                    If Not utils.Contains(udep) Then
+                        Return False
+                    End If
+                Next
+                Return True
+            End Function
+        )
         rrus2.Sort(
             Function(before, after)
                 Return (before.ReleaseDate < after.ReleaseDate)
@@ -261,6 +322,8 @@ Public Class UpdateRobotCommand : Inherits RpaCommandBase
         For Each sru In srus2
             srus.Remove(sru)
         Next
+
+        uru.UpdaterProcessId = dat.Initializer.ProcessId
         srus.Add(uru)
 
         jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)

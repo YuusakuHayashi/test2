@@ -359,43 +359,68 @@ Public Class IntranetClientServerProject
         Dim t As Task = Task.Run(
             Sub()
                 Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
-                Dim rrus As List(Of RpaUpdater)
-                Dim srus As List(Of RpaUpdater)
-                Dim ck1 As Boolean = False
                 Do
-                    ck1 = False
-                    rrus = jh.Load(Of List(Of RpaUpdater))(Me.RootRobotsUpdateFile)
-                    srus = jh.Load(Of List(Of RpaUpdater))(Me.SystemRobotsUpdateFile)
+                    Dim robots As List(Of String) = Me.RobotAliasDictionary.Keys.ToList()
+                    Dim utils As List(Of String) = Me.SystemUtilities.Keys.ToList()
 
-                    If rrus.Count > 0 Then
-                        rrus.Sort(
+                    Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(Me.RootRobotsUpdateFile)
+                    If rrus Is Nothing Then
+                        rrus = New List(Of RpaUpdater)
+                    End If
+
+                    Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(Me.SystemRobotsUpdateFile)
+                    If srus Is Nothing Then
+                        srus = New List(Of RpaUpdater)
+                    End If
+
+                    ' .netには部分集合を判定する方法がなさそう・・・                    
+                    Dim rrus2 As List(Of RpaUpdater) = rrus.FindAll(
+                        Function(rru)
+                            Return rru.IsCritical
+                        End Function
+                    )
+                    rrus2 = rrus2.FindAll(
+                        Function(rru)
+                            For Each rdep In rru.RobotDependencies
+                                If Not robots.Contains(rdep) Then
+                                    Return False
+                                End If
+                            Next
+                            Return True
+                        End Function
+                    )
+                    rrus2 = rrus2.FindAll(
+                        Function(rru)
+                            For Each udep In rru.UtilityDependencies
+                                If Not utils.Contains(udep) Then
+                                    Return False
+                                End If
+                            Next
+                            Return True
+                        End Function
+                    )
+                    rrus2.Sort(
+                        Function(before, after)
+                            Return (before.ReleaseDate < after.ReleaseDate)
+                        End Function
+                    )
+
+                    Dim srus2 As List(Of RpaUpdater) = srus
+                    If srus2.Count > 0 Then
+                        srus2.Sort(
                             Function(before, after)
                                 Return (before.ReleaseDate < after.ReleaseDate)
                             End Function
                         )
                     End If
 
-                    If srus.Count > 0 Then
-                        srus.Sort(
-                            Function(before, after)
-                                Return (before.ReleaseDate < after.ReleaseDate)
-                            End Function
-                        )
-                    End If
-
-                    If rrus.Count > 0 Then
-                        If srus.Count = 0 Then
-                            ck1 = True
-                        Else
-                            If rrus.Last.ReleaseDate > srus.Last.ReleaseDate Then
-                                ck1 = True
-                            End If
-                        End If
-                    End If
-
-                    If ck1 Then
-                        If rrus.Last.IsCritical Then
+                    If rrus2.Count > 0 Then
+                        If srus2.Count = 0 Then
                             Me.IsUpdateAvailable = True
+                        Else
+                            If rrus2.Last.ReleaseDate > srus2.Last.ReleaseDate Then
+                                Me.IsUpdateAvailable = True
+                            End If
                         End If
                     End If
 

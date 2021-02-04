@@ -1,11 +1,4 @@
 ﻿Public Class ShowMyCommandCommand : Inherits RpaCommandBase
-
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim truecmdlen As Integer = 20
         Dim aliascmdlen As Integer = 20
@@ -45,5 +38,6 @@
 
     Sub New()
         Me.ExecuteHandler = AddressOf Main
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

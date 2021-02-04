@@ -3,13 +3,6 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
-
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private _MyCommandJsonFileName As String
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
@@ -84,5 +77,6 @@ Public Class ImportMyCommandsCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

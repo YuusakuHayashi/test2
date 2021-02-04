@@ -59,16 +59,64 @@
         End Set
     End Property
 
-    Private _ReleaseTargets As List(Of String)
-    Public Property ReleaseTargets As List(Of String)
+    'Private _ReleaseTargets As List(Of String)
+    'Public Property ReleaseTargets As List(Of String)
+    '    Get
+    '        If Me._ReleaseTargets Is Nothing Then
+    '            Me._ReleaseTargets = New List(Of String)
+    '        End If
+    '        Return Me._ReleaseTargets
+    '    End Get
+    '    Set(value As List(Of String))
+    '        Me._ReleaseTargets = value
+    '    End Set
+    'End Property
+
+    Private _RobotDependencies As List(Of String)
+    Public Property RobotDependencies As List(Of String)
         Get
-            If Me._ReleaseTargets Is Nothing Then
-                Me._ReleaseTargets = New List(Of String)
+            If Me._RobotDependencies Is Nothing Then
+                Me._RobotDependencies = New List(Of String)
             End If
-            Return Me._ReleaseTargets
+            Return Me._RobotDependencies
         End Get
         Set(value As List(Of String))
-            Me._ReleaseTargets = value
+            Me._RobotDependencies = value
+        End Set
+    End Property
+
+    Private _UtilityDependencies As List(Of String)
+    Public Property UtilityDependencies As List(Of String)
+        Get
+            If Me._UtilityDependencies Is Nothing Then
+                Me._UtilityDependencies = New List(Of String)
+            End If
+            Return Me._UtilityDependencies
+        End Get
+        Set(value As List(Of String))
+            Me._UtilityDependencies = value
+        End Set
+    End Property
+
+    ' アップデート後実行コマンド
+    ' 実行したらNullStiringにして実行抑制する
+    Private _UpdatedBindingCommand As String
+    Public Property UpdatedBindingCommand As String
+        Get
+            Return Me._UpdatedBindingCommand
+        End Get
+        Set(value As String)
+            Me._UpdatedBindingCommand = value
+        End Set
+    End Property
+
+    Private _UpdaterProcessId As Integer
+    Public Property UpdaterProcessId As Integer
+        Get
+            Return Me._UpdaterProcessId
+        End Get
+        Set(value As Integer)
+            Me._UpdaterProcessId = value
         End Set
     End Property
 End Class

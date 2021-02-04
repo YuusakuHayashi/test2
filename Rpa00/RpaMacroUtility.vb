@@ -13,10 +13,10 @@ Imports Rpa00
 '     Object のため、メソッド定義が分からず、実行時例外が発生しているのか？・・・
 
 Public Class RpaMacroUtility : Inherits RpaUtilityBase
-    Public Overrides ReadOnly Property CommandHandler(dat As Object) As Object
+    Public Overrides ReadOnly Property CommandHandler(ByVal cmdtxt As String) As Object
         Get
             Dim cmd As Object
-            Select Case dat.Transaction.MainCommand
+            Select Case cmdtxt
                 Case "install" : cmd = New InstallMacroCommand(Me)
                 Case "download" : cmd = New DownloadMacroFileCommand(Me)
                 Case "update" : cmd = New UpdateMacroCommand(Me)
@@ -27,7 +27,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Get
     End Property
 
-    Public ReadOnly Property RootBasDirectory(dat As Object) As String
+    Public ReadOnly Property RootBasDirectory(dat As RpaDataWrapper) As String
         Get
             If Not String.IsNullOrEmpty(dat.Project.RootDirectory) Then
                 Dim [dir] As String = $"{dat.Project.RootDirectory}\bas"
@@ -121,8 +121,8 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
     ' Show Command
     '---------------------------------------------------------------------------------------------'
-    Private Class ShowMacrosCommand : Inherits RpaUtilityCommandBase
-        Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+    Private Class ShowMacrosCommand : Inherits RpaCommandBase
+        Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
             If Not File.Exists(Me.Parent.MacroFileName) Then
                 Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
                 Console.WriteLine($"開発者から入手してください")
@@ -133,7 +133,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Parent As RpaMacroUtility
-        Public Overrides Function Execute(ByRef dat As Object) As Integer
+        Private Function Main(ByRef dat As RpaDataWrapper) As Integer
             Dim txt As String = (Parent.InvokeMacroFunction("MacroImporter.ShowModules", {""})).ToString.TrimEnd
             Console.WriteLine()
             Console.WriteLine($"インストール済マクロ一覧")
@@ -144,20 +144,16 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Sub New(p As RpaMacroUtility)
             Me.Parent = p
+            Me.ExecuteHandler = AddressOf Main
+            Me.CanExecuteHandler = AddressOf Check
         End Sub
     End Class
 
 
     ' Update Command
     '---------------------------------------------------------------------------------------------'
-    Public Class UpdateMacroCommand : Inherits RpaUtilityCommandBase
-        Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-            Get
-                Return {0, 999}
-            End Get
-        End Property
-
-        Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+    Public Class UpdateMacroCommand : Inherits RpaCommandBase
+        Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
             If Not File.Exists(Me.Parent.MacroFileName) Then
                 Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
                 Console.WriteLine($"開発者から入手してください")
@@ -194,7 +190,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Parent As RpaMacroUtility
 
-        Public Overrides Function Execute(ByRef dat As Object) As Integer
+        Private Function Main(ByRef dat As RpaDataWrapper) As Integer
             Dim i As Integer = -1
             If dat.Transaction.Parameters.Count = 0 Then
                 i = AllUpdate(dat)
@@ -204,42 +200,41 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Return i
         End Function
 
-        Private Function AllUpdate(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootBasDirectory(dat)
-            Dim dstdir As String = Parent.MacroUtilityDirectory
-            Dim incmd As New InstallMacroCommand(Parent)
-            Dim dlcmd As New DownloadMacroFileCommand(Parent)
-            dlcmd.Execute(dat)
-            incmd.Execute(dat)
+        Private Function AllUpdate(ByRef dat As RpaDataWrapper) As Integer
+            'Dim srcdir As String = Parent.RootBasDirectory(dat)
+            'Dim dstdir As String = Parent.MacroUtilityDirectory
+            Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
+            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} download")
+            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} install")
+            'dlcmd.Execute(dat)
+            'incmd.Execute(dat)
             Return 0
         End Function
 
-        Private Function SelectedUpdate(ByRef dat As Object) As Integer
-            Dim srcdir As String = Parent.RootBasDirectory(dat)
-            Dim dstdir As String = Parent.MacroUtilityDirectory
-            Dim incmd As New InstallMacroCommand(Parent)
-            Dim dlcmd As New DownloadMacroFileCommand(Parent)
-            dlcmd.Execute(dat)
-            incmd.Execute(dat)
+        Private Function SelectedUpdate(ByRef dat As RpaDataWrapper) As Integer
+            'Dim srcdir As String = Parent.RootBasDirectory(dat)
+            'Dim dstdir As String = Parent.MacroUtilityDirectory
+            Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
+            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} download {dat.Transaction.ParametersText}")
+            dat.Transaction.LateBindingCommandText.Add($"{utilpfx} install {dat.Transaction.ParametersText}")
+            'dlcmd.Execute(dat)
+            'incmd.Execute(dat)
             Return 0
         End Function
 
         Sub New(p As RpaMacroUtility)
             Me.Parent = p
+            Me.ExecuteHandler = AddressOf Main
+            Me.CanExecuteHandler = AddressOf Check
+            Me.ExecutableParameterCount = {0, 999}
         End Sub
     End Class
 
 
     ' Install Command
     '---------------------------------------------------------------------------------------------'
-    Private Class InstallMacroCommand : Inherits RpaUtilityCommandBase
-        Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-            Get
-                Return {0, 999}
-            End Get
-        End Property
-
-        Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+    Private Class InstallMacroCommand : Inherits RpaCommandBase
+        Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
             If Not File.Exists(Me.Parent.MacroFileName) Then
                 Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
                 Console.WriteLine($"開発者から入手してください")
@@ -251,7 +246,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Parent As RpaMacroUtility
 
-        Public Overrides Function Execute(ByRef dat As Object) As Integer
+        Private Function Main(ByRef dat As RpaDataWrapper) As Integer
             Dim i As Integer = -1
             If dat.Transaction.Parameters.Count = 0 Then
                 i = AllInstall(dat)
@@ -261,7 +256,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Return i
         End Function
 
-        Private Function AllInstall(ByRef dat As Object) As Integer
+        Private Function AllInstall(ByRef dat As RpaDataWrapper) As Integer
             Dim srcdir As String = Parent.MacroUtilityDirectory
             For Each src In Directory.GetFiles(srcdir)
                 Dim ext As String = Path.GetExtension(src)
@@ -286,7 +281,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Return 0
         End Function
 
-        Public Function SelectedInstall(ByRef dat As Object) As Integer
+        Public Function SelectedInstall(ByRef dat As RpaDataWrapper) As Integer
             For Each para In dat.Transaction.Parameters
                 Dim bas As String = $"{Parent.MacroUtilityDirectory}\{para}"
                 Dim ext As String = Path.GetExtension(bas)
@@ -308,20 +303,17 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Sub New(p As RpaMacroUtility)
             Me.Parent = p
+            Me.ExecuteHandler = AddressOf Main
+            Me.CanExecuteHandler = AddressOf Check
+            Me.ExecutableParameterCount = {0, 999}
         End Sub
     End Class
 
 
     ' Download
     '---------------------------------------------------------------------------------------------'
-    Private Class DownloadMacroFileCommand : Inherits RpaUtilityCommandBase
-        Public Overrides ReadOnly Property ExecutableParameterCount As Integer()
-            Get
-                Return {0, 999}
-            End Get
-        End Property
-
-        Public Overrides Function CanExecute(ByRef dat As Object) As Boolean
+    Private Class DownloadMacroFileCommand : Inherits RpaCommandBase
+        Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
             'If Not File.Exists(Me.Parent.MacroFileName) Then
             '    Console.WriteLine($"マクロファイル '{Me.Parent.MacroFileName}' が存在しません")
             '    Console.WriteLine($"開発者から入手してください")
@@ -358,7 +350,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Parent As RpaMacroUtility
 
-        Public Overrides Function Execute(ByRef dat As Object) As Integer
+        Private Function Main(ByRef dat As RpaDataWrapper) As Integer
             Dim i As Integer = -1
             If dat.Transaction.Parameters.Count = 0 Then
                 i = AllDownload(dat)
@@ -368,7 +360,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
             Return i
         End Function
 
-        Private Function AllDownload(ByRef dat As Object) As Integer
+        Private Function AllDownload(ByRef dat As RpaDataWrapper) As Integer
             Dim srcdir As String = Parent.RootBasDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             For Each src In Directory.GetFiles(srcdir)
@@ -392,7 +384,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
 
-        Private Function SelectedDownload(ByRef dat As Object) As Integer
+        Private Function SelectedDownload(ByRef dat As RpaDataWrapper) As Integer
             Dim srcdir As String = Parent.RootBasDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
             For Each para In dat.Transaction.Parameters
@@ -414,6 +406,9 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Sub New(p As RpaMacroUtility)
             Me.Parent = p
+            Me.ExecuteHandler = AddressOf Main
+            Me.CanExecuteHandler = AddressOf Check
+            Me.ExecutableParameterCount = {0, 999}
         End Sub
     End Class
 End Class

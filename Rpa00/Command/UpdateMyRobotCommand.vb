@@ -1,4 +1,4 @@
-﻿Public Class ExportMyRobotJsonCommand : Inherits RpaCommandBase
+﻿Public Class UpdateMyRobotCommand : Inherits RpaCommandBase
 
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Project.MyRobotObject Is Nothing Then

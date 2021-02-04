@@ -1,6 +1,16 @@
 ﻿Imports System.IO
 
 Public Class PushRobotCommand : Inherits RpaCommandBase
+    Private _Updater As RpaUpdater
+    Public Property Updater As RpaUpdater
+        Get
+            Return Me._Updater
+        End Get
+        Set(value As RpaUpdater)
+            Me._Updater = value
+        End Set
+    End Property
+
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If String.IsNullOrEmpty(dat.Project.RootDirectory) Then
             Console.WriteLine($"'RootDirectory' が設定されていません")
@@ -39,17 +49,15 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
     End Function
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim i As Integer = -1
+        Dim i As Integer = WriteReleaseInfo(dat)
+        Dim j As Integer = AllPush(dat)
 
-        Dim pdname As String = WriteReleaseInfo(dat)
-        i = AllPush(dat, pdname)
-
-        Return i
+        Return 0
     End Function
 
-    Private Function AllPush(ByRef dat As RpaDataWrapper, ByVal pdir As String) As Integer
+    Private Function AllPush(ByRef dat As RpaDataWrapper) As Integer
         Dim srcdir As String = dat.Project.ReleaseRobotDirectory
-        Dim dstdir As String = pdir
+        Dim dstdir As String = Me.Updater.PackageDirectory
 
         For Each src In Directory.GetFiles(srcdir)
             Dim dst As String = $"{dstdir}\{Path.GetFileName(src)}"
@@ -82,7 +90,7 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
     '    Return 0
     'End Function
 
-    Private Function WriteReleaseInfo(ByRef dat As RpaDataWrapper) As String
+    Private Function WriteReleaseInfo(ByRef dat As RpaDataWrapper) As Integer
         Dim ru As New RpaUpdater With {
             .ReleaseDate = DateTime.Now.ToString("yyyyMMddHHmmss")
         }
@@ -176,22 +184,143 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
         '    End If
         'Loop Until False
 
-        Dim yorn6 As String = vbNullString
+        ' ＤＬＬ依存関係の入力
         Do
-            yorn6 = vbNullString
-            Console.WriteLine($"Is this Critical? (y/n) :")
-            Dim yorn7 As String = dat.Transaction.ShowRpaIndicator(dat)
+            Dim yorn4 As String = vbNullString
+            Dim yorn5 As String = vbNullString
+            Dim yorn6 As String = vbNullString
+            Console.WriteLine($"Please Input Robot Dependencies :")
+            Dim depsstr As String = dat.Transaction.ShowRpaIndicator(dat)
             Console.WriteLine()
+            If String.IsNullOrEmpty(depsstr) Then
+                Do
+                    Console.WriteLine($"No Dependencies? (y/n)")
+                    yorn5 = dat.Transaction.ShowRpaIndicator(dat)
+                    Console.WriteLine()
+                    If yorn5 = "y" Or yorn5 = "n" Then
+                        Exit Do
+                    End If
+                Loop Until False
+                If yorn5 = "y" Then
+                    Exit Do
+                End If
+            End If
+            Dim deps() As String = depsstr.Split(" "c)
             Do
-                Console.WriteLine($"IsCritical : '{yorn7}' ok? (y/n)")
+                Console.WriteLine($"Dependencies : '{depsstr}' add? (y/n)")
+                yorn4 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn4 = "y" Or yorn4 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            If yorn4 = "n" Then
+                Continue Do
+            End If
+            For Each dep In deps
+                ru.RobotDependencies.Add(dep)
+            Next
+            Do
+                Console.WriteLine($"continue? (y/n)")
                 yorn6 = dat.Transaction.ShowRpaIndicator(dat)
                 Console.WriteLine()
                 If yorn6 = "y" Or yorn6 = "n" Then
                     Exit Do
                 End If
             Loop Until False
-            ru.IsCritical = IIf(yorn7 = "y", True, False)
-            If yorn6 = "y" Then
+            If yorn6 = "n" Then
+                Exit Do
+            End If
+        Loop Until False
+
+        ' ＵＴＩＬＩＴＹ依存関係の入力
+        Do
+            Dim yorn4 As String = vbNullString
+            Dim yorn5 As String = vbNullString
+            Dim yorn6 As String = vbNullString
+            Console.WriteLine($"Please Input Utility Dependencies :")
+            Dim depsstr As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            If String.IsNullOrEmpty(depsstr) Then
+                Do
+                    Console.WriteLine($"No Dependencies? (y/n)")
+                    yorn5 = dat.Transaction.ShowRpaIndicator(dat)
+                    Console.WriteLine()
+                    If yorn5 = "y" Or yorn5 = "n" Then
+                        Exit Do
+                    End If
+                Loop Until False
+                If yorn5 = "y" Then
+                    Exit Do
+                End If
+            End If
+            Dim deps() As String = depsstr.Split(" "c)
+            Do
+                Console.WriteLine($"Dependencies : '{depsstr}' add? (y/n)")
+                yorn4 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn4 = "y" Or yorn4 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            If yorn4 = "n" Then
+                Continue Do
+            End If
+            For Each dep In deps
+                ru.UtilityDependencies.Add(dep)
+            Next
+            Do
+                Console.WriteLine($"continue? (y/n)")
+                yorn6 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn6 = "y" Or yorn6 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            If yorn6 = "n" Then
+                Exit Do
+            End If
+        Loop Until False
+
+        Dim yorn7 As String = vbNullString
+        Do
+            yorn7 = vbNullString
+            Console.WriteLine($"Is this Critical? (y/n) :")
+            Dim yorn8 As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            Do
+                Console.WriteLine($"IsCritical : '{yorn8}' ok? (y/n)")
+                yorn7 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn7 = "y" Or yorn7 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            ru.IsCritical = IIf(yorn8 = "y", True, False)
+            If yorn7 = "y" Then
+                Exit Do
+            End If
+        Loop Until False
+
+        Dim yorn9 As String = vbNullString
+        Do
+            yorn9 = vbNullString
+            Console.WriteLine($"UpdatedBindingCommand ? :")
+            Dim ubc As String = dat.Transaction.ShowRpaIndicator(dat)
+            Console.WriteLine()
+            If String.IsNullOrEmpty(ubc) Then
+                ubc = vbNullString
+            End If
+            Do
+                Console.WriteLine($"UpdatedBindingCommand : '{ubc}' ok? (y/n)")
+                yorn9 = dat.Transaction.ShowRpaIndicator(dat)
+                Console.WriteLine()
+                If yorn9 = "y" Or yorn9 = "n" Then
+                    Exit Do
+                End If
+            Loop Until False
+            ru.UpdatedBindingCommand = ubc
+            If yorn9 = "y" Then
                 Exit Do
             End If
         Loop Until False
@@ -206,7 +335,9 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
         Console.WriteLine($"'{dat.Project.RootRobotsUpdateFile}' Updated!")
         Console.WriteLine()
 
-        Return pdname
+        Me.Updater = ru
+
+        Return 0
     End Function
 
     Sub New()

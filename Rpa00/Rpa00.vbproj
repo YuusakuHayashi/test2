@@ -77,6 +77,7 @@
     <Compile Include="Command\AddRobotAliasCommand.vb" />
     <Compile Include="Command\AddUtilityCommand.vb" />
     <Compile Include="Command\AllSaveCommand.vb" />
+    <Compile Include="Command\BasUpdateCommand.vb" />
     <Compile Include="Command\ChangeInitializerPropertyCommand.vb" />
     <Compile Include="Command\ChangeProjectPropertyCommand.vb" />
     <Compile Include="Command\ChangeProjectPropertyUsingFolderBrowserCommand.vb" />
@@ -109,8 +110,8 @@
     <Compile Include="Command\ShowMyRobotPropertiesCommand.vb" />
     <Compile Include="Command\ShowProjectPropertiesCommand.vb" />
     <Compile Include="Command\ShowRobotReadMeCommand.vb" />
-    <Compile Include="Command\UpdateRobotCommand.vb" />
-    <Compile Include="Command\ExportMyRobotJsonCommand.vb" />
+    <Compile Include="Command\UpdateProjectCommand.vb" />
+    <Compile Include="Command\UpdateMyRobotCommand.vb" />
     <Compile Include="Command\ExportRootRobotJsonCommand.vb" />
     <Compile Include="CommonProject.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

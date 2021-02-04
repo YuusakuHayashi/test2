@@ -1,6 +1,18 @@
 ﻿Imports System.IO
 
 Public Class RpaSystem
+    Private IsUpdatedBindingCommandExecuted As Boolean
+    Private IsUpdatedBindingCommandCreated As Boolean
+    Private _UpdatedBindingCommand As String
+    Private Property UpdatedBindingCommand As String
+        Get
+            Return Me._UpdatedBindingCommand
+        End Get
+        Set(value As String)
+            Me._UpdatedBindingCommand = value
+        End Set
+    End Property
+
     Public ReadOnly Property RpaObject(ByVal index As Integer) As Object
         Get
             Dim ics As New IntranetClientServerProject
@@ -70,8 +82,8 @@ Public Class RpaSystem
                 Me._CommandDictionary.Add("changeprojectpropertyusingfolderbrowser", (New ChangeProjectPropertyUsingFolderBrowserCommand))
                 Me._CommandDictionary.Add("showinitializerproperties", (New ShowInitializerPropertiesCommand))
                 Me._CommandDictionary.Add("changeinitializerproperty", (New ChangeInitializerPropertyCommand))
-                Me._CommandDictionary.Add("updaterobot", (New UpdateRobotCommand))
-                Me._CommandDictionary.Add("exportmyrobotjson", (New ExportMyRobotJsonCommand))
+                Me._CommandDictionary.Add("updateproject", (New UpdateProjectCommand))
+                Me._CommandDictionary.Add("updatemyrobot", (New UpdateMyRobotCommand))
                 Me._CommandDictionary.Add("exportrootrobotjson", (New ExportRootRobotJsonCommand))
                 Me._CommandDictionary.Add("removemycommand", (New RemoveMyCommandCommand))
                 Me._CommandDictionary.Add("activatemycommand", (New ActivateMyCommandCommand))
@@ -85,59 +97,111 @@ Public Class RpaSystem
     End Property
 
     ' 機能はここに追加
-    ' ここでインスタンス化されたコマンドには、RpaDataWrapper型を持たせることが出来る
-    ' (おそらく、コンパイル時に型の情報を検査するのだと思われる)
+    ' 非常にごちゃごちゃしているので、後々見直し予定・・・
     '---------------------------------------------------------------------------------------------'
-    Public ReadOnly Property CommandHandler(dat As RpaDataWrapper) As Object
-        Get
-            ' Aliasの変換
-            Dim [alias] = dat.Initializer.MyCommandDictionary.Where(
-                Function(pair)
-                    If pair.Value.Alias = dat.Transaction.MainCommand Then
-                        Return True
-                    Else
-                        Return False
-                    End If
-                End Function
-            )
-            If Not String.IsNullOrEmpty([alias](0).Key) Then
-                dat.Transaction.MainCommand = [alias](0).Key
-            End If
+    Private Function CreateCommand(dat As RpaDataWrapper) As Object
+        ' コマンド生成
+        Dim cmd = Nothing
+        If String.IsNullOrEmpty(dat.Transaction.UtilityCommand) Then
+            cmd = Me.CommandDictionary(dat.Transaction.TrueCommand)
+        Else
+            cmd = dat.Project.SystemUtilities(dat.Transaction.UtilityCommand).UtilityObject.CommandHandler(dat.Transaction.TrueCommand)
+        End If
 
-
-            ' コマンド生成
-            Dim cmdtxt As String = dat.Transaction.MainCommand
-            Dim cmd = Nothing
-            If Me.CommandDictionary.ContainsKey(cmdtxt) Then
-                cmd = Me.CommandDictionary(cmdtxt)
-            Else
+        ' コマンド無効化
+        If dat.Initializer.MyCommandDictionary.ContainsKey(dat.Transaction.TrueCommand) Then
+            If Not dat.Initializer.MyCommandDictionary(dat.Transaction.TrueCommand).IsEnabled Then
                 cmd = Nothing
             End If
+        End If
 
-
-            ' ユーティリティコマンド
-            If dat.Project IsNot Nothing Then
-                If (dat.Project.SystemUtilities.Count > 0) And (cmd Is Nothing) Then
-                    If dat.Project.SystemUtilities.ContainsKey(dat.Transaction.MainCommand) Then
-                        dat.Transaction.MainCommand = dat.Transaction.Parameters(0)
-                        dat.Transaction.Parameters = RpaModule.Pop(Of List(Of String))(dat.Transaction.Parameters)
-                        cmd = dat.Project.SystemUtilities(cmdtxt).UtilityObject.CommandHandler(dat)
-                    End If
-                End If
-            End If
-
-
-            ' コマンド無効化
-            If dat.Initializer.MyCommandDictionary.ContainsKey(cmdtxt) Then
-                If Not dat.Initializer.MyCommandDictionary(cmdtxt).IsEnabled Then
-                    cmd = Nothing
-                End If
-            End If
-
-            Return cmd
-        End Get
-    End Property
+        Return cmd
+    End Function
     '---------------------------------------------------------------------------------------------'
+
+    ' 1. Transaction.MainCommand の更新
+    Private Function CheckMainCommand(ByRef dat As RpaDataWrapper) As Integer
+        Dim texts() As String
+        dat.Transaction.MainCommand = vbNullString
+
+        texts = dat.Transaction.CommandText.Split(" ")
+        dat.Transaction.MainCommand = texts(0)
+
+        Return 0
+    End Function
+
+    ' 2. Transaction.TrueCommand の更新
+    Private Function CheckTrueCommand(dat As RpaDataWrapper) As Integer
+        dat.Transaction.TrueCommand = vbNullString
+        Dim [alias] = dat.Initializer.MyCommandDictionary.Where(
+            Function(pair)
+                If pair.Value.Alias = dat.Transaction.MainCommand Then
+                    Return True
+                Else
+                    Return False
+                End If
+            End Function
+        )
+
+        If Not String.IsNullOrEmpty([alias](0).Key) Then
+            dat.Transaction.TrueCommand = [alias](0).Key
+        Else
+            dat.Transaction.TrueCommand = dat.Transaction.MainCommand
+        End If
+
+        Return 0
+    End Function
+
+    ' 3. Transaction.UtilityCommand の更新
+    ' UtilityCommand の場合、 Transaction.TrueCommand も更新する
+    Private Function CheckUtilityCommand(dat As RpaDataWrapper) As Integer
+        dat.Transaction.UtilityCommand = vbNullString
+
+        Dim texts() As String
+        texts = dat.Transaction.CommandText.Split(" ")
+
+        If dat.Project IsNot Nothing Then
+            If dat.Project.SystemUtilities.Count > 0 Then
+                If dat.Project.SystemUtilities.ContainsKey(dat.Transaction.TrueCommand) Then
+                    dat.Transaction.UtilityCommand = dat.Transaction.TrueCommand
+                    dat.Transaction.TrueCommand = texts(1)
+                End If
+            End If
+        End If
+
+        Return 0
+    End Function
+
+    ' 4. Transaction.Parameters, .ParametersText の更新
+    Private Function CheckCommandParameters(dat As RpaDataWrapper) As Integer
+        dat.Transaction.ParametersText = vbNullString
+        dat.Transaction.Parameters = New List(Of String)
+
+        Dim texts() As String
+        texts = dat.Transaction.CommandText.Split(" ")
+
+        Dim ex As Integer
+        If String.IsNullOrEmpty(dat.Transaction.UtilityCommand) Then
+            ex = 0
+        Else
+            ex = 1
+        End If
+
+        Dim cnt As Integer = 0
+        For Each p In texts
+            If cnt > ex Then
+                dat.Transaction.Parameters.Add(p)
+                dat.Transaction.ParametersText &= $"{p} "
+            End If
+            cnt += 1
+        Next
+
+        If Not String.IsNullOrEmpty(dat.Transaction.ParametersText) Then
+            dat.Transaction.ParametersText _
+                = dat.Transaction.ParametersText.TrimEnd(" ")
+        End If
+        Return 0
+    End Function
 
     Private Function BackupMonthlyLog(ByRef dat As RpaDataWrapper) As Integer
         Dim sw As StreamWriter
@@ -209,7 +273,7 @@ Public Class RpaSystem
     End Function
 
     Public Sub Main(ByRef dat As RpaDataWrapper)
-        Dim i As Integer = BackupMonthlyLog(dat)  ' 当月ログ保存
+        Dim i As Integer = BackupMonthlyLog(dat)               ' 当月ログ保存
 
         Do
             Call CuiLoop(dat)
@@ -265,49 +329,72 @@ Public Class RpaSystem
         Dim k As Integer = SendMonthlyLog(dat)    ' 当月ログ送信
     End Sub
 
-    ' IntranetClientServerProjectで実行
-    'Private Function UpdateCheck(ByRef dat As RpaDataWrapper) As Integer
-    '    If Not dat.Project.IsUpdateAvailable Then
-    '        Return 0
+
+    Private Function CreateUpdatedBindingCommand(ByRef dat As RpaDataWrapper) As Integer
+        If dat.Project Is Nothing Then
+            Return 0
+        End If
+        If dat.Project.SystemArchTypeName <> (New IntranetClientServerProject).GetType.Name Then
+            Return 0
+        End If
+
+        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
+        Dim srus2 As List(Of RpaUpdater) = srus
+        srus.Sort(
+            Function(before, after)
+                Return (before.ReleaseDate < after.ReleaseDate)
+            End Function
+        )
+
+        If srus.Last.UpdaterProcessId = dat.Initializer.ProcessId Then
+            Return 0
+        End If
+
+        If Not String.IsNullOrEmpty(srus.Last.UpdatedBindingCommand) Then
+            Me.UpdatedBindingCommand = srus.Last.UpdatedBindingCommand
+            Me.IsUpdatedBindingCommandCreated = True
+        End If
+
+        Return 0
+    End Function
+
+    Private Function CompleteUpdate(ByRef dat As RpaDataWrapper) As Integer
+        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
+        srus.Sort(
+            Function(before, after)
+                Return (before.ReleaseDate < after.ReleaseDate)
+            End Function
+        )
+        srus.Last.UpdatedBindingCommand = vbNullString
+        Call jh.Save(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile, srus)
+
+        Return 0
+    End Function
+
+    ' コマンドオブジェクト生成後のトランザクションデータの再構成
+    'Private Sub ReCheckMainCommand()
+    '    Dim texts() As String
+    '    Me.MainCommand = vbNullString
+    '    Me.ParametersText = vbNullString
+    '    Me.Parameters = New List(Of String)
+
+    '    texts = Me.CommandText.Split(" ")
+    '    Me.MainCommand = texts(0)
+
+    '    Dim i As Integer = 0
+    '    For Each p In texts
+    '        If i <> 0 Then
+    '            Me.Parameters.Add(p)
+    '            Me.ParametersText &= $"{p} "
+    '        End If
+    '        i += 1
+    '    Next
+    '    If Not String.IsNullOrEmpty(Me.ParametersText) Then
+    '        Me.ParametersText.TrimEnd()
     '    End If
-
-    '    Dim idx As String = vbNullString
-    '    If dat.Project.AutoUpdate Then
-    '        idx = "0"
-    '    Else
-    '        Do
-    '            idx = vbNullString
-    '            Console.WriteLine()
-    '            Console.WriteLine($"0 ...更新して終了")
-    '            Console.WriteLine($"1 ...終了")
-    '            idx = dat.Transaction.ShowRpaIndicator(dat)
-    '            If idx = "0" Or idx = "1" Then
-    '                Exit Do
-    '            End If
-    '        Loop Until False
-    '    End If
-
-    '    If idx = "1" Then
-    '        Return 0
-    '    End If
-
-    '    Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
-    '    Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
-    '    Dim uru As RpaUpdater
-    '    rrus.Sort(
-    '        Function(before, after)
-    '            Return (before.ReleaseDate < after.ReleaseDate)
-    '        End Function
-    '    )
-    '    uru = rrus.Last
-
-    '    ' リテラル部分は後で修正する（面倒なので、リテラルで仮置きしている）
-    '    '-----------------------------------------------------------------------------------------'
-    '    dat.Transaction.AutoCommandText.Add($"updaterobot {uru.ReleaseId}")
-    '    '-----------------------------------------------------------------------------------------'
-
-    '    Return 0
-    'End Function
+    'End Sub
 
     Private Sub CuiLoop(ByRef dat As RpaDataWrapper)
         Const RESULT_S As String = "Success"
@@ -318,7 +405,21 @@ Public Class RpaSystem
         Dim autocmdflag As Boolean = False
 
         Try
-            dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
+            Dim a As Integer = -1
+
+            ' 一度のみ実行
+            If Not Me.IsUpdatedBindingCommandCreated Then
+                a = CreateUpdatedBindingCommand(dat)
+            End If
+
+            If String.IsNullOrEmpty(Me.UpdatedBindingCommand) Then
+                dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
+            Else
+                dat.Transaction.CommandText = Me.UpdatedBindingCommand
+                Console.WriteLine($"更新プログラムを実行します・・・")
+                Console.WriteLine()
+            End If
+
             Do
                 cmdlog = New RpaTransaction.CommandLogData With {
                     .UserName = dat.Initializer.UserName,
@@ -337,10 +438,19 @@ Public Class RpaSystem
                     cmdlog.RobotName = dat.Project.RobotName
                 End If
 
-                Call dat.Transaction.CreateCommand()
+                dat.Transaction.CommandText _
+                    = dat.Transaction.CommandText.TrimEnd(" ")
 
-                Dim cmd = CommandHandler(dat)
+                Dim i As Integer = CheckMainCommand(dat)
+                Dim j As Integer = CheckTrueCommand(dat)
+                Dim k As Integer = CheckUtilityCommand(dat)
+                Dim h As Integer = CheckCommandParameters(dat)
+                Dim cmd = CreateCommand(dat)
 
+                cmdlog.UtilityCommand = dat.Transaction.UtilityCommand
+
+                ' コマンドチェック
+                '---------------------------------------------------------------------------------'
                 Dim err0 As String = $"コマンド  '{dat.Transaction.CommandText}' はありません"
                 If cmd Is Nothing Then
                     Console.WriteLine(err0)
@@ -377,7 +487,6 @@ Public Class RpaSystem
                     End If
                 End If
 
-
                 Dim err3 As String = $"このプロジェクト構成では、コマンド '{dat.Transaction.CommandText}' は実行できません"
                 Dim archs As String() = cmd.ExecutableProjectArchitectures
                 If Not archs.Contains("AllArchitectures") Then
@@ -410,6 +519,7 @@ Public Class RpaSystem
                     cmdlog.ResultString = err5
                     Throw (New Exception)
                 End If
+                '---------------------------------------------------------------------------------'
 
                 Dim [from] As DateTime = DateTime.Now
                 dat.Transaction.ReturnCode = cmd.Execute(dat)
@@ -422,13 +532,13 @@ Public Class RpaSystem
 
                 ' 自動生成コマンド
                 '---------------------------------------------------------------------------------'
-                If dat.Transaction.AutoCommandText.Count = 0 Then
+                If dat.Transaction.LateBindingCommandText.Count = 0 Then
                     Exit Do
                 End If
 
                 autocmdflag = True
-                dat.Transaction.CommandText = dat.Transaction.AutoCommandText(0)
-                dat.Transaction.AutoCommandText = RpaModule.Pop(Of List(Of String))(dat.Transaction.AutoCommandText)
+                dat.Transaction.CommandText = dat.Transaction.LateBindingCommandText(0)
+                dat.Transaction.LateBindingCommandText = RpaModule.Pop(Of List(Of String))(dat.Transaction.LateBindingCommandText)
                 '---------------------------------------------------------------------------------'
             Loop Until False
         Catch ex As Exception
@@ -443,6 +553,16 @@ Public Class RpaSystem
             dat.Transaction.CommandLogs.Add(cmdlog)
         Finally
             dat.Transaction.Parameters = New List(Of String)
+            Dim z As Integer = -1
+            If Not String.IsNullOrEmpty(Me.UpdatedBindingCommand) Then
+                If cmdlog.Result = RESULT_S Then
+                    z = CompleteUpdate(dat)
+                Else
+                    Console.WriteLine($"更新プログラムの実行に失敗しました")
+                    Console.WriteLine()
+                End If
+                Me.UpdatedBindingCommand = vbNullString
+            End If
         End Try
     End Sub
 End Class

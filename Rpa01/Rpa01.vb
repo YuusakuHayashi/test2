@@ -49,6 +49,43 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Public PrinterName As String
     Public PrintCreatedOnly As Boolean
 
+    ' Ｍａｔｓ年間スケジュール関連
+    '---------------------------------------------------------------------------------------------'
+    Public MatsNenkanScheduleFileName As String
+    Public MatsNenkanScheduleSheetName As String
+    Public Mats01Gatsu12FurikaebiCell As String
+    Public Mats02Gatsu12FurikaebiCell As String
+    Public Mats03Gatsu12FurikaebiCell As String
+    Public Mats04Gatsu12FurikaebiCell As String
+    Public Mats05Gatsu12FurikaebiCell As String
+    Public Mats06Gatsu12FurikaebiCell As String
+    Public Mats07Gatsu12FurikaebiCell As String
+    Public Mats08Gatsu12FurikaebiCell As String
+    Public Mats09Gatsu12FurikaebiCell As String
+    Public Mats10Gatsu12FurikaebiCell As String
+    Public Mats11Gatsu12FurikaebiCell As String
+    Public Mats12Gatsu12FurikaebiCell As String
+    ' 今回振替指定日
+    Private _FurikaeSiteibiCell As String
+    Private Property FurikaeSiteibiCell As String
+        Get
+            Return Me._FurikaeSiteibiCell
+        End Get
+        Set(value As String)
+            Me._FurikaeSiteibiCell = value
+        End Set
+    End Property
+    Private _FurikaeSiteibi As Date
+    Private Property FurikaeSiteibi As Date
+        Get
+            Return Me._FurikaeSiteibi
+        End Get
+        Set(value As Date)
+            Me._FurikaeSiteibi = value
+        End Set
+    End Property
+    '---------------------------------------------------------------------------------------------'
+
     Private _BankSaffixes As List(Of String)
     Public Property BankSaffixes As List(Of String)
         Get
@@ -154,7 +191,15 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Public SakuseibiZMCell As String                  ' 作成月（ゼロサプレス）
         Public SakuseibiDDCell As String                  ' 作成日（２桁）
         Public SakuseibiZDCell As String                  ' 作成日（ゼロサプレス）
-        Public FurikaesiteibiCell As String               ' 振替指定日
+        Public FurikaesiteibiCell As String               ' 振替指定日（８桁）
+        Public FurikaesiteibiYYYYCell As String           ' 振替指定年（４桁）
+        Public FurikaesiteibiYYCell As String             ' 振替指定年（下２桁）
+        Public FurikaesiteibiWaYYCell As String           ' 振替指定年（和暦）
+        Public FurikaesiteibiWaZYCell As String           ' 振替指定年（和暦、ゼロサプレス）
+        Public FurikaesiteibiMMCell As String             ' 振替指定月（２桁）
+        Public FurikaesiteibiZMCell As String             ' 振替指定月（ゼロサプレス）
+        Public FurikaesiteibiDDCell As String             ' 振替指定日 （２桁）
+        Public FurikaesiteibiZDCell As String             ' 振替指定日（ゼロサプレス）
 
         ' 停止依頼元
         Public ItakusyacodeCell As String                 ' 委託者コード
@@ -434,8 +479,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' 添付ファイルを解凍
         Console.WriteLine("添付ファイルを解凍します...")
-        'Call sutil.RunShell(Me.AttacheCase, $"/c '{afile_1}' /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
-        'Call sutil.RunShell(Me.AttacheCase, vbNullString)
         Call sutil.RunShell(Me.AttacheCase, $"""{afile_1}"" /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
         If Not File.Exists(ixls_1) Then
             Console.WriteLine($"エラー：解凍後ファイル '{ixls_1}' がありません")
@@ -700,10 +743,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim M_iraisho As Iraisho = Nothing
         Dim M_tb As Iraisho.BankInfo = Nothing
 
-        Dim dt As DateTime                                   ' 日付関係
-        Dim culture As CultureInfo
-        Dim sYYYYMMDD, sMM, sDD, wYYYYMMDD, wYY
-
         Dim header                                           ' ヘッダーフラグ
         Dim resheet                                          ' 改ページフラグ
         Dim row                                              ' 行位置
@@ -724,13 +763,33 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         ' 今日の日付
-        dt = DateTime.Now
-        sYYYYMMDD = dt.ToString("yyyyMMdd")
-        sMM = Strings.Mid(sYYYYMMDD, 5, 2)
-        sDD = Strings.Mid(sYYYYMMDD, 7, 2)
-        culture = New CultureInfo("ja-JP", True)
+        Dim culture As CultureInfo = New CultureInfo("ja-JP", True)
         culture.DateTimeFormat.Calendar = New JapaneseCalendar
-        wYYYYMMDD = dt.ToString("ggyyMMdd", culture)
+        Dim dt As Date = DateTime.Now
+        Dim SsYYYYMMDD As String = dt.ToString("yyyyMMdd")
+        Dim SsYYYY As String = Strings.Mid(SsYYYYMMDD, 1, 4)
+        Dim SsYY As String = Strings.Mid(SsYYYYMMDD, 3, 2)
+        Dim SsZY As String = IIf(SsYY > "09", SsYY, Strings.Right(SsYY, 1))
+        Dim SMM As String = Strings.Mid(SsYYYYMMDD, 5, 2)
+        Dim SzM As String = IIf(SMM > "09", SMM, Strings.Right(SMM, 1))
+        Dim SDD As String = Strings.Mid(SsYYYYMMDD, 7, 2)
+        Dim SzD As String = IIf(SDD > "09", SDD, Strings.Right(SDD, 1))
+        Dim SwYYMMDD As String = dt.ToString("ggyyMMdd", culture)
+        Dim SwYY As String = Strings.Mid(SwYYMMDD, 3, 2)
+        Dim SwZY As String = IIf(SwYY > "09", SwYY, Strings.Right(SwYY, 1))
+
+        Dim dt2 As Date = Me.FurikaeSiteibi
+        Dim FsYYYYMMDD As String = dt2.ToString("yyyyMMdd")
+        Dim FsYYYY As String = Strings.Mid(FsYYYYMMDD, 1, 4)
+        Dim FsYY As String = Strings.Mid(FsYYYYMMDD, 3, 2)
+        Dim FsZY As String = IIf(FsYY > "09", FsYY, Strings.Right(FsYY, 1))
+        Dim FMM As String = Strings.Mid(FsYYYYMMDD, 5, 2)
+        Dim FzM As String = IIf(FMM > "09", FMM, Strings.Right(FMM, 1))
+        Dim FDD As String = Strings.Mid(FsYYYYMMDD, 7, 2)
+        Dim FzD As String = IIf(FDD > "09", FDD, Strings.Right(FDD, 1))
+        Dim FwYYMMDD As String = dt2.ToString("ggyyMMdd", culture)
+        Dim FwYY As String = Strings.Mid(FwYYMMDD, 3, 2)
+        Dim FwZY As String = IIf(FwYY > "09", FwYY, Strings.Right(FwYY, 1))
 
         ' ヘッダーは読み飛ばし
         sr.ReadLine()
@@ -771,8 +830,8 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
                 ' 1. 依頼書の対象銀行コードが合致する依頼書データ取得
                 M_iraisho = M_iraishos.Find(
-                    Function(ri)
-                        Dim hit = ri.TargetBanks.Find(
+                    Function(mi)
+                        Dim hit = mi.TargetBanks.Find(
                             Function(tb)
                                 Return (tb.Code = imd.T_Ginkoucode)
                             End Function
@@ -891,121 +950,137 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             imd.MeisaiString = bookname                                                                                                                ' idx000 Ｅｘｃｅｌ名
             imd.MeisaiString &= "," & srcsheetname                                                                                                     ' idx001
             imd.MeisaiString &= "," & dstsheetname                                                                                                     ' idx002
-            imd.MeisaiString &= "," & Me.Syunoukigyoucode                                                                                           ' idx003
+            imd.MeisaiString &= "," & Me.Syunoukigyoucode                                                                                              ' idx003
             imd.MeisaiString &= "," & M_iraisho.SyunoukigyoucodeCell                                                                                   ' idx004
-            imd.MeisaiString &= "," & Me.Syunoukigyoumei                                                                                            ' idx005
+            imd.MeisaiString &= "," & Me.Syunoukigyoumei                                                                                               ' idx005
             imd.MeisaiString &= "," & M_iraisho.SyunoukigyoumeiCell                                                                                    ' idx006
-            imd.MeisaiString &= "," & Me.Syunoukigyouaddress                                                                                        ' idx007
+            imd.MeisaiString &= "," & Me.Syunoukigyouaddress                                                                                           ' idx007
             imd.MeisaiString &= "," & M_iraisho.SyunoukigyouaddressCell                                                                                ' idx008
-            imd.MeisaiString &= "," & Me.Syunoukigyoutel                                                                                            ' idx009
+            imd.MeisaiString &= "," & Me.Syunoukigyoutel                                                                                               ' idx009
             imd.MeisaiString &= "," & M_iraisho.SyunoukigyoutelCell                                                                                    ' idx010
-            imd.MeisaiString &= "," & Me.Syunoukigyoutantousya                                                                                      ' idx011
+            imd.MeisaiString &= "," & Me.Syunoukigyoutantousya                                                                                         ' idx011
             imd.MeisaiString &= "," & M_iraisho.SyunoukigyoutantousyaCell                                                                              ' idx012
-            imd.MeisaiString &= "," & Me.Haraikomisakikouzabangou                                                                                   ' idx013
+            imd.MeisaiString &= "," & Me.Haraikomisakikouzabangou                                                                                      ' idx013
             imd.MeisaiString &= "," & M_iraisho.HaraikomisakikouzabangouCell                                                                           ' idx014
-            imd.MeisaiString &= "," & Me.Haraikomikinshubetu                                                                                        ' idx015
+            imd.MeisaiString &= "," & Me.Haraikomikinshubetu                                                                                           ' idx015
             imd.MeisaiString &= "," & M_iraisho.HaraikomikinshubetuCell                                                                                ' idx016
-            imd.MeisaiString &= "," & sYYYYMMDD                                                                                                        ' idx017 依頼日
+            imd.MeisaiString &= "," & SsYYYYMMDD                                                                                                       ' idx017 依頼日
             imd.MeisaiString &= "," & M_iraisho.IraibiCell                                                                                             ' idx018
-            imd.MeisaiString &= "," & sYYYYMMDD                                                                                                        ' idx019 作成日
+            imd.MeisaiString &= "," & SsYYYYMMDD                                                                                                       ' idx019 作成日
             imd.MeisaiString &= "," & M_iraisho.SakuseibiCell                                                                                          ' idx020
-            imd.MeisaiString &= "," & Strings.Left(sYYYYMMDD, 4)                                                                                       ' idx021 作成年（４桁）
+            imd.MeisaiString &= "," & SsYYYY                                                                                                           ' idx021 作成年（４桁）
             imd.MeisaiString &= "," & M_iraisho.SakuseibiYYYYCell                                                                                      ' idx022
-            imd.MeisaiString &= "," & Strings.Mid(sYYYYMMDD, 3, 2)                                                                                     ' idx023 作成年（下２桁）
+            imd.MeisaiString &= "," & SsYY                                                                                                             ' idx023 作成年（下２桁）
             imd.MeisaiString &= "," & M_iraisho.SakuseibiYYCell                                                                                        ' idx024
-            imd.MeisaiString &= "," & wYY                                                                                                              ' idx025 作成年（和暦）
+            imd.MeisaiString &= "," & SwYY                                                                                                             ' idx025 作成年（和暦）
             imd.MeisaiString &= "," & M_iraisho.SakuseibiWaYYCell                                                                                      ' idx026
-            imd.MeisaiString &= "," & IIf(wYY > "09", wYY, Strings.Right(wYY, 1))                                                                      ' idx027 作成年（和暦、ゼロサプレス）
+            imd.MeisaiString &= "," & SwZY                                                                                                             ' idx027 作成年（和暦、ゼロサプレス）
             imd.MeisaiString &= "," & M_iraisho.SakuseibiWaZYCell                                                                                      ' idx028
-            imd.MeisaiString &= "," & sMM                                                                                                              ' idx029 作成月
+            imd.MeisaiString &= "," & SMM                                                                                                              ' idx029 作成月
             imd.MeisaiString &= "," & M_iraisho.SakuseibiMMCell                                                                                        ' idx030
-            imd.MeisaiString &= "," & IIf(sMM > "09", sMM, Strings.Right(sMM, 1))                                                                      ' idx031 作成月（ゼロサプレス）
+            imd.MeisaiString &= "," & SzM                                                                                                              ' idx031 作成月（ゼロサプレス）
             imd.MeisaiString &= "," & M_iraisho.SakuseibiZMCell                                                                                        ' idx032
-            imd.MeisaiString &= "," & sDD                                                                                                              ' idx033 作成日
+            imd.MeisaiString &= "," & SDD                                                                                                              ' idx033 作成日
             imd.MeisaiString &= "," & M_iraisho.SakuseibiDDCell                                                                                        ' idx034
-            imd.MeisaiString &= "," & IIf(sDD > "09", sDD, Strings.Right(sDD, 1))                                                                      ' idx035 作成日（ゼロサプレス）
+            imd.MeisaiString &= "," & SzD                                                                                                              ' idx035 作成日（ゼロサプレス）
             imd.MeisaiString &= "," & M_iraisho.SakuseibiZDCell                                                                                        ' idx036
-            imd.MeisaiString &= "," & vbNullString                                                                                                     ' idx037 振替指定日
-            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiCell                                                                                     ' idx038 （現在未使用）
-            imd.MeisaiString &= "," & vs2(2)                                                                                                           ' idx039 委託者コード
-            imd.MeisaiString &= "," & M_iraisho.ItakusyacodeCell                                                                                       ' idx040
-            imd.MeisaiString &= "," & vs2(3)                                                                                                           ' idx041 委託者名
-            imd.MeisaiString &= "," & M_iraisho.ItakusyameiCell                                                                                        ' idx042
-            imd.MeisaiString &= "," & M_iraisho.Iraisaki                                                                                               ' idx043 依頼先
-            imd.MeisaiString &= "," & M_iraisho.IraisakiCell                                                                                           ' idx044
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode                                                                                           ' idx045 銀行コード
-            imd.MeisaiString &= "," & M_iraisho.I_GinkoucodeCell                                                                                       ' idx046
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode1                                                                                          ' idx047 銀行コード（左から１桁目）
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode1Cell                                                                                      ' idx048
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode2                                                                                          ' idx049 銀行コード（左から２桁目）
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode2Cell                                                                                      ' idx050
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode3                                                                                          ' idx051 銀行コード（左から３桁目）
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode3Cell                                                                                      ' idx052
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode4                                                                                          ' idx053 銀行コード（左から４桁目）
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode4Cell                                                                                      ' idx054
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkoumei                                                                                            ' idx055 銀行名
-            imd.MeisaiString &= "," & M_iraisho.I_GinkoumeiCell                                                                                        ' idx056
-            imd.MeisaiString &= "," & M_iraisho.I_Ginkou                                                                                               ' idx057 銀行名（銀行名から「銀行」などを除いた名称）
-            imd.MeisaiString &= "," & M_iraisho.I_GinkouCell                                                                                           ' idx058
-            imd.MeisaiString &= "," & M_iraisho.I_GinkouSaffix                                                                                         ' idx059 「銀行」・「信用金庫」など
-            imd.MeisaiString &= "," & M_iraisho.I_GinkouSaffixCell                                                                                     ' idx060
-            imd.MeisaiString &= "," & M_iraisho.I_Zieisinkincode                                                                                       ' idx061 自営信金コード
-            imd.MeisaiString &= "," & M_iraisho.I_ZieisinkincodeCell                                                                                   ' idx062
-            imd.MeisaiString &= "," & M_iraisho.Baitaimei                                                                                              ' idx063 媒体名
-            imd.MeisaiString &= "," & M_iraisho.BaitaimeiCell                                                                                          ' idx064
-            imd.MeisaiString &= "," & gc                                                                                                               ' idx065 銀行コード
-            imd.MeisaiString &= "," & M_iraisho.T_GinkoucodeCell                                                                                       ' idx066
-            imd.MeisaiString &= "," & gc(0).ToString()                                                                                                 ' idx067 銀行コード（左から１桁目）
-            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode1Cell                                                                                      ' idx068
-            imd.MeisaiString &= "," & gc(1).ToString()                                                                                                 ' idx069 銀行コード（左から２桁目）
-            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode2Cell                                                                                      ' idx070
-            imd.MeisaiString &= "," & gc(2).ToString()                                                                                                 ' idx071 銀行コード（左から３桁目）
-            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode3Cell                                                                                      ' idx072
-            imd.MeisaiString &= "," & gc(3).ToString()                                                                                                 ' idx073 銀行コード（左から４桁目）
-            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode4Cell                                                                                      ' idx074
-            imd.MeisaiString &= "," & gm                                                                                                               ' idx075 銀行名
-            imd.MeisaiString &= "," & M_iraisho.T_GinkoumeiCell                                                                                        ' idx076
-            imd.MeisaiString &= "," & _GetGinkou(gm)                                                                                                   ' idx077 銀行名（銀行名から「銀行」などを除いた名称）
-            imd.MeisaiString &= "," & M_iraisho.T_GinkouCell                                                                                           ' idx078
-            imd.MeisaiString &= "," & _GetGinkouSaffix(gm)                                                                                             ' idx079 「銀行」・「信用金庫」など
-            imd.MeisaiString &= "," & M_iraisho.T_GinkouSaffixCell                                                                                     ' idx080
-            imd.MeisaiString &= "," & zsc                                                                                                              ' idx081 自営信金コード
-            imd.MeisaiString &= "," & M_iraisho.T_ZieisinkincodeCell                                                                                   ' idx082
-            imd.MeisaiString &= "," & vs2(4)                                                                                                           ' idx083 顧客コード
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KokyakucodeColumn), vbNullString, M_iraisho.KokyakucodeColumn & row)          ' idx084
-            imd.MeisaiString &= "," & gc                                                                                                               ' idx085 銀行コード
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkoucodeColumn), vbNullString, M_iraisho.K_GinkoucodeColumn & row)        ' idx086
-            imd.MeisaiString &= "," & vs2(8)                                                                                                           ' idx087 支店コード
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitencodeColumn), vbNullString, M_iraisho.SitencodeColumn & row)              ' idx088
-            imd.MeisaiString &= "," & gm                                                                                                               ' idx089 銀行名
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkoumeiColumn), vbNullString, M_iraisho.K_GinkoumeiColumn & row)          ' idx090
-            imd.MeisaiString &= "," & _GetGinkou(gm)                                                                                                   ' idx091 銀行名（銀行名から「銀行」などを除いた名称）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkouColumn), vbNullString, M_iraisho.K_GinkouColumn & row)                ' idx092
-            imd.MeisaiString &= "," & sm                                                                                                               ' idx093 支店名
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenmeiColumn), vbNullString, M_iraisho.SitenmeiColumn & row)                ' idx094
-            imd.MeisaiString &= "," & sm.Replace("支店", vbNullString)                                                                                 ' idx095 支店名（支店名から「支店」を除いた名称）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenColumn), vbNullString, M_iraisho.SitenColumn & row)                      ' idx096
-            imd.MeisaiString &= "," & vs2(11)                                                                                                          ' idx097 預金種別
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.YokinshubetuColumn), vbNullString, M_iraisho.YokinshubetuColumn & row)        ' idx098
-            imd.MeisaiString &= "," & vs2(12)                                                                                                          ' idx099 口座番号
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzabangouColumn), vbNullString, M_iraisho.KouzabangouColumn & row)          ' idx100
-            imd.MeisaiString &= "," & tkno                                                                                                             ' idx101 通帳記号
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoukigouColumn), vbNullString, M_iraisho.TuchoukigouColumn & row)          ' idx102
-            imd.MeisaiString &= "," & tbno                                                                                                             ' idx103 通帳番号
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoubangouColumn), vbNullString, M_iraisho.TuchoubangouColumn & row)        ' idx104
-            imd.MeisaiString &= "," & vs2(13)                                                                                                          ' idx105 口座名義（半角）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzameigiColumn), vbNullString, M_iraisho.KouzameigiColumn & row)            ' idx106
-            imd.MeisaiString &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)                                                                         ' idx107 口座名義（全角）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JISKouzameigiColumn), vbNullString, M_iraisho.JISKouzameigiColumn & row)      ' idx108
-            imd.MeisaiString &= "," & vs2(14)                                                                                                          ' idx109 振替金額
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FurikaekingakuColumn), vbNullString, M_iraisho.FurikaekingakuColumn & row)    ' idx110
-            imd.MeisaiString &= "," & M_iraisho.Bikou                                                                                                  ' idx111 備考
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.BikouColumn), vbNullString, M_iraisho.BikouColumn & row)                      ' idx112
-            imd.MeisaiString &= "," & M_iraisho.Tekiyou                                                                                                ' idx113 適用
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TekiyouColumn), vbNullString, M_iraisho.TekiyouColumn & row)                  ' idx114
-            imd.MeisaiString &= "," & M_iraisho.Funoucode                                                                                              ' idx115 不能コード
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FunoucodeColumn), vbNullString, M_iraisho.FunoucodeColumn & row)              ' idx116
-            imd.MeisaiString &= "," & vs2(19)                                                                                                          ' idx117 エラーコード
+            imd.MeisaiString &= "," & FsYYYYMMDD                                                                                                       ' idx037 振替指定日
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiCell                                                                                     ' idx038            
+            imd.MeisaiString &= "," & FsYYYY                                                                                                           ' idx039 振替指定年（４桁）
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiYYYYCell                                                                                 ' idx040           
+            imd.MeisaiString &= "," & FsYY                                                                                                             ' idx041 振替指定年（下２桁）
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiYYCell                                                                                   ' idx042           
+            imd.MeisaiString &= "," & FwYY                                                                                                             ' idx043 振替指定年（和暦）
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiWaYYCell                                                                                 ' idx044            
+            imd.MeisaiString &= "," & FwZY                                                                                                             ' idx045 振替指定日（和暦、ゼロサプレス）
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiWaZYCell                                                                                 ' idx046           
+            imd.MeisaiString &= "," & FMM                                                                                                              ' idx047 振替指定月
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiMMCell                                                                                   ' idx048          
+            imd.MeisaiString &= "," & FzM                                                                                                              ' idx049 振替指定月（ゼロサプレス）
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiZMCell                                                                                   ' idx050           
+            imd.MeisaiString &= "," & FDD                                                                                                              ' idx051 振替指定日
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiDDCell                                                                                   ' idx052           
+            imd.MeisaiString &= "," & FzD                                                                                                              ' idx053 振替指定日（ゼロサプレス）
+            imd.MeisaiString &= "," & M_iraisho.FurikaesiteibiZDCell                                                                                   ' idx054           
+            imd.MeisaiString &= "," & vs2(2)                                                                                                           ' idx055 委託者コード
+            imd.MeisaiString &= "," & M_iraisho.ItakusyacodeCell                                                                                       ' idx056
+            imd.MeisaiString &= "," & vs2(3)                                                                                                           ' idx057 委託者名
+            imd.MeisaiString &= "," & M_iraisho.ItakusyameiCell                                                                                        ' idx058
+            imd.MeisaiString &= "," & M_iraisho.Iraisaki                                                                                               ' idx059 依頼先
+            imd.MeisaiString &= "," & M_iraisho.IraisakiCell                                                                                           ' idx060
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode                                                                                           ' idx061 銀行コード
+            imd.MeisaiString &= "," & M_iraisho.I_GinkoucodeCell                                                                                       ' idx062
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode1                                                                                          ' idx063 銀行コード（左から１桁目）
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode1Cell                                                                                      ' idx064
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode2                                                                                          ' idx065 銀行コード（左から２桁目）
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode2Cell                                                                                      ' idx066
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode3                                                                                          ' idx067 銀行コード（左から３桁目）
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode3Cell                                                                                      ' idx068
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode4                                                                                          ' idx069 銀行コード（左から４桁目）
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoucode4Cell                                                                                      ' idx070
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkoumei                                                                                            ' idx071 銀行名
+            imd.MeisaiString &= "," & M_iraisho.I_GinkoumeiCell                                                                                        ' idx072
+            imd.MeisaiString &= "," & M_iraisho.I_Ginkou                                                                                               ' idx073 銀行名（銀行名から「銀行」などを除いた名称）
+            imd.MeisaiString &= "," & M_iraisho.I_GinkouCell                                                                                           ' idx074
+            imd.MeisaiString &= "," & M_iraisho.I_GinkouSaffix                                                                                         ' idx075 「銀行」・「信用金庫」など
+            imd.MeisaiString &= "," & M_iraisho.I_GinkouSaffixCell                                                                                     ' idx076
+            imd.MeisaiString &= "," & M_iraisho.I_Zieisinkincode                                                                                       ' idx077 自営信金コード
+            imd.MeisaiString &= "," & M_iraisho.I_ZieisinkincodeCell                                                                                   ' idx078
+            imd.MeisaiString &= "," & M_iraisho.Baitaimei                                                                                              ' idx079 媒体名
+            imd.MeisaiString &= "," & M_iraisho.BaitaimeiCell                                                                                          ' idx080
+            imd.MeisaiString &= "," & gc                                                                                                               ' idx081 銀行コード
+            imd.MeisaiString &= "," & M_iraisho.T_GinkoucodeCell                                                                                       ' idx082
+            imd.MeisaiString &= "," & gc(0).ToString()                                                                                                 ' idx083 銀行コード（左から１桁目）
+            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode1Cell                                                                                      ' idx084
+            imd.MeisaiString &= "," & gc(1).ToString()                                                                                                 ' idx085 銀行コード（左から２桁目）
+            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode2Cell                                                                                      ' idx086
+            imd.MeisaiString &= "," & gc(2).ToString()                                                                                                 ' idx087 銀行コード（左から３桁目）
+            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode3Cell                                                                                      ' idx088
+            imd.MeisaiString &= "," & gc(3).ToString()                                                                                                 ' idx089 銀行コード（左から４桁目）
+            imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode4Cell                                                                                      ' idx090
+            imd.MeisaiString &= "," & gm                                                                                                               ' idx091 銀行名
+            imd.MeisaiString &= "," & M_iraisho.T_GinkoumeiCell                                                                                        ' idx092
+            imd.MeisaiString &= "," & _GetGinkou(gm)                                                                                                   ' idx093 銀行名（銀行名から「銀行」などを除いた名称）
+            imd.MeisaiString &= "," & M_iraisho.T_GinkouCell                                                                                           ' idx094
+            imd.MeisaiString &= "," & _GetGinkouSaffix(gm)                                                                                             ' idx095 「銀行」・「信用金庫」など
+            imd.MeisaiString &= "," & M_iraisho.T_GinkouSaffixCell                                                                                     ' idx096
+            imd.MeisaiString &= "," & zsc                                                                                                              ' idx097 自営信金コード
+            imd.MeisaiString &= "," & M_iraisho.T_ZieisinkincodeCell                                                                                   ' idx098
+            imd.MeisaiString &= "," & vs2(4)                                                                                                           ' idx099 顧客コード
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KokyakucodeColumn), vbNullString, M_iraisho.KokyakucodeColumn & row)          ' idx100
+            imd.MeisaiString &= "," & gc                                                                                                               ' idx101 銀行コード
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkoucodeColumn), vbNullString, M_iraisho.K_GinkoucodeColumn & row)        ' idx102
+            imd.MeisaiString &= "," & vs2(8)                                                                                                           ' idx103 支店コード
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitencodeColumn), vbNullString, M_iraisho.SitencodeColumn & row)              ' idx104
+            imd.MeisaiString &= "," & gm                                                                                                               ' idx105 銀行名
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkoumeiColumn), vbNullString, M_iraisho.K_GinkoumeiColumn & row)          ' idx106
+            imd.MeisaiString &= "," & _GetGinkou(gm)                                                                                                   ' idx107 銀行名（銀行名から「銀行」などを除いた名称）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkouColumn), vbNullString, M_iraisho.K_GinkouColumn & row)                ' idx108
+            imd.MeisaiString &= "," & sm                                                                                                               ' idx109 支店名
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenmeiColumn), vbNullString, M_iraisho.SitenmeiColumn & row)                ' idx110
+            imd.MeisaiString &= "," & sm.Replace("支店", vbNullString)                                                                                 ' idx111 支店名（支店名から「支店」を除いた名称）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenColumn), vbNullString, M_iraisho.SitenColumn & row)                      ' idx112
+            imd.MeisaiString &= "," & vs2(11)                                                                                                          ' idx113 預金種別
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.YokinshubetuColumn), vbNullString, M_iraisho.YokinshubetuColumn & row)        ' idx114
+            imd.MeisaiString &= "," & vs2(12)                                                                                                          ' idx115 口座番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzabangouColumn), vbNullString, M_iraisho.KouzabangouColumn & row)          ' idx116
+            imd.MeisaiString &= "," & tkno                                                                                                             ' idx117 通帳記号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoukigouColumn), vbNullString, M_iraisho.TuchoukigouColumn & row)          ' idx118
+            imd.MeisaiString &= "," & tbno                                                                                                             ' idx119 通帳番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoubangouColumn), vbNullString, M_iraisho.TuchoubangouColumn & row)        ' idx120
+            imd.MeisaiString &= "," & vs2(13)                                                                                                          ' idx121 口座名義（半角）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzameigiColumn), vbNullString, M_iraisho.KouzameigiColumn & row)            ' idx122
+            imd.MeisaiString &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)                                                                         ' idx123 口座名義（全角）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JISKouzameigiColumn), vbNullString, M_iraisho.JISKouzameigiColumn & row)      ' idx124
+            imd.MeisaiString &= "," & vs2(14)                                                                                                          ' idx125 振替金額
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FurikaekingakuColumn), vbNullString, M_iraisho.FurikaekingakuColumn & row)    ' idx126
+            imd.MeisaiString &= "," & M_iraisho.Bikou                                                                                                  ' idx127 備考
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.BikouColumn), vbNullString, M_iraisho.BikouColumn & row)                      ' idx128
+            imd.MeisaiString &= "," & M_iraisho.Tekiyou                                                                                                ' idx129 適用
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TekiyouColumn), vbNullString, M_iraisho.TekiyouColumn & row)                  ' idx130
+            imd.MeisaiString &= "," & M_iraisho.Funoucode                                                                                              ' idx131 不能コード
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FunoucodeColumn), vbNullString, M_iraisho.FunoucodeColumn & row)              ' idx132
+            imd.MeisaiString &= "," & vs2(19)                                                                                                          ' idx133 エラーコード
 
             sw.WriteLine(imd.MeisaiString)
             zimd = imd
@@ -1288,6 +1363,156 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                 Return False
             End If
         Next
+
+        If String.IsNullOrEmpty(MatsNenkanScheduleFileName) Then
+            Console.WriteLine($"'MatsNenkanScheduleFileName' が指定されていません")
+            Return False
+        End If
+        If Not File.Exists(MatsNenkanScheduleFileName) Then
+            Console.WriteLine($"ファイル '{Me.MatsNenkanScheduleFileName}' は存在しません")
+            Return False
+        End If
+
+        ' シートチェック
+        If String.IsNullOrEmpty(MatsNenkanScheduleSheetName) Then
+            Console.WriteLine($"'MatsNenkanScheduleSheetName' が指定されていません")
+            Return False
+        End If
+        obj = Nothing
+        obj = mutil.InvokeMacroFunction("RpaSystem.IsSheetExist", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName})
+        If obj IsNot Nothing Then
+            Dim ck2 = CType(obj, Boolean)
+            If Not ck2 Then
+                Console.WriteLine($"シート名 '{Me.MatsNenkanScheduleSheetName}' は、 '{Me.MatsNenkanScheduleFileName}' 内に存在しません")
+                ck = False
+            End If
+        Else
+            Console.WriteLine($"シートのチェックに失敗しました")
+            ck = False
+        End If
+        If Not ck Then
+            Return False
+        End If
+
+        Dim MM As Integer = DateTime.Now.Month
+        Me.FurikaeSiteibiCell = vbNullString
+        If MM = 1 Then
+            If String.IsNullOrEmpty(Me.Mats01Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats01Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats01Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 2 Then
+            If String.IsNullOrEmpty(Me.Mats02Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats02Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats02Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 3 Then
+            If String.IsNullOrEmpty(Me.Mats03Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats03Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats03Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 4 Then
+            If String.IsNullOrEmpty(Me.Mats04Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats04Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats04Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 5 Then
+            If String.IsNullOrEmpty(Me.Mats05Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats05Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats05Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 6 Then
+            If String.IsNullOrEmpty(Me.Mats06Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats06Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats06Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 7 Then
+            If String.IsNullOrEmpty(Me.Mats07Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats07Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats07Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 8 Then
+            If String.IsNullOrEmpty(Me.Mats08Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats08Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats08Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 9 Then
+            If String.IsNullOrEmpty(Me.Mats09Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats09Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats09Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 10 Then
+            If String.IsNullOrEmpty(Me.Mats10Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats10Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats10Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 11 Then
+            If String.IsNullOrEmpty(Me.Mats11Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats11Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats11Gatsu12FurikaebiCell
+            End If
+        End If
+        If MM = 12 Then
+            If String.IsNullOrEmpty(Me.Mats12Gatsu12FurikaebiCell) Then
+                Console.WriteLine($"'Mats12Gatsu12FurikaebiCell' が指定されていません")
+                Return False
+            Else
+                Me.FurikaeSiteibiCell = Me.Mats12Gatsu12FurikaebiCell
+            End If
+        End If
+
+        Dim dt As DateTime
+        Dim ci As New CultureInfo("ja-JP")
+        obj = Nothing
+        obj = mutil.InvokeMacroFunction("RpaSystem.GetCellText", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName, Me.FurikaeSiteibiCell})
+        If obj IsNot Nothing Then
+            Dim ck2 = CType(obj, String)
+            If String.IsNullOrEmpty(ck2) Then
+                Console.WriteLine($"振替指定日の対象セル '{Me.FurikaeSiteibiCell}' の値は空でした")
+                ck = False
+            Else
+                dt = DateTime.ParseExact(ck2, "M月d日", ci)
+                Me.FurikaeSiteibi = dt
+            End If
+        Else
+            Console.WriteLine($"振替指定日の対象セルの取得に失敗しました")
+            ck = False
+        End If
+        If Not ck Then
+            Return False
+        End If
 
         Return True
     End Function

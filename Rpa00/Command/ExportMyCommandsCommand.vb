@@ -3,13 +3,6 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public Class ExportMyCommandsCommand : Inherits RpaCommandBase
-
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         If dat.Initializer.MyCommandDictionary.Count = 0 Then
             Console.WriteLine($"コマンド登録簿に登録がありません")
@@ -51,5 +44,6 @@ Public Class ExportMyCommandsCommand : Inherits RpaCommandBase
     Sub New()
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

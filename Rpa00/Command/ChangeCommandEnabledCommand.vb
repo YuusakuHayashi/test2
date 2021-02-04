@@ -1,11 +1,5 @@
 ﻿
 Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         ' 論理和
         If Not (Boolean.TryParse(dat.Transaction.Parameters(1), True) Or Boolean.TryParse(dat.Transaction.Parameters(1), False)) Then
@@ -40,5 +34,6 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
         Me.ExecutableParameterCount = {2, 2}
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class

@@ -44,10 +44,14 @@
         End Set
     End Property
 
-    Public Overridable ReadOnly Property ExecuteIfNoProject As Boolean Implements RpaCommandInterface.ExecuteIfNoProject
+    Private _ExecuteIfNoProject As Boolean
+    Public Property ExecuteIfNoProject As Boolean Implements RpaCommandInterface.ExecuteIfNoProject
         Get
-            Return False
+            Return Me._ExecuteIfNoProject
         End Get
+        Set(value As Boolean)
+            Me._ExecuteIfNoProject = value
+        End Set
     End Property
 
     Public Overloads Function CanExecute() As Boolean Implements RpaCommandInterface.CanExecute

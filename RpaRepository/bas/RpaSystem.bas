@@ -57,6 +57,33 @@ Private Function IsModuleExist(ByRef v() As Variant) As Boolean
     Set vbc = Nothing
 End Function
 
+Private Function GetCellText(ByRef v() As Variant) As String
+    Application.EnableEvents = False
+    Application.DisplayAlerts = False
+
+    Dim inf As String: inf = v(0)
+    Dim inbook As Workbook
+    Set inbook = Workbooks.Open(inf, 0)
+
+    Dim ins As String: ins = v(1)
+    Dim insheet As Worksheet
+    Set insheet = inbook.Worksheets(ins)
+
+    Dim inc As String : inc = v(2)
+    Dim incell As Range
+    Set incell = insheet.Range(inc)
+
+    GetCellText = incell.Text
+
+    Set incell = Nothing
+    Set insheet = Nothing
+    inbook.Close
+    Set inbook = Nothing
+
+    Application.DisplayAlerts = True
+    Application.EnableEvents = True
+End Function
+
 Public Sub test()
     Dim v(1) As Variant
     Dim ans As Variant

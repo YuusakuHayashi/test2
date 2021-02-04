@@ -22,6 +22,20 @@ Public Class RpaInitializer
     '    End Get
     'End Property
 
+    Private _ProcessId As Integer
+    <JsonIgnore>
+    Public Property ProcessId As Integer
+        Get
+            Do Until Me._ProcessId > 0
+                Me._ProcessId = (New Random).Next
+            Loop
+            Return Me._ProcessId
+        End Get
+        Set(value As Integer)
+            Me._ProcessId = value
+        End Set
+    End Property
+
     Private _LastActiveDate As Date
     Public Property LastActiveDate As Date
         Get

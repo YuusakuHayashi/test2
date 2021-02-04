@@ -1,13 +1,6 @@
 ﻿Imports System.Reflection
 
 Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
-
-    Public Overrides ReadOnly Property ExecuteIfNoProject As Boolean
-        Get
-            Return True
-        End Get
-    End Property
-
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         Dim pname As String = dat.Transaction.Parameters(0)
         Dim pi As PropertyInfo = dat.Initializer.GetType().GetProperty(pname)
@@ -60,5 +53,6 @@ Public Class ChangeInitializerPropertyCommand : Inherits RpaCommandBase
         Me.ExecuteHandler = AddressOf Main
         Me.CanExecuteHandler = AddressOf Check
         Me.ExecutableParameterCount = {2, 2}
+        Me.ExecuteIfNoProject = True
     End Sub
 End Class
