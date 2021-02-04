@@ -1,6 +1,34 @@
 Attribute VB_Name = "RpaSystem"
 Option Explicit
 
+Private Function IsSheetExist(ByRef v() As Variant) As Boolean
+    Application.EnableEvents = False
+    Application.DisplayAlerts = False
+
+    Dim b As Boolean : b = False
+
+    Dim bookname As String: bookname = v(0)
+    Dim sheetname As String: sheetname = v(1)
+    Dim wbook As Workbook: Set wbook = Nothing
+    Set wbook = Workbooks.Open(bookname, 0)
+
+    Dim ws As Worksheet: Set ws = Nothing
+    For Each ws In wbook.Worksheets
+        If ws.Name = sheetname Then
+            b = True
+            Exit For
+        End If
+    Next
+
+    wbook.Close
+    Set wbook = Nothing
+
+    IsSheetExist = b
+
+    Application.EnableEvents = True
+    Application.DisplayAlerts = True
+End Function
+
 Public Sub PrintOutSheet(ByRef v() As Variant)
     Dim printername As String: printername = v(0)
     Dim bookname As String: bookname = v(1)
