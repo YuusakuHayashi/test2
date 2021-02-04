@@ -32,3 +32,4 @@ C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.exe
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.xml
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.pdb
+C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbprojAssemblyReference.cache

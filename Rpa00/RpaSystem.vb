@@ -576,9 +576,12 @@ Public Class RpaSystem
 
             If dat.Transaction.ExitFlag Then
                 Me.LateExitFlag = True
+            End If
+            If Me.LateExitFlag And Me.FastBindingCommands.Count = 0 And Me.LateBindingCommands.Count = 0 Then
+                dat.Transaction.ExitFlag = True
+            Else
                 dat.Transaction.ExitFlag = False
             End If
-            If Me.LateExitFlag
         Catch ex As Exception
             ' Exceptionを利用するのは気持ち悪いので、修正するかも・・・
             ' cmdlog.Result が空文字の場合、例外が発生する場合
