@@ -83,6 +83,7 @@
     <Compile Include="Command\ChangeProjectPropertyUsingFolderBrowserCommand.vb" />
     <Compile Include="Command\ClearScreenCommand.vb" />
     <Compile Include="Command\ExportMyCommandsCommand.vb" />
+    <Compile Include="Command\HelpCommand.vb" />
     <Compile Include="Command\ImportMyCommandsCommand.vb" />
     <Compile Include="Command\ChangeCommandEnabledCommand.vb" />
     <Compile Include="Command\InstallRobotCommand.vb" />

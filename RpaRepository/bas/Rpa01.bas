@@ -2317,7 +2317,7 @@ Private Sub CreateIraisho(ByRef v() As Variant)
             End If
         End If
 
-        For idx = 4 To 132 Step 2
+        For idx = 4 To 158 Step 2
             If vs(idx) <> vbNullString Then
                 wsheet.Range(vs(idx)).Value = vs(idx - 1)
             End If

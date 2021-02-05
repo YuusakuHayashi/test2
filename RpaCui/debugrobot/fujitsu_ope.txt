@@ -1,0 +1,1556 @@
+２０１９年１月１７日作成
+２０１９年１月１８日改定
+
+●【何か探す時は’目次’を参照し、その中を探す】
+
+＜＜　目次：　ガ　　ス　＞＞
+＜＜　目次：日石、和田貝口振　＞＞
+＜＜　目次：富　士　通　メ　モ　＞＞（プライオリティやＡＩＦの切断、ＦＴＰ等いろいろ）
+＜＜　目次：ＩＤ・パス、ＵＲＬ、ＩＰコード　＞＞
+＜＜　目次：業務全般、その他の業務　＞＞（ＭＬＯＧや転送等全般、いろいろ）
+＜＜　目次：ＪＡ、生協　ＪＣＬ起動メモ　＞＞
+＜＜　目次：その他の便利メモ　＞＞（参考プロ、ＦＴＰ、漢字について等有り）
+
+●●●＜＜　目次：　ガ　　ス　＞＞●●●●●●●●●●●●●●●●●●●●●●●●
+
+●ガス関係は、「AAA_ここぞの時の便利メモ.txt」にも記述あり●
+
+【ジョブグループロック対応】解除を忘れないこと！！
+\ OLGJOBGL OLGGP1（無指定はOLGGP1のロック）
+＊ガスのバケツのデータからデータ削除等する場合
+　LPS.ALL.SYU(0) LPS.ALL.DAT(0)等のファイル
+
+【ライブラリの検索】（HYSLIBJは自分の為にOLGLIBJから作成）
+\ HYSLIBJ LPSLIBPG,SFIL-LPS.SOC.V01(,SMEM-LPSLIBPG,MOJI-PROGRAM)＜－ プログラム一覧 
+\ HYSLIBJ LPSLIBPG,SFIL-NSK.SOC.V01
+\ HYSLIBJ LPSLIBPG,SFIL-L.MBC.MAC                               ＜－ ＪＣＬ一覧
+\ HYSLIBJ LPSLIBPG,SFIL-L.MBC.MAC,SKIP-JLIBPG5 (再度行なう時LIBE処理をスキップ）
+
+【ガス臨時の処理終了スペック送信（何かしらの原因でAAA,AAEのファイル送信失敗時）】
+  また、処理スペックエラー等になってしまって、分配マスタがとれない時等
+  :S  FTOWSND LXXXX,AAE,LPS.WBS,NO  (LPS.WBS.LXXXX.AAEを送信)
+
+【ＷＥＢ上の送信処理データ確認情報（L9900.AAD.CSV）が消えていた時の対応】
+　アスキ変換等のエラーでOLGABNMLのＪＣＬがＲＵＮして異常終了の時有り。
+　\ OLGETC LXXX,LWBV1S,WBFL-LXXXX　(例：\ OLGETC L990,LWBV1S,WBFL-L9900)
+　　もし消えていた場合、処理起動ができなくなる。また送信処理時に「受信ファイルが
+　　ないか又はサーバエラー」のメッセージがでる。しかしそのまま「ＯＫ」を入れ送信
+　　すれば送信でき、L9900.AAD.CSVのファイルはＷＥＢ上に作成され、その後処理起動
+　　できる。
+
+【ガスＲＲ処理】
+\ OLGSVJ L990,SIME-99
+\ OLGLDJ OLGOLG,L990NN99,L990　（カセットからは\ OLGFFLOD OLGCTU,L990YY00,L990）
+\ OLGRRSYR OLGOLG,L990NN99,L990(,ADD)
+\ HYSCPY L990.PRE.LSDATE,L990.TRN.LSDATE
+\ HYSCPY L990.PRE.LS040C,L990.TRN.LS040C
+\ OLG10J L990,99,AUTO-YY,QKBN-RR 
+\ OLG20J L990,99,AUTO-YY,QKBN-RR
+【ガスＲＲ処理】＜－－ Ｌ０９１用
+\ OLGSVJ L091,SIME-99
+\ OLGLDJ OLGOLG,L091NN99,L091　（カセットからは\ OLGFFLOD OLGCTU,L091NN99,L091）
+\ OLGRRSYR OLGOLG,L091NN99,L091(,ADD)
+\ HYSCPY L091.PRE.LSDATE,L091.TRN.LSDATE
+\ HYSCPY L091.PRE.LS040C,L091.TRN.LS040C
+\ OLG10J L091,99,AUTO-YY,QKBN-RR 
+\ OLG20J L091,99,AUTO-YY,QKBN-RR
+【ガス月次帳票の再プリント】＜－－ Ｌ０９１用
+\ OLGSVJ L091
+\ OLGFFLOD OLGCTU,L091YG30,L091（カセットから)
+\ OLGRRSYR OLGCTU,L091GG30,L091（カセットから)
+\ OLG20J L091,30,AUTO-YY,QKBN-RJ <---ＱＫＢＮはＲＪ
+\ OLGLPRN L091,30                <---マスタアウト系の帳票が不要の場合は起動しない
+\ OLGDLT L091,AUTO-YY            <---ＲＪの時はＳＡＶＥ、ＤＬＴがＲＵＮしない為
+\ OLGLDJ OLGOLG,L091NN99,L091    <---戻し
+
+【ガス保管累積の検索　過去のデータから対象データを検索】
+\ HYSCPY LPS.ALL.HKN(0),HYS.ALL.HKN9999,20,10 
+\ OLGETC L990,RJDTF,HYS.ALL.HKN9999 
+ (無指定はLPS.ALL.HKN(0)だが、LPS.ALL.HKN(0)を他の名前でコピーしてから使用する)
+ (尚、FIMPORT 'HID.DBG1' を行いＴＸＴファイルで確認してもよい。) 
+
+【ガス保管累積データから臨時データ作成】
+①\ OLGPR90 LXXX,PRNT-Y （LPSPR90Pのプロにて作成。対象供給センタの集信日時のリストができる）
+②\ OLGPR90 LXXX,DATA-Y （LPSPR90のプロにて作成。日付時間の抽出KBD-IN有り。
+                      　　上記①のリストを見て対象日時を入れる。YYMMDDHHMM。  
+　　　　　　　　　　　　　ＷＥＢの「送信処理データ確認情報」の受信日時でもＯＫの場合あるが
+　　　　　　　　　　　　　累積データにその日付時間をスタンプする時間の誤差が
+　　　　　　　　　　　　　１分程度ある場合があるのでその辺を考慮する必要あり）　　　　　　　　　　　　　
+
+①\ OLGPR90 LXXX,RJDAT=Y（保管データから特定の臨時データ作成。
+　　　　　　　　　　　　　LPSRJDATのプロにて作成。
+　　　　　　　　　　　　　使用する時はLPSRJDATプロを変更する事！！） 
+
+【ガスＷＥＢ関係の帳票再作成】
+○最新の帳票ファイル（ＬＳＣＳＶ１）の再作成（供給センタ単位）
+  \ OLGFTS L990,LSCSV1
+  最初に、処理に生かすかどうかのポーズが止まるのでＯＫする
+  注意：複数拠点がある場合で、ある拠点はまだ帳票ファイルを受信していない場合に
+　　　　この処理を起動しても、ＨＯＳＴの前回帳票ファイルと更新処理をしているので
+　　　　未受信の拠点分がダブル事はない。（特に問題はない）
+　　　　但し、確認資料として既に受信してある拠点分を作成した場合はｗｅｂから
+　　　　帳票ファイルを削除しておく事。　　　　
+
+○帳票ファイル（ＬＳＣＳＶ１）の累積からの再作成（拠点単位）
+  ① \ OLGETC L990,WBSM9
+  ② \ OLGWBSJ L990,WBFL-L9900,MU,LSCSV1
+
+  ＊複数処理分を行なう時は上記①②を繰り返して行なう。
+　　尚、この処理は拠点毎のファイル再作成である。
+  起動すると、以下メッセージが止まる。
+  "抽出　～～　KBD　2ｹﾀ"
+  その前に、拠点、供給センター、種別、締日付、締日、処理日付、処理時間が
+  DISPLAYされているので、それを控えておいて、メッセージに応答する
+
+
+
+
+
+
+○最新の分配ファイルの再作成（供給センタ単位）
+  \ OLGFTS L990,LSWB90  
+
+
+*--- 使用してないということなので、無視 ------------------------------------------------*
+○ＰＰＪによる帳票ファイル（ＬＳＣＳＶ１）の再作成（あまり使用していない）
+  \ OLGPPJ OLGCTU,L990YG30,L990,L510-Y　等で作成する。( L990は例 ）
+  （ＷＥＢへの帳票ファイルができるように会社ＦＬＡＧ（１１６）がなっていること）
+  \ HYSCPY HID.PPJ.LSCSV1,L990.HKN.LSCSV1
+  \ OLGFTS L990,LSCSV1
+  注意：対象の拠点の帳票ファイルがないこと。
+　　　　客先で帳票ファイルをとると、その締の帳票ファイルにかぶさって
+　　　　本当の締時の帳票ファイルが消えてしまうので、本島で環境を作成し
+　　　　プリントし、そのWEBのファイルは消しておく。<---WEBで「削除」ボタンを押下
+　　　（対象ファイルを帳票再作成のＰＤＦで作成し、それをメール等で送るとよい）　
+　　　　尚、Ｌ９９０のＷＥＢへは投げられません。（データの内容をみてその拠点の
+　　　　フォルダに飛んでしまう為）
+*---------------------------------------------------------------------------------------*
+
+
+
+
+
+【ＷＥＢ検索用のファイル転送】
+＊夜間行っている(L.MBC.SSP(OLGWEBUP))の供給センタを処理後確認したい場合等
+  \ OLGSTW Lxxx (例： \ OLGSTW L091 )
+尚、その日に処理していない場合で、最新をアップしたい場合は、
+　\ OLGFTW Lxxx,LSWA80,XX (例 \ OLGFTW L091,LSWA80,XX )
+　\ OLGFTW Lxxx,LSWA81,XX (例 \ OLGFTW L091,LSWA81,XX )
+　\ OLGFTW Lxxx,LSWA82,XX (例 \ OLGFTW L091,LSWA82,XX )
+　各ファイル毎に起動する。
+
+【ガスの区分編成ファイルよりファイルをロードする臨時ＪＣＬ】
+　\ OLGFRLOD OLGCTU,NAME=MST.LSKYAM,MEMB=LXXXYG30,L=1380,B=15180,MTFL-XXXX 
+  \ OLGFRLOD OLGCTU,NAME=TRN.LSURSK,MEMB=LXXXYG30,L=0200,B=15200,MTFL-XXXX 
+  \ OLGFRLOD OLGCTU,NAME=TRN.LS040C,MEMB=LXXXYG30,L=0120,B=15360,MTFL-XXXX ＴＲＮデータ
+  \ OLGFRLOD OLGCTU,NAME=TRN.LSHRSK,MEMB=LXXXYG30,L=0150,B=15450,MTFL-XXXX
+　＊LXXXYG30はL091YY20等になる。
+  LRJ.LRJ.RNJDATのファイル名で作成される。
+  OLGXXXはカセットからの時ＯＬＧＣＴＵ、ディスクからの時ＯＬＧＯＬＧ。
+
+【年間累積明細からＰＣ用のＴ明細初期Ｆ作成】
+\ OLGETC LAAA,RJWB9,WBFL-LBBBB　＜－－LAAAはＬ＋供給センタ、LBBBBは拠点コード　
+
+【ガス明細アウト】
+\ OLGETC LXXX,MEI1,LXXX.TRN.LSNGME(0) 
+\ OLGETC LXXX,MEI1,LXXX.TRN.LSURSK(0)
+
+【顧客マスター内容調査】 
+\ OLGETC LXXX,RJKY9,FIL1-XXX.XXX.XXXXXX 
+
+【ＩＮＱ用累積ファイルからの削除】
+OLGMINQ処理時は不可！ 
+\ OLGETC LXXX,RJIQ4（LPSRJIQ4のプロがＲＵＮ）
+\ OLGETC LXXX,RJIQ6（LPSRJIQ6のプロがＲＵＮ）
+(KBD-INの締日付 YYYYMMDD,処理日・時間 YYMMDDHHMMは
+ 処理ファイル又は、「ガスセーブ一覧」を参照）
+
+【集中監視の自動検針データからのデータ削除】 
+集中監視の自動検針データもLPS.ALL.SYU(0)に累積されるので
+LPS.ALL.SYU(0)（又はLPS.ALL.DAT(0)）から対象ファイルを削除する。
+尚、アカウントがらみでLPS.PC98C5(0)にも累積されているのでそこからも削除しておく。
+例：需要家コード'033863590211000'
+　　LPS.ALL.SYU(0)は'590211'をサーチ
+　　LPS.PC98C5(0)の中の自動検針の需要家コードは'033863590211000'。上２桁C2が
+　　自動検針データ。自動検針の需要家コードは'033863590211000'だが、下３桁は無視。
+　　'033863590211000'-->'033 863 590211 000'
+
+【集中監視の自動検針データの内容調査】 
+\ OLGETC L990,RJP98(,FIL1-LPS.PC98C5(0))
+
+【集中監視の自動検針データの件数確認】 
+\ OLGW55CN YY,SOUTB-H 
+
+【マスタアウトの異常時のＦＬＡＧクリア】
+LPS.TRN.LSSPC1　の　'１’をスペースクリアする
+
+【ガス　データカットの前処理】
+ダブりデータがｏｋデータと混在していて、エディターで削除するのが
+難しい場合の前処理。ファイルを戻してから行う。（マスタ，データ両方）
+\ OLGRRDUP LXXX,QDAT-XXX(又はQDAT-ADD)
+  追加データが「無し」で戻した場合は、QDAT-XXX
+  追加データが「有り」で戻した場合は、QDAT-ADD で行なう 
+ （この臨時処理後、ダブりデータの件数を確認する事）
+ （他システム等に流れている場合は他システムのデータカット等必要）
+
+【ガス　締日を間違えて処理してしまった時や、デイリーなのに締処理をした時の対応】
+①単純ＲＲとして各ファイルを戻す　
+　処理ファイルを戻したら、締日付、締日を変更する。
+
+　例：処理ファイルの修正（今回は１５日を００に変更）
+　　L033.TRN.LSDATEを修正
+　　D033  2007091220070915151841            000000000020070912184115
+　　D033  2007091220070915001841            000000000020070912184100
+　　アスタリスク欄--->　　**                                      **
+
+②ＷＥＢのＰＣへの配信のファイルを削除する。（輸入はＰＤＦは２拠点あり）
+　＊ＷＥＢの「ガス転送データ」（赤帯のファイル）を削除する。
+　（既に客先が受信した場合は存在しない）
+
+③ＭＡＴＳのデータを削除する。（LPS.NXS.B2DT00）　
+
+④サンリンのデータがあったら、再作成しない等の対応をする。
+
+⑤元売のデータがあったら削除する。
+ （DAISND.ALL.DAT（０）からカット等。HTC.GSF.LGLxxxをチェック！）
+
+⑥ＩＮＱ用累積ファイルから削除する。（臨時プロ有り）
+ （LPSRJIQ4、LPSRJIQ6をＲＵＮ）
+  (\ OLGETC LXXX,RJIQ4,\ OLGETC LXXX,RJIQ6　OLGMINQ処理時は不可！）
+  (KBD-INの締日付 YYYYMMDD,処理日・時間 YYMMDDHHMMは処理ファイル又は、
+   「ガスセーブ一覧」を参照）
+
+  例：ＩＮＱ累積の削除
+　　\ OLGETC L033,RJIQ4 (累積明細のＩＮＱＯＭＩＴ）件数確認。
+　　KBD-IN 供給センタ 9(03)        ---> 033
+　　KBD-IN 締日付 YYYYMMDD         ---> 20180915
+　　KBD-IN 処理日・時間 YYMMDDHHMM ---> 0000000000 (締処理の時のカットはＡＬＬ’０’）
+　\ OLGETC L033,RJIQ6 (累積交換累積のＩＮＱＯＭＩＴ）件数確認。
+　　ＫＢＤ－ＩＮは累積明細と同じ
+  
+⑦供給センタマスタの最新処理日を変更しておく。
+　「１：供給センター保守」を選択し供給コード(033等)を入れる。
+  「処理締日（ＯＰ用）－－＞  20180915」欄を変更する。 
+　 例：20180915 ---> 20180910
+
+⑧セーブ一覧からは末締のセーブは削除(赤線を引く等)＜－現在はＣＳＶなので参照する時注意！
+
+＊別紙、ガスの「トラブル・ＲＲ報告書.xls」を参照
+
+【ガスの臨時「口振Ｍ取消依頼一覧表作成」】
+＊下記の処理は管理課が月１回、ＯＰＥに依頼している
+\ OLGLMAT7 SKIP-JMAT3 
+
+【オンラインガスのＩＮＱ】
+・立上げ \ LPGINQ1 JINQ1 
+・停止   PEND PRLPGA
+
+【ガスの環境設定】管理課用
+○１画面目【基本設定】の
+　・「インスタンス」は「◎規定」に印をつける
+　・「認証」は「◎SQL Server」に印をつける
+  ＊SQL Server認証の為ＬＰＧメニュー立上げの時にＩＤ、パスの入力画面がくる。
+　　ＩＤは担当名(例：TAKAHASHI 大文字)、パスはmbc (小文字)
+    ＩＤ、パスは「１：システム保守」の「ユーザ管理画面」にて登録。(ＰＣ１９９にて)
+  ・「コンピュータ名で接続する(IPアドレスは使用しない)」にレ点をつける。
+　・「ログイン画面を表示しない」にレ点をつける。
+○１画面目【基本設定】
+プログラムフォルダ：C:\LPGSQL\EXE\
+プログラムダウンロード格納フォルダ：C:\LPGSQL\UPEXE\
+システム使用プリンタ：FX DOCUPRINT 3100 (管理課)
+ＦＤドライブ：C:\LPGSQL\FD
+サーバ名：PC199G\
+データベース名：MBCLPG_L0920
+ＩＰアドレス：空白
+○２画面目【バックアップ先指定】
+データファイル（ハンディ等）フォルダ：C:\LPGSQL\BACKUP\DAT\
+データベース（SQL SERVER）フォルダ：C:\LPGSQL\BACKUP\DBS\
+○３画面目【ガス販売管理項目設定】
+送受信フォルダ：\\PC199G\MBC\LPGSQL\RCVDIR\
+受信PDFフォルダ：\\PC199G\MBC\LPGSQL\PDF\
+ロゴマークフォルダ：\\PC199G\MBC\LPGSQL\LOGO\
+○４画面目【ご使用の携帯端末(ハンディ)の選択・設定】
+ハンディＥＸＥフォルダ：C:\LPGSQL\HHTLINKW\
+ハンディリンクプログラムＩＤ：F5BJHTLK.EXE
+
+【ガスの環境設定】システムサーバの中のＳＱＬを参照する場合
+○１画面目【基本設定】
+プログラムフォルダ：\\BRONZE\DEV3\LPGSQL\EXE\
+プログラムダウンロード格納フォルダ：C:\LPGSQL\UPEXE\
+システム使用プリンタ：FX DOCUPRINT 3100 (PRN072)
+ＦＤドライブ：C:\FD
+サーバ名：SYS3SQL\SQLSERVER01
+データベース名：MBCLPG
+ＩＰアドレス：空白
+○２画面目【バックアップ先指定】
+データファイル（ハンディ等）フォルダ：\\BRONZE\DEV3\LPGSQL\GASSQL\BACKUP\
+データベース（SQL SERVER）フォルダ：\\BRONZE\DEV3\LPGSQL\HIDSQL\BACKUP_SQL\
+○３画面目【ガス販売管理項目設定】
+送受信フォルダ：\\BRONZE\DEV3\LPGSQL\GASSQL\SYSOPE\RCVDIR\
+受信PDFフォルダ：\\BRONZE\DEV3\LPGSQL\GASSQL\SYSOPE\PDF\
+ロゴマークフォルダ：\\BRONZE\DEV3\LPGSQL\GASSQL\SYSOPE\RCVDIR\
+○４画面目【ご使用の携帯端末(ハンディ)の選択・設定】
+ハンディＥＸＥフォルダ：C:\HHTLINKW\ﾊﾝﾃﾞｨﾘﾝｸ2000 (ﾊﾝﾃﾞｨ手順)\
+ハンディリンクプログラムＩＤ：F5BJHTLK.EXE
+
+【消費税計算時、「消費税は切捨て」という指定になっている場合で税込金額を裸にする時】
+　消費税計算時、「消費税は切捨て」という指定になっている場合で、
+　税込金額を裸にする時は、計算結果の金額を切上げにしなければならないのでは！！
+　サンプル　ＬＰＳＲＪ７４Ｆのプロ
+　COMPUTE OT-MAIKAI = ( OT-MAIKAI * 100 ) / 105 + 0.9.
+　１５０円の消費税は７．５円。これを切り捨てると７円。よって込みは１５７円。
+　１５７円（込み）の税抜計算をすると１４９．５２３８。それに０．９を足すと１５０円。
+  上記の計算だと税抜金額を算出している為０．９を足さなければならないが、
+　ＬＰＳ２１５０等の場合計算は消費税を算出しているので問題ない。
+ 142000  UTIZ-RTN.                                                              
+ 142100      IF KS-CTLFLG (19) = 0                                              
+ 142200         COMPUTE UD-SHOHIZ                                               
+ 142300                 = UD-KINGAK * WK-SHOTAX / (1000 + WK-SHOTAX)            
+ 142400         ELSE                                                            
+ 142500         COMPUTE UD-SHOHIZ ROUNDED                                       
+ 142600                 = UD-KINGAK * WK-SHOTAX / (1000 + WK-SHOTAX).           
+ 142700      SUBTRACT UD-SHOHIZ FROM UD-KINGAK. 
+
+
+●●●＜＜　目次：日石、和田貝口振　＞＞●●●●●●●●●●●●●●●●●●●●●
+【いせや石油の他社データ作成処理】
+(従来は伊勢宗が行っていたが、2015/06/10現在いせやのみ)
+\ NISRNJ AAA,ISSODATA
+  ＊NIS.SPC.ISSODATA を修正
+  ＊ダイテックにFAX送付
+
+【会員マスタのＣＳＶ作成】　
+　　\ NISRNJ AAA,NISRJKIN
+    和田商会新潟14500003　高岡14500805　
+
+【和田貝口振の送付データのＷＥＢ提供の再作成】
+\ NISJB24J NXV.WD0140
+\ NISJB24J NXV.WD0144
+\ NISJB24J NXV.WD9900
+\ NISJB24J NXV.SK0601
+\ NISJB24J NXV.SK0603
+\ NISJB24J NXV.SW0534
+\ NISJB24J NXV.SW2366
+
+【和田貝口振の各種マスタのＣＳＶ作成　UNISYSにて起動。自動で富士通で走る】 
+START WFL/NIS/NXGSFL ("B2141F") ISAMマスタ-->富士通(\ NISJBCVJ NXV.B2141F)
+ *００：基本マスタ      （１件の為作成しない。エディタで確認）           
+ *０３：システムマスタ  （和田貝は未使用の為作成しない）             
+ *１０：銀行・支店マスタ HID.FD1.B2141F.CSV
+ *２０：委託者マスタ     HID.FD2.B2141F.CSV                                               
+ *３０：決済マスタ       HID.FD3.B2141F.CSV
+ *上記10,20,30全て       HID.FDS.B2141F.CSV
+START WFL/NIS/NXGSFL ("B2201F") 顧客マスタ-->富士通(\ NISJBCVJ NXV.B2201F)
+START WFL/NIS/NXGSFL ("B2313F") 累積      -->富士通(\ NISJBCVJ NXV.B2313F)
+START WFL/NIS/NXGSFL ("B2402F") 引落データ-->富士通(\ NISJBCVJ NXV.B2402F)
+START WFL/NIS/NXGSFL ("B2DT99") 処理データ-->富士通(\ NISJBCVJ NXV.B2DT99)
+START WFL/NIS/NXGSFL ("B23ETC") 振分後　　-->富士通(\ NISJBCVJ NXV.B2DT99)
+START WFL/NIS/NXGSFL ("B23HID") テスト　　-->富士通(\ NISJBCVJ NXV.B2DT99)
+
+【南砺石油の代行データのＷＥＢへのアップ】
+\ NISJWUPJ C10562DK,HIZK=99
+
+【カード管理マスタをＮＸ--->ＧＳへ】
+START (ANS)WFL/NIS/NSCDMF/GS ON SYSTEM
+転送が終了すると\ NISRJCDL NXV.NSCDMF が起動される。
+会社コードのＫＢＤ－ＩＮ等有り。（武重は1501000-2）
+＊累積カード作成データは下記の処理
+
+【累積カード作成データ(カード作成待のデータ)ＮＸ--->ＧＳへ】  
+START (ANS)WFL/NIS/NSCDTF/GS ON SYSTEM
+転送が終了すると\ NISRJCDL NXV.NSCDTF が起動される。
+会社コードのＫＢＤ－ＩＮ等有り。（武重は1501000-2）
+
+【日石の計上日付について】
+　計上日付によって締処理に入れるか判定している。取引日付ではない。
+　例：計上日付2008/01/21 取引日付2008/01/07　
+　　　上記の場合、デイリー処理はされるが、２０日締の対象データにはならない。
+
+【日石の金額＝ゼロのデータについて】
+　数量が入っていて、単価、金額＝ゼロのデータでも、掛売データはＯＫになる。
+　現金、クレジットデータはエラーである。
+
+【日石サーバのＭＡＴＳのデータを消す方法】
+　①その会社のみしか入ってない場合
+　　日石サーバの「ＫＯＺＡＬＬ０１」のファイルの中に入っているので
+　　【口振ＨＯＳＴ転送データ作成】処理をする。
+　　すると件数が表示されるので、件数に問題なければ、「ＫＯＺＦＴＰ０１」にデータ
+　　が移っているので、そのファイルをゼロ件にする。
+　　ちなみに、そのあとのＵＮＩＳＹＳでの取込みは、
+　　(ANS)WFL/NIS/MATS である。
+　②会社の一部データを消す場合
+　　SRC/NIS/MATS10 のプロを臨時に変更してから、(ANS)WFL/NIS/MATSを起動する。
+　　処理後はプロを元にもどしておく。
+
+【日石サーバのＭＡＴＳのデータを見る方法】
+　①日石サーバのなかのＫＯＺのフォルダからＦＤにコピーし
+　　富士通にて FEXPORT 'HID.XXX'等の名前で落とす。
+　　その場合バイナリ指定で、２５６のレコード長でおとす。
+　　尚ファイルレイアウトは「売上請求他社提供データ」のレコード区分＝Ａを参照する。
+
+【ＮＩＳオプションのＲＲについて】
+　①日石の処理のＲＲの場合。（マスタ、データを戻しておく）
+　　\ NISLDJ XXX,LDLD-ALL 　
+    　      (XXX は業務コード。NNM,WAD,NAZ等)
+  　＊「\ NISRCVIN XXX」を起動すれば、ＦＡＣＯＭにデータが転送され、
+　　　自動的に最初から、ＳＡＶＥまで処理される。
+
+　②ＦＡＣＯＭのオプションのみのＲＲの場合。（マスタのみ、戻して行う。）
+  　\ NISLDJ XXX,LDLD-MST （又は ZZZ ）　　
+    　      (XXX は業務コード)
+      　    (LDLD はZEN（前回分を今回分としてＬＴＯからロード　世代管理の４ファイル）                                          
+        　          ZZZ（前回分を今回分としてＤＩＳＫからＦＣＰＹ　世代管理の４ファイル）                                                
+          　        ALL（マスタ、データの戻し　ＬＴＯからロード）                                        
+            　      MST（マスタの戻し　　　　　ＬＴＯからロード）                                         
+              　    DAT（データの戻し　　　　　ＬＴＯからロード）
+　　\ HYSCPY NIS.XXX.Z.NSKSYR,NIS.XXX.TRN.NSKSYR （処理ファイルの戻し）
+    　           (XXX は業務コード)
+  　\ NIS10J XXX,QKBN-XX,AUTO-YY(,P2-1,P3-1,P5-1)    　　
+　  　      (XXX は業務コード)
+
+　③臨時処理（帳票の再出力等。ﾏｽﾀ更新等が関係なければﾌｧｲﾙは戻さない）
+  　\ NIS10J XXX,JRNJ-YY,SKIP-XXXXX(,P2-1,P3-1,P5-1)    　　
+　  　      (XXX は業務コード)        
+　  ＊尚、QKBNはMUになります。   
+
+  ④参考：豊島屋の帳票の全てを再プリントする臨時処理(2018/05/17に行なった)
+　　1.現在のファイルの退避（念のため）
+　　  \ HYSCPY NIS.NNM.T.NSKNEN(0),HYS.NNM.T.NSKNEN,10,5 28395件　ＯＫ
+　　  \ HYSCPY NIS.NNM.T.NSKUKE(0),HYS.NNM.T.NSKUKE,10,5  1621件　ＯＫ
+　　  \ HYSCPY NIS.NNM.T.NSK27F(0),HYS.NNM.T.NSK27F,10,5   682件
+　　  \ HYSCPY NIS.NNM.TRN.NSKSYR,HYS.NNM.TRN.NSKSYR         1件
+    2.ファイルの戻し
+　    \ NISLDJ NNM,LDLD-ZZZ（上記①のファイルの戻し）
+　    \ HYSCPY NIS.NNM.Z.NSKSYR,NIS.NNM.TRN.NSKSYR （処理ファイルの戻し）
+    3.臨時処理
+　    ＊今回、WEBへのアップ,PDFは不要の為、NIS10JからHID10Jを作成し、NNM関係の
+　　    WEBへアップ,PDF作成処理(NISFTN,NISWASCJ)はコメントにした。　
+　    \ HID10J NNM,QKBN-XX,AUTO-YY
+    4.その他
+　    ＊処理後の更新ファイル（上記①）のファイルは特に問題ないので（通常に更新された為）
+　　    戻さくていい。                
+
+【AIRS(UNISYS)から日石へのマスタ移行の対応・転送】
+　１．漢字変換が必要な場合
+　　①漢字変換処理
+　　　ST (ANS)WFL/NIS/NSKJEF を起動
+　　　ＩＮのファイル名は(SAIS)TRN/RNJ/MASTER ON NEWPOS
+　　　この名前でない時はこのファイルにコピーする。
+　　　ＯＵＴは(ANS)NXV/NIS/BAKETU ON BATCHBになる。
+　　②ＧＳに空バケツを作成する。
+    　\ HYSBAKET NIS.NXV.BAKETU,0128,00128,5,3
+　  ③ＧＳへ転送するＷＦＬを起動。 
+    　START WFL/NIS/NXTOGS/SND ("NXV","BAKETU")
+　　④上記の③のデータをＭＴにＯＵＴ
+　　　\ HYSCPY NIS.NXV.BAKETU,HTC.GSF.DSK128
+　　⑤上記④のデータを投入
+　　　\ NISDTIN JJOB-GSF.DSK128
+　２．漢字変換が不要な場合（残高等）
+　　①対象のファイルを名前をかえてコピーする。
+　　　COPY (SAIS)TRN/RNJ/MASTER AS NXV/NIS/BAKETU FROM NEWPOS(PACK) TO BATCHB(PACK)
+　  ②以降は上記と同じ
+
+【日石ＰＣのデータの臨時ＨＯＳＴへの取込み　口座、領収ファイル，その他】
+　①日石ＰＣの対象のファイルをＨＩＤというフォルダーにコピーして入れ、名前を変更する。
+　　口座の場合--> RNJKOZ01  領収の場合--> RNJRYO01  その他の場合--> RNJETC01
+　②富士通にバケツを作成する。（口座、領収は常駐で有り。）
+　　その他は、レコード長等を変更して作成する。
+　　\ HYSBAKET DAIRCV.HID.RNJETC01,0000,00000,5,3,TMP001
+　③レシーブの起動をかける
+　　:S FTODRCV RNJKOZ01,HID,HID （口座の場合） 
+　　:S FTODRCV RNJRYO01,HID,HID （領収の場合）
+　　:S FTODRCV RNJETC01,HID,HID （その他の場合）
+　　富士通のそれぞれのDAIRCV.HID.RNJXXXXXXのバケツに入る
+　又は、ＦＤにはき出し、富士通にてＦＥＸＰＯＲＴを行う。
+
+
+●●●＜＜　目次：富　士　通　メ　モ　＞＞●●●●●●●●●●●●●●●●●●●●●
+
+【富士通とＰＣのファイル転送】
+・ＨＯＳＴからＰＣへ（順編成ファイル）
+　例：FIMPORT 'HYS.LIB.CSV'
+・ＨＯＳＴからＰＣへ（区分編成ファイル）
+　例：FIMPORT 'HID.JCL.V01(NISJJLPG)'
+・ＰＣからＨＯＳＴへ（順編成ファイル）
+　例：FEXPORT 'HYS.DBG1'　＜－－HYS.DBG1が存在していると不可。
+　転送後、可変長から固定長に変更する
+　（例：\ HYSVBFIX HYS.DBG1,HYS.DBG1.FIX）　
+
+【プライオリティの設定】 
+JAL JC-793,PR-15 (プライオリテイは１５がＭＡＸ。５が通常）
+ＪＣＬ上
+ 002500 \        JOBG  CMOWB1                                                   
+ 002600 \        JOB   CMOWASCJ,PRTY=(1,7)  
+                                    
+【富士通の覚書】
+＊１ＣＹＬ＝１５トラック　１トラック＝約４５０００バイト
+＊JCVJEIC(JEF-->シフトＪＩＳ）
+＊富士通のＬＴＯへのファイル名は１７文字がリミット（　．等も含む）
+　富士通のダスドのファイル名は２６文字がリミット　（　．等も含む）
+＊REN F（ＪＣＬ等の強制的なＲＥＳＥＱ）　 
+＊ＤＴＳの停止コマンド
+　　=STOP DTS,MODE=C
+    ※MODE=C：キャンセルモード
+　　　DTS を強制的に異常終了させるモードです.この指定は,DTS の動作が
+　　　異常とみなされる場合に使用して,DTS を停止させます.
+　ＤＴＳの起動コマンド
+　　=START DTS
+
+【ＡＩＭの確認、切離し等】
+・AIMの回線の確認
+・使用状況 JAL AIM,D,WS,MODE-ALL
+・切り離し JAL AIM,SLOGOFF,DP108,MD-E  
+ （DP108は、端末ｎｏ,ガスの客先はＭ＃ｘｘｘ,拠点はL0500等である。）
+  (DP108,DP510は酒井　DP202は角田の端末)
+　尚、それでもだめな場合は、ＡＩＦの画面にして上のほうにＤＳＰＮＥＴと入れて
+　次の画面で端末番号をいれて、確認して、Ｐ．ＡＣＴでなかったら、
+　変更の対応をする。
+　別紙、オンラインガスのＮｏ０のフォルダの最初に仕様書あり。
+
+【ＡＩＦ切断時の回復対応】
+・端末の状態確認はＰＦ７、ＰＦ５を順に押下
+・LOGON AIF M09 RECONNECT 左記でつなげばファイルがリカバリーできる。
+・CAN US-M09 は単純キャンセル（コンソールにて）
+
+【ＦＴＰでFTPERRになった時のＬＯＧ】
+・ファイル NIS.HKN.MGRABCHK
+  \ HYSCPY NIS.HKN.MGRABCHK,HID.DBGをして
+　FIMPORT 'HID.DBG'で参照可能（ＣＳＶファイルになっている）
+
+【FTSWATCHの切替】
+:C FTSWATCH   :S FTSWATCH   
+
+【富士通の画面変更後のプログラムファイル移動】
+・エディタの「IFD     - 画面／帳票の作成」で修正後、下記の処理を行なう。
+　\ FMTUTY MEMB-xxxxxx (例：\ FMTUTY LPGPRN1 )
+
+【廃止、不要のＪＣＬ、ソースの保管場所】
+ＪＣＬ　HID.JCL.V01＜－－日石、ガス等
+        GYM.JCL.V99＜－－一般業務
+ソース　HID.SOC.V01
+
+【臨時処理時の富士通の１世代目のファイル名（今迄はHID.～を使用していた）】
+ガス　LRJ.～
+日石　NRJ.～
+水利　SRJ.～
+シェルCRJ.～
+＊今後、通常業務の中でのHID.～は使用しない。
+　原則、自分のファイルとして保管する時のみHID.～とする
+　但し下記のファイルはHID.～のままとする(2017/09/14現在)
+　　HID.FDS.CSV HID.FD2.CSV HID.NIS HID.NIS2のファイル、
+　　HID.NXV.BAKETU HID.NXV.HID001のバケツ、
+　　HID.JCL.V01 HID.SOC.V01の区分編成ファイル 
+
+【臨時処理時のＪＣＬ、ＳＣＦのHIDXXXXXの名称の変更】
+今後はGYMXXXXXとする。
+例：HIDKITA --> GYMKITA HIDHEN --> GYMHEN 
+酒井自分だけが使用するＪＣＬは今迄どおりHIDXXXXXとする。
+
+【ライブラリの戻し】
+●全体のバックアップＬＴＯに入っている。（ＯＳＣで保管　夜間一括セーブ)
+（L.MBC.SSP(MBCSVALL)の中のLIBSAVEJのＪＣＬでＳＡＶＥさている）
+例：全てのLPS.SOC.V01をHID.SOC.V01に落とす
+    \ HYSLBLOD LPS.SOC.V01,HID.SOC.V01,MEMB-+ 
+例：１つのメンバをLPS.SOC.V01からをHID.SOC.V01に落とす
+    \ HYSLBLOD LPS.SOC.V01,HID.SOC.V01,MEMB-LPS2900
+
+【イニシエートエラーの場合の対応 コンソールよりＤＬＴする】
+　FILE ALLOCATE ERROR　　　　＜－－このようなＭＳＧ出る　　
+　EOS FCPY 91 INITIATE ERROR ＜－－このようなＭＳＧ出る
+
+DLT XXXX.XXX.XXX,VOL-WRK300 (ちなみにWORK3はWRK300～WRK304)
+例：DLT LPS.WBS.L0108.JEFAAA,VOL-WRK200 (ちなみにWORK2はWRK200～WRK204)
+　　JOBコード　Ｍ８０で確認
+　　IN=J,M80
+　　*M80    DLT ACCEPTED ならＯＫ
+
+【ファイルをDLTしようとすると「使用中です」で削除できない場合】
+ カタログのみ残っている場合があるので、アンカタログする(UNCAT)
+ 例：UNCAT NBI.PDF.NSMLNBI1 <---コンソールより行なう　　  
+
+【ファイル転送のＤＴＳの確認のコマンド】
+=JAL DTS,D,ID　　　　<--ＤＴＳ稼動の状態表示
+=JAL DTS,DISPLAY FILE<--ＤＴＳ対象ファイルの表示
+=JAL DTS,C ID(98168) <--特定のジョブのキャンセル
+＊ジョブのキャンセルがきかない場合で
+　DTSのファイル転送業務においてリプライ要求メッセージXBO0024Rが出力された場合
+　ボリュームの空き領域を確保した後、下記を投入
+　/ジョブコード OK
+　XBO0024R/DFF.00 MAKE SPACE TO ADD SYS32619=Z3(TMP008)
+　に対して下記のようにリプライします。
+　/DFF OK
+
+【ＰＡＵＳＥで5分無反応発生が出た場合の対応】
+例：PAUSE * SCF GNNOUN01 5分無反応発生 確認OK? 
+
+○とりあえず IN=J,DTS で確認してみる。
+　しかし、転送が多くうまく確認ができない場合が多いので
+　ＬＯＧを参照して下記の確認をする。 
+
+①GNNOUN01をサーチする
+　下記の「MSG    ** GNNOUN01   SND START **」 がサーチできる。
+*SCF(GNNOUN01) START                                                           
+*SCF(GNNOUN01) MSG    ** GNNOUN01   SND START **                               
+*SCF(GNNOUN01) CMD    =JALT     DTS,S,N(ND002099),F(NIS.FEP.TC020719           
+        .N01),V($GSWEB$GNNOU$FQUETC020719.PRN),IID(ﾑｵｲ
+  
+②上記のファイル名（F(NIS.FEP.TC020719.N01)）をサーチしＮｏを探す。
+　RID=25265がＪＯＢのＮｏになる。
+　そしてその番号がCOMPLETED NORMALLYになっているか確認する。
+ :DTS    MGR:-TRANSFER SERVICE STARTS.RID=25265,TYPE=SND,NODE=ND00209           
+         9,TIME=09:29:51                                                        
+ :DTS    MGR:-FILE=NIS.FEP.TC020719.N01                                         
+ :DTS    MGR:-VFILE=$GSWEB$GNNOU$FQUETC020719.PRN,DOCTYPE=BINREC,ADD=           
+         NO                                                                     
+ :DTS    MGR:-PATH=PH002099                                                     
+ :DTS    MGR:-TRANSFER SERVICE IS COMPLETED NORMALLY.RID=25265,TYPE=S           
+         ND,NODE=ND002099,TIME=09:29:52                                         
+ :DTS    MGR:-FILE=NIS.FEP.TC020719.N01                                         
+ :DTS    MGR:-VFILE=$GSWEB$GNNOU$FQUETC020719.PRN,DOCTYPE=BINARY,ADD=           
+         NO                                                                     
+ :DTS    MGR:-PATH=PH002099
+
+　注意１：通常は①でサーチしたファイルが転送されるが、ファイル名を変更して
+　　　　　転送している場合があり、その場合サーチできないので
+　　　　　F(NIS.FEP.TC020719.N01)でサーチする。
+     
+　注意２：ファイルのみを転送する場合と終了ファイルを転送している場合（ネオス等）が
+　　　　　あるのでその場合は、それに付随する転送のACKFILEのＮｏも確認して
+　　　　　正常終了しているか確認する。
+　　　　　ガスのネオスの場合はLPS.NES.ACKFILEである。
+　　　　　ファイル本体とACKFILEが対で転送されていないとサーバ上で処理されない。
+
+
+●●●＜＜　目次：ＩＤ・パス、ＵＲＬ、ＩＰコード　＞＞●●●●●●●●●●●●●●
+【本島ＷＥＢサーバ】
+　本島ＷＥＢサーバのアドレス
+　　https://www2.motojima.net/ 
+　本島ＷＥＢのログイン画面アドレス
+    https://www2.motojima.net/mbcweb/signin.aspx   ＜－－新（2018/11より）
+　　https://www2.motojima.net/logon/SALWebView.asp ＜－－旧　
+ 　
+　社内ＲＵＮで入る場合
+  　https://192.168.2.99/logon/SALWebView.asp ＜－－旧？  
+ 
+【リモート デスクトップ接続　ＷＥＢサーバ(192.168.2.99)】
+　　ＷＥＢサーバのマイコンピュータを選んで、WWW2(D:)を選ぶ 
+　　上記「リモート デスクトップ接続」後のログオフの対応のしかたWin10
+　　左下の旗のようなマークを右クリックし、”サインアウト”を選択。（”切断”は不可）
+　　又はＨｉｄｅｔａのマークを選んで”サインアウト”を選択する。
+　　ＷＥＢサーバのバックアップサーバ（https://192.168.9.99/）
+
+【リモート デスクトップ接続　ＡＰサーバ(CS460)(192.168.205.55) (テスト192.168.9.55)】
+＊ネオスのiniファイル登録等
+＊注意：従来のログオフはサインアウトを選択
+　　　　画面はＷｉｎ８スタイルなので左下の旗マークを右クリックしてサインアウト
+＊NEOSS(W) W:\data\OUTPUT\ の中のフォルダを見るとガス等のＷＥＢへの転送前の分が
+　見える。
+　例：ガス　NEOSS(W) W:\data\OUTPUT\GSL09100000000PD の中のフォルダを見る
+　　　日石　NEOSS(W) W:\data\OUTPUT\GNGNNNM0000000PD の中のフォルダを見る
+＊W:\inetroot\ftproot\NEOSS\DATA　のフォルダを見ればＰＤＦ化中のファイルがわかる
+＊ネオスのｉｎｉファイルは
+　C:\MBC_Libraly\JupiterFTP の中にある＜－－\JupiterFTP不明！！
+
+【ガスＳＱＬのＩＤ、パスワード】
+ガスの環境設定 SQL SERVER認証のＩＤとパス　　　　   ：ＩＤ SA　パス mbc4673
+ガスＳＱＬ版の中の【データ削除】のＩＤとパス　　　  ：ＩＤ manager パス mbc4673　
+ガスＳＱＬ版の中の【コントロール設定】のＩＤとパス  ：ＩＤ manager パス mbc4673　
+ガスＳＱＬ版の中の【ユーザ管理画面】のＩＤとパス　  ：ＩＤ SA　パス mbc4673　
+ガスＳＱＬ版の環境設定(４画面目)の照会のみのパスワード：manager/mbc4673　
+ 
+【管理課共有のＰＣの情報】
+３２ｂｉｔ
+ＩＰアドレス：192.168.105.170
+ＰＣ名：PC199G
+ＰＣログオン時のパスワード：mbc12345. 
+ＰＣのユーザー：PC199GAdmin <---？(要確認)
+○ガス環境設定等
+　ガスＳＱＬ版の中の【ユーザ管理画面】のＩＤとパス　：ＩＤ SA　パス manager　 
+  ガスの環境設定 SQL SERVER認証のＩＤとパス　　　　 ：ＩＤ SA　パス manager
+  ガスＳＱＬ版の中の【データ削除】のＩＤとパス　　　：ＩＤ manager パス mbc4673　
+  ガスＳＱＬ版の中の【コントロール設定】のＩＤとパス：ＩＤ manager パス mbc4673　
+
+【ＭＢＣＷＥＢ受信のＭＢＣのＵＲＬ】
+https://www2.motojima.net/logon/GSweb/NewGSDataDownload.ASP<--スタンド関係  ＜－－●旧
+https://www2.motojima.net/logon/lpgweb/ViewMenu01.asp<--ガスの業務データ受信＜－－●旧
+＊設定時最後にスペース文字も入れないこと！！
+＊上記のアドレスはファイルを参照している画面のアドレス
+
+【MbcFaxClient（メール、ＦＡＸ関係の登録等）】
+  相沢石油のメールはの送信先ＢＯＸ（ＩＤ）は、GNGNNBI0000000MA 
+  信濃石油                                    GNGNNNT0000000MA
+
+【新サーバ】
+\\Coral  \\Bronze        \\ivory
+業務部   開発・システム  営業
+
+【管理課　ＰＣ１９９】
+パス　mbc12345.
+
+【Redmine　レッドマイン】
+http://its.mbcnet.co.jp/
+http://its.mbcnet.co.jp/login?back_url=http%3A%2F%2Fits.mbcnet.co.jp%2F
+
+【ＡＮＳＥＮＥＯＳのアカウント（メール）】
+　anseneos@mbcnet.co.jp 
+　メールのパスワード mbc12345
+
+【富士通、ＵＮＩＳＹＳのＩＰコード】
+富士通ＰＱ（ＨＯＳＴ）　(192.168.250.1)
+ＵＮＩＳＹＳ（ＨＯＳＴ）(192.168.200.1)
+　富士通のIPADDRESS = 192.168.250.1,　USERCODE  = "FFTP"?  
+　富士通のIPADDRESS = 192.168.250.5,　USERCODE  = "FFTP" （臨時　primeforce）  
+　UNISYSのIPADDRESS   192.168.200.1
+  　ユーザーコード(IID=FTP)パスワード(DIP=MBC)　
+  　ノードアドレス ND200001(192.168は固定、200.1を3桁(200)3桁(001)で表示)
+　パンチのIPADDRESS   192.168.200.60          
+ 　 ユーザーコード(IID=SV)パスワード(DIP=SV)SVは小文字の為｢ﾍﾐ｣となる　
+ 　 ノードアドレス ND200060(200.60を3桁(200)3桁(060)で表示)
+　松田ｻｰﾊﾞアドレス    192.168.1.66
+　  ユーザーコード(IID=SAL)パスワード(DIP=SAL)SVは小文字の為｢ﾍｱﾂ｣となる　
+  ノードアドレス ND001066(1.66を3桁(001)3桁(066)で表示)
+
+【ダイテックからのアタッシェケース】
+　daitec
+
+【トナーカッターシリアルナンバー】
+ LXHS6-ABKFE-5TT6E-XD4AE
+
+【松田さんの作ったスマートｗｅｂのサイトにガスのＷＥＢの画面から入る方法】
+　ＩＤ　「*」のあとに　すし・サーフィン・ラーメン・アンドロメガを選択
+　中に入ったら　160     
+
+【ガス請求書サンプル】
+   URL  https://www2.motojima-idc.com/lpgmeisai/
+   会社用　会社:910  ＩＤ:hideta   パス:mbc
+   顧客用　会社:910  ＩＤ:mbc      パス:123456
+
+【ガス集中監視】
+  ＰＣのパスワード　mbclpg
+  集中監視のＩＤ mbc1
+            パス mbc1
+
+【上田への転送】
+　ＦＴＰサーバー「192.168.100.2」を用意しました。
+　ＷＥＢブラウザで「ftp://192.168.100.2/」にアクセス。
+ 
+【ＥＮＥＯＳサーバ関係】
+eneosサーバーへのリンク（自分のＰＣから）
+①リモートデスクトップへの接続を行いＩＰ192.168.135.1で入る
+②ユーザ名　Terminal パスワード eneosfsvw2
+
+マシン室からのeneosサーバの起動
+①ユーザ名　anseneos        パスワード mbc
+②ユーザ名　Administretor ? パスワード eneosfsvw2
+③ダイテックのＩＮＱの画面
+　LOGON DNS101  パスワード　P101
+
+【本島ＷＥＢのガスとＧＳのＡＬＬ拠点】
+ＩＤ：LKYTN
+パス：FzjX}0 
+ＩＤ：GKYTN
+パス：FzjX}1　
+
+●●●＜＜　目次：業務全般、その他の業務　＞＞●●●●●●●●●●●●●●●●●●●　
+【過去のＭＬＯＧについて】
+　MBC.MLOG.FILE01 (FILE01,FILE06,FILE11,FILE16,FILE21,FILE26)
+  尚、現在ＳＡＶＥ中のファイル名はMBC.MLOG.SAVE(-0)
+
+【区分編成からの戻し】
+\ HYSLBLOD LPS.SOC.V01,HID.SOC.V01,LPSXXXX（区分編成に１プログラム戻す）
+\ HYSLBLOD L.MBC.MAC,HID.JCL.V01,OLGPXXXX （区分編成に１ＪＣＬ戻す）
+
+【各種ファイルのコンペア】
+\ OLGETC LXXX,RJCPA,FIL1=XXX.XXX,FIL2=XXX.XXX 
+\ OLGETC LXXX,RJCPA,FIL1=NIS.FDS.WAD53M,FIL2=HID.NIS.FDS.WAD53M
+
+【ユニシスのデータを富士通のバケツに送ってもらう時の臨時バケツ作成】
+\ HYSBAKET HID.NXV.BAKETU,0000,00000,5,3
+
+【カセット（ＬＴＯ）からのＬＯＡＤ】
+例：豊島屋の請求明細ファイルのＬＯＡＤ
+MORNGSVJの中でＳＡＶＥされているのでそのLTOをセットし下記のＪＣＬを起動する　
+\ HYSLDJ RCV.NAA.NAAX1101,HID.NAAX1101.H0131,CYL1-10,CYL2-5 
+\ HYSLDJ RCV.NAB.NABX1101,HID.NABX1101.H0131,CYL1-10,CYL2-5 
+
+【エクセルデータをＨＯＳＴに投げる】
+　①エクセルデータを｢カンマ区切(CSV)｣で名前を変えて保存する。                                   
+  　次に、それの拡張子を.TXTに変更する。
+　　DLT HID.NIS を行う。　
+　　FEXPORT 'HID.NIS' を行う。
+　  レコード長は７００を指定。可変長。
+  ②可変長から固定長への変換
+    \ HYSVBFIX INFL-HID.NIS,OTFL-HID.NIS2,LONG-700,BLOK-14700
+
+【富士通のアスキーコードのデータを参照する方法】
+＊FIMPORTではＨＯＳＴのアスキーコードをＰＣに取り込めない為
+　ＷＥＢにアップしてそれをＰＣに取り込む。
+①ＨＯＳＴのデータをNIS.WBD.GN990.H99のファイルにコピーする
+例) \ HYSCPY LPW.WBV.L0910,NIS.WBD.GN990.H99,CYL1-05,CYL2-05
+②コピーしたファイルをGN990のフォルダにアップする
+    :S FTOWSND GN990,H99,NIS.WBD,NO 
+③ＷＥＢのGN990の拠点からGN990H99.DATをダウンロードする
+
+【臨時アスキーデータの転送】
+＊FACOM --> 日石サーバへの臨時転送（ＦＴＰ）のＳＣＦ
+ＳＣＦはFTODSTXとして臨時に作成してある。
+\ HYSCPY NIS.ANSJALPG.JEF,DAISND.PNC.ANSJALPG をしてから
+:S FTODSTX ANSJALPG,PNC (TEXT送信)を起動する
+
+【ＤＮＳマスタをＮＸ--->ＧＳへ】
+＊２０１１年１１月２１日の深夜よりＵＮＩＳＹＳからの自動起動に変更。
+　すぐに対応したい時のみ手動で起動する。
+　毎日富士通に送られたかの確認はログで** DNSMST  OK  (2011/11/21 09:30) 
+　のように出るので、** DNSMSTをサーチして確認する。
+最新転送日
+DNSMST  OK  (2011/09/20 19:04)
+① START (SAIS)WFL/DNS/DNSMST/GS ON SYSTEM
+
+【転送ＳＣＦ】
+・FTOWSND　ND002099
+・FTOBSND　ND205055
+・FTONSND　ND205055
+・FTOUSND　ND200001
+・FTODSND　ND135001
+・FTODRCV　ND135001
+
+【ＧＳからＮＸ（ＵＮＩＳＹＳ）への汎用的な転送】
+単純にＵＮＩＳＹＳへ送る場合
+①転送ファイル名を HIDRNJ01.NXS.HID001 にする。
+　\ HYSCPY XXX.XXX.XXXXXX,HIDRNJ01.NXS.HID001
+②転送 :S FTOUSND HIDRNJ01
+　UNISYS で　FILE (FTP)HID ON MOSMOS　で確認する事ができる。
+　(FTP)HID/HID/HID001/HIDRNJ01 というファイル名で作成される。
+③レコード長の変更
+　MOSMOSに１バイトのファイルで作成されているので通常のレコード長に変更する
+　＊WFL/HID/MOSMOSをGETしてMAXRECSIZE,BLOCKSIZE,TITLEを変更してから
+    STARTさせる
+　ST  WFL/HID/MOSMOS 
+
+【ＮＸ(UNISYS)からＧＳへの汎用的な転送＞　ユーザーＡＮＳの場合】
+　①対象のファイルを名前をかえてコピーする。
+　TRN/ANS/NBI/XXXXXX等をNXV/NIS/BAKETUに変更しコピーする。
+  COPY XXX/XXX/XXX AS NXV/NIS/BAKETU FROM BATCHB(PACK) TO BATCHB(PACK)
+　  尚、ファイルがＭＴの場合はＭＴをＤＩＳＫに落す。
+  　( ＭＴのＮＬの場合    START WFL/HID/MTDSNL   )　 
+    ( ＭＴのＳＬの場合    START WFL/HID/MTDSSL   ) 
+    但しSRC/HID/MTDSNL又はSRC/HID/MTDSSLは修正して使用する。
+
+    SRC/HID/MTPDSKに入っているレコード長、ブロッキングは
+　　WFL/HID/MTPDSKで処理可能。（ＫＢＤ－ＩＮ有り）
+　②ＧＳに空バケツを作成する。（レコード長、ブロッキングをそれなりに）
+    NIS.NXV.BAKETUの作成 \ HYSBAKET NIS.NXV.BAKETU,0000,00000,5,3
+　③ＧＳへ転送するＷＦＬを起動。 
+    START WFL/NIS/NXTOGS/SND ("NXV","BAKETU")
+
+【ＨＯＳＴのファイルをアスキー変換後ＷＥＢへ送る方法】
+　＊まずファイル名を変更する為、HYSCPYで処理しその後 OLGWASCJを起動
+　＊ファイル名は　LPS.WBS.LXXXX.JEFXXX　XXXの所をそれなりに変更する。　
+　\ HYSCPY HID.FDS.CSV,LPS.WBS.L0004.JEFHID,5,5 
+　\ HYSCPY HID.FDS.CSV,LPS.WBS.L0004.JEFCSV,5,5
+　＊PARAは　LXXXX,XXX,LPS.WBS,MU,999,9999　XXX,999の所をそれなりに変更
+    する。999はレコード長＋10バイトと、そのブロッキング（１０倍程度）
+　\ OLGWASCJ L0004,HID,LPS.WBS,MU,370,3700 
+　\ OLGWASCJ L0004,CSV,LPS.WBS,MU,370,3700 
+
+【ＨＯＳＴのデータをアスキー変換してｗｅｂにアップする】
+＊例：ＧＮ９９０のフォルダに転送する
+　HYSCPYでNIS.WBS.GN990.JEFTSTというファイルを作成する
+　\ HYSCPY HID.DBG9,NIS.WBS.GN990.JEFTST
+　\ NISWASCJ GN990,TST,NIS.WBS,MU,4010,12030,NO,20,10<--レコード長4000は4010
+  ＧＮ９９０のフォルダにGN990TST.CSVとして作成される
+
+【ｗｅｂサーバから自分のＰＣにファイルをコピーする方法】
+＊詳細はガスの「ＬＰＧ（ＶＢ）」の仕様書の中にあり　
+○ファイルコピーの仕方（ＦＴＰで自分のパソコンにもってくる）
+                      （又はＦＴＰで自分のパソコンのファイルをサーバにもって行く）
+  注意：ガスのフォルダに入れる場合、L9999.XXX のファイル名でないと表示されない。
+　　　　例えば、L0310-MEI4.CSVでは不可。L0310.XC1でＯＫになった。　　　　　　　　　　　
+　１）D:\INET\DATA\lpgwebの対象会社のファオルダのファイルを　D:\INET\DATA\su\ooki
+  　　の中にコピーする。
+　２）自分のパソコンのインタネットを開き、アドレスに
+　　　ftp://192.168.2.99/ を指定する
+  ２－１）ページ（Ｐ）－－＞「エクスプローラでＦＴＰサイトを開く」を選択
+　　　　　すると、ログオン方法画面になる。
+　３）ログオン方法画面になったら　
+　　　ＩＤ－－＞WEBFTP　 パス－－＞ftpweb を入れ「ログオン」する
+　　　すると画面が変わりフォルダが出てくるので、１）でコピーしたファイルを選び
+　　　そのファイルを右クリックし「フォルダーへコピー」を選択し、自分のファオルダに
+　　　コピーする。
+　４）上記　１）のサーバのファイルは消しておく
+　　　サーバを落とすときは
+　　　絶対に「Ｘ」で落とさない事
+　　　左下の旗のようなマークを右クリックして、”サインオフ”を選択する。
+     （”切断”は不可）
+　    又はＨｉｄｅｔａのマークを選んで”サインオフ”を選択する。
+
+【パソコンのファイルをＷＥＢへ送る方法（エクセル、画像等）】
+　①ファイルのＤＬＴ（前回が正常にＦＴＰされていればＤＬＴの必要無し）
+  　＊他の拠点へ送る時はL0004をL0001,L0002等に変更
+　　＊１度に複数のファイルを送る場合拡張子「.HID」「.A99」等を
+　　　適当に変更可。（.HHH等。但し実際に使っている拡張子.AAA等は駄目）
+  　DLT LPS.WBS.L0004.A99　ガス臨時
+  　DLT LPS.WBS.L0004.HID　名前無し
+　②ファイルの転送（パソコン――＞ＨＯＳＴ）　
+　　FEXPORT 'LPS.WBS.L0004.A99'
+ 　 FEXPORT 'LPS.WBS.L0004.HID'
+　　＊バイナリ転送を指定。ﾚｺｰﾄﾞ長はいくつでもよい。（通常128)
+　③ＦＴＰにてサーバーへ
+ 　 :S FTOWSND L0004,A99,LPS.WBS
+  　:S FTOWSND L0004,HID,LPS.WBS
+
+【ホストメールのサンプルＪＣＬ】
+　(ANS)HID/HOSTMAIL/01
+
+【ＸＥＲＯＸへのサンプル提供】
+FIMPORT 'FXIPF.V1R1.FTPOUT2' 
+OクラスのL09110Jが請求書
+上記ファイルは富士通ではレコード長が大きすぎてＰＣに取り込めないので、
+ＵＮＩＳＹＳにバイナリ転送してからＰＣに吸い上げる。
+
+【五味レジャー　圧着葉書作成のみ】
+\ OLGW95J L0950,AUTO-NN,SKIP-SL095
+
+【群自燃の請求書対応時のソースやり取り　UNISYS<--->FACOM 】
+＜ UNISYS--->FACOM ＞
+①COPY (GTS)SRC/SIME/S040 AS (ANS)SRC/HID/S040 FROM SYSTEM(PACK) TO SYSTEM(PACK)
+②START (ANS)WFL/NIS/SLDFCM 
+    ソース名のＫＢＤ－ＩＮ有り。
+    例）?9999AX SRC/HID/S040.  左記のようにピリオドも入れる。                  
+    ファイル転送まで行われるので富士通で　GYMKITAでPAUSEで止まる。OKを入れる。
+③\ HYSLIBNX NXS040,HID.SOC.V01　を起動    
+＜ FACOM--->UNISYS ＞
+①\ HIDLBMAK HID.SOC.V01,NXS040　を起動
+②START (ANS)WFL/HID/SRCMAK 
+    ソース名のＫＢＤ－ＩＮ有り。
+    例）?9999AX SRC/HID/S040. 左記のようにピリオドも入れる。
+③ＧＥＴして、ＣＯＢＯＬのタイプをＣＯＢＯＬ８５に変更
+  GET SRC/HID/S040  
+  TY C85
+  タイプを変えたらSAVEする
+  SA
+　USER=ANSで作成されるのでGTSに変更する
+　例:SA AS (GTS)SRC/HID/S040 (既に同一ファイル名が存在している場合は削除してから）
+  又はCOPY (ANS)SRC/HID/S040 AS (GTS)SRC/HID/S040 FROM SYSTEM(PACK) TO SYSTEM(PACK)
+
+
+●●●＜＜　目次：ＪＡ、生協　ＪＣＬ起動メモ　＞＞●●●●●●●●●●●●●●●●
+＊－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－＊
+＜＜　相沢生協関係の起動ＪＣＬ　＞＞　
+＊相沢生協（ KKCD=1:新学協  2:総合生協<--廃止!  3:県生協  9:ＡＬＬ(エラーも含む) ）
+
+【臨時処理等】
+○\ NISNBIPR KKCD-9,JJOB-TNKM（単価マスタ更新処理）  ＜－－毎月単価変更で使用する
+○\ NISNBIPR KKCD-9,JJOB-TNKL（単価マスタリスト作成）＜－－毎月単価変更で使用する
+
+　\ NISNBIIN SKIP-SNBIMG（今回パンチファイルの再累積。使用する時は注意！！） 
+　\ NISNBIPR KKCD-9,JJOB-KMST（県生協マスタ処理　通常はＦＤを投入すると自動起動される）
+　\ NISNBIPR KKCD-9,JJOB-SITB（仕入テーブル作成 NIS.SPC.NBITBLを修正してから！！）
+　\ NISNBIPR KKCD-9,JJOB-SHIN（商品テーブル作成）
+　\ NISNBIPR KKCD-9,JJOB-POSA (ＰＯＳ分のエラー、チェックリストの再出力　会社＝９）
+　\ NISNBIPR KKCD-X,JJOB-POSB (伝票分のエラー、チェックリストの再出力　会社指定する事）
+　\ NISNBIPR KKCD-X,JJOB-C1PR,ALLL-E (E:エラーの再出力　A:チェックリストの再出力）
+　\ NISNBISJ KKCD-X,JJOB-XXXX,JRNJ-YY,SKIP-JNBIXX,ALLL-1（通常処理の臨時処理）
+　\ NISNBIMJ KKCD-9,JJOB-MAIN,JRNJ-YY,SKIP-JNBIXX,ALLL-1（共通処理の臨時処理）
+　\ NISNBIBJ （ＳＡＶＥ処理　パラは無し）
+　\ NISRNJ NIS,NISNBIR3,KKCD-1                    （各生協明細ＣＳＶの作成 臨プロ 今回分）
+　\ NISRNJ NIS,NISNBIR3,FLFL-NIS.ZEN.NBIPAB,KKCD-2（各生協明細ＣＳＶの作成 臨プロ 前回分）
+
+【通常処理】
+ＰＯＳチェック処理    県生協ＦＤをＦＤサーバより投入後、下記のＪＣＬを起動
+                      \ NISRCVIN  X1NAZ 
+　　　　　　　　　　（\ NISNBISJ KKCD-9,JJOB-POSA(,P2-1)が自動起動される）
+新学協 チェック処理   \ NISNBISJ KKCD-1,JJOB-POSB(,P2-1)
+県生協 チェック処理   \ NISNBISJ KKCD-3,JJOB-POSB(,P2-1)
+総合生協 チェック処理 \ NISNBISJ KKCD-2,JJOB-POSB(,P2-1) 廃止
+新学協 チェック処理   \ NISNBISJ KKCD-1,JJOB-POSB(,P2-1) 
+新学協 本処理         \ NISNBISJ KKCD-1,JJOB-MAIN(,P2-1)
+県生協 チェック処理   \ NISNBISJ KKCD-3,JJOB-POSB(,P2-1) 
+県生協 本処理         \ NISNBISJ KKCD-3,JJOB-MAIN(,P2-1)
+総合生協 チェック処理 \ NISNBISJ KKCD-2,JJOB-POSB(,P2-1) 廃止 
+総合生協 本処理       \ NISNBISJ KKCD-2,JJOB-MAIN(,P2-1) 廃止
+売上仕入処理（相沢の日石投入ＦＤ等の作成　全ての生協本処理終了後、手動で起動）
+                    （\ NISNBIMJ KKCD-9,JJOB-MAIN(,P2-1)）
+県生協 組合員別売上集計表 \ NISNBISJ KKCD-3,JJOB-MAIN,SKIP-JNBIZ6,JRNJ-YY,P2-1 
+生協明細表                \ NISNBISJ KKCD-3,JJOB-MAIN,SKIP-JNBIL5,JRNJ-YY,P2-1
+単価ランク別集計表        \ NISNBISJ KKCD-3,JJOB-MAIN,SKIP-JNBIL6,JRNJ-YY,P2-1
+＊－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－＊
+
+＊－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－＊
+＜＜　ＪＡ関係の起動ＪＣＬ　＞＞　
+
+【ＪＡの転送確認のファイル】
+・NIS.JJA.ALLLCK(0)
+  \ HYSCPY NIS.JJA.ALLLCK(0),HID.DBG1　を行ってからHID.DBG1を参照する。
+・プロはNISJJLCK。
+
+【ＪＡのクレジットデータの集信有無のチェック】
+\ NISJJRNJ NISJJD0C （締日付のＫＢＤ－ＩＮあり。末日は実際日付）　 
+・送信表データは日石ＰＣの「\rcv\etc」フォルダの中の「ZNKSI010」を確認
+　詳細は「ＪＡ照合処理のＲＲ対応について」を参照 
+
+【ＪＡの各種集信、累積等】
+\ NISJJMRG NXV.JJAPOS    （ＰＯＳデータのマージ）
+\ NISJJMRG NXV.JJACRE    （ＣＲＥＤＩＴデータのマージ）
+\ NISJJMRG NXV.JJASST    （ＳＳテーブルのコピー）
+\ NISJJMRG NXV.JJAK1D    （会員－本人変更分のマージ）
+\ NISJJMRG NXV.JJAK2D    （会員－家族変更分のマージ）
+\ NISJJMRG NXV.JJAK1G    （会員－本人ＡＬＬの受信）
+\ NISJJMRG NXV.JJAK2G    （会員－家族ＡＬＬの受信）
+\ NISJJMGL NXV.JJALPG    （ＬＰＧ－ＬＰＧ売上Ｄの累積）
+\ NISJJMRG S6V.JJACFC    （メンバ・ＦＣの組合員データのマージ）
+
+\ NISRCVIN JJAFC          (ＦＣ需要家データの取込　　　ダイテックより受信後）
+\ NISJJMRG JJA.JJAFCD    （ＦＣ需要家データのマージ　　NISJEFJより自動起動）
+\ NISRCVIN JJAKS          (決済売上買戻しデータの取込　ダイテックより受信後）
+\ NISJJMRG JJA.JJAKSD    （決済売上買戻しデータの取込　NISDRCVJより自動起動）
+\ NISRCVIN JJAM1          (月間明細の取込　　　　　　　ダイテック処理終了後）
+
+\ NISJJCRD FCCD           (メンバ・ＦＣカードの今回処理データ抽出、テーブル作成）
+
+【ＪＡ　ＬＰＧオーソリ処理】
+\ NISJJPRE SSCP          （キャンペーンＳＳテーブルの作成）
+
+\ NISJJMGL NXV.JJALPG    （ＪＡからのＬＰＧ売上データの累積）
+ 　　　　　　　　　　　　 (FTSWATCHで監視して左記のＪＣＬが自動起動される。
+　　　　　　　　　　　　   その後\ NISJJLPGは左記JCLからRUN。
+　　　　　　　　　　　　　 今回転送データ抽出～日石ＰＣへの転送 ZNPOS001　追加書き） 
+
+\ NISJEFJ2 JJA.ZNERR001  （ＬＰＧオーソリエラー分を日石ＰＣより取込みUNISYSへ）
+　　　　　　　　　　　　 （FTSWATCHで監視して左記のＪＣＬが自動起動される。
+　　　　　　　　　　　　　 その後\ NISJJMGL JJA.JJALE2がＲＵＮし、UNISYSへ転送）
+                         （UNISYSには (FTP)NIS/NIS/NISJJA/JJALER2 ON MOSMOS で作成） 
+                     
+【ＪＡ　アカウント処理】
+\ NISJJACT                   （ＪＡ　アカウント処理）
+\ NISJJACT JRNJ-YY,SKIP-JJACC（ＪＡ　アカウント処理　臨時のＷＥＢファイル作成）
+
+【クレジット照合処理】
+ 処理ファイル　 末締時　サイクル区分＝１
+　　　　　　  １５締時　サイクル区分＝２
+ 
+ サイクル区分　１：１６日からのデータ。（末日後受信、末日処理に使用）             
+             　２：　１日からのデータ。（１５後受信、１５処理に使用） 
+       
+下記の９９は締日。１５又は３１を使用。（本番時は \ NISJJSTJ 99 )
+\ NISJJSGJ 99(,QKBN-RR) <--処理ファイル要変更 (一連の処理の場合）
+
+\ NISJJSGJ 99,DPOS,JRNJ-YY   (ＰＯＳ照合データの作成）
+\ NISJJSGJ 99,DCRE,JRNJ-YY   (クレ　＜売上明細＞照合データの作成）
+\ NISJJSGJ 99,DCR2,JRNJ-YY   (クレ２＜送金明細＞照合データの作成）
+\ NISJJSGJ 99,DTME,JRNJ-YY   (メンバ照合データの作成）
+\ NISJJSGJ 99,DFCD,JRNJ-YY   (ＦＣ　照合データの作成）
+\ NISJJSGJ 99,DKSD,JRNJ-YY   (送金表照合データの作成）
+
+\ NISJJSGJ 99,ECRE,JRNJ-YY   (クレ・ＰＯＳ照合データの照合更新）
+\ NISJJSGJ 99,ECR8,JRNJ-YY   (クレ　＜売上明細＞照合の整理番号採番）
+\ NISJJSGJ 99,EC29,JRNJ-YY   (クレ２＜送金明細＞照合の整理番号採番）
+\ NISJJSGJ 99,ETME,JRNJ-YY   (メンバ・ＰＯＳ照合データの照合更新）
+\ NISJJSGJ 99,ETM9,JRNJ-YY   (メンバ照合の整理番号採番）
+\ NISJJSGJ 99,EFCD,JRNJ-YY   (ＦＣ・ＰＯＳ照合データの照合更新）
+\ NISJJSGJ 99,EFC9,JRNJ-YY   (ＦＣ照合の整理番号１～３の採番　プロは４本）
+\ NISJJSGJ 99,EPOS,JRNJ-YY   (ＰＯＳ照合データの更新　相殺処理等もＲＵＮ　プロは３本）　
+
+\ NISJJSGJ 99,KPOS,JRNJ-YY   (ＰＯＳ連動データの作成）
+\ NISJJSGJ 99,KCRE,JRNJ-YY   (クレ　連動データの作成）
+\ NISJJSGJ 99,KCR2,JRNJ-YY   (クレ２連動データの作成）
+\ NISJJSGJ 99,KTME,JRNJ-YY   (メンバ連動データの作成）
+\ NISJJSGJ 99,KFCD,JRNJ-YY   (ＦＣ　連動データの作成　２種類ＲＵＮする）
+\ NISJJSGJ 99,KKSD,JRNJ-YY   (送金表連動データの作成）
+\ NISJJSGJ 99,KK90,JRNJ-YY   (ＡＬＬ連動データの作成）
+
+\ NISJJSGJ 99,GPOS,JRNJ-YY   (ＰＯＳ帳票データの作成）
+\ NISJJSGJ 99,GCRE,JRNJ-YY   (クレ　帳票データの作成）
+\ NISJJSGJ 99,GCR2,JRNJ-YY   (クレ２帳票データの作成）
+\ NISJJSGJ 99,GTME,JRNJ-YY   (メンバ帳票データの作成）
+\ NISJJSGJ 99,GFCD,JRNJ-YY   (ＦＣ　帳票データの作成　２種類ＲＵＮする）
+\ NISJJSGJ 99,GKSD,JRNJ-YY   (送金表帳票データの作成　３種類ＲＵＮする）
+\ NISJJSGJ 99,GG90,JRNJ-YY   (ＡＬＬ帳票データの作成）
+
+\ NISJJSGJ 99,JAK1,JRNJ-YY   (照合件数Ｆの更新処理）
+\ NISJJSGJ 99,JAK5,JRNJ-YY   (照合アカウントＦの作成）
+
+\ NISJJPRE JATB          （ＪＡコードテーブルの作成  NIS.JJA.JATABLのファイルを修正後）
+\ NISJJPRE JJRJS　       （エクセルのデータからＣＰ用初回加盟店テーブルデータ作成）
+\ NISJJPRE SSCP          （キャンペーンＳＳテーブルの作成）
+\ NISJJPRE SSTBRJ        （エクセルのＳＳテーブルへの変換　廃止！！）
+\ NISJJPRE SSTB          （ＳＳテーブルの作成）
+\ NISJJPRE SHTBRJ        （エクセルの商品テーブルへの変換）
+\ NISJJPRE SHTB          （商品テーブルの作成）
+
+*---*
+\ NISJJPRE KMCG          （組合員テーブルの支所一括変換 データをＨＯＳＴに落としてから）
+　①ＣＤのファイルをＰＣに保管し、ファイルを｢名前の変更｣で、拡張子を.TXTに変更する。
+  （一行目に見出しのデータがあるが、削除しなくてよい。プログラムにて削除している。）
+　②FEXPORT 'HID.NIS'  を行う。レコード長は７００を指定。可変長。
+　③\ HYSVBFIX INFL-HID.NIS,OTFL-HID.NIS2,LONG-700,BLOK-14700　を起動
+　④上記の　\ NISJJPRE KMCG　を起動
+*---*　　　　　　
+　　　　　　
+\ NISJJPRE KUML          （組合員一覧表の作成）
+\ NISJJPRE CPKM          （キャンペーン会員マスタ件数処理）
+
+【キャンペーン処理】
+\ NISJJCPJ                 （キャンペーン抽出処理のスタート）
+　NRJ.JJA.CPNSYR.AAA（利用金額用　）　をNIS.S6V.CPNSYRに入れて修正してから起動する。
+　NRJ.JJA.CPNSYR.BBB（入会年月日用）　をNIS.S6V.CPNSYRに入れて修正してから起動する。
+  NRJ.JJA.CPNSYR.CCC（全て入会年月日）をNIS.S6V.CPNSYRに入れて修正してから起動する。
+  \ NISJJCPN SELA,NO-000000（キャンペーンの抽出処理　Ａ）
+  \ NISJJCPN SELB,NO-000000（キャンペーンの抽出処理　Ｂ）  
+\ NISJJCP9 NO-000000       （キャンペーン確定処理のスタート）
+　\ NISJJCPN SEL9,NO-000000（キャンペーンの確定処理）
+\ NISJJCPN SEL9,NO-060517,JRNJ-YY,SKIP-JJC75（ＪＲＮＪ処理）　　
+ＦＴＰ
+  転送ファイル NIS.JA1.CP999999.JEFCP1 （販売促進：抽出抽選結果）
+  転送ファイル NIS.JA2.CP999999.JEFCP2 （販売促進：結果確定）
+
+【キャンペーン臨時処理】
+\ HYSCPY NIS.JJA.CPNRRK(0),NRJ.NIS.JJA.CPNRRK,3,2 
+
+\ NISJJCPX SELA,NO-320606（NIS.JJX.CPNSYR.HKNを利用金額用に修正してから処理）
+\ NISJJCPX SELB,NO-320606（NIS.JJX.CPNSYR.HKNを入会年月日用に修正してから処理）
+
+\ NISRNJ AAA,NISJJRJP,FLFL-NIS.JJA.CPNRRK(0)  （キャンペーン当選履歴Ｆの抽出）
+\ NISRNJ AAA,NISJJRJQ                         （キャンペーン案分ＦのＣＳＶ）
+\ NISRNJ AAA,NISJJRJ5,FLFL-NIS.JJA.KMSTBL     （キャンペーン会員テーブルの抽出）
+  \ NISRNJ AAA,NISJJRJ5,FLFL-NIS.JJA.CPNC3AB.WRK  
+  \ NISRNJ AAA,NISJJRJ5,FLFL-NIS.JJA.CPNC41.WRK
+  \ NISRNJ AAA,NISJJRJ5,FLFL-NIS.JJA.CPNC51.HKN
+
+【キャンペーン休眠客の臨時処理】
+\ NISJJCPR SELR,NO-888888
+  NIS.JJA.CPNSYR.RAA,NIS.JJA.CPNSYR.RBBの両方を変更してから処理！！
+　＊NISJJC3Rのプロに対象のＳＳをリテラルにて変更してから処理する
+  ＊ハガキ代は請求するのでｱｶｳﾝﾄ資料をシステムから管理部に渡す
+　＊NISJJC2Aのプロは処理時間に１時間前後かかる。２００万件ある為
+
+【渡辺氏への提供時の処理】＜－－よく使用するＪＣＬ
+○過去のデータをＬＴＯからＨＯＳＴに戻して抽出する場合
+　例：2016年12月7日に渡辺氏より下記の抽出依頼あり
+   　「9/1から9/5のＰＯＳ取引データ,9月末締めのクレジット照合で出力した帳票データ
+       給油ＳＳコードで搾れるなら 4604955」
+　＊ＪＡ照合処理の２０日締後のＬＴＯデータ(NIS.JJA.ALLPOS)を使用　
+    ①\ HYSLDJ NIS.JJA.ALLPOS,NRJ.JJA.ALLPOS,200,15,WRK2-WORK
+    ②プロ変更後 \ NISRNJ AAA,NISJJRJ1,FLFL-NRJ.JJA.ALLPOS
+  ＊ＪＡ照合処理の末締後のＬＴＯデータ(NIS.JJA.CJJG90)を使用　
+　　①\ HYSLDJ NIS.JJA.CJJG90,NRJ.JJA.CJJG90,200,15,WRK2-WORK
+    ②\ NISRNJ AAA,NISJJRJG,FLFL-NRJ.JJA.CJJG90
+ 
+○各種抽出処理
+＊連動・帳票・件数・アカウント以外は「FIMPORT 'NRJ.WRK.DAT'は バイナリ」で行なう。 
+　\ NISRNJ AAA,NISJJRJ1,FLFL-NIS.JJA.ALLPCJ(0)  （ＰＯＳデータの抽出　照合処理用）
+　\ NISRNJ AAA,NISJJRJ2 　　　　　　　　　　　　（ＣＲＥデータの抽出）
+　\ NISRNJ AAA,NISJJRJ6 　　　　　　　　　　　　（ＦＣデータの抽出。ダイテック分）
+　\ NISRNJ AAA,NISJJRJ7 　　　　　　　　　　　　（決済売上買戻(送金表)の抽出。ダイテック分)
+　\ NISRNJ AAA,NISJJRJ9 　　　　　　　　　　　　（取引明細２４０バイト累積 ダイテック分）
+　　下記はFIMPORT 'HID.FDS.CSV'
+　　\ NISRNJ AAA,NISJJRJK(,FLFL-NIS.JJA.CJJKPS.WRK)（連動データの抽出）CJJKCR,CJJKC2等
+    \ NISRNJ AAA,NISJJRJK(,FLFL-NIS.JJA.CJJK90.S31)（連動データの抽出) S10,S15,S20等
+　　\ NISRNJ AAA,NISJJRJG(,FLFL-NIS.JJA.CJJGPS.WRK)（帳票データの抽出）CJJGCR,CJJGC2等
+    \ NISRNJ AAA,NISJJRJG(,FLFL-NIS.JJA.CJJG90.S31)（帳票データの抽出) S10,S15,S20等
+    \ NISRNJ AAA,NISJJRJI                          （照合件数ファイルの抽出）
+    \ NISRNJ AAA,NISJJRJJ                          （照合アカウント基礎ファイルの抽出）
+
+\ NISRNJ AAA,NISJJRJ0(,FLFL-NIS.JJA.JJATMD.ZEN)（取引明細の抽出２００バイト）
+\ NISRNJ AAA,NISJJRJ9 　　　　　　　　　　　　 （取引明細の抽出２４０バイト累積）
+\ NISRNJ AAA,NISJJRJ1 　　　　　　　　　　　　 （ＰＯＳデータの抽出）
+\ NISRNJ AAA,NISJJRJ1,FLFL-NIS.JJA.ALLPCJ(0)   （ＰＯＳデータの抽出　照合処理用）
+\ NISRNJ AAA,NISJJRJ1,FLFL-NIS.JJA.JJAP01      （１ヶ月分のＰＯＳからの抽出　アカウント用）
+\ NISRNJ AAA,NISJJRJ2 　　　　　　　　　　　   （ＣＲＥデータの抽出） 　　　
+　　　　　　　
+\ NISRNJ AAA,NISJJRJ3,FLFL-NIS.NXV.JJAK1G.HKN （会員（本人　　）データの抽出）
+\ NISRNJ AAA,NISJJRJ3,FLFL-NIS.NXV.JJAK3G.HKN （会員（本人ＪＸ）データの抽出）
+\ NISRNJ AAA,NISJJRJ3,FLFL-NIS.JJA.ALLK1D(0)  （会員（本人　　）データの差分累積抽出）
+\ NISRNJ AAA,NISJJRJ3,FLFL-NIS.JJA.ALLK3D(0)  （会員（本人ＪＸ）データの差分累積抽出）
+\ NISRNJ AAA,NISJJRJ4,FLFL-NIS.NXV.JJAK2G.HKN （会員（家族　　）データの抽出）
+\ NISRNJ AAA,NISJJRJ4,FLFL-NIS.NXV.JJAK4G.HKN （会員（家族ＪＸ）データの抽出）
+\ NISRNJ AAA,NISJJRJ4,FLFL-NIS.JJA.ALLK2D(0)  （会員（家族　　）データの差分累積抽出）
+\ NISRNJ AAA,NISJJRJ4,FLFL-NIS.JJA.ALLK4D(0)  （会員（家族ＪＸ）データの差分累積抽出）
+\ NISRNJ AAA,NISJJRJ6 　　　　　　　　　　　　（ＦＣデータの抽出。ダイテック分）
+\ NISRNJ AAA,NISJJRJ7 　　　　　　　　　　　　（決済売上買戻（送金表）の抽出。ダイテック分）
+\ NISRNJ AAA,NISJJRJ8 　　　　　　　　　　　　（ＪＡ販促データの抽出）
+\ NISRNJ AAA,NISJJRJ8(,FLFL-NIS.JJA.ALLCP2(0))（ＪＡ販促データの抽出　ニコス分）
+\ NISRNJ AAA,NISJJRJA(,FLFL-NRJ.JJA.CJJDPS) 　（ＰＯＳ照合データの抽出）
+\ NISRNJ AAA,NISJJRJB(,FLFL-NRJ.JJA.CJJDCR) 　（クレ　照合データの抽出）
+\ NISRNJ AAA,NISJJRJC(,FLFL-NRJ.JJA.CJJDC2) 　（クレ２照合データの抽出）
+\ NISRNJ AAA,NISJJRJD(,FLFL-NRJ.JJA.CJJDTM) 　（メンバ照合データの抽出）
+\ NISRNJ AAA,NISJJRJE(,FLFL-NRJ.JJA.CJJDFC) 　（ＦＣ　照合データの抽出）
+\ NISRNJ AAA,NISJJRJF(,FLFL-NRJ.JJA.CJJDKS) 　（送金表照合データの抽出）
+\ NISRNJ AAA,NISJJRJK(,FLFL-NIS.JJA.CJJKPS.WRK)（連動データの抽出）CJJKCR,CJJKC2等
+\ NISRNJ AAA,NISJJRJK(,FLFL-NIS.JJA.CJJK90.S15)
+\ NISRNJ AAA,NISJJRJG(,FLFL-NIS.JJA.CJJGPS.WRK)（帳票データの抽出）CJJGCR,CJJGC2等
+\ NISRNJ AAA,NISJJRJG(,FLFL-NIS.JJA.CJJG90.S15)
+\ NISRNJ AAA,NISJJRJI                           （照合件数ファイルの抽出）
+\ NISRNJ AAA,NISJJRJJ                           （照合アカウント基礎ファイルの抽出）
+
+\ NISJJRNJ NISJJRJV                           （前回POS累積と今回POS累積のマージ 臨時）
+
+\ NISRNJ AAA,NISJJCV1,FLFL-NIS.NXV.JJAK1G     （ＪＡの会員（本人）データの漢字変換）
+\ NISRNJ AAA,NISJJCV2,FLFL-NIS.NXV.JJAK2G     （ＪＡの会員（家族）データの漢字変換）
+\ NISJJRNJ NISJJC02                           （ＪＡ会員マスタより切替マスタの抽出 臨時）
+\ NISJJRNJ NISJJC03                           （ＪＡ販促データの洗替え処理 臨時）
+\ NISJJRNJ NISJJC21,NO-888888                 （ＪＡ会員テーブルの抽出 臨時）
+\ NISJJRNJ NISJJMK1                           （ＪＡ会員マスタ本人の更新 臨時）
+\ NISJJRNJ NISJJMK2                           （ＪＡ会員マスタ家族の更新 臨時）
+
+\ NISRNJ AAA,NISJJRJM,FLFL-NIS.JJA.ALLJCB(0) ＪＣＢデータのＣＳＶデータ作成
+\ NISRNJ AAA,NISJJRJN,FLFL-NIS.JJA.ALLNCS(0) ニコスデータのＣＳＶデータ作成
+\ NISRNJ AAA,NISJJRJ8,FLFL-NIS.JJA.ALLCP2(0) 販促データ２のＣＳＶ
+\ NISJJPRE SSKM　ＣＰ用のＳＳ＋加盟店の合算テーブル作成
+\ NISJJPRE KMCP　ＣＰ用の加盟店テーブルの作成 
+\ NISJJPR2 CPCK　販売促進データの給油ＳＳ（又は加盟店）チェック 　　　
+\ NISRNJ AAA,NISJJRJO,FLFL-XXX.XXX.XXXXXX ニコス提携テーブルのＣＳＶデータ作成
+　
+【ゼロ件作成】
+\ HYSDUMMY NIS.JJA.ALLCRE(+1),290,15370,DLT-N　クレジット
+\ HYSDUMMY NIS.JJA.ALLK1D(+1),500,15000,DLT-N　本人
+\ HYSDUMMY NIS.JJA.ALLK2D(+1),250,15250,DLT-N　家族 
+\ HYSDUMMY NIS.JJA.ALLK3D(+1),500,15000,DLT-N　本人（ＪＸ会員）
+\ HYSDUMMY NIS.JJA.ALLK4D(+1),250,15250,DLT-N　家族（ＪＸ会員） 
+\ HYSDUMMY NIS.JJA.ALLFCD(+1),200,15200,DLT-N　ＦＣ需要家データ
+\ HYSDUMMY NIS.JJA.ALLKSD(+1),340,15300,DLT-N　決済売上買戻しデータ
+\ HYSDUMMY NIS.JJA.ALLTMD(+1),240,15360,DLT-N　取引明細データ
+\ HYSDUMMY NIS.JJA.ALLCPN(+1),140,15400,DLT-N　キャンペーン累積データ
+\ HYSDUMMY NIS.JJA.ALLCP2(+1),140,15400,DLT-N　キャンペーン２累積データ（ニコス分）
+\ HYSDUMMY NIS.JJA.ALLCFC(+1),160,15360,DLT-N　ＦＣカード・組合員データ
+\ HYSDUMMY NIS.JJA.CJKUMT(+1),120,15360,DLT-N　メンバカード・組合員テーブル
+\ HYSDUMMY NIS.JJA.CJJACT(+1),060,15360,DLT-N　クレ照合のアカウント
+\ HYSDUMMY NIS.JJA.ALLLE2(+1),210,15330,DLT-N  ＬＰＧオーソリエラー累積データ
+\ HYSDUMMY NIS.JJA.ALLLE3(+1),2XX,15XXX,DLT-N  ＬＰＧ日次エラー累積データ
+\ HYSDUMMY NIS.JJA.ALLLPG(+1),2XX,15XXX,DLT-N  ＬＰＧ売上累積データ
+\ HYSDUMMY NIS.JJA.ALLLCK(+1),060,15360,DLT-N  ＬＰＧ転送確認累積ファイル
+
+\ HYSDUMMY NIS.JJA.KMSTBL,350,15400          　キャンペーン会員テーブル
+\ HYSDUMMY NIS.JJA.CPNRRK(+1),120,15360,DLT-N　キャンペーン当選会員履歴ファイル
+\ HYSDUMMY NIS.JJA.CPNANB.HKN,500,15000        キャンペーン案分テーブル
+\ HYSDUMMY NIS.JJA.CPNSYR.HKN,300,15300        キャンペーン処理ファイル
+
+\ NISJJRNJ CJJZERO (これで下記６ファイルができる） 
+\ HYSDUMMY NIS.JJA.CJJDPS(+1),384,15360,DLT-N  ＰＯＳ照合データ
+\ HYSDUMMY NIS.JJA.CJJDCR(+1),340,15300,DLT-N  クレ　＜売上明細＞照合データ
+\ HYSDUMMY NIS.JJA.CJJDC2(+1),450,15300,DLT-N  クレ２＜送金明細＞照合データ
+\ HYSDUMMY NIS.JJA.CJJDTM(+1),400,15200,DLT-N  メンバ照合データ
+\ HYSDUMMY NIS.JJA.CJJDFC(+1),360,15120,DLT-N  ＦＣ照合データ
+\ HYSDUMMY NIS.JJA.CJJDKS(+1),280,15400,DLT-N  送金表照合データ
+
+(照合関係の戻し　ＲＲ対応）
+【次回の処理に入ってない場合】
+\ NISJJLSG DSCJJD (ＤＩＳＫよりCJJDXX関係の戻し　処理Ｆ、ＰＯＳデータも含む！！）　　　　　　　　         
+　　
+【既に末締が終わっていて、１５日締からＲＲしたい時等】
+\ NISJJLSG CTCJJD (前回！！カセットよりCJJDXX関係の戻し）
+\ NISJJLSG CJJSYR (今回！！カセットよりＰＯＳデータ、処理Ｆの戻し）
+
+ＲＲの起動（ＲＲ時は \ NISJJSTJ 15(又は31)のＪＣＬでは起動しない事！！）
+　　　　\ NISJJSGJ 15,QKBN-RR（１５日締）
+        \ NISJJSGJ 31,QKBN-RR（　末日締）
+        起動前に処理ファイル(NIS.JJA.CJJSYR.HKN)はエディターで確認すること！！
+　　　
+【各種転送ファイルの再送信の対応について】　
+\ NISJJLSG DSNX15 (ＤＩＳＫより１５締の転送関係の戻し）
+\ NISJJLSG CTNX15 (カセットより１５締の転送関係の戻し）
+\ NISJJLSG DSNX31 (ＤＩＳＫより　末締の転送関係の戻し）
+\ NISJJLSG CTNX31 (カセットより　末締の転送関係の戻し）
+
+\ NISJJSGJ 31,JRNJ-YY,SKIP-JZENDL (CJJDXX関係等の前回ファイルの作成） 
+＊－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－＊
+
+
+●●●＜＜　目次：その他の便利メモ　＞＞●●●●●●●●●●●●●●●●●●●●●
+【サンプルプログラムについて】
+・SEARCH 命令のサンプルプロ     　　　　　　    …AGS2020 (SID.SOC.V02)
+・英数字全角ーー＞英数字半角のサンプルプロ      …AGS2020 (SID.SOC.V02)
+・可変長のプロ（　ＩＮファイルが可変長）        …AGS2010 (SID.SOC.V02)
+　　　　　　　　　　　　　　　　　　　　　　　　　FDSVLST1(LPS.SOC.V01)
+                                                  NISCOND (NSK.SOC.V01)
+・可変長のプロ（ＯＵＴファイルが可変長）        …CMONTG1P～2P (CMO.SOC.V01)
+                                                  JCLはNTTNTG1P
+                                                  NXNBGCR3(NSK.SOC.V01)
+                                                  JCLはNISJCREJ
+・作表で計を打たないプロ　　　　　　　　　　　　…LPS3550
+・作表で明細と合計を別々のルーチンで作表するプロ…LPSMAT8C,LPSMAT7C,LPS834L
+                                                  LPS5660,LPSRNJA9,NSKNBIL5
+・作表で集計しながら合計のみ作表するプロ　　　　…LPS5650,LPS2800,NISNBIL6
+・マッチングプロ　　　　                        …LPS5650,LPSALLP1
+                                                  LPSINQ40,LPSINQ10,LPS4820
+・マスタメンテプロ　　　                        …LPS1250,SUR0500,SUR0800　
+・作表ファイル又は集計ファイル作成プロ          …LPS8340,LPS2510,LPSRJSUM
+                                                  CMOALLAS,NISRJCV6
+・PERFORM VARYINGを使用しているプロ             …LPS834L,LPSWA81,LPSSTJBD,
+                                                  LPSWBV1,LPSWBVE,NISACTD1
+・集計ファイル作成プロ                          …LPS5280,NISJJC2A
+・<= ,  >= を使用しているプロ                   …YSKCHK,NISJJC2A
+・ＣＳＶファイルを作成している参考プロ          …LPSRJCSV,
+                                                  NISDTKCM,NISRJCDL,NISRJKIN
+・ＳＯＲＴを２回使用しているプロ                …LPSL32B,LPS683M
+・漢字９ポの半角（１２ピッチ）プリントの対応プロ…SUR5500,CMONTTN5
+・漢字の倍角・長体のサンプル                    …MCM.SOC.V01(MRHR710)
+                                                  LPS4096
+・プログラムの大小比較                          …LPS.SOC.V01(YSKCHK)　
+　026100     IF WK-HAIBAI <= 0.1 OR >= 10.0 GO TO LNCT-RTN. 
+
+【ＡＳＣＩＩ＝シフトＪＩＳ】
+
+【ＪＢＡ－－＞全銀手順です】
+
+【通常のオンラインプログラム－－＞ＢＳＣ手順　ＣＶＣＳもＢＳＣ手順】
+
+【ＪＣＡ　－－＞ＣＶＣＳの事です】
+
+【アルファベットの小文字の表示の一覧】
+ユニシスのＷＦＬなどに+Kの状態でｱｲｳｴｵ～を入れて、-Kに変えてから表示すると
+アルファベットの小文字が表示される。
+＊富士通の転送のＳＣＦ（L.MBC.SSP(FTOWSND)）でアルファベットの小文字を使用。
+  しかし、サーバが変更(2014/11/27テスト)になってからは、大文字での指定になった。
+ +K ｱｲｳｴｵ ｶｷｸｹｺ ｻｼｽｾｿ ﾀﾁﾂﾃﾄ ﾅﾆﾇﾈﾉ ﾊﾋﾌﾍﾎ ﾏﾐﾑﾒﾓ ﾔ ﾕ ｦ ﾗﾘﾙﾚﾛ ﾜ ﾝ    
+ -K abcde fghi? ????? jklmn opqr? ???st uvwxy z ? ? ????? ? ?  
+ +K ABCDEFGHIJKLMNOPQRSTUVWXYZ  
+ -K ABCDEFGHIJKLMNOPQRSTUVWXYZ 
+ +K ! " # $ % & ' ( ) = ~ | - ^ \ ` { @ [ + * ; : ] < > ? _ , . /  
+ -K ! " # \ % & ' ( ) = ? ? - ^ $ ? { @ [ + * ; : ] < > ? _ , . /  
+
+【ＰＣで『送る』の中にメモ帳を入れる方法】
+C:\Users\hideta.MBC\AppData\Roaming\Microsoft\Windows\SendTo　のフォルダーの中に
+アクセサリのフォルダのメモ帳を右クリックしながらドラックして上記のフォルダに移動し、
+ショートカットを作成するを選択する。
+
+【漢字について】
+　富士通の場合、第２水準までは問題なしで、ＰＣもＯＫ。
+　しかし、拡張文字は、ＨＯＳＴのプリンタに登録してあるかによって表示される
+　場合とされない場合がある。また、パンチでうてるかどうかも登録しないとだめ。
+　ＸＥＲＯＸは拡張文字は全て登録してあるとの事。
+　ただ、パソコンとのやり取りで、ＨＯＳＴに登録してあっても、ＰＣのシフトＪＩＳで、
+　拡張文字の範囲でないとアスキ変換ができない。
+  しかし、ＰＣ毎の対応になるが、下記の「ＪＥＦ拡張漢字サポート」の対応を行なえば
+　変換可能。（自分のＰＣには２００８年９月２４日に対応した）
+　また、ハンディも㈱等の表示も可能だが、どこまで拡張文字の対応がＯＫか不明。
+　尚、ネオスは㈱はＯＫだったが氏名の中の拡張文字は表示できなかった。（栁、﨑）　　
+
+【ＪＥＦ拡張漢字サポートの対応について】
+　スタートメニュウのプログラムから「ＪＥＦ拡張漢字サポート」の中の「変換テーブル作成」
+　を選択する。すると画面がでてくるので、一番上の「テンプレートからＪＥＦ変換テーブル
+　作成」を選択し、\\Black\sys3\Pubric\jefsaveの中にある「標準．ｔｘｔ」を選択し処理
+　する。するとC:\Program Files\Fujitsu\JEFの中にFMB1JEFB.TBLが作成されＯＫ。
+　尚、ＰＣは再起動すること！！
+
+【ネオス】
+・ネオス　24DOT－6P  30DOT－7P  32DOT－8P  40DOT－10P  48DOT－12P
+
+・ネオス　追加フォルダの対応　C:\MBC_Libraly\JupiterFTP
+　　　　　JupiterFTPのファイルを開きそれに追加する。L0331を参照。
+
+【ＩＰ電話】
+　１．内線番号６６へかける
+　２．５００（常磐町）５０１（上田）５０２（宇都宮）５０３（新潟）
+　３．転送の仕方
+　　　保留ボタンを押すー＞転送先の内線をかけるー＞フックボタンを押す　　
+
+【ＣＲＬＦ等について】
+　ファイル転送（ＦＩＭＰＯＲＴ等）によってＤＯＳに変換し端末に
+　取りこんだ場合ＣＲＬＦがついている。
+　（見た目にはわからないがダンプ等で見るとわかる）
+　また、最後のＦＩＬＬＥＲの部分は欠落してその後にＣＲＬＦがつく。
+　例えば、２６０バイトでファイルを作成しても、最後の１０バイトが
+　ＦＩＬＬＥＲの場合、２５０＋ＣＲＬＦ（２バイト）で２５２バイトで
+　作成される。
+　漢字認識のＳＯＫ・ＥＯＫも欠落する。
+　尚、プログラム側で、レコード長を意識しない対応は可能。
+
+【ファイル転送の概要】
+　①原則的には、作成したほうが、ファイルを送出してやる。
+　②取りにきた場合、そのファイルを転送終了後ゼロ件クリアしておく。
+　③ＦＴＳＷＡＴＣＨ…･ＦＡＣＯＭの転受・転送の監視ＳＣＦ。
+　④ＦＴＯＵＳＮＤ　…･ＵＮＩＳＹＳへの転送ＳＣＦ。パラメータがＳＣＦ名になる。
+　⑤ＦＴＯＰＲＣＶ　…･ＦＡＣＯＭからパンチへデータを取りに行くＳＣＦ。パラメータが
+　　 　　　　　　　　　ＳＣＦ名になる。
+  ⑥ＵＮＩＳＹＳから取りに来る場合、ＦＡＣＯＭ側にファイルがないと、ＵＮＩＳＹＳで
+    Ｐ－ＤＳ。ＦＡＣＯＭはＦＴＳＷＡＴＣＨがＰＡＵＳＥでとまる。
+　⑦ＦＡＣＯＭからＵＮＩＳＹＳに送る場合は、ファイルが存在していてはならない。
+　　（監視の都合上？）
+　⑧ノード　パンチ…･ＮＤ２０００６０　ＵＮＩＳＹＳ…･ＮＤ２００００１
+　　　　ＦＤサーバ…･ＮＤ２０００７０
+
+【ファイル転送】
+　ＨＯＳＴ～ＰＣ  FIMPORT 'HID.DBG'
+　ＰＣ～ＨＯＳＴ  FEXPORT 'HID.DBG'
+  ＊FEXPORTの詳細はHID業務メモ（HIDメモ帳等の中)の＜FEXPORTについて＞
+　　を参照。＜－－？？
+　＊ＦＥＸＰＯＲＴはＨＯＳＴにそのファイルが存在していてはならない。
+　　また、ＨＯＳＴに可変長で作成される。レコード長を長く？
+　　丸岡課長のＳＩＤ．ＳＯＣ．Ｖ０２の中のプロにコンマ編集の
+　　プロあり。ガスはLPSWRJC1の臨時プロあり。
+  ＊ＦＩＭＰＯＲＴでファイルを作成する場合で、ＥＸＣＥＬで使用可能な
+　　データを作りたい時は、拡張子を｢～．ＣＳＶ｣とする。
+　　例）ファイル名ーー＞　ＨＩＤ．ＣＳＶ
+　　また、ＨＯＳＴにファイルを作成する時は、コンマ編集で作成するが、
+　　漢字の前後は｢”」で囲んだほうがよい。また、仮名欄でも、｢－｣等が
+　　使用されている場合は、前後を｢”」で囲んだほうがよい。
+　　｢－｣等があると数字とみなされてしまう。
+
+【Ｓ６０００からのデータを投げる時のファイル名について】
+　｢．｣　は使える。｢／｣はデレクトリとしては使えるとの事。
+　例えば、Ａのフォルダーの中にＢのフォルダーがあり、その中に
+　ＣＣＣ．ＤＡＴというファイルがあった場合Ａ／Ｂ／ＣＣＣ．ＤＡＴ
+　という形使える。でも、ファイル名としても使えると思うとの事。
+
+【ＦＥＸＰＯＲＴについてのメモ】
+・テキストファイル送信設定にて行う。
+（バイナリ送信だと当然ＥＢＣＤＩＣ変換されない）
+　レコード形式は「可変長」を指定して行う。
+　レコード長はアスキーデータにそれなりの概念がないので、なんとも
+　言えないが、存在するレコード長より短いと転送不可？。
+　長い場合は、後ろにスペースが入るだけで問題無し。
+・通常、ＴＸＴの拡張子で行う。（ＴＸＴ、ＣＳＶ、ＤＡＴはＯＫだった）
+・ｘｌｓは通常不可。エクセルのデータはカンマ区切（ＣＳＶ）に名前を
+　変えて保存して、それを，ＴＸＴの拡張子にチェンジしてから使う。
+・ＦＡＣＯＭのダスドにファイルが存在していると転送不可能。
+
+・可変長のファイルを通常のプロでは読めない為、固定長に変換する事。
+　\ HYSVBFIX INFL-XXX.XXX,OTFL-XXX.XXX,LONG-300,BLOK-15000
+　尚、ガスの転送ファイル(D:に LPGHAIF.DATで作成)にてL0005で
+　送ってもよい。
+
+・疑問点…エリアはいくつ確保されるの？指定可能？
+　　　　　ブロッキングは？
+　　　　　固定長の場合、３０００前後でそれなりに確保されているが、
+　　　　　可変長の場合、割切れないブロッキングになっている。
+　　　　　例えば、８００バイトの場合３１２０とか。
+　　　　　（３２１０÷８００＝３．９）
+・テスト結果
+　前提：ＦＡＣＯＭで５００バイトのデータを作成し、ＵＮＩＳＹＳに投げ、
+　　　　ＤＯＳプロンプトでパソコン上に取り込んだファイルを、
+　　　　ＦＡＣＯＭに転送してみた。
+　①固定長を指定した場合、５００バイト、５００バイト以上はＯＫ。
+　　４９９バイト以下は不可。
+　　例えば、８００バイトを指定した場合、５０１バイト目からはスペース
+　　が入っているだけ。データもずれていなかった。
+　②可変長は５００バイト、５０２バイトも不可。５１０以上はＯＫ。
+　　５０８は？
+　　しかし、可変長はブロッキングがおかしくなる。
+　結論：ＦＡＣＯＭに存在しないファイル名で転送。
+　　　　可変長の場合、データの先頭にレコード長等の情報が入るようなので
+　　　　通常、１０バイト＋αしておけば大丈夫みたい。
+　　　　（５００バイトの場合、５１０バイトにすれば大丈夫）　　　　
+　　　　尚、エリアの確保量、ブロッキングがどうに決められているか不明。
+・質問…タブストップって何？   
+
+・FTOWSND(サーバへの転送ＳＣＦ）
+　IID=ﾍｱﾂ (SAL) …ユーザコード　英字の小文字の為 
+  DIP=ﾍｱﾂ (SAL) …パスワード　　英字の小文字の為
+　転送のファイル名は英文字でＯＫ（但し￥は＄とする）
+　（例えば　\LPG\L9900.ASCの場合 $LPG$L9900.ASC とすると、ＩＴ側で
+　　　　　　\LPGのフォルダ。
+　　ちなみに、\\とすると\がついたファイル名になる。例えば\\HIDETAは
+　　\HIDETAというファイルになり、仮パラ扱いされない。
+　　また、\をつけた仮パラ扱いにしたい場合\\\HIDETAにすると
+　　\+仮パラ名になる。HIDETA=L9900の場合、\\\HIDETAは\L9900になる）
+
+・CRLFについて
+　FIMPORTを行うとCRLF(アスキーのコードは0D0A)が無条件につき１レコード
+　に分けてくれる。
+　今回、バイナリ転送で、サーバに送るので、１レコードの区切りが区別
+　できない。よってCRLFをセットしてほしいとの事。
+　ＥＢＣＤＩＣの世界で｢0D25」をセットすればＯＫ。
+　ＦＴＰでアスキに変換しながら転送する時は、CRLFがなくても問題なし。
+　ついていても問題無し。
+
+　ＨＯＳＴにてアスキ変換して、ＦＴＰにてバイナリ変換する場合は
+  ＥＢＣＤＩＣの世界で｢0D25」をセットしては駄目！！
+　アスキ変換の時、自動的にＣＲＬＦがつくので、ＣＲＬＦ、ＣＲＬＦ
+　の形になり、サーバ側で２件になってしまう。
+
+　尚、アスキ変換時、変換不可能な英数字は｢２Ｄ｣（－ハイフン）に変換
+　されてしまう。また、変換不能な漢字は｢８１Ａ１｣になってしまう。
+
+・拡張文字について
+  ①ＨＯＳＴで変換する場合テーブルに登録可能の為ＯＫ。
+　②サーバ側では今のところ(2001/08/06現在)不可（ﾘｯﾎﾟｳ、㈱等）。
+  ③変換不可能の文字が入ったデータをＨＯＳＴ－－＞サーバへＦＴＰで
+　　送った場合サーバに転送は可。
+　　但し、ＨＯＳＴ－－＞パソコンへＦＩＭＰＯＲＴは転送不可だった。
+　④変換不可能の文字が入ったデータをサーバーー＞ＨＯＳＴへＦＴＰで
+　　送った場合ＨＯＳＴに転送できない。
+  （漢字と見なされず、レコード長がおかしくなる？未定）
+
+・ＦＴＰについて
+　ＤＴＳにて転送可能。バイナリ転送が基本だが、アスキー変換しながらも
+　転送可能。但し、漢字は変換不可能。
+  転送のパラ－－＞DOCTYPE=BINREC(バイナリ) OR TEXT(アスキ)
+  （ＳＣＦのFTOWSNDを参照 ）
+
+・ＨＯＳＴでのアスキ変換について
+　①漢字をアスキで送りたい場合は、ホストにて、アスキ変換してから
+　　ＦＴＰでバイナリ転送を行う。
+　②ＨＯＳＴでのアスキ変換は、データを可変長に変更し、そしてコンバート
+　　する。
+　　共通ＪＣＬで行う。テストＪＣＬ \ HIDSEND3 LPS.WBS.L9900 
+    LPS.WBS.L9900.JEF を読んで、～.VBL(可変長）にして ～.ASC(変換後）。
+　　～.ASCをＦＴＰにて送る。
+　　通常、バケツのレコード長等の指定も必要。
+　　ＣＯＮＤ＝１０以外はエラーとする。
+　③アスキ変換する時は、ＦＴＰＳが起動されていないと、終了コード＝１２
+　　となってしまう。
+　　富士通のコンソールから、｢　START FTPC,PARM=00　」 でスタート
+　　　　　　　　　　　　　  ｢　STOP  FTPC　　　　  」 でストップ
+・懸案事項
+　①ＨＯＳＴ－→サーバへ取りに行く
+　②ＨＯＳＴでのアスキーー＞ＥＢＣＤＩＣ変換
+　③客先が配信終了－－＞サーバへゼロ件ーー＞ＨＯＳＴへゼロ件
+
+【ＣＳＶ形式のデータについて】
+・6-6-6等 も日付になってしまう
+　2000/01は英語月＋年で表示されるjun-98等 ダブコー「”」を入れてもだめ
+　尚、漢字でも上記になってしまう。
+　よって、住所２で「２０００－１」とかある場合おかしくなるので
+　「'」でくくる事にした。
+・Ｘ項目に数字と「Ｅ」が入っているとへんな表示になる。指数？
+　「Ｅ」は桁あふれのような意味になってしまう？
+・Ｘ項目でも、数字のみだと、左づめになってしまう。
+　また、Ｘ項目でも、数字のみで前ゼロは全てカットされてしまう。
+　当然、９項目でも前ゼロは全てカットされる。
+　「００１２３４」－－＞　「　　１２３４」になる
+・よってＸ項目でおかしくなる可能性がある時は、「'」か、「（　」で
+　くくる事にした。
+  但し「（　」は、括弧内が全て数字だと、「－」に変換されてしまう。
+　例：（０１２３４５）－－－＞　－１２３４５　
+　しかし、（２０００／１０）等はＯＫ
+・㈱、㈲の対応について
+　　ＨＯＳＴで㈱，㈲等はＤＯＳ変換した時、変換不可能である。
+　　よってその対応をＨＯＳＴで行う。                          
+　  ＤＯＳの㈱ はＨＯＳＴに転送されるとＡＤＥＡに、 ㈲ はＡＤＥＢに
+　　コード変換され「■」になる。
+　　よってＨＯＳＴの㈱、㈲のコードのを、上記のコードに変換すればよい。
+
+　　と、思ったがだめだった。 　　                                
+　　㈱は　ＨＯＳＴ－＞７８Ｄ５　　ＪＩＳ－＞８７８Ａ　
+　　㈲は　ＨＯＳＴ－＞７８ＣＦ　　ＪＩＳ－＞８７８Ｂ
+　　酒井
+　　上記㈱㈲酒井をＨＯＳＴにファイル転送したら下記のようになった。
+　　ADEA                                                                           
+　　■　                                                                           
+ 　 ADEB                                                                           
+    ■　                                                                           
+    BCF2B0E6                                                                       
+    酒　井　
+    その後上記ファイルを再度端末に転送したら、黒の四角になって
+　　しまった。このコードはＪＩＳでは、「８１Ａ１」で変換不能時の
+　　コードみたい。（黒四角）
+　　よって現在対応方法なし。
+    よってとりあえず下記の対応をした。
+　　　スタートメニューのプログラムの「ＪＥＦ拡張漢字サポート」を選択し
+　　テンプレート標準を選び、その「；」をはずす。
+　　すると、その行のコードの変換が可能となる。
+　　その後、変換テーブル作成を選択し、テンプレートのファイルを選び
+　　しょりする。
+・桁数が大きくて、その中に数字のみの場合表現不可能になる。
+（指数？。桁あふれのようなかんじ）
+　９（１５）－－＞Ｘ（１５）に送っても全て数字は不可。１１桁迄はＯＫ。
+
+
+●●●　お　し　ま　い　●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+　　　　　∧_∧
+　　　　ミ・.・ミ
+--------ω"-^-"ω-------
+お邪魔しました。
+
+●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●

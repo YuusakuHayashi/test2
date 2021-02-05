@@ -18,6 +18,34 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Public Haraikomisakikouzabangou As String      ' 払込先口座番号
     Public Haraikomikinshubetu As String           ' 払込金種別
 
+
+    ' 2021-02-05 : 追加
+    '-------------------------------------------------------------------------'
+    Private Kouzabangou As String
+
+    Private Ginkoucode As String
+
+    Private Sitencode As String
+    Private JSitencode As String
+
+    Private AZkouzabangou As String
+    Private JZkouzabangou As String
+    Private Akouzabangou As String
+    Private Jkouzabangou As String
+
+    Private Tuchoukigou As String
+    Private AZTuchoukigou As String
+    Private JZTuchoukigou As String
+    Private ATuchoukigou As String
+    Private JTuchoukigou As String
+
+    Private Tuchoubangou As String
+    Private AZTuchoubangou As String
+    Private JZTuchoubangou As String
+    Private ATuchoubangou As String
+    Private JTuchoubangou As String
+    '-------------------------------------------------------------------------'
+
     ' 加工済送付明細のカラムサイズ
     Public SofuMeisaiColumnALength As Double
     Public SofuMeisaiColumnBLength As Double
@@ -173,6 +201,21 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Public ResheetType As String
         Public SourceSheetName As String
 
+        Private _ShubetDictionary As Dictionary(Of String, String)
+        Public Property ShubetDictionary As Dictionary(Of String, String)
+            Get
+                If Me._ShubetDictionary Is Nothing Then
+                    Me._ShubetDictionary = New Dictionary(Of String, String)
+                    Me._ShubetDictionary.Add("1", "普通")
+                    Me._ShubetDictionary.Add("2", "当座")
+                End If
+                Return Me._ShubetDictionary
+            End Get
+            Set(value As Dictionary(Of String, String))
+                Me._ShubetDictionary = value
+            End Set
+        End Property
+
         ' 停止依頼元
         Public SyunoukigyoucodeCell As String             ' 収納企業コード
         Public SyunoukigyoumeiCell As String              ' 収納企業名
@@ -246,14 +289,27 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Public KokyakucodeColumn As String                ' 顧客コード
         Public K_GinkoucodeColumn As String               ' 銀行コード
         Public SitencodeColumn As String                  ' 支店コード
+        Public JSitencodeColumn As String                 ' 支店コード（全角）
         Public K_GinkoumeiColumn As String                ' 銀行名
         Public K_GinkouColumn As String                   ' 銀行名（銀行名から「銀行」などを除いた名称）
         Public SitenmeiColumn As String                   ' 支店名
         Public SitenColumn As String                      ' 支店名（支店名から「支店」を除いた名称）
         Public YokinshubetuColumn As String               ' 預金種別
-        Public KouzabangouColumn As String                ' 口座番号
-        Public TuchoukigouColumn As String                ' 通帳記号
-        Public TuchoubangouColumn As String               ' 通帳番号
+        Public KouzabangouColumn As String                ' 口座番号（旧仕様）
+        Public AZKouzabangouColumn As String              ' 口座番号（半角・ゼロサプレス）
+        Public JZKouzabangouColumn As String              ' 口座番号（全角・ゼロサプレス）
+        Public AKouzabangouColumn As String               ' 口座番号（半角・ゼロ埋め７桁）
+        Public JKouzabangouColumn As String               ' 口座番号（全角・ゼロ埋め７桁）
+        Public TuchoukigouColumn As String                ' 通帳記号（旧仕様）
+        Public AZTuchoukigouColumn As String              ' 通帳記号（半角・ゼロサプレス）
+        Public JZTuchoukigouColumn As String              ' 通帳記号（全角・ゼロサプレス）
+        Public ATuchoukigouColumn As String               ' 通帳記号（半角・ゼロ埋め５桁）
+        Public JTuchoukigouColumn As String               ' 通帳記号（全角・ゼロ埋め５桁）
+        Public TuchoubangouColumn As String               ' 通帳番号（旧仕様）
+        Public AZTuchoubangouColumn As String             ' 通帳番号（半角・ゼロサプレス）
+        Public JZTuchoubangouColumn As String             ' 通帳番号（全角・ゼロサプレス）
+        Public ATuchoubangouColumn As String              ' 通帳番号（半角・ゼロ埋め８桁）
+        Public JTuchoubangouColumn As String              ' 通帳番号（全角・ゼロ埋め８桁）
         Public KouzameigiColumn As String                 ' 口座名義（半角）
         Public JISKouzameigiColumn As String              ' 口座名義（全角）
         Public FurikaekingakuColumn As String             ' 振替金額
@@ -678,14 +734,50 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Return bankname
     End Function
 
-    Private Function _GetTuchoKigouBangou(ByVal kouza As String) As String
+    Private Function GetTuchoKigouBangou() As Integer
+        If Me.Ginkoucode <> "9900" Then
+            Me.Tuchoukigou = vbNullString
+            Me.AZTuchoukigou = vbNullString
+            Me.JZTuchoukigou = vbNullString
+            Me.ATuchoukigou = vbNullString
+            Me.JTuchoukigou = vbNullString
+            Me.Tuchoubangou = vbNullString
+            Me.AZTuchoubangou = vbNullString
+            Me.JZTuchoubangou = vbNullString
+            Me.ATuchoubangou = vbNullString
+            Me.JTuchoubangou = vbNullString
+            Return 0
+        End If
+
         Dim bno As String
         Dim kno As String
-        bno = Strings.Right(kouza, 7)
-        kno = Strings.Replace(kouza, bno, vbNullString,,, CompareMethod.Text)
+        bno = Strings.Right(Me.Kouzabangou, 7)
+        kno = Strings.Replace(Me.Kouzabangou, bno, vbNullString,,, CompareMethod.Text)
         bno &= "1"
         kno = "1" & kno.PadLeft(4, "0")
-        Return (kno & bno)
+
+        Me.Tuchoukigou = kno
+        Me.AZTuchoukigou = kno.TrimStart("0"c)
+        Me.JZTuchoukigou = Strings.StrConv(kno.TrimStart("0"c), VbStrConv.Wide)
+        Me.ATuchoukigou = kno
+        Me.JTuchoukigou = Strings.StrConv(kno, VbStrConv.Wide)
+
+        Me.Tuchoubangou = bno
+        Me.AZTuchoubangou = bno.TrimStart("0"c)
+        Me.JZTuchoubangou = Strings.StrConv(bno.TrimStart("0"c), VbStrConv.Wide)
+        Me.ATuchoubangou = bno
+        Me.JTuchoubangou = Strings.StrConv(bno, VbStrConv.Wide)
+
+        Return 0
+    End Function
+
+    Private Function GetKouzabangou() As Integer
+        Me.AZkouzabangou = Me.Kouzabangou
+        Me.JZkouzabangou = Strings.StrConv(Me.AZkouzabangou, VbStrConv.Wide)
+        Me.Akouzabangou = Me.Kouzabangou.PadLeft(7, "0")
+        Me.Jkouzabangou = Strings.StrConv(Me.Akouzabangou, VbStrConv.Wide)
+
+        Return 0
     End Function
 
     Private Sub _CreateSummaryFile(ByVal otfile As String)
@@ -751,7 +843,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim dstsheetname                                     ' 作成先シート名
         Dim tno, tkno, tbno                                  ' 通帳記号番号関連
         Dim zsc                                              ' 自営信金コード
-        Dim gc, gm, sm                                       ' 銀行コード、銀行名、支店名
+        Dim gm, sm                                           ' 銀行名、支店名
 
         Dim imdcount = 0                                     ' 依頼書の件数
 
@@ -921,7 +1013,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             vs2 = imd.MeisaiString.Split(",")
 
             ' 銀行コード、自営信金コード
-            gc = vs2(7).PadLeft(4, "0")
+            Me.Ginkoucode = vs2(7).PadLeft(4, "0")
             If M_tb Is Nothing Then
                 gm = vs2(9)
                 zsc = vbNullString
@@ -929,16 +1021,15 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                 gm = M_tb.Name
                 zsc = M_tb.ZieiSinkinCode
             End If
+            
+            Me.Sitencode = vs2(8)
+            Me.JSitencode = Strings.StrConv(Me.Sitencode, VbStrConv.Wide)
 
             sm = vs2(10)
-            If gc = "9900" Then
-                tno = _GetTuchoKigouBangou(vs2(12))
-                tkno = Strings.Left(tno, 5)
-                tbno = Strings.Right(tno, 8)
-            Else
-                tkno = vbNullString
-                tbno = vbNullString
-            End If
+
+            Me.Kouzabangou = vs2(12)                                ' 口座番号
+            Dim a As Integer = GetKouzabangou()                     ' 口座番号（全角等）
+            Dim b As Integer = GetTuchoKigouBangou()                ' 通帳記号・番号
             '---------------------------------------------------------------------------'
 
             ' 未使用
@@ -1028,15 +1119,15 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             imd.MeisaiString &= "," & M_iraisho.I_ZieisinkincodeCell                                                                                   ' idx078
             imd.MeisaiString &= "," & M_iraisho.Baitaimei                                                                                              ' idx079 媒体名
             imd.MeisaiString &= "," & M_iraisho.BaitaimeiCell                                                                                          ' idx080
-            imd.MeisaiString &= "," & gc                                                                                                               ' idx081 銀行コード
+            imd.MeisaiString &= "," & Me.Ginkoucode                                                                                                    ' idx081 銀行コード
             imd.MeisaiString &= "," & M_iraisho.T_GinkoucodeCell                                                                                       ' idx082
-            imd.MeisaiString &= "," & gc(0).ToString()                                                                                                 ' idx083 銀行コード（左から１桁目）
+            imd.MeisaiString &= "," & Me.Ginkoucode(0).ToString()                                                                                      ' idx083 銀行コード（左から１桁目）
             imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode1Cell                                                                                      ' idx084
-            imd.MeisaiString &= "," & gc(1).ToString()                                                                                                 ' idx085 銀行コード（左から２桁目）
+            imd.MeisaiString &= "," & Me.Ginkoucode(1).ToString()                                                                                      ' idx085 銀行コード（左から２桁目）
             imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode2Cell                                                                                      ' idx086
-            imd.MeisaiString &= "," & gc(2).ToString()                                                                                                 ' idx087 銀行コード（左から３桁目）
+            imd.MeisaiString &= "," & Me.Ginkoucode(2).ToString()                                                                                      ' idx087 銀行コード（左から３桁目）
             imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode3Cell                                                                                      ' idx088
-            imd.MeisaiString &= "," & gc(3).ToString()                                                                                                 ' idx089 銀行コード（左から４桁目）
+            imd.MeisaiString &= "," & Me.Ginkoucode(3).ToString()                                                                                      ' idx089 銀行コード（左から４桁目）
             imd.MeisaiString &= "," & M_iraisho.T_Ginkoucode4Cell                                                                                      ' idx090
             imd.MeisaiString &= "," & gm                                                                                                               ' idx091 銀行名
             imd.MeisaiString &= "," & M_iraisho.T_GinkoumeiCell                                                                                        ' idx092
@@ -1048,39 +1139,65 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             imd.MeisaiString &= "," & M_iraisho.T_ZieisinkincodeCell                                                                                   ' idx098
             imd.MeisaiString &= "," & vs2(4)                                                                                                           ' idx099 顧客コード
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KokyakucodeColumn), vbNullString, M_iraisho.KokyakucodeColumn & row)          ' idx100
-            imd.MeisaiString &= "," & gc                                                                                                               ' idx101 銀行コード
+            imd.MeisaiString &= "," & Me.Ginkoucode                                                                                                    ' idx101 銀行コード
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkoucodeColumn), vbNullString, M_iraisho.K_GinkoucodeColumn & row)        ' idx102
-            imd.MeisaiString &= "," & vs2(8)                                                                                                           ' idx103 支店コード
+            imd.MeisaiString &= "," & Me.Sitencode                                                                                                     ' idx103 支店コード
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitencodeColumn), vbNullString, M_iraisho.SitencodeColumn & row)              ' idx104
-            imd.MeisaiString &= "," & gm                                                                                                               ' idx105 銀行名
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkoumeiColumn), vbNullString, M_iraisho.K_GinkoumeiColumn & row)          ' idx106
-            imd.MeisaiString &= "," & _GetGinkou(gm)                                                                                                   ' idx107 銀行名（銀行名から「銀行」などを除いた名称）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkouColumn), vbNullString, M_iraisho.K_GinkouColumn & row)                ' idx108
-            imd.MeisaiString &= "," & sm                                                                                                               ' idx109 支店名
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenmeiColumn), vbNullString, M_iraisho.SitenmeiColumn & row)                ' idx110
-            imd.MeisaiString &= "," & sm.Replace("支店", vbNullString)                                                                                 ' idx111 支店名（支店名から「支店」を除いた名称）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenColumn), vbNullString, M_iraisho.SitenColumn & row)                      ' idx112
-            imd.MeisaiString &= "," & vs2(11)                                                                                                          ' idx113 預金種別
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.YokinshubetuColumn), vbNullString, M_iraisho.YokinshubetuColumn & row)        ' idx114
-            imd.MeisaiString &= "," & vs2(12)                                                                                                          ' idx115 口座番号
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzabangouColumn), vbNullString, M_iraisho.KouzabangouColumn & row)          ' idx116
-            imd.MeisaiString &= "," & tkno                                                                                                             ' idx117 通帳記号
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoukigouColumn), vbNullString, M_iraisho.TuchoukigouColumn & row)          ' idx118
-            imd.MeisaiString &= "," & tbno                                                                                                             ' idx119 通帳番号
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoubangouColumn), vbNullString, M_iraisho.TuchoubangouColumn & row)        ' idx120
-            imd.MeisaiString &= "," & vs2(13)                                                                                                          ' idx121 口座名義（半角）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzameigiColumn), vbNullString, M_iraisho.KouzameigiColumn & row)            ' idx122
-            imd.MeisaiString &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)                                                                         ' idx123 口座名義（全角）
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JISKouzameigiColumn), vbNullString, M_iraisho.JISKouzameigiColumn & row)      ' idx124
-            imd.MeisaiString &= "," & vs2(14)                                                                                                          ' idx125 振替金額
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FurikaekingakuColumn), vbNullString, M_iraisho.FurikaekingakuColumn & row)    ' idx126
-            imd.MeisaiString &= "," & M_iraisho.Bikou                                                                                                  ' idx127 備考
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.BikouColumn), vbNullString, M_iraisho.BikouColumn & row)                      ' idx128
-            imd.MeisaiString &= "," & M_iraisho.Tekiyou                                                                                                ' idx129 適用
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TekiyouColumn), vbNullString, M_iraisho.TekiyouColumn & row)                  ' idx130
-            imd.MeisaiString &= "," & M_iraisho.Funoucode                                                                                              ' idx131 不能コード
-            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FunoucodeColumn), vbNullString, M_iraisho.FunoucodeColumn & row)              ' idx132
-            imd.MeisaiString &= "," & vs2(19)                                                                                                          ' idx133 エラーコード
+            imd.MeisaiString &= "," & Me.JSitencode                                                                                                    ' idx105 支店コード（全角）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JSitencodeColumn), vbNullString, M_iraisho.JSitencodeColumn & row)            ' idx106
+            imd.MeisaiString &= "," & gm                                                                                                               ' idx107 銀行名
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkoumeiColumn), vbNullString, M_iraisho.K_GinkoumeiColumn & row)          ' idx108
+            imd.MeisaiString &= "," & _GetGinkou(gm)                                                                                                   ' idx109 銀行名（銀行名から「銀行」などを除いた名称）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.K_GinkouColumn), vbNullString, M_iraisho.K_GinkouColumn & row)                ' idx110
+            imd.MeisaiString &= "," & sm                                                                                                               ' idx111 支店名
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenmeiColumn), vbNullString, M_iraisho.SitenmeiColumn & row)                ' idx112
+            imd.MeisaiString &= "," & sm.Replace("支店", vbNullString)                                                                                 ' idx113 支店名（支店名から「支店」を除いた名称）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.SitenColumn), vbNullString, M_iraisho.SitenColumn & row)                      ' idx114
+            imd.MeisaiString &= "," & M_iraisho.ShubetDictionary(vs2(11))                                                                              ' idx115 預金種別
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.YokinshubetuColumn), vbNullString, M_iraisho.YokinshubetuColumn & row)        ' idx116
+            imd.MeisaiString &= "," & Me.Kouzabangou                                                                                                   ' idx117 口座番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzabangouColumn), vbNullString, M_iraisho.KouzabangouColumn & row)          ' idx118
+            imd.MeisaiString &= "," & Me.AZKouzabangou                                                                                                 ' idx119 口座番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.AZKouzabangouColumn), vbNullString, M_iraisho.AZKouzabangouColumn & row)      ' idx120
+            imd.MeisaiString &= "," & Me.JZKouzabangou                                                                                                 ' idx121 口座番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JZKouzabangouColumn), vbNullString, M_iraisho.JZKouzabangouColumn & row)      ' idx122
+            imd.MeisaiString &= "," & Me.AKouzabangou                                                                                                  ' idx123 口座番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.AKouzabangouColumn), vbNullString, M_iraisho.AKouzabangouColumn & row)        ' idx124
+            imd.MeisaiString &= "," & Me.JKouzabangou                                                                                                  ' idx125 口座番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JKouzabangouColumn), vbNullString, M_iraisho.JKouzabangouColumn & row)        ' idx126
+            imd.MeisaiString &= "," & Me.Tuchoukigou                                                                                                   ' idx127 通帳記号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoukigouColumn), vbNullString, M_iraisho.TuchoukigouColumn & row)          ' idx128
+            imd.MeisaiString &= "," & Me.AZTuchoukigou                                                                                                 ' idx129 通帳記号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.AZTuchoukigouColumn), vbNullString, M_iraisho.AZTuchoukigouColumn & row)      ' idx130
+            imd.MeisaiString &= "," & Me.JZTuchoukigou                                                                                                 ' idx131 通帳記号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JZTuchoukigouColumn), vbNullString, M_iraisho.JZTuchoukigouColumn & row)      ' idx132
+            imd.MeisaiString &= "," & Me.ATuchoukigou                                                                                                  ' idx133 通帳記号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.ATuchoukigouColumn), vbNullString, M_iraisho.ATuchoukigouColumn & row)        ' idx134
+            imd.MeisaiString &= "," & Me.JTuchoukigou                                                                                                  ' idx135 通帳記号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JTuchoukigouColumn), vbNullString, M_iraisho.JTuchoukigouColumn & row)        ' idx136
+            imd.MeisaiString &= "," & Me.Tuchoubangou                                                                                                  ' idx137 通帳番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoubangouColumn), vbNullString, M_iraisho.TuchoubangouColumn & row)        ' idx138
+            imd.MeisaiString &= "," & Me.AZTuchoubangou                                                                                                ' idx139 通帳番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.AZTuchoubangouColumn), vbNullString, M_iraisho.AZTuchoubangouColumn & row)    ' idx140
+            imd.MeisaiString &= "," & Me.JZTuchoubangou                                                                                                ' idx141 通帳番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JZTuchoubangouColumn), vbNullString, M_iraisho.JZTuchoubangouColumn & row)    ' idx142
+            imd.MeisaiString &= "," & Me.ATuchoubangou                                                                                                 ' idx143 通帳番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.ATuchoubangouColumn), vbNullString, M_iraisho.ATuchoubangouColumn & row)      ' idx144
+            imd.MeisaiString &= "," & Me.JTuchoubangou                                                                                                 ' idx145 通帳番号
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JTuchoubangouColumn), vbNullString, M_iraisho.JTuchoubangouColumn & row)      ' idx146
+            imd.MeisaiString &= "," & vs2(13)                                                                                                          ' idx147 口座名義（半角）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzameigiColumn), vbNullString, M_iraisho.KouzameigiColumn & row)            ' idx148
+            imd.MeisaiString &= "," & Strings.StrConv(vs2(13), VbStrConv.Wide)                                                                         ' idx149 口座名義（全角）
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JISKouzameigiColumn), vbNullString, M_iraisho.JISKouzameigiColumn & row)      ' idx150
+            imd.MeisaiString &= "," & vs2(14)                                                                                                          ' idx151 振替金額
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FurikaekingakuColumn), vbNullString, M_iraisho.FurikaekingakuColumn & row)    ' idx152
+            imd.MeisaiString &= "," & M_iraisho.Bikou                                                                                                  ' idx153 備考
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.BikouColumn), vbNullString, M_iraisho.BikouColumn & row)                      ' idx154
+            imd.MeisaiString &= "," & M_iraisho.Tekiyou                                                                                                ' idx155 適用
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TekiyouColumn), vbNullString, M_iraisho.TekiyouColumn & row)                  ' idx156
+            imd.MeisaiString &= "," & M_iraisho.Funoucode                                                                                              ' idx157 不能コード
+            imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.FunoucodeColumn), vbNullString, M_iraisho.FunoucodeColumn & row)              ' idx158
+            imd.MeisaiString &= "," & vs2(19)                                                                                                          ' idx159 エラーコード
 
             sw.WriteLine(imd.MeisaiString)
             zimd = imd
@@ -1153,7 +1270,8 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                 tv(4) = tv(4).TrimStart("0")
                 tv(4) = tv(4).PadLeft(8, "0")
                 tv(13) = tv(13).Trim
-                tv(13) = tv(13).Replace(" ", vbNullString)
+                'tv(13) = tv(13).Replace(" ", vbNullString)
+                'tv(13) = tv(13).Replace(" ", vbNullString)
                 tv(14) = tv(14).Trim
                 tv(14) = tv(14).Replace(" ", vbNullString)
 

@@ -76,9 +76,6 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
     Private _ReleaseBasDirectory As String
     Public Property ReleaseBasDirectory As String
         Get
-            If String.IsNullOrEmpty(Me._ReleaseBasDirectory) Then
-                Me._ReleaseBasDirectory = vbNullString
-            End If
             Return Me._ReleaseBasDirectory
         End Get
         Set(value As String)
