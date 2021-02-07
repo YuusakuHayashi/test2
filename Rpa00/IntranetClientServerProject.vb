@@ -6,7 +6,7 @@ Imports Newtonsoft.Json.Linq
 Imports System.Windows.Forms
 Imports System.ComponentModel
 
-'Public Class RpaProject : Inherits RpaCui.JsonHandler(Of RpaProject)
+'Public Class RpaProject : Inherits Rpa00.JsonHandler(Of RpaProject)
 Public Class IntranetClientServerProject
     Inherits RpaProjectBase(Of IntranetClientServerProject)
 
@@ -191,7 +191,6 @@ Public Class IntranetClientServerProject
         End Get
     End Property
 
-    ' このファイルがRootRobotになければ、AttachRobotすることができない
     <JsonIgnore>
     Public ReadOnly Property RootRobotReadMeFileName As String
         Get
@@ -245,7 +244,7 @@ Public Class IntranetClientServerProject
     Public ReadOnly Property RootRobotsUpdateFile As String
         Get
             Dim fil As String = vbNullString
-            Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+            Dim jh As New Rpa00.JsonHandler(Of List(Of RpaUpdater))
             If Not String.IsNullOrEmpty(Me.RootDirectory) Then
                 fil = $"{Me.RootDirectory}\robotsupdate"
                 If Not File.Exists(fil) Then
@@ -312,7 +311,7 @@ Public Class IntranetClientServerProject
     <JsonIgnore>
     Public ReadOnly Property SystemRobotsUpdateFile As String
         Get
-            Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+            Dim jh As New Rpa00.JsonHandler(Of List(Of RpaUpdater))
             Dim fil As String = $"{RpaCui.SystemDirectory}\robotsupdate"
             If Not File.Exists(fil) Then
                 Call jh.Save(fil, (New List(Of RpaUpdater)))
@@ -366,7 +365,7 @@ Public Class IntranetClientServerProject
     Private Async Sub _CheckUpdateAvailable()
         Dim t As Task = Task.Run(
             Sub()
-                Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
+                Dim jh As New Rpa00.JsonHandler(Of RpaUpdater)
                 Do
                     Dim robots As List(Of String) = Me.RobotAliasDictionary.Keys.ToList()
                     Dim utils As List(Of String) = Me.SystemUtilities.Keys.ToList()

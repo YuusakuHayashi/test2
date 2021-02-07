@@ -8,14 +8,14 @@ Public Class HelpCommand : Inherits RpaCommandBase
 
     Private ReadOnly Property Navigater As String
         Get
-            Dim pstr As String = $"p. {Me.Page.ToString}"
+            Dim pstr As String = $"p. {Me.Page.ToString}/{Me.LastPage}"
             Dim pstrlen As Integer = pstr.Length
             Dim bstr As String = IIf(Me.Page = Me.BeginPage, "    ", "  <<")
             Dim bstrlen As Integer = bstr.Length
             Dim fstr As String = IIf(Me.Page = Me.LastPage, "END ", ">> ")
             Dim fstrlen As Integer = fstr.Length
 
-            Dim spclen As Integer = Console.WindowWidth - (pstrlen + bstrlen + fstrlen)
+            Dim spclen As Integer = (Console.WindowWidth - 1) - (pstrlen + bstrlen + fstrlen)
             Dim lspclen As Integer = 0
             Dim rspclen As Integer = 0
 
@@ -42,6 +42,7 @@ Public Class HelpCommand : Inherits RpaCommandBase
                 Me._ForwardChars.Add(ConsoleKey.PageDown)
                 Me._ForwardChars.Add(ConsoleKey.Enter)
                 Me._ForwardChars.Add(ConsoleKey.Add)
+                Me._ForwardChars.Add(ConsoleKey.DownArrow)
             End If
             Return Me._ForwardChars
         End Get
@@ -56,9 +57,32 @@ Public Class HelpCommand : Inherits RpaCommandBase
                 Me._BackChars.Add(ConsoleKey.H)
                 Me._BackChars.Add(ConsoleKey.PageUp)
                 Me._BackChars.Add(ConsoleKey.Backspace)
-                Me._ForwardChars.Add(ConsoleKey.Subtract)
+                Me._BackChars.Add(ConsoleKey.Subtract)
+                Me._BackChars.Add(ConsoleKey.UpArrow)
             End If
             Return Me._BackChars
+        End Get
+    End Property
+
+    Private _EndChars As List(Of ConsoleKey)
+    Private ReadOnly Property EndChars As List(Of ConsoleKey)
+        Get
+            If Me._EndChars Is Nothing Then
+                Me._EndChars = New List(Of ConsoleKey)
+                Me._EndChars.Add(ConsoleKey.End)
+            End If
+            Return Me._EndChars
+        End Get
+    End Property
+
+    Private _TopChars As List(Of ConsoleKey)
+    Private ReadOnly Property TopChars As List(Of ConsoleKey)
+        Get
+            If Me._TopChars Is Nothing Then
+                Me._TopChars = New List(Of ConsoleKey)
+                Me._TopChars.Add(ConsoleKey.Home)
+            End If
+            Return Me._TopChars
         End Get
     End Property
 
@@ -115,6 +139,26 @@ Public Class HelpCommand : Inherits RpaCommandBase
         End Set
     End Property
 
+    Private _OldHeight As Integer
+    Private Property OldHeight As Integer
+        Get
+            Return Me._OldHeight
+        End Get
+        Set(value As Integer)
+            Me._OldHeight = value
+        End Set
+    End Property
+
+    Private _OldWidth As Integer
+    Private Property OldWidth As Integer
+        Get
+            Return Me._OldWidth
+        End Get
+        Set(value As Integer)
+            Me._OldWidth = value
+        End Set
+    End Property
+
     Private _CurrentLine As String
     Private Property CurrentLine As String
         Get
@@ -122,16 +166,6 @@ Public Class HelpCommand : Inherits RpaCommandBase
         End Get
         Set(value As String)
             Me._CurrentLine = value
-        End Set
-    End Property
-
-    Private _CurrentLineCount As Integer
-    Private Property CurrentLineCount As Integer
-        Get
-            Return Me._CurrentLineCount
-        End Get
-        Set(value As Integer)
-            Me._CurrentLineCount = value
         End Set
     End Property
 
@@ -170,16 +204,6 @@ Public Class HelpCommand : Inherits RpaCommandBase
         End Set
     End Property
 
-    Private _ExitFlag As Boolean
-    Private Property ExitFlag As Boolean
-        Get
-            Return Me._ExitFlag
-        End Get
-        Set(value As Boolean)
-            Me._ExitFlag = value
-        End Set
-    End Property
-
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim hs As List(Of String) = Directory.GetFiles(RpaCui.SystemDllDirectory).ToList
         Me.Helps = hs.FindAll(
@@ -194,19 +218,19 @@ Public Class HelpCommand : Inherits RpaCommandBase
         Me.Helps.Add("終了する")
 
         Do
-            Console.WriteLine($"id  ファイル名")
-            Console.WriteLine($"______________________________________________________________________")
+            Console.WriteLine($" ID  | ファイル名")
+            Console.WriteLine($"-----+----------------------------------------------------------------")
             For Each help In Me.Helps
-                Dim idxno As String = String.Format("{0, 3}", Me.Helps.IndexOf(help))
+                Dim idxno As String = String.Format("{0, 4}", Me.Helps.IndexOf(help))
                 Dim helpname As String = Path.GetFileName(help)
-                Console.WriteLine($"{idxno} {helpname}")
+                Console.WriteLine($"{idxno} | {helpname}")
             Next
             Console.WriteLine()
 
             Dim idx As Integer = -1
             Do
                 idx = -1
-                Console.WriteLine($"確認したいヘルプの 'id' を指定してください")
+                Console.WriteLine($"確認したいヘルプの 'ID' を指定してください")
                 Dim idxstr As String = dat.Transaction.ShowRpaIndicator(dat)
                 Console.WriteLine()
 
@@ -236,33 +260,48 @@ Public Class HelpCommand : Inherits RpaCommandBase
     End Function
 
     Private Function Read(ByRef dat As RpaDataWrapper) As Integer
-        Me.Buffers = Nothing
         Me.BufferIndex = 0
-        Me.Reader = New StreamReader(Me.HelpFile, Text.Encoding.GetEncoding(RpaModule.DEFUALTENCODING))
 
-        Dim i As Integer = ReadBuffers()
-
-        Call Console.Clear()
-        Dim j As Integer = GoForward()
         Do
-            Dim k As ConsoleKey = GetPageNavigationKey()
+            Me.OldHeight = Console.WindowHeight
+            Me.OldWidth = Console.WindowWidth
+
+            Me.Buffers = Nothing
+            Me.Reader = New StreamReader(Me.HelpFile, Text.Encoding.GetEncoding(RpaModule.DEFUALTENCODING))
+
+            Dim i As Integer = ReadBuffers()
+            Do
+                If (Me.Page < Me.BeginPage) Or (Me.Page > Me.LastPage) Or (Console.WindowHeight <> Me.OldHeight) Or (Console.WindowWidth <> Me.OldWidth) Then
+                    Exit Do
+                End If
+
+                Call Console.Clear()
+                Console.WriteLine(Me.Buffers(Me.BufferIndex))
+
+                Dim k As ConsoleKey = GetPageNavigationKey()
+
+                If Me.ForwardChars.Contains(k) Then
+                    Dim h As Integer = GoForward()
+                End If
+                If Me.BackChars.Contains(k) Then
+                    Dim h As Integer = GoBack()
+                End If
+                If Me.TopChars.Contains(k) Then
+                    Dim h As Integer = GoTop()
+                End If
+                If Me.EndChars.Contains(k) Then
+                    Dim h As Integer = GoEnd()
+                End If
+            Loop Until False
 
             Call Console.Clear()
+            Me.Reader.Close()
+            Me.Reader.Dispose()
 
-            If Me.ForwardChars.Contains(k) Then
-                Dim h As Integer = GoForward()
-            End If
-            If Me.BackChars.Contains(k) Then
-                Dim h As Integer = GoBack()
-            End If
-
-            If Me.ExitFlag Then
+            If (Me.Page < Me.BeginPage) Or (Me.Page > Me.LastPage) Then
                 Exit Do
             End If
         Loop Until False
-
-        Me.Reader.Close()
-        Me.Reader.Dispose()
 
         Return 0
     End Function
@@ -271,11 +310,16 @@ Public Class HelpCommand : Inherits RpaCommandBase
         Dim k As ConsoleKeyInfo
         Do
             k = Nothing
+
             Console.WriteLine(Me.Navigater)
             k = Console.ReadKey(True)
-            If Me.ForwardChars.Contains(k.Key) Or Me.BackChars.Contains(k.Key) Then
+
+            If Me.ForwardChars.Contains(k.Key) Or Me.BackChars.Contains(k.Key) Or Me.TopChars.Contains(k.Key) Or Me.EndChars.Contains(k.Key) Then
                 Exit Do
             End If
+
+            Call Console.Clear()
+            Console.WriteLine(Me.Buffers(Me.BufferIndex))
         Loop Until False
 
         Return k.Key
@@ -308,20 +352,28 @@ Public Class HelpCommand : Inherits RpaCommandBase
 
         Loop Until False
 
-        Me.LastPage = Me.Buffers.Count + 1
+        Me.LastPage = Me.Buffers.Count
 
         Return 0
     End Function
 
     Private Function GoForward() As Integer
         Me.BufferIndex += 1
-        Console.WriteLine(Me.Buffers(Me.BufferIndex))
         Return 0
     End Function
 
     Private Function GoBack() As Integer
         Me.BufferIndex -= 1
-        Console.WriteLine(Me.Buffers(Me.BufferIndex))
+        Return 0
+    End Function
+
+    Private Function GoTop() As Integer
+        Me.BufferIndex = 0
+        Return 0
+    End Function
+
+    Private Function GoEnd() As Integer
+        Me.BufferIndex = Me.Buffers.IndexOf(Me.Buffers.Last)
         Return 0
     End Function
 

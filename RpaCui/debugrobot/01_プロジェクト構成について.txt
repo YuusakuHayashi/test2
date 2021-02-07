@@ -1,0 +1,13 @@
+
+          プロジェクト構成について (2021/02/05 現在)
+
+・プロジェクトには３種類の構成があります
+  1. IntranetClientServerProject 構成
+  2. ClientServerProject 構成
+  3. StandAloneProject 構成
+
+  ※ 現在、ClientServerProject 構成、StandAloneProject 構成はクラス自体は存在するものの、
+     全く実装されていない状態です。使用可能なのは、IntranetClientServerProject 構成のみです。
+
+・IntranetClientServerProject 構成について
+  信頼されたネットワーク上において、あるフォルダーをルートリポジトリフォルダーと見なし、

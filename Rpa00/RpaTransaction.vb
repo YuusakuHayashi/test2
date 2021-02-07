@@ -3,7 +3,7 @@ Public Class RpaTransaction
     Public ReadOnly Property CommandTextLogFileName As String
         Get
             Dim [fil] As String = $"{RpaCui.SystemDirectory}\command.log"
-            Dim jh As New RpaCui.JsonHandler(Of List(Of CommandLogData))
+            Dim jh As New Rpa00.JsonHandler(Of List(Of CommandLogData))
             If Not File.Exists([fil]) Then
                 Call jh.Save(Of List(Of CommandLogData))([fil], (New List(Of CommandLogData)))
             End If

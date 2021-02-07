@@ -27,7 +27,7 @@ Public Class ExitCommand : Inherits RpaCommandBase
             Return 0
         End If
 
-        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim jh As New Rpa00.JsonHandler(Of List(Of RpaUpdater))
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
         Dim uru As RpaUpdater
         rrus.Sort(

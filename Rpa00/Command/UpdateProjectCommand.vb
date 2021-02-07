@@ -66,7 +66,7 @@ Public Class UpdateProjectCommand : Inherits RpaCommandBase
     ' IDを指定したアップデート
     ' 自動アップデートなどで使用
     Private Function SelectedUpdate(ByRef dat As RpaDataWrapper) As Integer
-        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim jh As New Rpa00.JsonHandler(Of List(Of RpaUpdater))
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
 
         If rrus.Count = 0 Then
@@ -143,7 +143,7 @@ Public Class UpdateProjectCommand : Inherits RpaCommandBase
         Dim utils As List(Of String) = udic.Keys.ToList()
 
         Dim robotname As String = dat.Project.RobotName
-        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim jh As New Rpa00.JsonHandler(Of List(Of RpaUpdater))
         Dim rrus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.RootRobotsUpdateFile)
         Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
 
@@ -221,7 +221,7 @@ Public Class UpdateProjectCommand : Inherits RpaCommandBase
 
     ' インタラクティブモードから特定時点のアップデートを適用
     Private Function PointUpdate(ByRef dat As Object) As Integer
-        Dim jh As New RpaCui.JsonHandler(Of RpaUpdater)
+        Dim jh As New Rpa00.JsonHandler(Of RpaUpdater)
 
         Dim rdic As Dictionary(Of String, String) = dat.Project.RobotAliasDictionary
         Dim udic As Dictionary(Of String, IntranetClientServerProject.RpaUtility) = dat.Project.SystemUtilities

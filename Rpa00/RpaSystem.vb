@@ -1,6 +1,22 @@
 ﻿Imports System.IO
 
 Public Class RpaSystem
+
+    Public Enum ExecuteModeNumber
+        RpaCui = 0
+        RpaGui = 1
+    End Enum
+
+    Private _ExecuteMode As Integer
+    Public Property ExecuteMode As Integer
+        Get
+            Return Me._ExecuteMode
+        End Get
+        Set(value As Integer)
+            Me._ExecuteMode = value
+        End Set
+    End Property
+
     ' 自動
     Private _LateExitFlag As Boolean
     Private Property LateExitFlag As Boolean
@@ -9,6 +25,17 @@ Public Class RpaSystem
         End Get
         Set(value As Boolean)
             Me._LateExitFlag = value
+        End Set
+    End Property
+
+    ' Ｇｕｉ起動コマンド
+    Private _GuiCommandText As String
+    Public Property GuiCommandText As String
+        Get
+            Return Me._GuiCommandText
+        End Get
+        Set(value As String)
+            Me._GuiCommandText = value
         End Set
     End Property
 
@@ -52,6 +79,19 @@ Public Class RpaSystem
         End Get
         Set(value As List(Of String))
             Me._LateBindingCommands = value
+        End Set
+    End Property
+
+    Private _ChainBindingCommands As List(Of String)
+    Private Property ChainBindingCommands As List(Of String)
+        Get
+            If Me._ChainBindingCommands Is Nothing Then
+                Me._ChainBindingCommands = New List(Of String)
+            End If
+            Return Me._ChainBindingCommands
+        End Get
+        Set(value As List(Of String))
+            Me._ChainBindingCommands = value
         End Set
     End Property
 
@@ -134,6 +174,8 @@ Public Class RpaSystem
                 Me._CommandDictionary.Add("pushrobot", (New PushRobotCommand))
                 Me._CommandDictionary.Add("showrobotreadme", (New ShowRobotReadMeCommand))
                 Me._CommandDictionary.Add("help", (New HelpCommand))
+                Me._CommandDictionary.Add("selectmydirectory", (New SelectMyDirectoryCommand))
+                Me._CommandDictionary.Add("addalias", (New AddAliasCommand))
             End If
             Return Me._CommandDictionary
         End Get
@@ -162,6 +204,17 @@ Public Class RpaSystem
     End Function
     '---------------------------------------------------------------------------------------------'
 
+    Private Function CheckAlias(dat As RpaDataWrapper) As Integer
+        Dim [key] As String = dat.Transaction.CommandText
+        Dim [keys] As List(Of String) = dat.Initializer.AliasDictionary.Keys.ToList
+
+        If [keys].Contains([key]) Then
+            dat.Transaction.CommandText = dat.Initializer.AliasDictionary([key])
+        End If
+
+        Return 0
+    End Function
+
     ' 1. Transaction.MainCommand の更新
     Private Function CheckMainCommand(ByRef dat As RpaDataWrapper) As Integer
         Dim texts() As String
@@ -173,30 +226,48 @@ Public Class RpaSystem
         Return 0
     End Function
 
-    ' 2. Transaction.TrueCommand の更新
+    ' 2. Alias変換 (Transaction.TrueCommand の更新)
     Private Function CheckTrueCommand(dat As RpaDataWrapper) As Integer
         dat.Transaction.TrueCommand = vbNullString
-        Dim [alias] = dat.Initializer.MyCommandDictionary.Where(
-            Function(pair)
-                If pair.Value.Alias = dat.Transaction.MainCommand Then
-                    Return True
-                Else
-                    Return False
-                End If
-            End Function
-        )
 
-        If Not String.IsNullOrEmpty([alias](0).Key) Then
-            dat.Transaction.TrueCommand = [alias](0).Key
-        Else
+        Dim [key] As String = dat.Transaction.CommandText
+        Dim [keys] As List(Of String) = dat.Initializer.MyCommandDictionary.Keys.ToList
+
+        ' 初期値
+        dat.Transaction.TrueCommand = dat.Transaction.MainCommand
+
+        If [keys].Contains([key]) Then
+            If dat.Initializer.MyCommandDictionary([key]).IsEnabled Then
+                dat.Transaction.TrueCommand = dat.Initializer.MyCommandDictionary([key]).TrueCommand
+            End If
+        End If
+
+        ' 自動コマンドの場合、正式名称をセットする
+        If dat.Transaction.IsAutoCommand Then
             dat.Transaction.TrueCommand = dat.Transaction.MainCommand
         End If
+
+        'Dim [alias] = dat.Initializer.MyCommandDictionary.Where(
+        '    Function(pair)
+        '        If pair.Value.Alias = dat.Transaction.MainCommand Then
+        '            Return True
+        '        Else
+        '            Return False
+        '        End If
+        '    End Function
+        ')
+
+        'If Not String.IsNullOrEmpty([alias](0).Key) Then
+        '    dat.Transaction.TrueCommand = [alias](0).Key
+        'Else
+        '    dat.Transaction.TrueCommand = dat.Transaction.MainCommand
+        'End If
 
         Return 0
     End Function
 
     ' 3. Transaction.UtilityCommand の更新
-    ' UtilityCommand の場合、 Transaction.TrueCommand も更新する
+    ' UtilityCommand の場合、 Transaction.TrueCommand も再更新する
     Private Function CheckUtilityCommand(dat As RpaDataWrapper) As Integer
         dat.Transaction.UtilityCommand = vbNullString
 
@@ -243,6 +314,27 @@ Public Class RpaSystem
             dat.Transaction.ParametersText _
                 = dat.Transaction.ParametersText.TrimEnd(" ")
         End If
+        Return 0
+    End Function
+
+    Private Function CheckChainBindingCommand(dat As RpaDataWrapper) As Integer
+        If Me.ChainBindingCommands.Count > 0 Then
+            Return 0
+        End If
+
+        Dim cmds As List(Of String) = dat.Transaction.CommandText.Split("&"c).ToList
+        If cmds.Count <= 1 Then
+            Return 0
+        End If
+
+        ' List(Of String).ForEachメソッドが機能しない・・・
+        For Each cmd In cmds
+            cmd = cmd.Trim
+            Me.ChainBindingCommands.Add(cmd)
+        Next
+
+        dat.Transaction.CommandText = cmds(0)
+        Me.ChainBindingCommands = RpaModule.Pop(Of List(Of String))(Me.ChainBindingCommands)
         Return 0
     End Function
 
@@ -322,14 +414,6 @@ Public Class RpaSystem
             Call CuiLoop(dat)
         Loop Until dat.Transaction.ExitFlag
 
-        '' アップデートチェック
-        ''-----------------------------------------------------------------------------------------'
-        'Dim j As Integer
-        'If dat.Project.SystemArchTypeName = (New IntranetClientServerProject).GetType.Name Then
-        '    j = UpdateCheck(dat)
-        'End If
-        ''-----------------------------------------------------------------------------------------'
-
         ' プロジェクトセーブ
         '-----------------------------------------------------------------------------------------'
         If dat.Project IsNot Nothing Then
@@ -383,7 +467,7 @@ Public Class RpaSystem
 
         Me.IsUpdatedBindingCommandsCreated = True
 
-        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim jh As New Rpa00.JsonHandler(Of List(Of RpaUpdater))
         Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
         Dim srus2 As List(Of RpaUpdater)
         srus2 = srus.FindAll(
@@ -417,7 +501,7 @@ Public Class RpaSystem
     End Function
 
     Private Function CompleteUpdate(ByRef dat As RpaDataWrapper) As Integer
-        Dim jh As New RpaCui.JsonHandler(Of List(Of RpaUpdater))
+        Dim jh As New Rpa00.JsonHandler(Of List(Of RpaUpdater))
         Dim srus As List(Of RpaUpdater) = jh.Load(Of List(Of RpaUpdater))(dat.Project.SystemRobotsUpdateFile)
         srus.Sort(
             Function(before, after)
@@ -434,7 +518,8 @@ Public Class RpaSystem
         Return 0
     End Function
 
-    Private Sub CuiLoop(ByRef dat As RpaDataWrapper)
+    ' Gui対応の為、Publicプロシージャに変更
+    Public Sub CuiLoop(ByRef dat As RpaDataWrapper)
         Dim cmdlog As RpaTransaction.CommandLogData = Nothing
         Const RESULT_S As String = "Success"
         Const RESULT_F As String = "Failed"
@@ -443,6 +528,7 @@ Public Class RpaSystem
         Dim latecmdflag As Boolean = False
         Try
             Dim autocmdflag As Boolean = False
+            dat.Transaction.IsAutoCommand = False
 
             ' 一度のみ実行
             If Not Me.IsUpdatedBindingCommandsCreated Then
@@ -450,12 +536,14 @@ Public Class RpaSystem
             End If
 
             If Me.LateBindingCommands.Count > 0 Then
+                dat.Transaction.IsAutoCommand = True
                 autocmdflag = True
                 latecmdflag = True
                 dat.Transaction.CommandText = Me.LateBindingCommands(0)
                 Me.LateBindingCommands = RpaModule.Pop(Of List(Of String))(Me.LateBindingCommands)
             ElseIf Me.FastBindingCommands.Count > 0 Then
                 Console.WriteLine($"更新プログラムを実行中・・・")
+                dat.Transaction.IsAutoCommand = True
                 autocmdflag = True
                 fastcmdflag = True
                 If Not IsFastBindingCommandsExecuted Then
@@ -463,9 +551,19 @@ Public Class RpaSystem
                 End If
                 dat.Transaction.CommandText = Me.FastBindingCommands(0)
                 Me.FastBindingCommands = RpaModule.Pop(Of List(Of String))(Me.FastBindingCommands)
+            ElseIf Me.ChainBindingCommands.Count > 0 Then
+                dat.Transaction.CommandText = Me.ChainBindingCommands(0)
+                Me.ChainBindingCommands = RpaModule.Pop(Of List(Of String))(Me.ChainBindingCommands)
+            ElseIf Me.ExecuteMode = ExecuteModeNumber.RpaGui Then
+                dat.Transaction.CommandText = Me.GuiCommandText
             Else
                 dat.Transaction.CommandText = dat.Transaction.ShowRpaIndicator(dat)
             End If
+
+            ' コマンドチェーンのチェック
+            Dim b As Integer = CheckChainBindingCommand(dat)
+
+            Dim c As Integer = CheckAlias(dat)
 
             cmdlog = New RpaTransaction.CommandLogData With {
                 .UserName = dat.Initializer.UserName,
@@ -578,7 +676,7 @@ Public Class RpaSystem
             If dat.Transaction.ExitFlag Then
                 Me.LateExitFlag = True
             End If
-            If Me.LateExitFlag And Me.FastBindingCommands.Count = 0 And Me.LateBindingCommands.Count = 0 Then
+            If Me.LateExitFlag And Me.FastBindingCommands.Count = 0 And Me.LateBindingCommands.Count = 0 And Me.ChainBindingCommands.Count = 0 Then
                 dat.Transaction.ExitFlag = True
             Else
                 dat.Transaction.ExitFlag = False

@@ -1,0 +1,14 @@
+C:\Users\yuusa\project\test2\GuiRunner\bin\Debug\GuiRunner.dll
+C:\Users\yuusa\project\test2\GuiRunner\bin\Debug\GuiRunner.pdb
+C:\Users\yuusa\project\test2\GuiRunner\bin\Debug\GuiRunner.xml
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner.g.vb
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner_MarkupCompile.cache
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner_MarkupCompile.lref
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner.baml
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner.g.resources
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner.Resources.resources
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\RpaGui00.vbproj.GenerateResource.cache
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\RpaGui00.vbproj.CoreCompileInputs.cache
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner.dll
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner.xml
+C:\Users\yuusa\project\test2\GuiRunner\obj\Debug\GuiRunner.pdb

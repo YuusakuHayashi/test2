@@ -91,15 +91,16 @@ Public Module RpaCui
                 For Each src In srcs2
                     srcs3.Add(Path.GetFileName(src))
                 Next
-                Dim subs As List(Of String) = dsts.FindAll(Function(d)
-                                                               Dim b As Boolean = False
-                                                               If Path.GetExtension(d) = ".dll" Then
-                                                                   If Not srcs3.Contains(Path.GetFileName(d)) Then
-                                                                       b = True
-                                                                   End If
-                                                               End If
-                                                               Return b
-                                                           End Function)
+                Dim subs As List(Of String)
+                subs = dsts.FindAll(Function(d)
+                                        Dim b As Boolean = False
+                                        If Path.GetExtension(d) = ".dll" Then
+                                            If Not srcs3.Contains(Path.GetFileName(d)) Then
+                                                b = True
+                                            End If
+                                        End If
+                                        Return b
+                                    End Function)
                 For Each [sub] In subs
                     Console.WriteLine($"特定時点へのアップグレード／ダウングレードを適用しています... Delete --> {[sub]}")
                     File.Delete([sub])

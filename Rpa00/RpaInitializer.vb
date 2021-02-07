@@ -4,7 +4,7 @@ Imports Newtonsoft.Json.Linq
 Imports System.ComponentModel
 
 Public Class RpaInitializer
-    Inherits RpaCui.JsonHandler(Of RpaInitializer)
+    Inherits Rpa00.JsonHandler(Of RpaInitializer)
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
@@ -14,13 +14,6 @@ Public Class RpaInitializer
             Me, New PropertyChangedEventArgs(PropertyName)
         )
     End Sub
-
-    '<JsonIgnore>
-    'Public Shared ReadOnly Property SystemIniFileName As String
-    '    Get
-    '        Return $"{RpaCui.SystemDirectory}\rpa.ini"
-    '    End Get
-    'End Property
 
     Private _ProcessId As Integer
     <JsonIgnore>
@@ -170,10 +163,20 @@ Public Class RpaInitializer
         End Get
     End Property
 
+    Private _AliasDictionary As Dictionary(Of String, String)
+    Public Property AliasDictionary As Dictionary(Of String, String)
+        Get
+            If Me._AliasDictionary Is Nothing Then
+                Me._AliasDictionary = New Dictionary(Of String, String)
+            End If
+            Return Me._AliasDictionary
+        End Get
+        Set(value As Dictionary(Of String, String))
+            Me._AliasDictionary = value
+        End Set
+    End Property
 
     Private _MyCommandDictionary As Dictionary(Of String, MyCommand)
-
-
     Public Property MyCommandDictionary As Dictionary(Of String, MyCommand)
         Get
             If Me._MyCommandDictionary Is Nothing Then
@@ -187,20 +190,9 @@ Public Class RpaInitializer
     End Property
 
     Public Class MyCommand
-        Public [Alias] As String
+        Public TrueCommand As String
         Public IsEnabled As Boolean
     End Class
-
-    'Public Function BeginTransaction()
-    '    Call Save(RpaInitializer.SystemIniTempFileName, Me)
-    '    Return Me
-    'End Function
-
-    'Public Function TransactionRollBack() As RpaInitializer
-    '    Dim ini = Load(RpaInitializer.SystemIniTempFileName)
-    '    File.Delete(RpaInitializer.SystemIniTempFileName)
-    '    Return ini
-    'End Function
 
     Private Sub CreateChangedFile(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If Me.FirstLoad Then

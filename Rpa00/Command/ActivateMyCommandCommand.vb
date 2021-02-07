@@ -2,20 +2,12 @@
 
 Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        For Each [key] In dat.Transaction.Parameters
-            If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
-                dat.Initializer.MyCommandDictionary([key]).IsEnabled = True
-            Else
-                dat.Initializer.MyCommandDictionary.Add(
-                    [key], New RpaInitializer.MyCommand With {
-                        .[Alias] = [key],
-                        .IsEnabled = True
-                    }
-                )
+        For Each cmd In dat.Initializer.MyCommandDictionary.Values
+            If dat.Transaction.Parameters.Contains(cmd.TrueCommand) Then
+                cmd.IsEnabled = True
+                Console.WriteLine($"'{cmd.TrueCommand}' コマンドを有効にしました")
             End If
         Next
-
-        Console.WriteLine($"コマンドを無効にしました")
         Console.WriteLine()
 
         Return 0

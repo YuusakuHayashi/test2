@@ -25,7 +25,7 @@ Public Class CloneRobotCommand : Inherits RpaCommandBase
     End Property
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim jh As New RpaCui.JsonHandler(Of List(Of String))
+        Dim jh As New Rpa00.JsonHandler(Of List(Of String))
 
         If dat.Transaction.Parameters.Count > 0 Then
             Call SelectedCopy(dat)

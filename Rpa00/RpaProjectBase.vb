@@ -6,7 +6,7 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Public MustInherit Class RpaProjectBase(Of T As {New})
-    Inherits RpaCui.JsonHandler(Of T)
+    Inherits Rpa00.JsonHandler(Of T)
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
@@ -78,6 +78,19 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         Set(value As String)
             Me._MyDirectory = value
             RaisePropertyChanged("MyDirectory")
+        End Set
+    End Property
+
+    Private _MyDirectories As List(Of String)
+    Public Property MyDirectories As List(Of String)
+        Get
+            If Me._MyDirectories Is Nothing Then
+                Me._MyDirectories = New List(Of String)
+            End If
+            Return Me._MyDirectories
+        End Get
+        Set(value As List(Of String))
+            Me._MyDirectories = value
         End Set
     End Property
 
@@ -156,6 +169,22 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
             End If
             Return [fil]
         End Get
+    End Property
+
+    Private Property _MyRobotReadMe As String
+    <JsonIgnore>
+    Public Property MyRobotReadMe As String
+        Get
+            If String.IsNullOrEmpty(Me._MyRobotReadMe) Then
+                If File.Exists(Me.MyRobotReadMeFileName) Then
+                    Dim i As Integer = GetMyRobotReadMe()
+                End If
+            End If
+            Return Me._MyRobotReadMe
+        End Get
+        Set(value As String)
+            Me._MyRobotReadMe = value
+        End Set
     End Property
 
     ' ロボット本体
@@ -249,6 +278,24 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
             b = False
         End Try
         Return b
+    End Function
+
+    Private Function GetMyRobotReadMe() As Integer
+        Dim txt As String
+        Dim sr As StreamReader
+        Try
+            sr = New System.IO.StreamReader(
+                Me.MyRobotReadMeFileName, System.Text.Encoding.GetEncoding(RpaModule.DEFUALTENCODING))
+            Me.MyRobotReadMe = sr.ReadToEnd()
+        Catch ex As Exception
+            Console.WriteLine(ex.Message)
+        Finally
+            If sr IsNot Nothing Then
+                sr.Close()
+                sr.Dispose()
+            End If
+        End Try
+        Return 0
     End Function
 
     Public Function DeepCopy() As Object

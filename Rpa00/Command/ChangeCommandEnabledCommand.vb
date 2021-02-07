@@ -11,20 +11,27 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
     End Function
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim [key] As String = dat.Transaction.Parameters(0)
+        Dim val As String = dat.Transaction.Parameters(0)
         Dim torf As Boolean = Boolean.Parse(dat.Transaction.Parameters(1))
-        If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
-            dat.Initializer.MyCommandDictionary([key]).IsEnabled = torf
-        Else
+        Dim hit As Boolean = False
+
+        For Each cmd In dat.Initializer.MyCommandDictionary.Values
+            If cmd.TrueCommand = val Then
+                cmd.IsEnabled = torf
+                hit = True
+                Exit For
+            End If
+        Next
+        If Not hit Then
             dat.Initializer.MyCommandDictionary.Add(
-                [key], New RpaInitializer.MyCommand With {
-                    .[Alias] = [key],
+                val, (New RpaInitializer.MyCommand With {
+                    .TrueCommand = val,
                     .IsEnabled = torf
-                }
+                })
             )
         End If
 
-        Console.WriteLine($"コマンド '{[key]}' を '{torf.ToString}' に変更しました")
+        Console.WriteLine($"コマンド '{[val]}' を '{torf.ToString}' に変更しました")
         Console.WriteLine()
 
         Return 0

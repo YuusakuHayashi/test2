@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="ClientServerProject.vb" />
     <Compile Include="Command\ActivateMyCommandCommand.vb" />
+    <Compile Include="Command\AddAliasCommand.vb" />
     <Compile Include="Command\AddCommandAliasCommand.vb" />
     <Compile Include="Command\AddRobotAliasCommand.vb" />
     <Compile Include="Command\AddUtilityCommand.vb" />
@@ -95,6 +96,7 @@
     <Compile Include="Command\RpaUtilityCommandBase.vb" />
     <Compile Include="Command\SaveInitializerCommand.vb" />
     <Compile Include="Command\AttachRobotCommand.vb" />
+    <Compile Include="Command\SelectMyDirectoryCommand.vb" />
     <Compile Include="Command\SelectProjectCommand.vb" />
     <Compile Include="Command\SetupInitializerCommand.vb" />
     <Compile Include="Command\CloneRobotCommand.vb" />
@@ -115,6 +117,7 @@
     <Compile Include="Command\UpdateMyRobotCommand.vb" />
     <Compile Include="Command\ExportRootRobotJsonCommand.vb" />
     <Compile Include="CommonProject.vb" />
+    <Compile Include="JsonHandler.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
