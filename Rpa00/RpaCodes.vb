@@ -5,7 +5,9 @@ Imports System.IO
 Public Module RpaCodes
     ' プラグインを追加する場合には、ここに記述
     Public Function CreateRobotObject(ByRef rpa As Object) As Object
-        Dim dllpath As String = $"{RpaCui.SystemDllDirectory}\{rpa.RobotName}.dll"
+        ' Test
+        Dim dllpath As String = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\{rpa.RobotName}.dll"
+        'Dim dllpath As String = $"{RpaCui.SystemDllDirectory}\{rpa.RobotName}.dll"
 
         If Not File.Exists(dllpath) Then
             Return Nothing

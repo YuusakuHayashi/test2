@@ -107,9 +107,28 @@
         End Set
     End Property
 
-    Private Sub _RunRobotCommandExecute(ByVal parameter As Object)
+    Private Async Sub _RunRobotCommandExecute(ByVal parameter As Object)
         Me.Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
-        Me.Data.System.GuiCommandText = "runrobot"
+        Me.Data.System.GuiCommandText = "runrobot noprint end"
+        Dim t As Task(Of String) = Task.Run(
+            Function()
+                Data.System.Output.OutputText &= "hoge"
+                Return "hoge"
+            End Function
+        )
+        Await t
+        Threading.Thread.Sleep(1000)
+        Data.System.Output.OutputText &= t.Result
+
+        Threading.Thread.Sleep(1000)
+        Dim t2 As Task(Of String) = Task.Run(
+            Function()
+                Data.System.Output.OutputText &= "fuga"
+                Return "fuga"
+            End Function
+        )
+        Await t2
+        Data.System.Output.OutputText &= t2.Result
         Call Data.System.CuiLoop(Data)
     End Sub
 
@@ -125,6 +144,10 @@
         bi.EndInit()
         Return bi
     End Function
+
+    Sub Test()
+        '重い処理
+    End Sub
 
     Sub New(ByRef dat As Object)
         Me.Data = dat

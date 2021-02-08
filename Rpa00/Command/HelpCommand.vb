@@ -311,7 +311,7 @@ Public Class HelpCommand : Inherits RpaCommandBase
         Do
             k = Nothing
 
-            Console.WriteLine(Me.Navigater)
+            Console.Write(Me.Navigater)
             k = Console.ReadKey(True)
 
             If Me.ForwardChars.Contains(k.Key) Or Me.BackChars.Contains(k.Key) Or Me.TopChars.Contains(k.Key) Or Me.EndChars.Contains(k.Key) Then

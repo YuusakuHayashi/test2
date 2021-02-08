@@ -44,7 +44,6 @@ Public Class RpaOutlookUtility : Inherits RpaUtilityBase
         Return rtn
     End Function
 
-
     Public Function InvokeOutlookMacroFunction(ByRef automation As OutlookAutomation) As Object
         Dim obj = CallOutlookMacro(automation)
         Return obj

@@ -345,7 +345,6 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
                     Exit Do
                 End If
             End If
-            Dim ubcs() As String = ubcsstr.Split(" "c)
             Do
                 Console.WriteLine($"Updated Binding Commands : '{ubcsstr}' ok? (y/n)")
                 yorn4 = dat.Transaction.ShowRpaIndicator(dat)
@@ -357,9 +356,7 @@ Public Class PushRobotCommand : Inherits RpaCommandBase
             If yorn4 = "n" Then
                 Continue Do
             End If
-            For Each ubc In ubcs
-                ru.UpdatedBindingCommands.Add(ubc)
-            Next
+            ru.UpdatedBindingCommands.Add(ubcsstr)
             Do
                 Console.WriteLine($"continue? (y/n)")
                 yorn6 = dat.Transaction.ShowRpaIndicator(dat)

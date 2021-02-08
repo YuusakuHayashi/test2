@@ -28,6 +28,17 @@ Public Class ControllerViewModel : Inherits ViewModelBase
         End Set
     End Property
 
+    Private _Output As Rpa00.OutputData
+    Public Property Output As Rpa00.OutputData
+        Get
+            Return Me._Output
+        End Get
+        Set(value As Rpa00.OutputData)
+            Me._Output = value
+            RaisePropertyChanged("Output")
+        End Set
+    End Property
+
     Private _SelectedMenu As ObservableCollection(Of ExecuteMenu)
     Public ReadOnly Property SelectedMenu As ObservableCollection(Of ExecuteMenu)
         Get
@@ -55,4 +66,7 @@ Public Class ControllerViewModel : Inherits ViewModelBase
         Me.Content = menu.DataObject
         Return 0
     End Function
+
+    Sub New()
+    End Sub
 End Class

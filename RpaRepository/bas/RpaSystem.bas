@@ -33,6 +33,15 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
     Dim printername As String: printername = v(0)
     Dim bookname As String: bookname = v(1)
     Dim sheetname As String: sheetname = v(2)
+    ' Optional
+    Dim orientation As Integer: orientation = XlPageOrientation.xlPortrait
+    If Ubound(v) > 2 Then
+        If v(3) = 0 Then
+            orientation = XlPageOrientation.xlPortrait
+        Else
+            orientation = XlPageOrientation.xlLandscape
+        End If
+    End If
     Dim wbook As Workbook: Set wbook = Nothing
     Dim wsheet As Worksheet: Set wsheet = Nothing
 
@@ -45,6 +54,7 @@ Public Sub PrintOutSheet(ByRef v() As Variant)
     'wbook.Application.ScreenUpdating = False
 
     Set wsheet = wbook.Worksheets(sheetname)
+    wsheet.PageSetup.Orientation = orientation
 
     If printername <> vbNullString Then
         wsheet.PrintOut ActivePrinter:=printername

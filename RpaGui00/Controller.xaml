@@ -69,6 +69,6 @@
             Content="{Binding Content}" />
         <TextBlock 
             Grid.Row="2" Grid.Column="2"
-            Text="{Binding OutputText}" />
+            Text="{Binding Data.System.Output.OutputText}" />
     </Grid>
 </UserControl>

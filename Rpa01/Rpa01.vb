@@ -18,6 +18,75 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     Public Haraikomisakikouzabangou As String      ' 払込先口座番号
     Public Haraikomikinshubetu As String           ' 払込金種別
 
+    Private TargetItakusya As String               ' 対象委託者コード
+
+
+    ' 送付明細ＣＳＶファイル名
+    Private ReadOnly Property SMCsvFileName As String
+        Get
+            Return $"{Data.Project.MyRobotDirectory}\{Me.MasterCsvFileName}"
+        End Get
+    End Property
+
+    ' 送付明細ＣＳＶファイル名（ワーク）
+    Private ReadOnly Property WorkSMCsvFileName As String
+        Get
+            Return $"{Me.WorkDirectory}\{Me.MasterCsvFileName}"
+        End Get
+    End Property
+
+    ' 入力のエクセル
+    Private _InputXlsFileName As String
+    Private Property InputXlsFileName As String
+        Get
+            Return Me._InputXlsFileName
+        End Get
+        Set(value As String)
+            Me._InputXlsFileName = value
+        End Set
+    End Property
+
+    ' 入力のエクセルをＣＳＶ化したもの
+    Private ReadOnly Property InputCsvFileName As String
+        Get
+            Return $"{Me.WorkDirectory}\input.csv"
+        End Get
+    End Property
+
+    ' 送付明細からモテキ分を抽出したもの
+    Private ReadOnly Property TempCsvFileName As String
+        Get
+            Return $"{Me.WorkDirectory}\temp.csv"
+        End Get
+    End Property
+
+    ' 送付明細から今回対象を抽出したもの
+    Private ReadOnly Property Tmp2CsvFileName As String
+        Get
+            Return $"{Me.WorkDirectory}\tmp2.csv"
+        End Get
+    End Property
+
+    ' 依頼書作成用データの確認用ファイル名
+    Private ReadOnly Property HokanCsvFileName As String
+        Get
+            Return $"{Me.WorkDirectory}\hokan.csv"
+        End Get
+    End Property
+
+    ' 出力加工済み送付明細ファイル名
+    Private ReadOnly Property OutputSMXlsxFileName As String
+        Get
+            Return $"{Me.BackupDirectory}\加工済送付明細.xlsx"
+        End Get
+    End Property
+
+    ' 出力件数集計ファイル
+    Private ReadOnly Property OutputKensuuTxtFileName As String
+        Get
+            Return $"{Me.BackupDirectory}\件数集計.txt"
+        End Get
+    End Property
 
     ' 2021-02-05 : 追加
     '-------------------------------------------------------------------------'
@@ -127,69 +196,55 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End Set
     End Property
 
-    'Private _ItakusyaCodeDictionary As Dictionary(Of String, String)
-    'Public Property ItakusyaCodeDictionary As Dictionary(Of String, String)
-    '    Get
-    '        If Me._ItakusyaCodeDictionary Is Nothing Then
-    '            Me._ItakusyaCodeDictionary = New Dictionary(Of String, String)
-    '            Me._ItakusyaCodeDictionary.Add("Moteki", "0029005")
-    '        End If
-    '        Return Me._ItakusyaCodeDictionary
-    '    End Get
-    '    Set(value As Dictionary(Of String, String))
-    '        Me._ItakusyaCodeDictionary = value
-    '    End Set
-    'End Property
-
-    Private __IraishoDirectory As String
-    Private ReadOnly Property _IraishoDirectory As String
+    Private _IraishoDirectory As String
+    Private ReadOnly Property IraishoDirectory As String
         Get
-            If String.IsNullOrEmpty(Me.__IraishoDirectory) Then
-                Me.__IraishoDirectory = $"{Data.Project.MyRobotDirectory}\iraisho"
-                If Not Directory.Exists(Me.__IraishoDirectory) Then
-                    Directory.CreateDirectory(Me.__IraishoDirectory)
+            If String.IsNullOrEmpty(Me._IraishoDirectory) Then
+                Me._IraishoDirectory = $"{Data.Project.MyRobotDirectory}\iraisho"
+                If Not Directory.Exists(Me._IraishoDirectory) Then
+                    Directory.CreateDirectory(Me._IraishoDirectory)
                 End If
             End If
-            Return Me.__IraishoDirectory
+            Return Me._IraishoDirectory
         End Get
     End Property
 
-    Private __BackupDirectory As String
-    Private ReadOnly Property _BackupDirectory As String
+    Private _BackupDirectory As String
+    Private ReadOnly Property BackupDirectory As String
         Get
-            If String.IsNullOrEmpty(Me.__BackupDirectory) Then
-                Me.__BackupDirectory = $"{Data.Project.MyRobotDirectory}\backup"
-                If Not Directory.Exists(Me.__BackupDirectory) Then
-                    Directory.CreateDirectory(Me.__BackupDirectory)
+            If String.IsNullOrEmpty(Me._BackupDirectory) Then
+                Me._BackupDirectory = $"{Data.Project.MyRobotDirectory}\backup"
+                If Not Directory.Exists(Me._BackupDirectory) Then
+                    Directory.CreateDirectory(Me._BackupDirectory)
                 End If
             End If
-            Return Me.__BackupDirectory
+            Return Me._BackupDirectory
         End Get
     End Property
 
-    Private __Work2Directory As String
-    Private ReadOnly Property _Work2Directory As String
+    Private _Work2Directory As String
+    Private ReadOnly Property Work2Directory As String
         Get
-            If String.IsNullOrEmpty(Me.__Work2Directory) Then
-                Me.__Work2Directory = $"{Data.Project.MyRobotDirectory}\work2"
-                If Not Directory.Exists(Me.__Work2Directory) Then
-                    Directory.CreateDirectory(Me.__Work2Directory)
+            If String.IsNullOrEmpty(Me._Work2Directory) Then
+                Me._Work2Directory = $"{Data.Project.MyRobotDirectory}\work2"
+                If Not Directory.Exists(Me._Work2Directory) Then
+                    Directory.CreateDirectory(Me._Work2Directory)
                 End If
             End If
-            Return Me.__Work2Directory
+            Return Me._Work2Directory
         End Get
     End Property
 
-    Private __WorkDirectory As String
-    Private ReadOnly Property _WorkDirectory As String
+    Private _WorkDirectory As String
+    Private ReadOnly Property WorkDirectory As String
         Get
-            If String.IsNullOrEmpty(Me.__WorkDirectory) Then
-                Me.__WorkDirectory = $"{Data.Project.MyRobotDirectory}\work"
-                If Not Directory.Exists(Me.__WorkDirectory) Then
-                    Directory.CreateDirectory(Me.__WorkDirectory)
+            If String.IsNullOrEmpty(Me._WorkDirectory) Then
+                Me._WorkDirectory = $"{Data.Project.MyRobotDirectory}\work"
+                If Not Directory.Exists(Me._WorkDirectory) Then
+                    Directory.CreateDirectory(Me._WorkDirectory)
                 End If
             End If
-            Return Me.__WorkDirectory
+            Return Me._WorkDirectory
         End Get
     End Property
 
@@ -472,7 +527,6 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim mutil As New Rpa00.RpaMacroUtility
         Dim putil As New Rpa00.RpaPrinterUtility
         Dim outil As New Rpa00.RpaOutlookUtility
-        Dim sutil As New Rpa00.RpaShellUtility
         Dim [x] As Integer
 
         ' プリンター名設定
@@ -484,99 +538,87 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' マスターファイルのチェック・コピー
         '-----------------------------------------------------------------------------------------'
-        Dim imaster_1 = $"{Data.Project.MyRobotDirectory}\{Me.MasterCsvFileName}"
-        Dim wmaster_1 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
-        If Not Rpa00.RpaModule.FileCheckLoop(imaster_1, dat) Then
-            Console.WriteLine($"中断しました")
-            Console.WriteLine()
+        If Not Rpa00.RpaModule.FileCheckLoop(Me.SMCsvFileName, dat) Then
+            Call dat.System.RpaWriteLine($"中断しました")
+            Call dat.System.RpaWriteLine()
             Return 1000
         End If
 
-        File.Copy(imaster_1, wmaster_1, True)
+        File.Copy(Me.SMCsvFileName, Me.WorkSMCsvFileName, True)
         '-----------------------------------------------------------------------------------------'
-
 
         ' 添付ファイルの取得・解凍・ＣＳＶデータ生成
         '-----------------------------------------------------------------------------------------'
-        ' Outlook内
-        Dim nameobj                                      '   添付ファイル名（オブジェクト型）
-        Dim attachmentfile_1 As String = vbNullString    '   添付ファイル名（ファイル名のみ） 
-        ' 添付ファイル保存後
-        Dim afile_1 = vbNullString                       '   添付ファイル（フルパス）
-        Dim afile_1_base = vbNullString                  '   添付ファイル（ファイル名（拡張子除く）のみ）
-        Dim ixls_1 = vbNullString                        '   解凍後ファイル名
-        Dim icsv_1 = $"{Me._WorkDirectory}\input.csv"    ' ＣＳＶ変換後ファイル名
+        '' Outlook内
+        'Dim nameobj                                      '   添付ファイル名（オブジェクト型）
+        'Dim attachmentfile_1 As String = vbNullString    '   添付ファイル名（ファイル名のみ） 
+        '' 添付ファイル保存後
+        'Dim afile_1 = vbNullString                       '   添付ファイル（フルパス）
+        'Dim afile_1_base = vbNullString                  '   添付ファイル（ファイル名（拡張子除く）のみ）
 
+        'Call dat.System.RpaWriteLine("添付ファイルを検索しています...")
 
-        Console.WriteLine("添付ファイルを検索しています...")
+        '' 添付ファイルを保存し、その名前を取得
+        'nameobj = outil.InvokeOutlookMacroFunction(AddressOf _GetAttachmentFile)
+        'If nameobj IsNot Nothing Then
+        '    attachmentfile_1 = CType(nameobj, String)
+        'End If
+        'If String.IsNullOrEmpty(attachmentfile_1) Then
+        '    Call dat.System.RpaWriteLine("エラー：添付ファイルが見つかりません")
+        '    Call dat.System.RpaWriteLine()
+        '    Return 1000
+        'End If
 
-        ' 添付ファイルを保存し、その名前を取得
-        nameobj = outil.InvokeOutlookMacroFunction(AddressOf _GetAttachmentFile)
-        If nameobj IsNot Nothing Then
-            attachmentfile_1 = CType(nameobj, String)
-        End If
-        If String.IsNullOrEmpty(attachmentfile_1) Then
-            Console.WriteLine("エラー：添付ファイルが見つかりません")
-            Console.WriteLine()
-            Return 1000
-        End If
+        'For Each f In Directory.GetFiles(Me.WorkDirectory)
+        '    If Path.GetFileName(f) = attachmentfile_1 Then
+        '        afile_1 = f
+        '    End If
+        'Next
+        'If String.IsNullOrEmpty(afile_1) Then
+        '    Call dat.System.RpaWriteLine("エラー：添付ファイルが見つかりません")
+        '    Return 1000
+        'End If
+        'afile_1_base = Path.GetFileNameWithoutExtension(afile_1)
+        'Me.InputXlsFileName = $"{Me.WorkDirectory}\{afile_1_base}.xls"
 
-        For Each f In Directory.GetFiles(Me._WorkDirectory)
-            If Path.GetFileName(f) = attachmentfile_1 Then
-                afile_1 = f
-            End If
-        Next
-        If String.IsNullOrEmpty(afile_1) Then
-            Console.WriteLine("エラー：添付ファイルが見つかりません")
-            Return 1000
-        End If
-        afile_1_base = Path.GetFileNameWithoutExtension(afile_1)
-        ixls_1 = $"{Me._WorkDirectory}\{afile_1_base}.xls"
-
-        ' 添付ファイルを解凍
-        Console.WriteLine("添付ファイルを解凍します...")
-        Call sutil.RunShell(Me.AttacheCase, $"""{afile_1}"" /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
-        If Not File.Exists(ixls_1) Then
-            Console.WriteLine($"エラー：解凍後ファイル '{ixls_1}' がありません")
-            Return 1000
-        End If
+        '' 添付ファイルを解凍
+        'Call dat.System.RpaWriteLine("添付ファイルを解凍します...")
+        'Call sutil.RunShell(Me.AttacheCase, $"""{afile_1}"" /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
+        'If Not File.Exists(Me.InputXlsFileName) Then
+        '    Call dat.System.RpaWriteLine($"エラー：解凍後ファイル '{Me.InputXlsFileName}' がありません")
+        '    Return 1000
+        'End If
 
         ' TEST TEST
-        'ixls_1 = $"{Data.Project.MyRobotDirectory}\input.xls"
+        'Me.InputXlsFileName = $"{Data.Project.MyRobotDirectory}\input.xls"
 
         ' ＣＳＶデータ生成
-        [x] = mutil.InvokeMacro("Rpa01.CreateInputTextData", {ixls_1, icsv_1})
+        [x] = mutil.InvokeMacro("Rpa01.CreateInputTextData", {Me.InputXlsFileName, Me.InputCsvFileName})
         '-----------------------------------------------------------------------------------------'
 
 
         ' ＣＳＶから対象得意先（モテキ）のみ抜き出し・入力ＣＳＶとのマッチング
         '-----------------------------------------------------------------------------------------'
-        Dim target = "0029005"
-        Dim wmaster_2 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
-        Dim tmpcsv_1 = $"{Me._WorkDirectory}\tmp.csv"
-        Dim icsv_2 = $"{Me._WorkDirectory}\input.csv"
-        Dim idata1_1 = $"{Me._WorkDirectory}\idata1.csv"
-        Dim idata2_1 = $"{Me._WorkDirectory}\idata2.csv"
-        Call _CreateTmpCsv(wmaster_2, target, tmpcsv_1)
-        Call _CompareInputCsvToTmpCsv(icsv_1, tmpcsv_1, idata1_1)
-        Call _CreateIraishoMeisaiDatas(idata1_1, idata2_1)
+        Me.TargetItakusya = "0029005"
+        Call CreateTmpCsv(dat)
+        Call CompareInputCsvToTmpCsv(dat)
+        Call CreateIraishoMeisaiDatas(dat)
         '-----------------------------------------------------------------------------------------'
 
 
         ' 各停止依頼書を作成
         '-----------------------------------------------------------------------------------------'
-        Dim idata2_2 = $"{Me._WorkDirectory}\idata2.csv"
         Dim bookname_1 As String = vbNullString
         Dim sheetname_1 As String = vbNullString
-        Dim cmp = StringComparer.Ordinal
+        'Dim cmp = StringComparer.Ordinal
 
-        Console.WriteLine("停止依頼書を作成中・・・")
+        Call dat.System.RpaWriteLine("停止依頼書を作成中・・・")
 
         ' ワークへコピー
-        For Each f In Directory.GetFiles(Me._IraishoDirectory)
-            File.Copy(f, $"{Me._Work2Directory}\{Path.GetFileName(f)}", True)
+        For Each f In Directory.GetFiles(Me.IraishoDirectory)
+            File.Copy(f, $"{Me.Work2Directory}\{Path.GetFileName(f)}", True)
         Next
-        [x] = mutil.InvokeMacro("Rpa01.CreateIraisho", {idata2_2})
+        [x] = mutil.InvokeMacro("Rpa01.CreateIraisho", {Me.HokanCsvFileName})
 
         Me.IraishoMeisaiDatas.Sort(
             Function(before, after)
@@ -596,14 +638,14 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                 If bookname_1 <> imd.BookName Then
                     File.Copy(
                         imd.BookName,
-                        $"{Me._BackupDirectory}\{Path.GetFileName(imd.BookName)}",
+                        $"{Me.BackupDirectory}\{Path.GetFileName(imd.BookName)}",
                         True
                 )
                 End If
             Next
         Else
-            For Each f In Directory.GetFiles(Me._Work2Directory)
-                File.Copy(f, $"{Me._BackupDirectory}\{Path.GetFileName(f)}", True)
+            For Each f In Directory.GetFiles(Me.Work2Directory)
+                File.Copy(f, $"{Me.BackupDirectory}\{Path.GetFileName(f)}", True)
             Next
         End If
 
@@ -622,17 +664,14 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             Next
         End If
 
-        Console.WriteLine("停止依頼書作成完了！")
+        Call dat.System.RpaWriteLine("停止依頼書作成完了！")
         '-----------------------------------------------------------------------------------------'
 
 
         ' 加工済送付明細の作成
         '-----------------------------------------------------------------------------------------'
-        Console.WriteLine("加工済送付明細を作成中・・・")
+        Call dat.System.RpaWriteLine("加工済送付明細を作成中・・・")
         Dim idx_1 = 0
-        Dim wkmaster_v2 = $"{Me._WorkDirectory}\{Me.MasterCsvFileName}"
-        Dim idata1_2 = $"{Me._WorkDirectory}\idata1.csv"
-        Dim outxlsx_1 = $"{Me._BackupDirectory}\加工済送付明細.xlsx"
         Dim sheetname_2 = vbNullString
         Dim setting_v1(26) As Double
         setting_v1(idx_1) = Me.SofuMeisaiColumnALength : idx_1 += 1
@@ -663,30 +702,30 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         setting_v1(idx_1) = Me.SofuMeisaiColumnZLength : idx_1 += 1
 
         If Me.RestartCount = 1 Then
-            File.Delete(outxlsx_1)
-            [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {wkmaster_v2, outxlsx_1, "master", SHIFT_JIS})
+            File.Delete(Me.OutputSMXlsxFileName)
+            [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {Me.WorkSMCsvFileName, Me.OutputSMXlsxFileName, "master", SHIFT_JIS})
         End If
         sheetname_2 = $"停止{Me.RestartCount.ToString}回目"
-        [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {idata1_2, outxlsx_1, sheetname_2, SHIFT_JIS, setting_v1})
+        [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {Me.Tmp2CsvFileName, Me.OutputSMXlsxFileName, sheetname_2, SHIFT_JIS, setting_v1})
 
-        If Not Data.Transaction.Parameters.Contains("noprint") Then
-            [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, outxlsx_1, sheetname_2})
-        End If
+        'If Not Data.Transaction.Parameters.Contains("noprint") Then
+        '    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, Me.OutputSMXlsxFileName, sheetname_2})
+        'End If
+        ' Test
+        [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, Me.OutputSMXlsxFileName, sheetname_2, 1})
 
-        Console.WriteLine("加工済送付明細作成完了！")
+        Call dat.System.RpaWriteLine("加工済送付明細作成完了！")
         '-----------------------------------------------------------------------------------------'
 
 
         ' 件数集計ファイル作成・出力
         '-----------------------------------------------------------------------------------------'
-        Dim outtxt_1 = $"{Me._BackupDirectory}\件数集計.txt"
-
-        Console.WriteLine("件数集計ファイルを作成中・・・")
-        Call _CreateSummaryFile(outtxt_1)
+        Call dat.System.RpaWriteLine("件数集計ファイルを作成中・・・")
+        Call CreateSummaryFile(dat)
         If Not Data.Transaction.Parameters.Contains("noprint") Then
-            Call putil.TextPrintRequest((New FileInfo(outtxt_1)), SHIFT_JIS)
+            Call putil.TextPrintRequest((New FileInfo(Me.OutputKensuuTxtFileName)), SHIFT_JIS)
         End If
-        Console.WriteLine("件数集計ファイル作成完了！")
+        Call dat.System.RpaWriteLine("件数集計ファイル作成完了！")
         '-----------------------------------------------------------------------------------------'
 
 
@@ -704,11 +743,11 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
 
         Call Me.Save(Data.Project.MyRobotJsonFileName, Me)
-        Console.WriteLine($"{Data.Project.MyRobotJsonFileName} を更新しました")
+        Call dat.System.RpaWriteLine($"{Data.Project.MyRobotJsonFileName} を更新しました")
         '-----------------------------------------------------------------------------------------'
 
-        Console.WriteLine("処理終了！")
-        Console.WriteLine()
+        Call dat.System.RpaWriteLine("処理終了！")
+        Call dat.System.RpaWriteLine()
         Return 0
     End Function
 
@@ -780,7 +819,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Return 0
     End Function
 
-    Private Sub _CreateSummaryFile(ByVal otfile As String)
+    Private Sub CreateSummaryFile(ByRef dat As Object)
         Dim sw As StreamWriter
         Dim bankcount = 0
         Dim sumcount = 0
@@ -788,7 +827,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim wline = vbNullString
         Dim zimd = New IraishoMeisai
 
-        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        sw = New StreamWriter(Me.OutputKensuuTxtFileName, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         For Each imd In Me.IraishoMeisaiDatas
             If imd.T_Ginkoucode <> zimd.T_Ginkoucode Then
@@ -820,7 +859,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     End Sub
 
     ' 明細コレクションの作成およびデバッグ用ファイルの作成
-    Private Sub _CreateIraishoMeisaiDatas(ByVal infile As String, ByVal otfile As String)
+    Private Sub CreateIraishoMeisaiDatas(ByRef dat As Object)
         Dim sr As StreamReader
         Dim sw As StreamWriter
 
@@ -851,8 +890,8 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
 
         ' ストリームリーダ、ライター
-        sr = New StreamReader(infile, System.Text.Encoding.GetEncoding(SHIFT_JIS))
-        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        sr = New StreamReader(Me.Tmp2CsvFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        sw = New StreamWriter(Me.HokanCsvFileName, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         ' 今日の日付
         Dim culture As CultureInfo = New CultureInfo("ja-JP", True)
@@ -972,7 +1011,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
             '---------------------------------------------------------------------------'
             ' ブック名を取得（印刷時に使用）
-            bookname = $"{Me._Work2Directory}\{M_iraisho.BookName}"
+            bookname = $"{Me.Work2Directory}\{M_iraisho.BookName}"
             imd.BookName = bookname
 
             ' 改ページ判定
@@ -1021,7 +1060,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                 gm = M_tb.Name
                 zsc = M_tb.ZieiSinkinCode
             End If
-            
+
             Me.Sitencode = vs2(8)
             Me.JSitencode = Strings.StrConv(Me.Sitencode, VbStrConv.Wide)
 
@@ -1157,13 +1196,13 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.YokinshubetuColumn), vbNullString, M_iraisho.YokinshubetuColumn & row)        ' idx116
             imd.MeisaiString &= "," & Me.Kouzabangou                                                                                                   ' idx117 口座番号
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.KouzabangouColumn), vbNullString, M_iraisho.KouzabangouColumn & row)          ' idx118
-            imd.MeisaiString &= "," & Me.AZKouzabangou                                                                                                 ' idx119 口座番号
+            imd.MeisaiString &= "," & Me.AZkouzabangou                                                                                                 ' idx119 口座番号
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.AZKouzabangouColumn), vbNullString, M_iraisho.AZKouzabangouColumn & row)      ' idx120
-            imd.MeisaiString &= "," & Me.JZKouzabangou                                                                                                 ' idx121 口座番号
+            imd.MeisaiString &= "," & Me.JZkouzabangou                                                                                                 ' idx121 口座番号
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JZKouzabangouColumn), vbNullString, M_iraisho.JZKouzabangouColumn & row)      ' idx122
-            imd.MeisaiString &= "," & Me.AKouzabangou                                                                                                  ' idx123 口座番号
+            imd.MeisaiString &= "," & Me.Akouzabangou                                                                                                  ' idx123 口座番号
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.AKouzabangouColumn), vbNullString, M_iraisho.AKouzabangouColumn & row)        ' idx124
-            imd.MeisaiString &= "," & Me.JKouzabangou                                                                                                  ' idx125 口座番号
+            imd.MeisaiString &= "," & Me.Jkouzabangou                                                                                                  ' idx125 口座番号
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.JKouzabangouColumn), vbNullString, M_iraisho.JKouzabangouColumn & row)        ' idx126
             imd.MeisaiString &= "," & Me.Tuchoukigou                                                                                                   ' idx127 通帳記号
             imd.MeisaiString &= "," & IIf(String.IsNullOrEmpty(M_iraisho.TuchoukigouColumn), vbNullString, M_iraisho.TuchoukigouColumn & row)          ' idx128
@@ -1216,7 +1255,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     End Sub
 
 
-    Private Sub _CompareInputCsvToTmpCsv(ByVal infile As String, ByVal tmpcsv As String, ByVal otfile As String)
+    Private Sub CompareInputCsvToTmpCsv(ByRef dat As Object)
         Dim isr As StreamReader
         Dim tsr As StreamReader
         Dim sw As StreamWriter
@@ -1234,9 +1273,9 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         errmsg(14) = "振替金額不一致"
         errmsg(15) = "チェックＯＫ"
 
-        isr = New StreamReader(infile, System.Text.Encoding.GetEncoding(SHIFT_JIS))
-        tsr = New StreamReader(tmpcsv, System.Text.Encoding.GetEncoding(SHIFT_JIS))
-        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        isr = New StreamReader(Me.InputCsvFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        tsr = New StreamReader(Me.TempCsvFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        sw = New StreamWriter(Me.Tmp2CsvFileName, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         ' ヘッダー
         tline = tsr.ReadLine
@@ -1301,8 +1340,8 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                 oline &= errlevel.ToString & "," & errmsg(errlevel) & ","
                 sw.WriteLine(oline)
             Else
-                Console.WriteLine("以下のデータは送付明細上に存在しません")
-                Console.WriteLine($"データ: {iline.TrimEnd}")
+                Call dat.System.RpaWriteLine("以下のデータは送付明細上に存在しません")
+                Call dat.System.RpaWriteLine($"データ: {iline.TrimEnd}")
             End If
 
             ' リスタートの設定
@@ -1327,13 +1366,13 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
     End Sub
 
 
-    Private Sub _CreateTmpCsv(ByVal infile As String, ByVal target As String, ByVal otfile As String)
+    Private Sub CreateTmpCsv(ByRef dat As Object)
         Dim sr As StreamReader
         Dim sw As StreamWriter
         Dim line As String
         Dim v() As String
-        sr = New StreamReader(infile, System.Text.Encoding.GetEncoding(SHIFT_JIS))
-        sw = New StreamWriter(otfile, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        sr = New StreamReader(Me.WorkSMCsvFileName, System.Text.Encoding.GetEncoding(SHIFT_JIS))
+        sw = New StreamWriter(Me.TempCsvFileName, False, System.Text.Encoding.GetEncoding(SHIFT_JIS))
 
         ' ヘッダー
         line = sr.ReadLine
@@ -1344,7 +1383,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Do Until sr.EndOfStream
             line = sr.ReadLine
             v = line.Split(",")
-            If v(2) = target Then
+            If v(2) = Me.TargetItakusya Then
                 sw.WriteLine(line)
             End If
         Loop
@@ -1383,7 +1422,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                     If [item] IsNot Nothing Then
                         For Each attachment In item.Attachments
                             If String.IsNullOrEmpty(Me.AttachmentFileName) Then
-                                attachment.SaveAsFile($"{Me._WorkDirectory}\{attachment.FileName}")
+                                attachment.SaveAsFile($"{Me.WorkDirectory}\{attachment.FileName}")
                                 rtn = attachment.FileName
                             End If
                         Next
@@ -1396,23 +1435,23 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
                         Next
                     Loop
                 Catch ex As Exception
-                    Console.WriteLine(ex.Message)
-                    Console.WriteLine($"受信用フォルダー、または保管用フォルダーの取得に失敗しました")
+                    Call Console.WriteLine(ex.Message)
+                    Call Console.WriteLine($"受信用フォルダー、または保管用フォルダーの取得に失敗しました")
                     rtn = vbNullString
                 Finally
                     Marshal.ReleaseComObject(sfolder)
                     Marshal.ReleaseComObject(bfolder)
                 End Try
             Catch ex As Exception
-                Console.WriteLine(ex.Message)
-                Console.WriteLine($"フォルダーコレクションの取得に失敗しました")
+                Call Console.WriteLine(ex.Message)
+                Call Console.WriteLine($"フォルダーコレクションの取得に失敗しました")
                 rtn = vbNullString
             Finally
                 Marshal.ReleaseComObject(inboxfolders)
             End Try
         Catch ex As Exception
-            Console.WriteLine(ex.Message)
-            Console.WriteLine($"受信トレイの取得に失敗しました")
+            Call Console.WriteLine(ex.Message)
+            Call Console.WriteLine($"受信トレイの取得に失敗しました")
             rtn = vbNullString
         Finally
             Marshal.ReleaseComObject(inbox)
@@ -1420,95 +1459,147 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Return rtn
     End Function
 
-
     Private Function Check(ByRef dat As Object) As Boolean
+        Dim obj1, obj2, obj3, obj4, obj5
+        Dim bool1, bool2, bool3, bool4, bool5
+        Dim str1, str2, str3, str4, str5
         Dim mutil As New Rpa00.RpaMacroUtility
         Dim outil As New Rpa00.RpaOutlookUtility
+        Dim sutil As New Rpa00.RpaShellUtility
 
+        ' 1. マクロモジュールチェック
+        '-----------------------------------------------------------------------------------------'
         If Not File.Exists(mutil.MacroFileName) Then
-            Console.WriteLine($"マクロファイル '{mutil.MacroFileName}' が存在しません")
+            Call dat.System.RpaWriteLine($"マクロファイル '{mutil.MacroFileName}' が存在しません")
             Return False
         End If
-
-        Dim obj As Object
-        Dim ck As Boolean = True
+        obj1 = Nothing
+        bool1 = True
         For Each [mod] In {"Rpa01", "RpaSystem", "RpaLibrary"}
-            obj = mutil.InvokeMacroFunction("MacroImporter.IsModuleExist", {[mod]})
-            If obj IsNot Nothing Then
-                Dim ck2 = CType(obj, Boolean)
-                If Not ck2 Then
-                    Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
-                    ck = False
+            obj1 = mutil.InvokeMacroFunction("MacroImporter.IsModuleExist", {[mod]})
+            If obj1 IsNot Nothing Then
+                bool2 = CType(obj1, Boolean)
+                If Not bool2 Then
+                    Call dat.System.RpaWriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
+                    bool1 = False
                 End If
             Else
-                Console.WriteLine($"モジュールのチェックに失敗しました")
-                ck = False
+                Call dat.System.RpaWriteLine($"モジュールのチェックに失敗しました")
+                bool1 = False
                 Exit For
             End If
         Next
-        If Not ck Then
+        If Not bool1 Then
             Return False
         End If
+        '-----------------------------------------------------------------------------------------'
 
+        ' 2. プリンタ名チェック
+        '-----------------------------------------------------------------------------------------'
         Dim prn As String = vbNullString
         prn = IIf(String.IsNullOrEmpty(dat.Project.PrinterName), prn, dat.Project.PrinterName)
         prn = IIf(String.IsNullOrEmpty(Me.PrinterName), prn, Me.PrinterName)
         If String.IsNullOrEmpty(prn) Then
-            Console.WriteLine($"プリンター名が指定されていません")
+            Call dat.System.RpaWriteLine($"プリンター名が指定されていません")
             Return False
         End If
+        '-----------------------------------------------------------------------------------------'
 
+        ' 3. Outlook関連チェック
+        '-----------------------------------------------------------------------------------------'
         If String.IsNullOrEmpty(Me.AttacheCase) Then
-            Console.WriteLine($"'MyRobotObject.AttacheCase' が指定されていません")
+            Call dat.System.RpaWriteLine($"'MyRobotObject.AttacheCase' が指定されていません")
             Return False
         End If
         If Not File.Exists(Me.AttacheCase) Then
-            Console.WriteLine($"アタッシュケース '{Me.AttacheCase}' が存在しません")
+            Call dat.System.RpaWriteLine($"アタッシュケース '{Me.AttacheCase}' が存在しません")
             Return False
         End If
 
         If String.IsNullOrEmpty(Me.OutlookSourceInboxName) Then
-            Console.WriteLine($"'MyRobotObject.OutlookSourceInboxName' が指定されていません")
+            Call dat.System.RpaWriteLine($"'MyRobotObject.OutlookSourceInboxName' が指定されていません")
             Return False
         End If
         If String.IsNullOrEmpty(Me.OutlookBackupInboxName) Then
-            Console.WriteLine($"'MyRobotObject.OutlookBackupInboxName' が指定されていません")
+            Call dat.System.RpaWriteLine($"'MyRobotObject.OutlookBackupInboxName' が指定されていません")
             Return False
         End If
         For Each [folder] In {Me.OutlookSourceInboxName, Me.OutlookBackupInboxName}
             If Not (outil.IsInboxFolderExist([folder])) Then
-                Console.WriteLine($"受信トレイに '{[folder]}' が存在しません")
+                Call dat.System.RpaWriteLine($"受信トレイに '{[folder]}' が存在しません")
                 Return False
             End If
         Next
 
+        obj1 = Nothing                                    '   添付ファイル名（オブジェクト型）
+        str1 = vbNullString                               '   添付ファイル名（ファイル名のみ） 
+        ' 添付ファイル保存後
+        str2 = vbNullString                               '   添付ファイル（フルパス）
+        str3 = vbNullString                               '   添付ファイル（ファイル名のみ（拡張子除く））
+        Call dat.System.RpaWriteLine("添付ファイルを検索しています...")
+
+        ' 添付ファイルを保存し、その名前を取得
+        obj1 = outil.InvokeOutlookMacroFunction(AddressOf _GetAttachmentFile)
+        If obj1 IsNot Nothing Then
+            str1 = CType(obj1, String)
+        End If
+        If String.IsNullOrEmpty(str1) Then
+            Call dat.System.RpaWriteLine("エラー：添付ファイルが見つかりません")
+            Call dat.System.RpaWriteLine()
+            Return False
+        End If
+
+        For Each f In Directory.GetFiles(Me.WorkDirectory)
+            If Path.GetFileName(f) = str1 Then
+                str2 = f
+            End If
+        Next
+        If String.IsNullOrEmpty(str2) Then
+            Call dat.System.RpaWriteLine("エラー：添付ファイルが見つかりません")
+            Return False
+        End If
+        str3 = Path.GetFileNameWithoutExtension(str2)
+        Me.InputXlsFileName = $"{Me.WorkDirectory}\{str3}.xls"
+
+        ' 添付ファイルを解凍
+        Call dat.System.RpaWriteLine("添付ファイルを解凍します...")
+        Call sutil.RunShell(Me.AttacheCase, $"""{str2}"" /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
+        If Not File.Exists(Me.InputXlsFileName) Then
+            Call dat.System.RpaWriteLine($"エラー：解凍後ファイル '{Me.InputXlsFileName}' がありません")
+            Return False
+        End If
+        '-----------------------------------------------------------------------------------------'
+
+        ' 4. 口座振替スケジュールファイルのチェック(2021/02/08追加)
+        '-----------------------------------------------------------------------------------------'
         If String.IsNullOrEmpty(MatsNenkanScheduleFileName) Then
-            Console.WriteLine($"'MatsNenkanScheduleFileName' が指定されていません")
+            Call dat.System.RpaWriteLine($"'MatsNenkanScheduleFileName' が指定されていません")
             Return False
         End If
         If Not File.Exists(MatsNenkanScheduleFileName) Then
-            Console.WriteLine($"ファイル '{Me.MatsNenkanScheduleFileName}' は存在しません")
+            Call dat.System.RpaWriteLine($"ファイル '{Me.MatsNenkanScheduleFileName}' は存在しません")
             Return False
         End If
 
         ' シートチェック
         If String.IsNullOrEmpty(MatsNenkanScheduleSheetName) Then
-            Console.WriteLine($"'MatsNenkanScheduleSheetName' が指定されていません")
+            Call dat.System.RpaWriteLine($"'MatsNenkanScheduleSheetName' が指定されていません")
             Return False
         End If
-        obj = Nothing
-        obj = mutil.InvokeMacroFunction("RpaSystem.IsSheetExist", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName})
-        If obj IsNot Nothing Then
-            Dim ck2 = CType(obj, Boolean)
-            If Not ck2 Then
-                Console.WriteLine($"シート名 '{Me.MatsNenkanScheduleSheetName}' は、 '{Me.MatsNenkanScheduleFileName}' 内に存在しません")
-                ck = False
+        obj1 = Nothing
+        bool1 = True
+        obj1 = mutil.InvokeMacroFunction("RpaSystem.IsSheetExist", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName})
+        If obj1 IsNot Nothing Then
+            bool2 = CType(obj1, Boolean)
+            If Not bool2 Then
+                Call dat.System.RpaWriteLine($"シート名 '{Me.MatsNenkanScheduleSheetName}' は、 '{Me.MatsNenkanScheduleFileName}' 内に存在しません")
+                bool1 = False
             End If
         Else
-            Console.WriteLine($"シートのチェックに失敗しました")
-            ck = False
+            Call dat.System.RpaWriteLine($"シートのチェックに失敗しました")
+            bool1 = False
         End If
-        If Not ck Then
+        If Not bool1 Then
             Return False
         End If
 
@@ -1516,7 +1607,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Me.FurikaeSiteibiCell = vbNullString
         If MM = 1 Then
             If String.IsNullOrEmpty(Me.Mats01Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats01Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats01Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats01Gatsu12FurikaebiCell
@@ -1524,7 +1615,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 2 Then
             If String.IsNullOrEmpty(Me.Mats02Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats02Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats02Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats02Gatsu12FurikaebiCell
@@ -1532,7 +1623,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 3 Then
             If String.IsNullOrEmpty(Me.Mats03Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats03Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats03Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats03Gatsu12FurikaebiCell
@@ -1540,7 +1631,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 4 Then
             If String.IsNullOrEmpty(Me.Mats04Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats04Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats04Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats04Gatsu12FurikaebiCell
@@ -1548,7 +1639,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 5 Then
             If String.IsNullOrEmpty(Me.Mats05Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats05Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats05Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats05Gatsu12FurikaebiCell
@@ -1556,7 +1647,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 6 Then
             If String.IsNullOrEmpty(Me.Mats06Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats06Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats06Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats06Gatsu12FurikaebiCell
@@ -1564,7 +1655,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 7 Then
             If String.IsNullOrEmpty(Me.Mats07Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats07Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats07Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats07Gatsu12FurikaebiCell
@@ -1572,7 +1663,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 8 Then
             If String.IsNullOrEmpty(Me.Mats08Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats08Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats08Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats08Gatsu12FurikaebiCell
@@ -1580,7 +1671,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 9 Then
             If String.IsNullOrEmpty(Me.Mats09Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats09Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats09Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats09Gatsu12FurikaebiCell
@@ -1588,7 +1679,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 10 Then
             If String.IsNullOrEmpty(Me.Mats10Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats10Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats10Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats10Gatsu12FurikaebiCell
@@ -1596,7 +1687,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 11 Then
             If String.IsNullOrEmpty(Me.Mats11Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats11Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats11Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats11Gatsu12FurikaebiCell
@@ -1604,7 +1695,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
         If MM = 12 Then
             If String.IsNullOrEmpty(Me.Mats12Gatsu12FurikaebiCell) Then
-                Console.WriteLine($"'Mats12Gatsu12FurikaebiCell' が指定されていません")
+                Call dat.System.RpaWriteLine($"'Mats12Gatsu12FurikaebiCell' が指定されていません")
                 Return False
             Else
                 Me.FurikaeSiteibiCell = Me.Mats12Gatsu12FurikaebiCell
@@ -1613,24 +1704,26 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         Dim dt As DateTime
         Dim ci As New CultureInfo("ja-JP")
-        obj = Nothing
-        obj = mutil.InvokeMacroFunction("RpaSystem.GetCellText", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName, Me.FurikaeSiteibiCell})
-        If obj IsNot Nothing Then
-            Dim ck2 = CType(obj, String)
-            If String.IsNullOrEmpty(ck2) Then
-                Console.WriteLine($"振替指定日の対象セル '{Me.FurikaeSiteibiCell}' の値は空でした")
-                ck = False
+        obj1 = Nothing
+        bool1 = True
+        obj1 = mutil.InvokeMacroFunction("RpaSystem.GetCellText", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName, Me.FurikaeSiteibiCell})
+        If obj1 IsNot Nothing Then
+            str1 = CType(obj1, String)
+            If String.IsNullOrEmpty(str1) Then
+                Call dat.System.RpaWriteLine($"振替指定日の対象セル '{Me.FurikaeSiteibiCell}' の値は空でした")
+                bool1 = False
             Else
-                dt = DateTime.ParseExact(ck2, "M月d日", ci)
+                dt = DateTime.ParseExact(str1, "M月d日", ci)
                 Me.FurikaeSiteibi = dt
             End If
         Else
-            Console.WriteLine($"振替指定日の対象セルの取得に失敗しました")
-            ck = False
+            Call dat.System.RpaWriteLine($"振替指定日の対象セルの取得に失敗しました")
+            bool1 = False
         End If
-        If Not ck Then
+        If Not bool1 Then
             Return False
         End If
+        '-----------------------------------------------------------------------------------------'
 
         Return True
     End Function

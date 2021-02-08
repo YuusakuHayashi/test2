@@ -1,11 +1,24 @@
 ﻿Imports System.IO
 
 Public Class RpaSystem
-
     Public Enum ExecuteModeNumber
         RpaCui = 0
         RpaGui = 1
     End Enum
+
+    ' 2021/02/08 : Gui化のため追加
+    Private _Output As OutputData
+    Public Property Output As OutputData
+        Get
+            If Me._Output Is Nothing Then
+                Me._Output = New OutputData
+            End If
+            Return Me._Output
+        End Get
+        Set(value As OutputData)
+            Me._Output = value
+        End Set
+    End Property
 
     Private _ExecuteMode As Integer
     Public Property ExecuteMode As Integer
@@ -134,6 +147,7 @@ Public Class RpaSystem
 
 
     Private _CommandDictionary As Dictionary(Of String, Object)
+
     Friend ReadOnly Property CommandDictionary As Dictionary(Of String, Object)
         Get
             If Me._CommandDictionary Is Nothing Then
@@ -542,7 +556,7 @@ Public Class RpaSystem
                 dat.Transaction.CommandText = Me.LateBindingCommands(0)
                 Me.LateBindingCommands = RpaModule.Pop(Of List(Of String))(Me.LateBindingCommands)
             ElseIf Me.FastBindingCommands.Count > 0 Then
-                Console.WriteLine($"更新プログラムを実行中・・・")
+                Call RpaWriteLine($"更新プログラムを実行中・・・")
                 dat.Transaction.IsAutoCommand = True
                 autocmdflag = True
                 fastcmdflag = True
@@ -597,8 +611,8 @@ Public Class RpaSystem
             '---------------------------------------------------------------------------------'
             Dim err0 As String = $"コマンド  '{dat.Transaction.CommandText}' はありません"
             If cmd Is Nothing Then
-                Console.WriteLine(err0)
-                Console.WriteLine()
+                Call RpaWriteLine(err0)
+                Call RpaWriteLine()
                 cmdlog.Result = RESULT_F
                 cmdlog.ResultString = err0
                 Throw (New Exception)
@@ -606,15 +620,15 @@ Public Class RpaSystem
 
             Dim err1 As String = $"パラメータ数が範囲外です: 許容パラメータ数範囲={cmd.ExecutableParameterCount(0)}~{cmd.ExecutableParameterCount(1)}"
             If cmd.ExecutableParameterCount(0) > dat.Transaction.Parameters.Count Then
-                Console.WriteLine(err1)
-                Console.WriteLine()
+                Call RpaWriteLine(err1)
+                Call RpaWriteLine()
                 cmdlog.Result = RESULT_F
                 cmdlog.ResultString = err1
                 Throw (New Exception)
             End If
             If cmd.ExecutableParameterCount(1) < dat.Transaction.Parameters.Count Then
-                Console.WriteLine(err1)
-                Console.WriteLine()
+                Call RpaWriteLine(err1)
+                Call RpaWriteLine()
                 cmdlog.Result = RESULT_F
                 cmdlog.ResultString = err1
                 Throw (New Exception)
@@ -623,8 +637,8 @@ Public Class RpaSystem
             Dim err2 As String = $"プロジェクトが存在しないため、実行できません"
             If Not cmd.ExecuteIfNoProject Then
                 If dat.Project Is Nothing Then
-                    Console.WriteLine(err2)
-                    Console.WriteLine()
+                    Call RpaWriteLine(err2)
+                    Call RpaWriteLine()
                     cmdlog.Result = RESULT_F
                     cmdlog.ResultString = err2
                     Throw (New Exception)
@@ -635,8 +649,8 @@ Public Class RpaSystem
             Dim archs As String() = cmd.ExecutableProjectArchitectures
             If Not archs.Contains("AllArchitectures") Then
                 If Not archs.Contains(dat.Project.SystemArchTypeName) Then
-                    Console.WriteLine(err3)
-                    Console.WriteLine()
+                    Call RpaWriteLine(err3)
+                    Call RpaWriteLine()
                     cmdlog.Result = RESULT_F
                     cmdlog.ResultString = err3
                     Throw (New Exception)
@@ -647,8 +661,8 @@ Public Class RpaSystem
             Dim users As String() = cmd.ExecutableUser
             If Not users.Contains("AllUser") Then
                 If Not users.Contains(dat.Initializer.UserLevel) Then
-                    Console.WriteLine(err4)
-                    Console.WriteLine()
+                    Call RpaWriteLine(err4)
+                    Call RpaWriteLine()
                     cmdlog.Result = RESULT_F
                     cmdlog.ResultString = err4
                     Throw (New Exception)
@@ -657,8 +671,8 @@ Public Class RpaSystem
 
             Dim err5 As String = $"コマンドは実行出来ませんでした"
             If Not cmd.CanExecute(dat) Then
-                Console.WriteLine(err5)
-                Console.WriteLine()
+                Call RpaWriteLine(err5)
+                Call RpaWriteLine()
                 cmdlog.Result = RESULT_F
                 cmdlog.ResultString = err5
                 Throw (New Exception)
@@ -685,15 +699,15 @@ Public Class RpaSystem
             ' Exceptionを利用するのは気持ち悪いので、修正するかも・・・
             ' cmdlog.Result が空文字の場合、例外が発生する場合
             If String.IsNullOrEmpty(cmdlog.Result) Then
-                Console.WriteLine($"({Me.GetType.Name}) {ex.Message}")
-                Console.WriteLine()
+                Call RpaWriteLine($"({Me.GetType.Name}) {ex.Message}")
+                Call RpaWriteLine()
                 cmdlog.Result = RESULT_E
                 cmdlog.ResultString = ex.Message
             End If
 
             If latecmdflag Or fastcmdflag Then
-                Console.WriteLine($"自動生成されたコマンド '{dat.Transaction.CommandText}' は失敗しました")
-                Console.WriteLine()
+                Call RpaWriteLine($"自動生成されたコマンド '{dat.Transaction.CommandText}' は失敗しました")
+                Call RpaWriteLine()
                 Me.LateBindingCommands = New List(Of String)
                 Me.FastBindingCommands = New List(Of String)
             End If
@@ -714,5 +728,34 @@ Public Class RpaSystem
             dat.Transaction.CommandLogs.Add(cmdlog)
             dat.Transaction.Parameters = New List(Of String)
         End Try
+    End Sub
+
+    Public Sub RpaWriteLine(Optional wline As String = vbNullString)
+        ' Cuiの場合
+        If Me.ExecuteMode = ExecuteModeNumber.RpaCui Then
+            Console.WriteLine(wline)
+        ElseIf Me.ExecuteMode = ExecuteModeNumber.RpaGui Then
+            Call AsyncRpaWriteLine(wline)
+        End If
+    End Sub
+
+    'Private Async Sub AsyncRpaWriteLine(ByVal wline As String)
+    '    ' Guiの場合
+    '    Dim t As Task = Task.Run(
+    '        Sub()
+    '            Me.Output.OutputText &= $"{wline}{vbCrLf}"
+    '        End Sub
+    '    )
+    '    Await t
+    'End Sub
+    Private Async Sub AsyncRpaWriteLine(ByVal wline As String)
+        ' Guiの場合
+        Dim t As Task(Of String) = Task.Run(
+            Function()
+                Return wline
+            End Function
+        )
+        Await t
+        Me.Output.OutputText &= $"{t.Result}{vbCrLf}"
     End Sub
 End Class

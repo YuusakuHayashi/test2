@@ -134,6 +134,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Command\PushRobotCommand.vb" />
+    <Compile Include="OutputData.vb" />
     <Compile Include="RpaBase.vb" />
     <Compile Include="RpaCodes.vb" />
     <Compile Include="Command\RpaCommandBase.vb" />

@@ -18,7 +18,8 @@ Public Class Controller
     Public Shared Property SystemDllDirectory As String
         Get
             If String.IsNullOrEmpty(Controller._SystemDllDirectory) Then
-                Controller._SystemDllDirectory = $"{Controller.SystemDirectory}\dll"
+                'Controller._SystemDllDirectory = $"{Controller.SystemDirectory}\dll"
+                Controller._SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
                 If Not Directory.Exists(Controller._SystemDllDirectory) Then
                     Directory.CreateDirectory(Controller._SystemDllDirectory)
                 End If
@@ -48,6 +49,7 @@ Public Class Controller
         ' DLLロード
         ' アップデート・デバッグパスには現状対応してない
         Dim rpa00dll As String = $"{Controller.SystemDllDirectory}\Rpa00.dll"
+        'Dim rpa00dll As String = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\bin\Debug\Rpa00.dll"
         Dim asm As Assembly = Assembly.LoadFrom(rpa00dll)
         Dim [mod] As [Module] = asm.GetModule("Rpa00.dll")
         Dim dat_type = [mod].GetType("Rpa00.RpaDataWrapper")
