@@ -1,4 +1,6 @@
-﻿Public MustInherit Class RpaUtilityCommandBase : Implements RpaCommandInterface
+﻿Imports Rpa00
+
+Public MustInherit Class RpaUtilityCommandBase : Implements RpaCommandInterface
 
     Public Overridable ReadOnly Property ExecutableProjectArchitectures As String() Implements RpaCommandInterface.ExecutableProjectArchitectures
         Get

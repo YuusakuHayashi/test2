@@ -2,7 +2,7 @@
 Imports System.Collections.ObjectModel
 Imports System.Collections.Specialized
 
-Public Class ControllerViewModel : Inherits ViewModelBase
+Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel)
 
     ' !!! RpaDataWrapper型のdllオブジェクトがキャストされる
     ' 別プロジェクトのせいか、RpaDataWrapper型としては定義できなかった
@@ -45,7 +45,7 @@ Public Class ControllerViewModel : Inherits ViewModelBase
             If Me._SelectedMenu Is Nothing Then
                 Dim i As Integer = -1
                 Me._SelectedMenu = New ObservableCollection(Of ExecuteMenu)
-                Me._SelectedMenu.Add(New ExecuteMenu With {.Name = "起動＆チェック", .DataObject = (New RunnerViewModel(Data))}) : AddHandler Me._SelectedMenu((i + 1)).PropertyChanged, AddressOf CheckSwitchMenu
+                Me._SelectedMenu.Add(New ExecuteMenu With {.Name = "起動＆チェック", .DataObject = (New RunnerViewModel)}) : AddHandler Me._SelectedMenu((i + 1)).PropertyChanged, AddressOf CheckSwitchMenu
             End If
             Return Me._SelectedMenu
         End Get
@@ -63,6 +63,7 @@ Public Class ControllerViewModel : Inherits ViewModelBase
     End Sub
 
     Private Function SwitchMenu(ByRef menu As ExecuteMenu) As Integer
+        Call menu.DataObject.Initialize(Data)
         Me.Content = menu.DataObject
         Return 0
     End Function

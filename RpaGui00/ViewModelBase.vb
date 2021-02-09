@@ -1,6 +1,8 @@
 ﻿Imports System.ComponentModel
 Imports System.Collections.Specialized
-Public Class ViewModelBase : Implements INotifyPropertyChanged, INotifyCollectionChanged
+Public Class ViewModelBase(Of T As {New})
+    Inherits Rpa00.JsonHandler(Of T)
+    Implements INotifyPropertyChanged, INotifyCollectionChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
     Public Event CollectionChanged As NotifyCollectionChangedEventHandler Implements INotifyCollectionChanged.CollectionChanged

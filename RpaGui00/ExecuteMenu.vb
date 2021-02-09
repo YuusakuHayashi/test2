@@ -1,4 +1,4 @@
-﻿Public Class ExecuteMenu : Inherits ViewModelBase
+﻿Public Class ExecuteMenu : Inherits ViewModelBase(Of ExecuteMenu)
 
     Private _Name As String
     Public Property Name As String

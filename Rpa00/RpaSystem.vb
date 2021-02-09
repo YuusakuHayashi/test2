@@ -1,24 +1,40 @@
-﻿Imports System.IO
+﻿Imports System.ComponentModel
+Imports System.IO
 
-Public Class RpaSystem
+Public Class RpaSystem : Implements INotifyPropertyChanged
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+    Protected Sub RaisePropertyChanged(ByVal PropertyName As String)
+        RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(PropertyName))
+    End Sub
+
     Public Enum ExecuteModeNumber
         RpaCui = 0
         RpaGui = 1
     End Enum
 
     ' 2021/02/08 : Gui化のため追加
-    Private _Output As OutputData
-    Public Property Output As OutputData
+    Private _OutputText As String
+    Public Property OutputText As String
         Get
-            If Me._Output Is Nothing Then
-                Me._Output = New OutputData
-            End If
-            Return Me._Output
+            Return Me._OutputText
         End Get
-        Set(value As OutputData)
-            Me._Output = value
+        Set(value As String)
+            Me._OutputText = value
+            RaisePropertyChanged("OutputText")
         End Set
     End Property
+    'Private _Output As OutputData
+    'Public Property Output As OutputData
+    '    Get
+    '        If Me._Output Is Nothing Then
+    '            Me._Output = New OutputData
+    '        End If
+    '        Return Me._Output
+    '    End Get
+    '    Set(value As OutputData)
+    '        Me._Output = value
+    '    End Set
+    'End Property
 
     Private _ExecuteMode As Integer
     Public Property ExecuteMode As Integer
@@ -27,6 +43,17 @@ Public Class RpaSystem
         End Get
         Set(value As Integer)
             Me._ExecuteMode = value
+        End Set
+    End Property
+
+    Private _IsRunTime As Boolean
+    Public Property IsRunTime As Boolean
+        Get
+            Return Me._IsRunTime
+        End Get
+        Set(value As Boolean)
+            Me._IsRunTime = value
+            RaisePropertyChanged("IsRunTime")
         End Set
     End Property
 
@@ -190,6 +217,7 @@ Public Class RpaSystem
                 Me._CommandDictionary.Add("help", (New HelpCommand))
                 Me._CommandDictionary.Add("selectmydirectory", (New SelectMyDirectoryCommand))
                 Me._CommandDictionary.Add("addalias", (New AddAliasCommand))
+                Me._CommandDictionary.Add("checkrobot", (New CheckRobotCommand))
             End If
             Return Me._CommandDictionary
         End Get
@@ -421,7 +449,7 @@ Public Class RpaSystem
         Return 0
     End Function
 
-    Public Sub Main(ByRef dat As RpaDataWrapper)
+    Public Async Sub Main(dat As RpaDataWrapper)
         Dim i As Integer = BackupMonthlyLog(dat)               ' 当月ログ保存
 
         Do
@@ -533,7 +561,7 @@ Public Class RpaSystem
     End Function
 
     ' Gui対応の為、Publicプロシージャに変更
-    Public Sub CuiLoop(ByRef dat As RpaDataWrapper)
+    Public Async Sub CuiLoop(dat As RpaDataWrapper)
         Dim cmdlog As RpaTransaction.CommandLogData = Nothing
         Const RESULT_S As String = "Success"
         Const RESULT_F As String = "Failed"
@@ -541,6 +569,7 @@ Public Class RpaSystem
         Dim fastcmdflag As Boolean = False
         Dim latecmdflag As Boolean = False
         Try
+            Me.IsRunTime = True
             Dim autocmdflag As Boolean = False
             dat.Transaction.IsAutoCommand = False
 
@@ -680,7 +709,18 @@ Public Class RpaSystem
             '---------------------------------------------------------------------------------'
 
             Dim [from] As DateTime = DateTime.Now
-            dat.Transaction.ReturnCode = cmd.Execute(dat)
+            If Me.ExecuteMode = ExecuteModeNumber.RpaCui Then
+                dat.Transaction.ReturnCode = cmd.Execute(dat)
+            ElseIf Me.ExecuteMode = ExecuteModeNumber.RpaGui Then
+                Dim t As Task(Of Integer) = Task.Run(
+                    Function()
+                        Dim x As Integer = cmd.Execute(dat)
+                        Return x
+                    End Function
+                )
+                Await t
+                dat.Transaction.ReturnCode = t.Result
+            End If
             Dim [to] As DateTime = DateTime.Now
             cmdlog.ExecuteTime = [to] - [from]
 
@@ -727,6 +767,7 @@ Public Class RpaSystem
 
             dat.Transaction.CommandLogs.Add(cmdlog)
             dat.Transaction.Parameters = New List(Of String)
+            Me.IsRunTime = False
         End Try
     End Sub
 
@@ -735,7 +776,7 @@ Public Class RpaSystem
         If Me.ExecuteMode = ExecuteModeNumber.RpaCui Then
             Console.WriteLine(wline)
         ElseIf Me.ExecuteMode = ExecuteModeNumber.RpaGui Then
-            Call AsyncRpaWriteLine(wline)
+            Me.OutputText &= $"{wline}{vbCrLf}"
         End If
     End Sub
 
@@ -748,14 +789,4 @@ Public Class RpaSystem
     '    )
     '    Await t
     'End Sub
-    Private Async Sub AsyncRpaWriteLine(ByVal wline As String)
-        ' Guiの場合
-        Dim t As Task(Of String) = Task.Run(
-            Function()
-                Return wline
-            End Function
-        )
-        Await t
-        Me.Output.OutputText &= $"{t.Result}{vbCrLf}"
-    End Sub
 End Class

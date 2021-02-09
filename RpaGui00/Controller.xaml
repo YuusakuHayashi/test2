@@ -31,16 +31,17 @@
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="3" />
+            <RowDefinition Height="5" />
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="3" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <TreeView Grid.Row="0" Grid.RowSpan="3" Grid.Column="0">
             <TreeViewItem 
+                FontSize="11"
                 IsExpanded="True"
                 Header="メニュー一覧"
                 ItemsSource="{Binding SelectedMenu}">
@@ -67,8 +68,10 @@
         <ContentControl 
             Grid.Row="0" Grid.Column="2"
             Content="{Binding Content}" />
-        <TextBlock 
-            Grid.Row="2" Grid.Column="2"
-            Text="{Binding Data.System.Output.OutputText}" />
+        <ScrollViewer Grid.Row="2" Grid.Column="2">
+            <TextBlock                 
+                Grid.Row="2" Grid.Column="2"
+                FontFamily="ＭＳ ゴシック" FontSize="11" Text="{Binding Data.System.OutputText}" />
+        </ScrollViewer>
     </Grid>
 </UserControl>

@@ -64,6 +64,15 @@ Public Module RpaModule
         Return [new]
     End Function
 
+    Public Function Push(Of T, TList As {New, IList(Of T)})(ByVal elm As T, ByVal [old] As TList) As TList
+        Dim [new] As New TList
+        [new].Add(elm)
+        For Each elm In old
+            [new].Add(elm)
+        Next
+        Return [new]
+    End Function
+
     Public Sub Save(ByVal savefile As String, ByRef obj As Object, ByVal chgfile As String)
         obj.Save(savefile, obj)
         File.Delete(chgfile)

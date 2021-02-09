@@ -113,8 +113,35 @@
         Return i
     End Function
 
-    Public Delegate Function ExecuteDelegater(ByRef dat As RpaDataWrapper) As Integer
+    'Public Overloads Function AsyncExecute() As Integer Implements RpaCommandInterface.AsyncExecute
+    '    Throw New NotImplementedException()
+    'End Function
 
+    'Public Overridable Overloads Async Function AsyncExecute(dat As RpaDataWrapper) As Task(Of Integer)
+    '    Dim i As Integer = -1
+    '    Try
+    '        Dim dlg As ExecuteDelegater = Me.ExecuteHandler
+    '        If dlg Is Nothing Then
+    '            Throw New NotImplementedException()
+    '        Else
+    '            Dim t As Task(Of Integer) = Task.Run(
+    '                Function()
+    '                    Dim j As Integer = dlg(dat)
+    '                    Return j
+    '                End Function
+    '            )
+    '            Await t
+    '            i = t.Result
+    '        End If
+    '    Catch ex As Exception
+    '        Console.WriteLine($"({Me.GetType.Name}.ExecuteHandler) {ex.Message}")
+    '        Console.WriteLine()
+    '        i = -1
+    '    End Try
+    '    Return i
+    'End Function
+
+    Public Delegate Function ExecuteDelegater(ByRef dat As RpaDataWrapper) As Integer
     Private _ExecuteHandler As ExecuteDelegater
     Public Property ExecuteHandler As ExecuteDelegater
         Get

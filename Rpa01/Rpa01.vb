@@ -1459,6 +1459,275 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Return rtn
     End Function
 
+    'Private Function Check(ByRef dat As Object) As Boolean
+    '    Dim obj1, obj2, obj3, obj4, obj5
+    '    Dim bool1, bool2, bool3, bool4, bool5
+    '    Dim str1, str2, str3, str4, str5
+    '    Dim mutil As New Rpa00.RpaMacroUtility
+    '    Dim outil As New Rpa00.RpaOutlookUtility
+    '    Dim sutil As New Rpa00.RpaShellUtility
+
+    '    ' 1. マクロモジュールチェック
+    '    '-----------------------------------------------------------------------------------------'
+    '    If Not File.Exists(mutil.MacroFileName) Then
+    '        Call dat.System.RpaWriteLine($"マクロファイル '{mutil.MacroFileName}' が存在しません")
+    '        Return False
+    '    End If
+    '    obj1 = Nothing
+    '    bool1 = True
+    '    For Each [mod] In {"Rpa01", "RpaSystem", "RpaLibrary"}
+    '        obj1 = mutil.InvokeMacroFunction("MacroImporter.IsModuleExist", {[mod]})
+    '        If obj1 IsNot Nothing Then
+    '            bool2 = CType(obj1, Boolean)
+    '            If Not bool2 Then
+    '                Call dat.System.RpaWriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
+    '                bool1 = False
+    '            End If
+    '        Else
+    '            Call dat.System.RpaWriteLine($"モジュールのチェックに失敗しました")
+    '            bool1 = False
+    '            Exit For
+    '        End If
+    '    Next
+    '    If Not bool1 Then
+    '        Return False
+    '    End If
+    '    '-----------------------------------------------------------------------------------------'
+
+    '    ' 2. プリンタ名チェック
+    '    '-----------------------------------------------------------------------------------------'
+    '    Dim prn As String = vbNullString
+    '    prn = IIf(String.IsNullOrEmpty(dat.Project.PrinterName), prn, dat.Project.PrinterName)
+    '    prn = IIf(String.IsNullOrEmpty(Me.PrinterName), prn, Me.PrinterName)
+    '    If String.IsNullOrEmpty(prn) Then
+    '        Call dat.System.RpaWriteLine($"プリンター名が指定されていません")
+    '        Return False
+    '    End If
+    '    '-----------------------------------------------------------------------------------------'
+
+    '    ' 3. Outlook関連チェック
+    '    '-----------------------------------------------------------------------------------------'
+    '    If String.IsNullOrEmpty(Me.AttacheCase) Then
+    '        Call dat.System.RpaWriteLine($"'MyRobotObject.AttacheCase' が指定されていません")
+    '        Return False
+    '    End If
+    '    If Not File.Exists(Me.AttacheCase) Then
+    '        Call dat.System.RpaWriteLine($"アタッシュケース '{Me.AttacheCase}' が存在しません")
+    '        Return False
+    '    End If
+
+    '    If String.IsNullOrEmpty(Me.OutlookSourceInboxName) Then
+    '        Call dat.System.RpaWriteLine($"'MyRobotObject.OutlookSourceInboxName' が指定されていません")
+    '        Return False
+    '    End If
+    '    If String.IsNullOrEmpty(Me.OutlookBackupInboxName) Then
+    '        Call dat.System.RpaWriteLine($"'MyRobotObject.OutlookBackupInboxName' が指定されていません")
+    '        Return False
+    '    End If
+    '    For Each [folder] In {Me.OutlookSourceInboxName, Me.OutlookBackupInboxName}
+    '        If Not (outil.IsInboxFolderExist([folder])) Then
+    '            Call dat.System.RpaWriteLine($"受信トレイに '{[folder]}' が存在しません")
+    '            Return False
+    '        End If
+    '    Next
+
+    '    obj1 = Nothing                                    '   添付ファイル名（オブジェクト型）
+    '    str1 = vbNullString                               '   添付ファイル名（ファイル名のみ） 
+    '    ' 添付ファイル保存後
+    '    str2 = vbNullString                               '   添付ファイル（フルパス）
+    '    str3 = vbNullString                               '   添付ファイル（ファイル名のみ（拡張子除く））
+    '    Call dat.System.RpaWriteLine("添付ファイルを検索しています...")
+
+    '    ' 添付ファイルを保存し、その名前を取得
+    '    obj1 = outil.InvokeOutlookMacroFunction(AddressOf _GetAttachmentFile)
+    '    If obj1 IsNot Nothing Then
+    '        str1 = CType(obj1, String)
+    '    End If
+    '    If String.IsNullOrEmpty(str1) Then
+    '        Call dat.System.RpaWriteLine("エラー：添付ファイルが見つかりません")
+    '        Call dat.System.RpaWriteLine()
+    '        Return False
+    '    End If
+
+    '    For Each f In Directory.GetFiles(Me.WorkDirectory)
+    '        If Path.GetFileName(f) = str1 Then
+    '            str2 = f
+    '        End If
+    '    Next
+    '    If String.IsNullOrEmpty(str2) Then
+    '        Call dat.System.RpaWriteLine("エラー：添付ファイルが見つかりません")
+    '        Return False
+    '    End If
+    '    str3 = Path.GetFileNameWithoutExtension(str2)
+    '    Me.InputXlsFileName = $"{Me.WorkDirectory}\{str3}.xls"
+
+    '    ' 添付ファイルを解凍
+    '    Call dat.System.RpaWriteLine("添付ファイルを解凍します...")
+    '    Call sutil.RunShell(Me.AttacheCase, $"""{str2}"" /p={Me.PasswordOfAttacheCase} /de=1 /ow=0 /opf=0 /exit=1")
+    '    If Not File.Exists(Me.InputXlsFileName) Then
+    '        Call dat.System.RpaWriteLine($"エラー：解凍後ファイル '{Me.InputXlsFileName}' がありません")
+    '        Return False
+    '    End If
+    '    '-----------------------------------------------------------------------------------------'
+
+    '    ' 4. 口座振替スケジュールファイルのチェック(2021/02/08追加)
+    '    '-----------------------------------------------------------------------------------------'
+    '    If String.IsNullOrEmpty(MatsNenkanScheduleFileName) Then
+    '        Call dat.System.RpaWriteLine($"'MatsNenkanScheduleFileName' が指定されていません")
+    '        Return False
+    '    End If
+    '    If Not File.Exists(MatsNenkanScheduleFileName) Then
+    '        Call dat.System.RpaWriteLine($"ファイル '{Me.MatsNenkanScheduleFileName}' は存在しません")
+    '        Return False
+    '    End If
+
+    '    ' シートチェック
+    '    If String.IsNullOrEmpty(MatsNenkanScheduleSheetName) Then
+    '        Call dat.System.RpaWriteLine($"'MatsNenkanScheduleSheetName' が指定されていません")
+    '        Return False
+    '    End If
+    '    obj1 = Nothing
+    '    bool1 = True
+    '    obj1 = mutil.InvokeMacroFunction("RpaSystem.IsSheetExist", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName})
+    '    If obj1 IsNot Nothing Then
+    '        bool2 = CType(obj1, Boolean)
+    '        If Not bool2 Then
+    '            Call dat.System.RpaWriteLine($"シート名 '{Me.MatsNenkanScheduleSheetName}' は、 '{Me.MatsNenkanScheduleFileName}' 内に存在しません")
+    '            bool1 = False
+    '        End If
+    '    Else
+    '        Call dat.System.RpaWriteLine($"シートのチェックに失敗しました")
+    '        bool1 = False
+    '    End If
+    '    If Not bool1 Then
+    '        Return False
+    '    End If
+
+    '    Dim MM As Integer = DateTime.Now.Month
+    '    Me.FurikaeSiteibiCell = vbNullString
+    '    If MM = 1 Then
+    '        If String.IsNullOrEmpty(Me.Mats01Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats01Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats01Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 2 Then
+    '        If String.IsNullOrEmpty(Me.Mats02Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats02Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats02Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 3 Then
+    '        If String.IsNullOrEmpty(Me.Mats03Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats03Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats03Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 4 Then
+    '        If String.IsNullOrEmpty(Me.Mats04Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats04Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats04Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 5 Then
+    '        If String.IsNullOrEmpty(Me.Mats05Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats05Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats05Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 6 Then
+    '        If String.IsNullOrEmpty(Me.Mats06Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats06Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats06Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 7 Then
+    '        If String.IsNullOrEmpty(Me.Mats07Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats07Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats07Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 8 Then
+    '        If String.IsNullOrEmpty(Me.Mats08Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats08Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats08Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 9 Then
+    '        If String.IsNullOrEmpty(Me.Mats09Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats09Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats09Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 10 Then
+    '        If String.IsNullOrEmpty(Me.Mats10Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats10Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats10Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 11 Then
+    '        If String.IsNullOrEmpty(Me.Mats11Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats11Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats11Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+    '    If MM = 12 Then
+    '        If String.IsNullOrEmpty(Me.Mats12Gatsu12FurikaebiCell) Then
+    '            Call dat.System.RpaWriteLine($"'Mats12Gatsu12FurikaebiCell' が指定されていません")
+    '            Return False
+    '        Else
+    '            Me.FurikaeSiteibiCell = Me.Mats12Gatsu12FurikaebiCell
+    '        End If
+    '    End If
+
+    '    Dim dt As DateTime
+    '    Dim ci As New CultureInfo("ja-JP")
+    '    obj1 = Nothing
+    '    bool1 = True
+    '    obj1 = mutil.InvokeMacroFunction("RpaSystem.GetCellText", {Me.MatsNenkanScheduleFileName, Me.MatsNenkanScheduleSheetName, Me.FurikaeSiteibiCell})
+    '    If obj1 IsNot Nothing Then
+    '        str1 = CType(obj1, String)
+    '        If String.IsNullOrEmpty(str1) Then
+    '            Call dat.System.RpaWriteLine($"振替指定日の対象セル '{Me.FurikaeSiteibiCell}' の値は空でした")
+    '            bool1 = False
+    '        Else
+    '            dt = DateTime.ParseExact(str1, "M月d日", ci)
+    '            Me.FurikaeSiteibi = dt
+    '        End If
+    '    Else
+    '        Call dat.System.RpaWriteLine($"振替指定日の対象セルの取得に失敗しました")
+    '        bool1 = False
+    '    End If
+    '    If Not bool1 Then
+    '        Return False
+    '    End If
+    '    '-----------------------------------------------------------------------------------------'
+
+    '    Return True
+    'End Function
+
     Private Function Check(ByRef dat As Object) As Boolean
         Dim obj1, obj2, obj3, obj4, obj5
         Dim bool1, bool2, bool3, bool4, bool5
@@ -1466,6 +1735,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         Dim mutil As New Rpa00.RpaMacroUtility
         Dim outil As New Rpa00.RpaOutlookUtility
         Dim sutil As New Rpa00.RpaShellUtility
+        Dim t1 As Task(Of Boolean), t2, t3, t4, t5
 
         ' 1. マクロモジュールチェック
         '-----------------------------------------------------------------------------------------'
@@ -1492,6 +1762,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         If Not bool1 Then
             Return False
         End If
+        '-----------------------------------------------------------------------------------------'
         '-----------------------------------------------------------------------------------------'
 
         ' 2. プリンタ名チェック

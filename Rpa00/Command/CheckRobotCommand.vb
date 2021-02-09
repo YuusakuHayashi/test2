@@ -1,4 +1,4 @@
-﻿Public Class RunRobotCommand : Inherits RpaCommandBase
+﻿Public Class CheckRobotCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim i = 0
         'MyRobotObjectのリロード用
@@ -9,7 +9,9 @@
         If dat.Project.CanExecute(dat) Then
             Call dat.System.RpaWriteLine($"ロボットの起動条件を確認しています・・・")
             If dat.Project.MyRobotObject.CanExecute(dat) Then
-                i = dat.Project.MyRobotObject.Execute(dat)
+                Call dat.System.RpaWriteLine("ロボットは起動条件を満たしています")
+                Call dat.System.RpaWriteLine()
+                i = 0
             Else
                 Call dat.System.RpaWriteLine("ロボットが起動条件を満たしていません")
                 Call dat.System.RpaWriteLine()
@@ -25,6 +27,5 @@
 
     Sub New()
         Me.ExecuteHandler = AddressOf Me.Main
-        Me.ExecutableParameterCount = {0, 999}
     End Sub
 End Class

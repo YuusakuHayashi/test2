@@ -1,5 +1,4 @@
 ﻿Public Interface RpaCommandInterface
-
     Function Execute() As Integer
     Function CanExecute() As Boolean
     ReadOnly Property ExecutableProjectArchitectures As String()

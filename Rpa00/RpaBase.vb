@@ -34,7 +34,6 @@ Public MustInherit Class RpaBase(Of T As {New}) : Inherits Rpa00.JsonHandler(Of 
         Return i
     End Function
 
-
     Public Delegate Function CanExecuteDelegater(ByRef dat As Object) As Boolean
     Private _CanExecuteHandler As CanExecuteDelegater
     <JsonIgnore>
@@ -63,6 +62,40 @@ Public MustInherit Class RpaBase(Of T As {New}) : Inherits Rpa00.JsonHandler(Of 
         End Try
         Return b
     End Function
+
+    'Public Function CanExecute(dat As Object) As Boolean
+    '    Dim b As Boolean = False
+    '    Try
+    '        Dim dlg As CanAsyncExecuteDelegater = Me.CanAsyncExecuteHandler
+    '        If dlg Is Nothing Then
+    '            Throw New NotImplementedException
+    '        Else
+    '            Dim t As Task(Of Boolean) = Task.Run(
+    '                Function()
+    '                    Return dlg(dat)
+    '                End Function
+    '            )
+    '            b = t.Result
+    '        End If
+    '    Catch ex As Exception
+    '        Console.WriteLine($"({Me.GetType.Name}.CanExecute) {ex.Message}")
+    '        Console.WriteLine()
+    '        b = False
+    '    End Try
+    '    Return b
+    'End Function
+
+    Public Delegate Function CanAsyncExecuteDelegater(dat As Object) As Task(Of Boolean)
+    Private _CanAsyncExecuteHandler As CanAsyncExecuteDelegater
+    <JsonIgnore>
+    Public Property CanAsyncExecuteHandler As CanAsyncExecuteDelegater
+        Get
+            Return Me._CanAsyncExecuteHandler
+        End Get
+        Set(value As CanAsyncExecuteDelegater)
+            Me._CanAsyncExecuteHandler = value
+        End Set
+    End Property
 
     <JsonIgnore>
     Public Data As Object
