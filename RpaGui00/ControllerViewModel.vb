@@ -1,73 +1,83 @@
 ﻿Imports System.ComponentModel
 Imports System.Collections.ObjectModel
 Imports System.Collections.Specialized
+Imports Newtonsoft.Json
 
 Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel)
-
     ' !!! RpaDataWrapper型のdllオブジェクトがキャストされる
     ' 別プロジェクトのせいか、RpaDataWrapper型としては定義できなかった
     ' (するとキャスト時エラーになる)
     Private _Data As Object
+    <JsonIgnore>
     Public Property Data As Object
         Get
             Return Me._Data
         End Get
         Set(value As Object)
             Me._Data = value
+            Call RaisePropertyChanged("Data")
         End Set
     End Property
 
-    Private _Content As Object
-    Public Property Content As Object
+    Private _ExplorerTabIndex As Integer
+    Public Property ExplorerTabIndex As Integer
         Get
-            Return Me._Content
+            Return Me._ExplorerTabIndex
+        End Get
+        Set(value As Integer)
+            Me._ExplorerTabIndex = value
+        End Set
+    End Property
+
+    Private _ExplorerTabs As ObservableCollection(Of TabItemViewModel)
+    Public ReadOnly Property ExplorerTabs As ObservableCollection(Of TabItemViewModel)
+        Get
+            If Me._ExplorerTabs Is Nothing Then
+                Me._ExplorerTabs = New ObservableCollection(Of TabItemViewModel)
+                Me._ExplorerTabs.Add(New TabItemViewModel With {.Header = "メニュー", .Content = New MenuExplorerViewModel With {.ViewController = Me}})
+            End If
+            Return Me._ExplorerTabs
+        End Get
+    End Property
+
+    Private _OutputTabIndex As Integer
+    Public Property OutputTabIndex As Integer
+        Get
+            Return Me._OutputTabIndex
+        End Get
+        Set(value As Integer)
+            Me._OutputTabIndex = value
+        End Set
+    End Property
+
+    Private _OutputTabs As ObservableCollection(Of TabItemViewModel)
+    Public ReadOnly Property OutputTabs As ObservableCollection(Of TabItemViewModel)
+        Get
+            If Me._OutputTabs Is Nothing Then
+                Me._OutputTabs = New ObservableCollection(Of TabItemViewModel)
+                Me._OutputTabs.Add(New TabItemViewModel With {.Header = "コンソール", .Content = New ConsoleOutputViewModel With {.ViewController = Me}})
+            End If
+            Return Me._OutputTabs
+        End Get
+    End Property
+
+    Private _MainContent As Object
+    <JsonIgnore>
+    Public Property MainContent As Object
+        Get
+            If Me._MainContent Is Nothing Then
+                Me._MainContent = New NoContentViewModel
+            End If
+            Return Me._MainContent
         End Get
         Set(value As Object)
-            Me._Content = value
-            Call RaisePropertyChanged("Content")
+            Me._MainContent = value
+            Call RaisePropertyChanged("MainContent")
         End Set
     End Property
-
-    Private _Output As Rpa00.OutputData
-    Public Property Output As Rpa00.OutputData
-        Get
-            Return Me._Output
-        End Get
-        Set(value As Rpa00.OutputData)
-            Me._Output = value
-            RaisePropertyChanged("Output")
-        End Set
-    End Property
-
-    Private _SelectedMenu As ObservableCollection(Of ExecuteMenu)
-    Public ReadOnly Property SelectedMenu As ObservableCollection(Of ExecuteMenu)
-        Get
-            If Me._SelectedMenu Is Nothing Then
-                Dim i As Integer = -1
-                Me._SelectedMenu = New ObservableCollection(Of ExecuteMenu)
-                Me._SelectedMenu.Add(New ExecuteMenu With {.Name = "起動＆チェック", .DataObject = (New RunnerViewModel)}) : AddHandler Me._SelectedMenu((i + 1)).PropertyChanged, AddressOf CheckSwitchMenu
-            End If
-            Return Me._SelectedMenu
-        End Get
-    End Property
-
-    Private Overloads Sub CheckSwitchMenu(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
-        If sender.GetType.Name = "ExecuteMenu" Then
-            If e.PropertyName = "IsSelected" Then
-                If sender.IsSelected Then
-                    Dim menu As ExecuteMenu = CType(sender, ExecuteMenu)
-                    Dim i As Integer = SwitchMenu(menu)
-                End If
-            End If
-        End If
-    End Sub
-
-    Private Function SwitchMenu(ByRef menu As ExecuteMenu) As Integer
-        Call menu.DataObject.Initialize(Data)
-        Me.Content = menu.DataObject
-        Return 0
-    End Function
 
     Sub New()
+        Me.ExplorerTabIndex = 0
+        Me.OutputTabIndex = 0
     End Sub
 End Class

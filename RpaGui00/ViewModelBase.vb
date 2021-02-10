@@ -1,5 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Collections.Specialized
+Imports Newtonsoft.Json
+
 Public Class ViewModelBase(Of T As {New})
     Inherits Rpa00.JsonHandler(Of T)
     Implements INotifyPropertyChanged, INotifyCollectionChanged
@@ -14,4 +16,19 @@ Public Class ViewModelBase(Of T As {New})
     Protected Sub RaiseCollectionChanged(ByVal PropertyName As String)
         RaiseEvent CollectionChanged(Me, New NotifyCollectionChangedEventArgs(PropertyName))
     End Sub
+
+    ' !!! RpaDataWrapper型のdllオブジェクトがキャストされる
+    ' 別プロジェクトのせいか、RpaDataWrapper型としては定義できなかった
+    ' (するとキャスト時エラーになる)
+    'Private _Data As Object
+    '<JsonIgnore>
+    'Public Property Data As Object
+    '    Get
+    '        Return Me._Data
+    '    End Get
+    '    Set(value As Object)
+    '        Me._Data = value
+    '        Call RaisePropertyChanged("Data")
+    '    End Set
+    'End Property
 End Class

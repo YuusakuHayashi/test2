@@ -8,52 +8,84 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.Resources>
-            <HierarchicalDataTemplate
-                DataType="{x:Type local:ExecuteMenu}">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Name}" />
-                </StackPanel>
-                <!--<HierarchicalDataTemplate.ItemContainerStyle>
-                    <Style TargetType="TreeViewItem">
-                        <Setter 
-                            Property="IsSelected" 
-                            Value="{Binding IsSelected}" />
-                    </Style>
-                </HierarchicalDataTemplate.ItemContainerStyle>-->
-            </HierarchicalDataTemplate>
+            <DataTemplate DataType="{x:Type local:MenuExplorerViewModel}">
+                <ListBox      
+                    HorizontalContentAlignment="Stretch"
+                    SelectedIndex="{Binding MenuIndex}"
+                    ItemsSource="{Binding Menus}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:ExecuteMenu}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DataTemplate>
 
+            <DataTemplate DataType="{x:Type local:ConsoleOutputViewModel}">
+                <ScrollViewer>
+                    <TextBlock                 
+                    Grid.Row="2" Grid.Column="2"
+                    FontFamily="ＭＳ ゴシック" FontSize="11" Text="{Binding Data.System.OutputText}" />
+                </ScrollViewer>
+            </DataTemplate>
+            
             <!-- 増やす時はこの下に追加 -->
             <!-- 起動＆チェック -->
+            <DataTemplate DataType="{x:Type local:NoContentViewModel}">
+                <TextBlock 
+                    TextAlignment="Center"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" 
+                    FontSize="11" Text="コンテンツがありません" />
+            </DataTemplate>
             <DataTemplate DataType="{x:Type local:RunnerViewModel}">
                 <local:Runner />
             </DataTemplate>
             <!-- 増やす時はこの上に追加 -->
+            
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="5" />
-            <RowDefinition Height="100" />
+            <RowDefinition Height="150" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="150" />
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TreeView Grid.Row="0" Grid.RowSpan="3" Grid.Column="0">
-            <TreeViewItem 
-                FontSize="11"
-                IsExpanded="True"
-                Header="メニュー一覧"
-                ItemsSource="{Binding SelectedMenu}">
-                <TreeViewItem.ItemContainerStyle>
-                    <Style TargetType="TreeViewItem">
-                        <Setter 
-                            Property="IsSelected" 
-                            Value="{Binding IsSelected}" />
-                    </Style>
-                </TreeViewItem.ItemContainerStyle>
-            </TreeViewItem>
-        </TreeView>
+        <GroupBox Header="エクスプローラー" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0">
+            <TabControl
+                SelectedIndex="{Binding ExplorerTabIndex}"
+                ItemsSource="{Binding ExplorerTabs}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Header}" />
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <ContentControl Content="{Binding Content}" />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+            <!--<TreeView>
+                <TreeViewItem 
+                    FontSize="11"
+                    IsExpanded="True"
+                    Header="メニュー一覧"
+                    ItemsSource="{Binding SelectedMenu}">
+                    <TreeViewItem.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <Setter 
+                                Property="IsSelected" 
+                                Value="{Binding IsSelected}" />
+                        </Style>
+                    </TreeViewItem.ItemContainerStyle>
+                </TreeViewItem>
+            </TreeView>-->
+        </GroupBox>
         <GridSplitter
             Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
             HorizontalAlignment="Stretch"
@@ -65,13 +97,24 @@
             HorizontalAlignment="Stretch"
             ResizeDirection="Rows"
             ResizeBehavior="PreviousAndNext" />
-        <ContentControl 
-            Grid.Row="0" Grid.Column="2"
-            Content="{Binding Content}" />
-        <ScrollViewer Grid.Row="2" Grid.Column="2">
-            <TextBlock                 
-                Grid.Row="2" Grid.Column="2"
-                FontFamily="ＭＳ ゴシック" FontSize="11" Text="{Binding Data.System.OutputText}" />
-        </ScrollViewer>
+        <GroupBox  Grid.Row="0" Grid.Column="2">
+            <ContentControl Content="{Binding MainContent}" />
+        </GroupBox>
+        <GroupBox Header="出力" Grid.Row="2" Grid.Column="2">
+            <TabControl
+                SelectedIndex="{Binding OutputTabIndex}"
+                ItemsSource="{Binding OutputTabs}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Header}" />
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <ContentControl Content="{Binding Content}" />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </GroupBox>
     </Grid>
 </UserControl>

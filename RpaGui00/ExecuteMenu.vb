@@ -1,5 +1,4 @@
-﻿Public Class ExecuteMenu : Inherits ViewModelBase(Of ExecuteMenu)
-
+﻿Public Class ExecuteMenu
     Private _Name As String
     Public Property Name As String
         Get
@@ -10,36 +9,23 @@
         End Set
     End Property
 
-    Private _IsSelected As Boolean
-    Public Property IsSelected As Boolean
+    Private _Content As Object
+    Public Property Content As Object
         Get
-            Return Me._IsSelected
+            Return Me._Content
         End Get
-        Set(value As Boolean)
-            Me._IsSelected = value
-            RaisePropertyChanged("IsSelected")
+        Set(value As Object)
+            Me._Content = value
         End Set
     End Property
 
-    'Public Delegate Function ExecuteDelegater(ByRef dat As Object) As Integer
-    'Private _ExecuteHandler As ExecuteDelegater
-    'Public Property ExecuteHandler As ExecuteDelegater
-    '    Get
-    '        Return Me._ExecuteHandler
-    '    End Get
-    '    Set(value As ExecuteDelegater)
-    '        Me._ExecuteHandler = value
-    '    End Set
-    'End Property
-
-    Private _DataObject As Object
-
-    Public Property DataObject As Object
+    Private _ContentType As Type
+    Public Property ContentType As Type
         Get
-            Return Me._DataObject
+            Return Me._ContentType
         End Get
-        Set(value As Object)
-            Me._DataObject = value
+        Set(value As Type)
+            Me._ContentType = value
         End Set
     End Property
 End Class

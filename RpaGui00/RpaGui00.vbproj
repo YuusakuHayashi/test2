@@ -66,17 +66,23 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleOutputViewModel.vb" />
     <Compile Include="Controller.xaml.vb">
       <DependentUpon>Controller.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ControllerViewModelBase.vb" />
     <Compile Include="converter\RunnerStatusConverter.vb" />
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="ExecutableMenuBase.vb" />
     <Compile Include="ExecuteMenu.vb" />
+    <Compile Include="MainContentViewModelBase.vb" />
     <Compile Include="MenuController.xaml.vb">
       <DependentUpon>MenuController.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MenuExplorerViewModel.vb" />
+    <Compile Include="TabItemViewModel.vb" />
     <Compile Include="ViewModelBase.vb" />
+    <Compile Include="viewmodel\NoContentViewModel.vb" />
     <Compile Include="viewmodel\RunnerViewModel.vb" />
     <Page Include="Controller.xaml">
       <SubType>Designer</SubType>

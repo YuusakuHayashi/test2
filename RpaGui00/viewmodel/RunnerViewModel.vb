@@ -1,14 +1,14 @@
 ﻿Imports System.Collections.ObjectModel
 Imports Newtonsoft.Json
 
-Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
+Public Class RunnerViewModel : Inherits MainContentViewModelBase(Of RunnerViewModel)
     <JsonIgnore>
     Public ReadOnly Property RunnerJsonFileName As String
         Get
             Dim fil As String = vbNullString
-            If Data IsNot Nothing Then
-                If Data.Project IsNot Nothing Then
-                    fil = $"{Data.Project.MyRobotDirectory}\runner.json"
+            If ViewController.Data IsNot Nothing Then
+                If ViewController.Data.Project IsNot Nothing Then
+                    fil = $"{ViewController.Data.Project.MyRobotDirectory}\runner.json"
                 End If
             End If
             Return fil
@@ -273,9 +273,9 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     Public Property MyRobotReadMe As String
         Get
             If String.IsNullOrEmpty(Me._MyRobotReadMe) Then
-                If Data IsNot Nothing Then
-                    If Data.Project IsNot Nothing Then
-                        Me._MyRobotReadMe = Data.Project.MyRobotReadMe
+                If ViewController.Data IsNot Nothing Then
+                    If ViewController.Data.Project IsNot Nothing Then
+                        Me._MyRobotReadMe = ViewController.Data.Project.MyRobotReadMe
                     End If
                 End If
             End If
@@ -317,9 +317,9 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
 
     Private Sub _CheckRobotCommandExecute(ByVal parameter As Object)
         Me.StatusCode = 1
-        Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
-        Data.System.GuiCommandText = $"checkrobot"
-        Call Data.System.CuiLoop(Data)
+        ViewController.Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
+        ViewController.Data.System.GuiCommandText = $"checkrobot"
+        Call ViewController.Data.System.CuiLoop(ViewController.Data)
     End Sub
 
     Private Async Sub CheckRobotCommandExecute(ByVal parameter As Object)
@@ -376,9 +376,9 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
 
     Private Sub _RunRobotCommandExecute(ByVal parameter As Object)
         Me.StatusCode = 1
-        Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
-        Data.System.GuiCommandText = $"{Me.RunRobotCommandFormalText}"
-        Call Data.System.CuiLoop(Data)
+        ViewController.Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
+        ViewController.Data.System.GuiCommandText = $"{Me.RunRobotCommandFormalText}"
+        Call ViewController.Data.System.CuiLoop(ViewController.Data)
     End Sub
 
     Private Async Sub RunRobotCommandExecute(ByVal parameter As Object)
@@ -468,7 +468,7 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
             If Me.ProcessTime > Me.PreProcessTime Then
                 Me.ProcessTime = 1
             End If
-        Loop Until Not Data.System.IsRunTime
+        Loop Until Not ViewController.Data.System.IsRunTime
     End Sub
 
     Private Function CreateIcon(ByVal filename As String) As BitmapImage
@@ -479,36 +479,34 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
         Return bi
     End Function
 
-    Private Sub _Initialize()
-    End Sub
-
-    Public Overrides Sub Initialize(ByRef dat As Object)
-        MyBase.Initialize(dat)
-        If Data IsNot Nothing Then
-            If Data.Project IsNot Nothing Then
-                Dim vm As RunnerViewModel = Me.Load(Me.RunnerJsonFileName)
-                If vm Is Nothing Then
-                    Me.PreProcessTime = 60
-                    Me.PreRunProcessTime = 60
-                    Me.PreCheckProcessTime = 60
-                    Me._RunRobotCommandTexts = New ObservableCollection(Of String)(New String() {"runrobot"})
-                Else
-                    Me.PreProcessTime = vm.PreProcessTime
-                    Me.PreRunProcessTime = vm.PreRunProcessTime
-                    Me.PreCheckProcessTime = vm.PreCheckProcessTime
-                    Me.RunRobotCommandTexts = vm.RunRobotCommandTexts
+    Public Overrides Sub Initialize()
+        If ViewController IsNot Nothing Then
+            If ViewController.Data IsNot Nothing Then
+                If ViewController.Data.Project IsNot Nothing Then
+                    Dim vm As RunnerViewModel = Me.Load(Me.RunnerJsonFileName)
+                    If vm Is Nothing Then
+                        Me.PreProcessTime = 60
+                        Me.PreRunProcessTime = 60
+                        Me.PreCheckProcessTime = 60
+                        Me._RunRobotCommandTexts = New ObservableCollection(Of String)(New String() {"runrobot"})
+                    Else
+                        Me.PreProcessTime = vm.PreProcessTime
+                        Me.PreRunProcessTime = vm.PreRunProcessTime
+                        Me.PreCheckProcessTime = vm.PreCheckProcessTime
+                        Me.RunRobotCommandTexts = vm.RunRobotCommandTexts
+                    End If
+                    Me.StatusCode = 0
+                    Me.ProjectName = ViewController.Data.Project.ProjectName
+                    Me.RobotName = ViewController.Data.Project.RobotName
+                    Me.RobotAlias = ViewController.Data.Project.RobotAlias
+                    Me.MyRobotDirectory = ViewController.Data.Project.MyRobotDirectory
+                    Me.RootRobotDirectory = ViewController.Data.Project.RootRobotDirectory
+                    Me.RunRobotCommandText = Me.RunRobotCommandTexts(0)
+                    Me.ProcessTime = 0
+                    Me.IsReloadMyRobotReadMeCommandEnabled = True
+                    Me.IsRunRobotCommandEnabled = CheckRunRobotCommandEnabled()
+                    Me.IsCheckRobotCommandEnabled = True
                 End If
-                Me.StatusCode = 0
-                Me.ProjectName = Data.Project.ProjectName
-                Me.RobotName = Data.Project.RobotName
-                Me.RobotAlias = Data.Project.RobotAlias
-                Me.MyRobotDirectory = Data.Project.MyRobotDirectory
-                Me.RootRobotDirectory = Data.Project.RootRobotDirectory
-                Me.RunRobotCommandText = Me.RunRobotCommandTexts(0)
-                Me.ProcessTime = 0
-                Me.IsReloadMyRobotReadMeCommandEnabled = True
-                Me.IsRunRobotCommandEnabled = CheckRunRobotCommandEnabled()
-                Me.IsCheckRobotCommandEnabled = True
             End If
         End If
     End Sub
