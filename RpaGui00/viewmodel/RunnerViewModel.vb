@@ -3,12 +3,12 @@ Imports Newtonsoft.Json
 
 Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     <JsonIgnore>
-    Public ReadOnly Property RunnerFileName As String
+    Public ReadOnly Property RunnerJsonFileName As String
         Get
             Dim fil As String = vbNullString
             If Data IsNot Nothing Then
                 If Data.Project IsNot Nothing Then
-                    fil = $"{Data.Project.MyDirectory}\runner.json"
+                    fil = $"{Data.Project.MyRobotDirectory}\runner.json"
                 End If
             End If
             Return fil
@@ -386,7 +386,7 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
         Me.PreRunProcessTime = Me.ProcessTime
         Me.ProcessTime = 0
         Dim i As Integer = AddParametersText()
-        Call Save(Me.RunnerFileName, Me)
+        Call Save(Me.RunnerJsonFileName, Me)
     End Sub
 
     Private Sub CountProcessTime()
@@ -456,24 +456,34 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
         Return bi
     End Function
 
+    Private Sub _Initialize()
+    End Sub
+
     Public Overrides Sub Initialize(ByRef dat As Object)
         MyBase.Initialize(dat)
         If Data IsNot Nothing Then
             If Data.Project IsNot Nothing Then
+                Dim vm As RunnerViewModel = Me.Load(Me.RunnerJsonFileName)
+                If vm Is Nothing Then
+                    Me.PreProcessTime = 60
+                    Me.PreRunProcessTime = 60
+                    Me.PreCheckProcessTime = 60
+                Else
+                    Me.PreProcessTime = vm.PreProcessTime
+                    Me.PreRunProcessTime = vm.PreRunProcessTime
+                    Me.PreCheckProcessTime = vm.PreCheckProcessTime
+                    Me.ParametersTexts = vm.ParametersTexts
+                End If
                 Me.StatusCode = 0
                 Me.ProjectName = Data.Project.ProjectName
                 Me.RobotName = Data.Project.RobotName
                 Me.RobotAlias = Data.Project.RobotAlias
                 Me.MyRobotDirectory = Data.Project.MyRobotDirectory
                 Me.RootRobotDirectory = Data.Project.RootRobotDirectory
+                Me.ProcessTime = 0
+                Me.IsReloadMyRobotReadMeCommandEnabled = True
                 Me.IsRunRobotCommandEnabled = True
                 Me.IsCheckRobotCommandEnabled = True
-                Me.ProcessTime = 0
-                Me.PreProcessTime = 60
-                Me.PreRunProcessTime = 60
-                Me.PreCheckProcessTime = 60
-                Me.IsReloadMyRobotReadMeCommandEnabled = True
-                'AddHandler Me.ParametersTexts.CollectionChanged, AddressOf UpdateParametersTexts
             End If
         End If
     End Sub
