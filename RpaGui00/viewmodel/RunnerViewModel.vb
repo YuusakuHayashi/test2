@@ -15,16 +15,36 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
         End Get
     End Property
 
-    Private _ParametersText As String
+    Private _RunRobotCommandText As String
     <JsonIgnore>
-    Public Property ParametersText As String
+    Public Property RunRobotCommandText As String
         Get
-            Return Me._ParametersText
+            Return Me._RunRobotCommandText
         End Get
         Set(value As String)
-            Me._ParametersText = value
-            RaisePropertyChanged("ParametersText")
+            Me._RunRobotCommandText = value
+            ' ここに書くのは気持ち悪いけど、面倒なので一旦ここに記述
+            Me._IsRunRobotCommandEnabled = CheckRunRobotCommandEnabled()
+            RaisePropertyChanged("RunRobotCommandText")
         End Set
+    End Property
+
+    Private _RunRobotCommandFormalText As String
+    Private ReadOnly Property RunRobotCommandFormalText As String
+        Get
+            Me._RunRobotCommandFormalText = vbNullString
+            If String.IsNullOrEmpty(Me.CommnadText) Then
+                Me._RunRobotCommandFormalText = "runrobot"
+            Else
+                Dim cmds As List(Of String) = Me.RunRobotCommandText.Split(" "c)
+                If cmds.Count > 0 Then
+                    If cmds.First = "runrobot" Then
+                        Me._RunRobotCommandFormalText = Me.RunRobotCommandText
+                    End If
+                End If
+            End If
+            Return Me._RunRobotCommandFormalText
+        End Get
     End Property
 
     Private _StatusCode As Integer
@@ -39,31 +59,31 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
         End Set
     End Property
 
-    Private _ParametersTexts As ObservableCollection(Of String)
-    Public Property ParametersTexts As ObservableCollection(Of String)
+    Private _RunRobotCommandTexts As ObservableCollection(Of String)
+    Public Property RunRobotCommandTexts As ObservableCollection(Of String)
         Get
-            If Me._ParametersTexts Is Nothing Then
-                Me._ParametersTexts = New ObservableCollection(Of String)
+            If Me._RunRobotCommandTexts Is Nothing Then
+                Me._RunRobotCommandTexts = New ObservableCollection(Of String)
             End If
-            Return Me._ParametersTexts
+            Return Me._RunRobotCommandTexts
         End Get
         Set(value As ObservableCollection(Of String))
-            Me._ParametersTexts = value
-            RaisePropertyChanged("ParametersTexts")
+            Me._RunRobotCommandTexts = value
+            RaisePropertyChanged("RunRobotCommandTexts")
         End Set
     End Property
 
-    Private _IndexOfParametersText As Integer
+    Private _IndexOfRunRobotCommandText As Integer
     <JsonIgnore>
-    Public Property IndexOfParametersText As Integer
+    Public Property IndexOfRunRobotCommandText As Integer
         Get
-            Return Me._IndexOfParametersText
+            Return Me._IndexOfRunRobotCommandText
         End Get
         Set(value As Integer)
-            Me._IndexOfParametersText = value
+            Me._IndexOfRunRobotCommandText = value
             ' ここに書くのは気持ち悪いけど、面倒なので一旦ここに記述
-            Me.ParametersText = Me.ParametersTexts(value)
-            RaisePropertyChanged("IndexOfParametersText")
+            Me.RunRobotCommandText = Me.RunRobotCommandTexts(value)
+            RaisePropertyChanged("IndexOfRunRobotCommandText")
         End Set
     End Property
 
@@ -125,7 +145,6 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     End Property
 
     Private _PreProcessTime As Integer
-    <JsonIgnore>
     Public Property PreProcessTime As Integer
         Get
             Return Me._PreProcessTime
@@ -363,7 +382,7 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     Private Sub _RunRobotCommandExecute(ByVal parameter As Object)
         Me.StatusCode = 1
         Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
-        Data.System.GuiCommandText = $"runrobot {Me.ParametersText}"
+        Data.System.GuiCommandText = $"{Me.RunRobotCommandFormalText}"
         Call Data.System.CuiLoop(Data)
     End Sub
 
@@ -385,22 +404,20 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
         Me.StatusCode = 2
         Me.PreRunProcessTime = Me.ProcessTime
         Me.ProcessTime = 0
-        Dim i As Integer = AddParametersText()
+        Dim i As Integer = AddRunRobotCommandText()
         Call Save(Me.RunnerJsonFileName, Me)
-    End Sub
-
-    Private Sub CountProcessTime()
-        Do
-            Threading.Thread.Sleep(1000)
-            Me.ProcessTime += 1
-            If Me.ProcessTime > Me.PreProcessTime Then
-                Me.ProcessTime = 1
-            End If
-        Loop Until Not Data.System.IsRunTime
     End Sub
 
     Private Function RunRobotCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me.IsRunRobotCommandEnabled
+    End Function
+
+    Private Function CheckRunRobotCommandEnabled() As Boolean
+        If String.IsNullOrEmpty(Me.RunRobotCommandFormalText) Then
+            Return False
+        Else
+            Return True
+        End If
     End Function
     '---------------------------------------------------------------------------------------------'
 
@@ -441,12 +458,22 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     End Function
     '---------------------------------------------------------------------------------------------'
 
-    Private Function AddParametersText() As Integer
-        If Not Me.ParametersTexts.Contains(Me.ParametersText) Then
-            Me.ParametersTexts = Rpa00.RpaModule.Push(Of String, ObservableCollection(Of String))(Me.ParametersText, Me.ParametersTexts)
+    Private Function AddRunRobotCommandText() As Integer
+        If Not Me.RunRobotCommandTexts.Contains(Me.RunRobotCommandText) Then
+            Me.RunRobotCommandTexts = Rpa00.RpaModule.Push(Of String, ObservableCollection(Of String))(Me.RunRobotCommandText, Me.RunRobotCommandTexts)
         End If
         Return 0
     End Function
+
+    Private Sub CountProcessTime()
+        Do
+            Threading.Thread.Sleep(1000)
+            Me.ProcessTime += 1
+            If Me.ProcessTime > Me.PreProcessTime Then
+                Me.ProcessTime = 1
+            End If
+        Loop Until Not Data.System.IsRunTime
+    End Sub
 
     Private Function CreateIcon(ByVal filename As String) As BitmapImage
         Dim bi = New BitmapImage
@@ -472,7 +499,7 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
                     Me.PreProcessTime = vm.PreProcessTime
                     Me.PreRunProcessTime = vm.PreRunProcessTime
                     Me.PreCheckProcessTime = vm.PreCheckProcessTime
-                    Me.ParametersTexts = vm.ParametersTexts
+                    Me.RunRobotCommandTexts = vm.RunRobotCommandTexts
                 End If
                 Me.StatusCode = 0
                 Me.ProjectName = Data.Project.ProjectName
