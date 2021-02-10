@@ -27,7 +27,7 @@
                 <ScrollViewer>
                     <TextBlock                 
                     Grid.Row="2" Grid.Column="2"
-                    FontFamily="ＭＳ ゴシック" FontSize="11" Text="{Binding Data.System.OutputText}" />
+                    FontFamily="ＭＳ ゴシック" FontSize="11" Text="{Binding ViewController.Data.System.OutputText}" />
                 </ScrollViewer>
             </DataTemplate>
             
@@ -46,6 +46,7 @@
             
         </Grid.Resources>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="5" />
             <RowDefinition Height="150" />
@@ -55,7 +56,12 @@
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <GroupBox Header="エクスプローラー" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0">
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+            <MenuItem Header="ファイル">
+                <MenuItem Header="終了" Command="{Binding}"/>
+            </MenuItem>
+        </Menu>
+        <GroupBox Header="エクスプローラー" Grid.Row="1" Grid.RowSpan="3" Grid.Column="0">
             <TabControl
                 SelectedIndex="{Binding ExplorerTabIndex}"
                 ItemsSource="{Binding ExplorerTabs}">
@@ -87,20 +93,20 @@
             </TreeView>-->
         </GroupBox>
         <GridSplitter
-            Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
+            Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"
             HorizontalAlignment="Stretch"
             ResizeDirection="Columns"
             ResizeBehavior="PreviousAndNext" />
         <GridSplitter
-            Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+            Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch"
             ResizeDirection="Rows"
             ResizeBehavior="PreviousAndNext" />
-        <GroupBox  Grid.Row="0" Grid.Column="2">
+        <GroupBox  Grid.Row="1" Grid.Column="2">
             <ContentControl Content="{Binding MainContent}" />
         </GroupBox>
-        <GroupBox Header="出力" Grid.Row="2" Grid.Column="2">
+        <GroupBox Header="出力" Grid.Row="3" Grid.Column="2">
             <TabControl
                 SelectedIndex="{Binding OutputTabIndex}"
                 ItemsSource="{Binding OutputTabs}">

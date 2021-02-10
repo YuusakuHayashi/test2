@@ -24,30 +24,30 @@
                 <Menu>
                     <MenuItem Command="{Binding CheckRobotCommand}">
                         <MenuItem.Icon>
-                            <Image HorizontalAlignment="Center" Source="{Binding CheckRobotIcon}" />
+                            <Image Source="{Binding CheckRobotIcon}" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <MenuItem Command="{Binding RunRobotCommand}">
                         <MenuItem.Icon>
-                            <Image HorizontalAlignment="Center" Source="{Binding RunRobotIcon}" />
+                            <Image Source="{Binding RunRobotIcon}" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </Menu>
                 <TextBox VerticalContentAlignment="Center" Text="{Binding RunRobotCommandText}" FontSize="11" Width="200" />
             </StackPanel>
-            <ProgressBar Value="{Binding ProcessTime}" Maximum="{Binding PreProcessTime}" />
+            <ProgressBar Margin="0,3,0,0" Value="{Binding ProcessTime}" Maximum="{Binding PreProcessTime}" />
         </StackPanel>
         <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="True">
             <GroupBox DockPanel.Dock="Top" Header="現在のステータス">
                 <TextBlock HorizontalAlignment="Left" TextAlignment="Left" Text="{Binding StatusCode, Converter={StaticResource RunnerStatusConverter}}" />
             </GroupBox>
-            <GroupBox DockPanel.Dock="Top" Header="起動パラメタ一覧">
+            <GroupBox Margin="0,3,0,0" DockPanel.Dock="Top" Header="起動パラメタ一覧">
                 <ListBox                
                     Height="100"
                     SelectedIndex="{Binding IndexOfRunRobotCommandText}"
                     ItemsSource="{Binding RunRobotCommandTexts}" />
             </GroupBox>
-            <GroupBox DockPanel.Dock="Top" Header="ロボット情報">
+            <GroupBox Margin="0,3,0,0" DockPanel.Dock="Top" Header="ロボット情報">
                 <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
                     <StackPanel>
                         <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
