@@ -24,7 +24,7 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
         Set(value As String)
             Me._RunRobotCommandText = value
             ' ここに書くのは気持ち悪いけど、面倒なので一旦ここに記述
-            Me._IsRunRobotCommandEnabled = CheckRunRobotCommandEnabled()
+            Me.IsRunRobotCommandEnabled = CheckRunRobotCommandEnabled()
             RaisePropertyChanged("RunRobotCommandText")
         End Set
     End Property
@@ -33,10 +33,8 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     Private ReadOnly Property RunRobotCommandFormalText As String
         Get
             Me._RunRobotCommandFormalText = vbNullString
-            If String.IsNullOrEmpty(Me.CommnadText) Then
-                Me._RunRobotCommandFormalText = "runrobot"
-            Else
-                Dim cmds As List(Of String) = Me.RunRobotCommandText.Split(" "c)
+            If Not String.IsNullOrEmpty(Me.RunRobotCommandText) Then
+                Dim cmds As String() = Me.RunRobotCommandText.Split(" "c)
                 If cmds.Count > 0 Then
                     If cmds.First = "runrobot" Then
                         Me._RunRobotCommandFormalText = Me.RunRobotCommandText
@@ -62,9 +60,6 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     Private _RunRobotCommandTexts As ObservableCollection(Of String)
     Public Property RunRobotCommandTexts As ObservableCollection(Of String)
         Get
-            If Me._RunRobotCommandTexts Is Nothing Then
-                Me._RunRobotCommandTexts = New ObservableCollection(Of String)
-            End If
             Return Me._RunRobotCommandTexts
         End Get
         Set(value As ObservableCollection(Of String))
@@ -461,6 +456,7 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
     Private Function AddRunRobotCommandText() As Integer
         If Not Me.RunRobotCommandTexts.Contains(Me.RunRobotCommandText) Then
             Me.RunRobotCommandTexts = Rpa00.RpaModule.Push(Of String, ObservableCollection(Of String))(Me.RunRobotCommandText, Me.RunRobotCommandTexts)
+            Me.IndexOfRunRobotCommandText = 0
         End If
         Return 0
     End Function
@@ -495,6 +491,7 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
                     Me.PreProcessTime = 60
                     Me.PreRunProcessTime = 60
                     Me.PreCheckProcessTime = 60
+                    Me._RunRobotCommandTexts = New ObservableCollection(Of String)(New String() {"runrobot"})
                 Else
                     Me.PreProcessTime = vm.PreProcessTime
                     Me.PreRunProcessTime = vm.PreRunProcessTime
@@ -507,9 +504,10 @@ Public Class RunnerViewModel : Inherits ExecutableMenuBase(Of RunnerViewModel)
                 Me.RobotAlias = Data.Project.RobotAlias
                 Me.MyRobotDirectory = Data.Project.MyRobotDirectory
                 Me.RootRobotDirectory = Data.Project.RootRobotDirectory
+                Me.RunRobotCommandText = Me.RunRobotCommandTexts(0)
                 Me.ProcessTime = 0
                 Me.IsReloadMyRobotReadMeCommandEnabled = True
-                Me.IsRunRobotCommandEnabled = True
+                Me.IsRunRobotCommandEnabled = CheckRunRobotCommandEnabled()
                 Me.IsCheckRobotCommandEnabled = True
             End If
         End If

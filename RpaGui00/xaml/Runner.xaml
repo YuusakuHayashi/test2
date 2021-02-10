@@ -33,7 +33,7 @@
                         </MenuItem.Icon>
                     </MenuItem>
                 </Menu>
-                <TextBox VerticalContentAlignment="Center" Text="{Binding ParametersText}" FontSize="11" Width="200" />
+                <TextBox VerticalContentAlignment="Center" Text="{Binding RunRobotCommandText}" FontSize="11" Width="200" />
             </StackPanel>
             <ProgressBar Value="{Binding ProcessTime}" Maximum="{Binding PreProcessTime}" />
         </StackPanel>
@@ -44,8 +44,8 @@
             <GroupBox DockPanel.Dock="Top" Header="起動パラメタ一覧">
                 <ListBox                
                     Height="100"
-                    SelectedIndex="{Binding IndexOfCommandText}"
-                    ItemsSource="{Binding ParametersTexts}" />
+                    SelectedIndex="{Binding IndexOfRunRobotCommandText}"
+                    ItemsSource="{Binding RunRobotCommandTexts}" />
             </GroupBox>
             <GroupBox DockPanel.Dock="Top" Header="ロボット情報">
                 <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
