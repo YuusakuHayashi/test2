@@ -23,9 +23,6 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
         Set(value As String)
             Me._GuiCommandText = value
             RaisePropertyChanged("GuiCommandText")
-            If ViewController.GuiCommandTextPath <> value Then
-                ViewController.GuiCommandTextPath = value
-            End If
         End Set
     End Property
 
@@ -63,18 +60,9 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
                 Call _ExecuteGuiCommandCommandExecute(parameter)
             End Sub
         )
-        Dim t2 As Task = Task.Run(
-            Sub()
-                ViewController.GuiCommandExecuteStatusSender = 1
-                ' Test
-                Threading.Thread.Sleep(5000)
-            End Sub
-        )
-        Await Task.WhenAll(t, t2)
+        Await Task.WhenAll(t)
         Me.IsExecuteGuiCommandCommandEnabled = True
 
-        ' Controllerへの通知
-        ViewController.GuiCommandExecuteStatusSender = 0
         Dim i As Integer = AddGuiCommandText()
     End Sub
 
@@ -105,31 +93,28 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
         If Not Me.GuiCommandTexts.Contains(Me.GuiCommandText) Then
             Me.GuiCommandTexts.Add(Me.GuiCommandText)
         End If
-        If Not ViewController.GuiCommandTextsPath.Contains(Me.GuiCommandText) Then
-            ViewController.GuiCommandTextsPath.Add(Me.GuiCommandText)
-        End If
         Return 0
     End Function
 
-    Private Sub CheckPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
+    Private Sub _CheckPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If e.PropertyName = "GuiCommandText" Then
             Me.IsExecuteGuiCommandCommandEnabled = CheckExecuteGuiCommandCommandEnabled()
             Exit Sub
         End If
     End Sub
 
-    Private Sub CheckViewControllerPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
-        If e.PropertyName = "GuiCommandTextPath" Then
-            Me.GuiCommandText = ViewController.GuiCommandTextPath
+    Private Sub _CheckViewControllerPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
+        If e.PropertyName = "GuiCommandChangeRequest" Then
+            Stop
             Exit Sub
         End If
     End Sub
 
-    Public Overrides Sub Initialize()
-        AddHandler ViewController.PropertyChanged, AddressOf CheckViewControllerPropertyChanged
+    Sub Initialize()
+        AddHandler ViewController.PropertyChanged, AddressOf _CheckViewControllerPropertyChanged
     End Sub
 
     Sub New()
-        AddHandler Me.PropertyChanged, AddressOf CheckPropertyChanged
+        AddHandler Me.PropertyChanged, AddressOf _CheckPropertyChanged
     End Sub
 End Class

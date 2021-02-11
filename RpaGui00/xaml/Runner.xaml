@@ -11,7 +11,6 @@
             <local:RunnerStatusConverter x:Key="RunnerStatusConverter" />
         </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -19,80 +18,85 @@
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,3,0,0">
-            <StackPanel Orientation="Horizontal">
+        <DockPanel Grid.Row="0" Grid.Column="0" LastChildFill="True">
+            <StackPanel DockPanel.Dock="Top">
                 <Menu>
-                    <MenuItem Command="{Binding CheckRobotCommand}">
+                    <MenuItem Command="{Binding SaveRunnerCommand}">
                         <MenuItem.Icon>
-                            <Image Source="{Binding CheckRobotIcon}" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="{Binding RunRobotCommand}">
-                        <MenuItem.Icon>
-                            <Image Source="{Binding RunRobotIcon}" />
+                            <Image Source="{Binding RunnerSaveIcon, Mode=OneTime}" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </Menu>
-                <TextBox VerticalContentAlignment="Center" Text="{Binding RunRobotCommandText}" FontSize="11" Width="200" />
             </StackPanel>
-            <ProgressBar Margin="0,3,0,0" Value="{Binding ProcessTime}" Maximum="{Binding PreProcessTime}" />
-        </StackPanel>
-        <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="True">
-            <GroupBox DockPanel.Dock="Top" Header="現在のステータス">
-                <TextBlock HorizontalAlignment="Left" TextAlignment="Left" Text="{Binding StatusCode, Converter={StaticResource RunnerStatusConverter}}" />
-            </GroupBox>
-            <GroupBox Margin="0,3,0,0" DockPanel.Dock="Top" Header="起動パラメタ一覧">
-                <ListBox                
-                    Height="100"
-                    SelectedIndex="{Binding IndexOfRunRobotCommandText}"
-                    ItemsSource="{Binding RunRobotCommandTexts}" />
-            </GroupBox>
-            <GroupBox Margin="0,3,0,0" DockPanel.Dock="Top" Header="ロボット情報">
-                <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-                    <StackPanel>
+            <ScrollViewer Margin="5,5,0,0" DockPanel.Dock="Top">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top">
+                        <TextBlock Background="WhiteSmoke"  Text="チェックコマンド履歴" />
+                        <ScrollViewer>
+                            <ListBox Height="100" ItemsSource="{Binding CheckRobotCommandDatas}" SelectedIndex="{Binding CheckRobotCommandIndex}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Top" Text="{Binding CommandText}" FontWeight="ExtraBold" />
+                                            <TextBlock VerticalAlignment="Bottom"  Foreground="Gray" Text="{Binding ExecuteDate}" FontSize="8" Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </ScrollViewer>
+                    </StackPanel>
+                    <StackPanel Margin="0,5,0,0" DockPanel.Dock="Top">
+                        <TextBlock Background="WhiteSmoke" Text="起動コマンド履歴" />
+                        <ScrollViewer>
+                            <ListBox Height="100" ItemsSource="{Binding RunRobotCommandDatas}" SelectedIndex="{Binding RunRobotCommandIndex}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Top" Text="{Binding CommandText}" FontWeight="ExtraBold" />
+                                            <TextBlock VerticalAlignment="Bottom"  Foreground="Gray" Text="{Binding ExecuteDate}" FontSize="8" Margin="10,0,0,0"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </ScrollViewer>
+                    </StackPanel>
+                    <StackPanel Margin="0,5,0,0" DockPanel.Dock="Top">
+                        <TextBlock Background="WhiteSmoke" Text="処理状況" />
+                        <ProgressBar Margin="0,3,0,0" Value="{Binding ProcessTime}" Maximum="{Binding AverageTime}" />
                         <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock FontSize="11" Width="100" Text="プロジェクト名 :" />
-                            <TextBlock FontSize="11" Margin="0,0,10,0" Text="{Binding ProjectName}" />
+                            <TextBlock Text="(経過時間 / 平均(予測)時間)" />
+                            <TextBlock Text="{Binding ProcessTime}" Margin="5,0,0,0" />
+                            <TextBlock Text="/" Margin="1,0,0,0" />
+                            <TextBlock Text="{Binding AverageTime}" Margin="1,0,0,0" />
                         </StackPanel>
                         <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock FontSize="11" Width="100" Text="ロボットID :" />
-                            <TextBlock FontSize="11" Margin="0,0,10,0" Text="{Binding RobotName}" />
+                            <TextBlock Text="(起動平均(予測)時間)" />
+                            <TextBlock Text="{Binding RunAverageTime}" Margin="5,0,0,0" />
                         </StackPanel>
                         <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock FontSize="11" Width="100" Text="ロボット名 :" />
-                            <TextBlock FontSize="11" Margin="0,0,10,0" Text="{Binding RobotAlias}" />
-                        </StackPanel>
-                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock FontSize="11" Width="100" Text="ルートディレクトリ名 :" />
-                            <TextBlock FontSize="11" Margin="0,0,10,0" Text="{Binding RootRobotDirectory}" />
-                        </StackPanel>
-                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock FontSize="11" Width="100" Text="Ｍｙディレクトリ名 :" />
-                            <TextBlock FontSize="11" Margin="0,0,10,0" Text="{Binding MyRobotDirectory}" />
+                            <TextBlock Text="(チェック平均(予測)時間)" />
+                            <TextBlock Text="{Binding CheckAverageTime}" Margin="5,0,0,0" />
                         </StackPanel>
                     </StackPanel>
-                </ScrollViewer>
-            </GroupBox>
+                </DockPanel>
+            </ScrollViewer>
         </DockPanel>
         <GridSplitter
-            Grid.Row="1" Grid.RowSpan="2" Grid.Column="1"
+            Grid.Row="0" Grid.Column="1"
             HorizontalAlignment="Stretch"
             ResizeDirection="Columns" ResizeBehavior="PreviousAndCurrent" />
-        <DockPanel Grid.Row="1" Grid.RowSpan="2" Grid.Column="2">
-            <GroupBox Header="ReadMeファイル情報">
-                <DockPanel LastChildFill="True">
-                    <Menu DockPanel.Dock="Top">
-                        <MenuItem Command="{Binding ReloadMyRobotReadMeCommand}">
-                            <MenuItem.Icon>
-                                <Image HorizontalAlignment="Center" Source="{Binding ReloadMyRobotReadMeIcon}" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </Menu>
-                    <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-                        <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="11" Text="{Binding MyRobotReadMe}" />
-                    </ScrollViewer>
-                </DockPanel>
-            </GroupBox>
+        <DockPanel Margin="5,0,0,0" Grid.Row="0" Grid.Column="2" LastChildFill="True">
+            <TextBlock Background="WhiteSmoke" DockPanel.Dock="Top" Text="ReadMeファイル内容" />
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Command="{Binding ReloadMyRobotReadMeCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{Binding ReloadMyRobotReadMeIcon, Mode=OneTime}" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </Menu>
+            <ScrollViewer Margin="0,3,0,0" DockPanel.Dock="Top" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
+                <TextBlock Background="WhiteSmoke" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="11" Text="{Binding MyRobotReadMe}" />
+            </ScrollViewer>
         </DockPanel>
     </Grid>
 </UserControl>

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:RpaGui"
         xmlns:lib="clr-namespace:RpaGui00;assembly=RpaGui00"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="RpaGui" Height="450" Width="800">
     <Grid>
         <lib:Controller />
     </Grid>

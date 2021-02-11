@@ -13,12 +13,37 @@ Public Class MenuExplorerViewModel : Inherits ControllerViewModelBase(Of MenuExp
         End Set
     End Property
 
+    '---------------------------------------------------------------------------------------------'
+    Private ReadOnly Property CheckAndRunIconFileName As String
+        Get
+            Return $"{Controller.SystemDllDirectory}\checkandrun.png"
+        End Get
+    End Property
+    Private _CheckAndRunIcon As BitmapImage
+    Private ReadOnly Property CheckAndRunIcon As BitmapImage
+        Get
+            If Me._CheckAndRunIcon Is Nothing Then
+                Me._CheckAndRunIcon = RpaGuiModule.CreateIcon(Me.CheckAndRunIconFileName)
+            End If
+            Return Me._CheckAndRunIcon
+        End Get
+    End Property
+    '---------------------------------------------------------------------------------------------'
+
     Private _Menus As ObservableCollection(Of ExecuteMenu)
     Public ReadOnly Property Menus As ObservableCollection(Of ExecuteMenu)
         Get
             If Me._Menus Is Nothing Then
+                Dim [obj] As Object
+                Dim [men] As ExecuteMenu
                 Me._Menus = New ObservableCollection(Of ExecuteMenu)
-                Me._Menus.Add(New ExecuteMenu With {.Name = "起動＆チェック", .Content = New RunnerViewModel With {.ViewController = ViewController}})
+
+                '---------------------------------------------------------------------------------'
+                [obj] = New RunnerViewModel With {.ViewController = ViewController}
+                [obj].Initialize()
+                [men] = New ExecuteMenu With {.Icon = Me.CheckAndRunIcon, .Name = "起動とチェック", .Content = [obj]}
+                Me._Menus.Add([men])
+                '---------------------------------------------------------------------------------'
             End If
             Return Me._Menus
         End Get
@@ -27,7 +52,7 @@ Public Class MenuExplorerViewModel : Inherits ControllerViewModelBase(Of MenuExp
     Private Sub SwitchMainContent()
         If Me.MenuIndex >= 0 Then
             Dim obj = Me.Menus(Me.MenuIndex).Content
-            Call obj.Initialize()
+            'Call obj.Initialize()
             ViewController.MainContent = obj
         End If
     End Sub

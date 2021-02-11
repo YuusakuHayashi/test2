@@ -1,4 +1,14 @@
 ﻿Public Class ExecuteMenu
+    Private _Icon As BitmapImage
+    Public Property Icon As BitmapImage
+        Get
+            Return Me._Icon
+        End Get
+        Set(value As BitmapImage)
+            Me._Icon = value
+        End Set
+    End Property
+
     Private _Name As String
     Public Property Name As String
         Get

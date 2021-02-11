@@ -80,6 +80,7 @@
       <DependentUpon>MenuController.xaml</DependentUpon>
     </Compile>
     <Compile Include="MenuExplorerViewModel.vb" />
+    <Compile Include="RpaGuiModule.vb" />
     <Compile Include="TabItemViewModel.vb" />
     <Compile Include="ViewModelBase.vb" />
     <Compile Include="viewmodel\NoContentViewModel.vb" />

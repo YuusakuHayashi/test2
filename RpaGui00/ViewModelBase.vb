@@ -31,4 +31,8 @@ Public Class ViewModelBase(Of T As {New})
     '        Call RaisePropertyChanged("Data")
     '    End Set
     'End Property
+
+    ' よくよく考えると、JsonHandlerを継承した時点で、このロジックも実装している必要がある
+    Public Overridable Sub Initialize()
+    End Sub
 End Class
