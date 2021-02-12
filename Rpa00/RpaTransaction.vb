@@ -54,16 +54,6 @@ Public Class RpaTransaction
         End Get
     End Property
 
-    Private _ReturnCode As Integer
-    Public Property ReturnCode As Integer
-        Get
-            Return Me._ReturnCode
-        End Get
-        Set(value As Integer)
-            Me._ReturnCode = value
-        End Set
-    End Property
-
     Private _ProjectArchitecture As Integer
     Public Property ProjectArchitecture As Integer
         Get

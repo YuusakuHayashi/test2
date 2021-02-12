@@ -178,6 +178,10 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
     '    End If
     'End Sub
 
+    Public Overrides Sub Initialize()
+        Data.System.ReturnCode = -1
+    End Sub
+
     Sub New()
         Me.ExplorerTabIndex = 0
         Me.OutputTabIndex = 0

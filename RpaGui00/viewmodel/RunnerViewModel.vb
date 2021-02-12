@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.IO
 Imports System.Collections.ObjectModel
 Imports System.Collections.Specialized
 Imports Newtonsoft.Json
@@ -21,7 +22,6 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
             Return $"{Controller.SystemDllDirectory}\runnersave.png"
         End Get
     End Property
-
     Private _RunnerSaveIcon As BitmapImage
     Public ReadOnly Property RunnerSaveIcon As BitmapImage
         Get
@@ -37,7 +37,6 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
             Return $"{Controller.SystemDllDirectory}\reloadmyrobotreadme.png"
         End Get
     End Property
-
     Private _ReloadMyRobotReadMeIcon As BitmapImage
     Public ReadOnly Property ReloadMyRobotReadMeIcon As BitmapImage
         Get
@@ -45,6 +44,21 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                 Me._ReloadMyRobotReadMeIcon = RpaGuiModule.CreateIcon(Me.ReloadMyRobotReadMeIconFileName)
             End If
             Return Me._ReloadMyRobotReadMeIcon
+        End Get
+    End Property
+
+    Private ReadOnly Property SaveMyRobotReadMeIconFileName As String
+        Get
+            Return $"{Controller.SystemDllDirectory}\savemyrobotreadme.png"
+        End Get
+    End Property
+    Private _SaveMyRobotReadMeIcon As BitmapImage
+    Public ReadOnly Property SaveMyRobotReadMeIcon As BitmapImage
+        Get
+            If Me._SaveMyRobotReadMeIcon Is Nothing Then
+                Me._SaveMyRobotReadMeIcon = RpaGuiModule.CreateIcon(Me.SaveMyRobotReadMeIconFileName)
+            End If
+            Return Me._SaveMyRobotReadMeIcon
         End Get
     End Property
 
@@ -216,6 +230,16 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         End Set
     End Property
 
+    Private _IsProjectExist As Boolean
+    Private Property IsProjectExist As Boolean
+        Get
+            Return Me._IsProjectExist
+        End Get
+        Set(value As Boolean)
+            Me._IsProjectExist = value
+        End Set
+    End Property
+
     Private _IsProcessEnded As Boolean
     Private Property IsProcessEnded As Boolean
         Get
@@ -279,6 +303,53 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
 
     Private Function SaveRunnerCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me.IsSaveRunnerCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
+    Private _SaveMyRobotReadMeCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property SaveMyRobotReadMeCommand As ICommand
+        Get
+            If Me._SaveMyRobotReadMeCommand Is Nothing Then
+                Me._SaveMyRobotReadMeCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf SaveMyRobotReadMeCommandExecute,
+                    .CanExecuteHandler = AddressOf SaveMyRobotReadMeCommandCanExecute
+                }
+            End If
+            Return Me._SaveMyRobotReadMeCommand
+        End Get
+    End Property
+
+    Private _IsSaveMyRobotReadMeCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsSaveMyRobotReadMeCommandEnabled As Boolean
+        Get
+            Return Me._IsSaveMyRobotReadMeCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsSaveMyRobotReadMeCommandEnabled = value
+            RaisePropertyChanged("IsSaveMyRobotReadMeCommandEnabled")
+            CType(SaveMyRobotReadMeCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub SaveMyRobotReadMeCommandExecute(ByVal parameter As Object)
+        Dim sw As New StreamWriter(ViewController.Data.Project.MyRobotReadMeFileName, False, Text.Encoding.GetEncoding(Rpa00.RpaModule.DEFUALTENCODING))
+        sw.Write(Me.MyRobotReadMe)
+        sw.Dispose()
+        sw.Close()
+    End Sub
+
+    Private Function SaveMyRobotReadMeCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsSaveMyRobotReadMeCommandEnabled
+    End Function
+
+    Private Function CheckSaveMyRobotReadMeCommandEnabled() As Boolean
+        If Me.IsProjectExist Then
+            Return True
+        End If
+        Return False
     End Function
     '---------------------------------------------------------------------------------------------'
 
@@ -381,12 +452,16 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         Dim cmds As String() = Me.GuiCommand.Split(" "c)
         If Me.ProcessTime > 0 Then
             If cmds(0) = "runrobot" Then
-                Me.RunProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.RunProcessTimeLogs)
-                Call CalculateRunAverageTime()
+                If ViewController.Data.System.ReturnCode = 0 Then
+                    Me.RunProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.RunProcessTimeLogs)
+                    Call CalculateRunAverageTime()
+                End If
             End If
             If cmds(0) = "checkrobot" Then
-                Me.CheckProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.CheckProcessTimeLogs)
-                Call CalculateCheckAverageTime()
+                If ViewController.Data.System.ReturnCode = 0 Then
+                    Me.CheckProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.CheckProcessTimeLogs)
+                    Call CalculateCheckAverageTime()
+                End If
             End If
             Me.ProcessTime = 0
         End If
@@ -454,6 +529,7 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
             ViewController.ExecutableGuiCommands = New List(Of String)(New String() {"runrobot", "checkrobot"})
             If ViewController.Data IsNot Nothing Then
                 If ViewController.Data.Project IsNot Nothing Then
+                    Me.IsProjectExist = True
                     Dim vm As RunnerViewModel = Me.Load(Me.RunnerJsonFileName)
                     If vm Is Nothing Then
                         Me.RunRobotCommandDatas = New ObservableCollection(Of CommandData)
@@ -488,6 +564,7 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                 End If
             End If
         End If
+        Me.IsSaveMyRobotReadMeCommandEnabled = CheckSaveMyRobotReadMeCommandEnabled()
     End Sub
 
     Sub New()

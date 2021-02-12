@@ -13,12 +13,12 @@
             Else
                 Call dat.System.RpaWriteLine("ロボットが起動条件を満たしていません")
                 Call dat.System.RpaWriteLine()
-                i = 1000
+                i = 8200
             End If
         Else
             Call dat.System.RpaWriteLine("プロジェクトが起動条件を満たしていません")
             Call dat.System.RpaWriteLine()
-            i = 1000
+            i = 8201
         End If
         Return i
     End Function

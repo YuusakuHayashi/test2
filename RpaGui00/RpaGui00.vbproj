@@ -52,6 +52,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System" />
@@ -71,6 +72,8 @@
       <DependentUpon>Controller.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControllerViewModelBase.vb" />
+    <Compile Include="converter\ReturnCodeToForegroundConverter.vb" />
+    <Compile Include="converter\ReturnCodeToMessageConverter.vb" />
     <Compile Include="converter\RunnerStatusConverter.vb" />
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="ExecutableMenuBase.vb" />

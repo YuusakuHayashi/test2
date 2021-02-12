@@ -58,13 +58,13 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="5" />
+            <RowDefinition Height="15" />
             <RowDefinition Height="150" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150" />
-            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="15" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Menu Margin="0,0,0,5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
@@ -73,7 +73,7 @@
             </MenuItem>
         </Menu>
         <DockPanel Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" LastChildFill="True">
-            <TextBlock Margin="3,0,0,0" Background="LightGray" Text="エクスプローラー" DockPanel.Dock="Top" />
+            <TextBlock Background="LightGray" Text="エクスプローラー" DockPanel.Dock="Top" />
             <TabControl
                 DockPanel.Dock="Top"
                 BorderThickness="0"
@@ -107,22 +107,24 @@
             </TreeView>-->
         </DockPanel>
         <GridSplitter
+            Margin="5,0,5,0"
             Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"
             HorizontalAlignment="Stretch"
             ResizeDirection="Columns"
             ResizeBehavior="PreviousAndNext" />
         <GridSplitter
+            Margin="0,5,0,5"
             Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch"
             ResizeDirection="Rows"
             ResizeBehavior="PreviousAndNext" />
         <DockPanel Grid.Row="1" Grid.Column="2" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="3,0,0,0" Background="LightGray" Text="メインコンテンツ" />
+            <TextBlock DockPanel.Dock="Top" Background="LightGray" Text="メインコンテンツ" />
             <ContentControl DockPanel.Dock="Top" Content="{Binding MainContent}" />
         </DockPanel>
         <DockPanel Grid.Row="3" Grid.Column="2" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="3,0,0,0" Background="LightGray" Text="出力" />
+            <TextBlock DockPanel.Dock="Top" Background="LightGray" Text="出力" />
             <TabControl
                 DockPanel.Dock="Top"
                 BorderThickness="0"

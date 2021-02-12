@@ -19,8 +19,8 @@ Public Class Controller
         Get
             If String.IsNullOrEmpty(Controller._SystemDllDirectory) Then
                 'Controller._SystemDllDirectory = $"{Controller.SystemDirectory}\dll"
-                'Controller._SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
-                Controller._SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
+                Controller._SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
+                'Controller._SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
                 If Not Directory.Exists(Controller._SystemDllDirectory) Then
                     Directory.CreateDirectory(Controller._SystemDllDirectory)
                 End If

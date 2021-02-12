@@ -23,6 +23,18 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
             RaisePropertyChanged("OutputText")
         End Set
     End Property
+
+    Private _ReturnCode As Integer
+    Public Property ReturnCode As Integer
+        Get
+            Return Me._ReturnCode
+        End Get
+        Set(value As Integer)
+            Me._ReturnCode = value
+            RaisePropertyChanged("ReturnCode")
+        End Set
+    End Property
+
     'Private _Output As OutputData
     'Public Property Output As OutputData
     '    Get
@@ -465,7 +477,7 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
                     yorn = vbNullString
                     Console.WriteLine()
                     Console.WriteLine($"Projectに変更があります。変更を保存しますか？ (y/n)")
-                    yorn = dat.Transaction.ShowRpaIndicator(dat)
+                    yorn = RpaReadLine(dat, RpaReadLineMode.YesNo, $"Projectに変更があります。変更を保存しますか？ (y/n)")
                 Loop Until yorn = "y" Or yorn = "n"
                 If yorn = "y" Then
                     RpaModule.Save(dat.Project.SystemJsonFileName, dat.Project, dat.Project.SystemJsonChangedFileName)
@@ -710,7 +722,7 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
 
             Dim [from] As DateTime = DateTime.Now
             If Me.ExecuteMode = ExecuteModeNumber.RpaCui Then
-                dat.Transaction.ReturnCode = cmd.Execute(dat)
+                Me.ReturnCode = cmd.Execute(dat)
             ElseIf Me.ExecuteMode = ExecuteModeNumber.RpaGui Then
                 Dim t As Task(Of Integer) = Task.Run(
                     Function()
@@ -719,7 +731,7 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
                     End Function
                 )
                 Await t
-                dat.Transaction.ReturnCode = t.Result
+                Me.ReturnCode = t.Result
             End If
             Dim [to] As DateTime = DateTime.Now
             cmdlog.ExecuteTime = [to] - [from]
@@ -777,6 +789,23 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
             Console.WriteLine(wline)
         ElseIf Me.ExecuteMode = ExecuteModeNumber.RpaGui Then
             Me.OutputText &= $"{wline}{vbCrLf}"
+        End If
+    End Sub
+
+    Public Sub RpaReadLine(ByRef dat As RpaDataWrapper, ByVal mode As Integer, Optional wline As String = vbNullString)
+        ' Cuiの場合
+        If Me.ExecuteMode = ExecuteModeNumber.RpaCui Then
+            If dat.Project IsNot Nothing Then
+                Console.Write($"{dat.Project.GuideString}")
+            Else
+                Console.Write("NoRpa>")
+            End If
+            Return Console.ReadLine()
+        End If
+        If Me.ExecuteMode = ExecuteModeNumber.RpaGui Then
+            If mode = RpaGuiReadLineMode.YesNo Then
+                Return MessageBox.Show(wline, MessageBoxButtons.YesNo, MessageBoxDefaultButton.Button2)
+            End If
         End If
     End Sub
 

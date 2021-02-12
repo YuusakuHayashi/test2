@@ -66,8 +66,6 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
         Dim t2 As Task = Task.Run(
             Sub()
                 ViewController.GuiCommandExecuteStatusSender = 1
-                ' Test
-                Threading.Thread.Sleep(5000)
             End Sub
         )
         Await Task.WhenAll(t, t2)

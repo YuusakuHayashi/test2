@@ -8,14 +8,16 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.Resources>
-            <local:RunnerStatusConverter x:Key="RunnerStatusConverter" />
+            <local:ReturnCodeToMessageConverter x:Key="ReturnCodeToMessageConverter" />
+            <local:ReturnCodeToForegroundConverter x:Key="ReturnCodeToForeGroundConverter" />
+            <!--<SolidColorBrush x:Key="ReturnCodeColor" Color="{Binding ViewController.Data.System.ReturnCode, Converter={StaticResource ReturnCodeToForegroundConverter}}" />-->
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="15" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <DockPanel Grid.Row="0" Grid.Column="0" LastChildFill="True">
@@ -28,7 +30,7 @@
                     </MenuItem>
                 </Menu>
             </StackPanel>
-            <ScrollViewer Margin="5,5,0,0" DockPanel.Dock="Top">
+            <ScrollViewer DockPanel.Dock="Top">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top">
                         <TextBlock Background="WhiteSmoke"  Text="チェックコマンド履歴" />
@@ -62,6 +64,7 @@
                     </StackPanel>
                     <StackPanel Margin="0,5,0,0" DockPanel.Dock="Top">
                         <TextBlock Background="WhiteSmoke" Text="処理状況" />
+                        <TextBlock Margin="0,3,0,0" Text="{Binding ViewController.Data.System.ReturnCode, Converter={StaticResource ReturnCodeToMessageConverter}}" />
                         <ProgressBar Margin="0,3,0,0" Value="{Binding ProcessTime}" Maximum="{Binding AverageTime}" />
                         <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
                             <TextBlock Text="(経過時間 / 平均(予測)時間)" />
@@ -82,10 +85,11 @@
             </ScrollViewer>
         </DockPanel>
         <GridSplitter
+            Margin="5,0,5,0"
             Grid.Row="0" Grid.Column="1"
             HorizontalAlignment="Stretch"
             ResizeDirection="Columns" ResizeBehavior="PreviousAndCurrent" />
-        <DockPanel Margin="5,0,0,0" Grid.Row="0" Grid.Column="2" LastChildFill="True">
+        <DockPanel Grid.Row="0" Grid.Column="2" LastChildFill="True">
             <TextBlock Background="WhiteSmoke" DockPanel.Dock="Top" Text="ReadMeファイル内容" />
             <Menu DockPanel.Dock="Top">
                 <MenuItem Command="{Binding ReloadMyRobotReadMeCommand}">
@@ -93,9 +97,14 @@
                         <Image Source="{Binding ReloadMyRobotReadMeIcon, Mode=OneTime}" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Command="{Binding SaveMyRobotReadMeCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="{Binding SaveMyRobotReadMeIcon, Mode=OneTime}" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </Menu>
             <ScrollViewer Margin="0,3,0,0" DockPanel.Dock="Top" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-                <TextBlock Background="WhiteSmoke" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="11" Text="{Binding MyRobotReadMe}" />
+                <TextBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="11" Text="{Binding MyRobotReadMe}" />
             </ScrollViewer>
         </DockPanel>
     </Grid>
