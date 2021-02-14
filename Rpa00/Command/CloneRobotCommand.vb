@@ -27,7 +27,7 @@ Public Class CloneRobotCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim jh As New Rpa00.JsonHandler(Of List(Of String))
 
-        If dat.Transaction.Parameters.Count > 0 Then
+        If dat.System.CommandData.Parameters.Count > 0 Then
             Call SelectedCopy(dat)
         Else
             If File.Exists(dat.Project.RootRobotIgnoreFileName) Then
@@ -50,7 +50,7 @@ Public Class CloneRobotCommand : Inherits RpaCommandBase
     End Function
 
     Private Sub SelectedCopy(ByRef dat As RpaDataWrapper)
-        For Each param In dat.Transaction.Parameters
+        For Each param In dat.System.CommandData.Parameters
             Dim src = $"{dat.Project.RootRobotDirectory}\{param}"
             Dim dst = $"{dat.Project.MyRobotDirectory}\{param}"
             Dim dstp = Path.GetDirectoryName(dst)

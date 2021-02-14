@@ -1,5 +1,6 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.ComponentModel
+Imports System.Dynamic
 
 Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of ConsoleOutputViewModel)
     Private _GuiCommandTexts As ObservableCollection(Of String)
@@ -74,12 +75,15 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
         ' Controllerへの通知
         ViewController.GuiCommandExecuteStatusSender = 0
         Dim i As Integer = AddGuiCommandText()
+
+        ' Controllerへの通知
+        'ViewController.CommandLogsPath = ViewController.Data.System.CommandLogs
     End Sub
 
     Private Sub _ExecuteGuiCommandCommandExecute(ByVal parameter As Object)
         ViewController.Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
         ViewController.Data.System.GuiCommandText = $"{Me.GuiCommandText}"
-        Call ViewController.Data.System.CuiLoop(ViewController.Data)
+        Call ViewController.Data.System.Main(ViewController.Data)
     End Sub
 
     Private Function ExecuteGuiCommandCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -119,6 +123,13 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
     Private Sub CheckViewControllerPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If e.PropertyName = "GuiCommandTextPath" Then
             Me.GuiCommandText = ViewController.GuiCommandTextPath
+            Exit Sub
+        End If
+        If e.PropertyName = "ExecuteGuiCommandPath" Then
+            If ViewController.ExecuteGuiCommandPath Then
+                Call ExecuteGuiCommandCommandExecute(Nothing)
+                ViewController.ExecuteGuiCommandPath = False
+            End If
             Exit Sub
         End If
     End Sub

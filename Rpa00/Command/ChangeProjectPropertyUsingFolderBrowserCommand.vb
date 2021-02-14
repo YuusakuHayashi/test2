@@ -1,7 +1,7 @@
 ﻿Imports System.Reflection
 Public Class ChangeProjectPropertyUsingFolderBrowserCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim pname As String = dat.Transaction.Parameters(0)
+        Dim pname As String = dat.System.CommandData.Parameters(0)
         Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
         If pi Is Nothing Then
             Console.WriteLine($"プロパティ '{pname}' は存在しません")

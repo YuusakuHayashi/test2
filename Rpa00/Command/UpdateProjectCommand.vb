@@ -24,7 +24,7 @@ Public Class UpdateProjectCommand : Inherits RpaCommandBase
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim i As Integer = -1
-        If dat.Transaction.Parameters.Count = 0 Then
+        If dat.System.CommandData.Parameters.Count = 0 Then
             i = IntaractiveUpdate(dat)
         Else
             i = SelectedUpdate(dat)
@@ -75,7 +75,7 @@ Public Class UpdateProjectCommand : Inherits RpaCommandBase
             Return 0
         End If
 
-        Dim id As String = dat.Transaction.Parameters(0)
+        Dim id As String = dat.System.CommandData.Parameters(0)
         Dim rru As RpaUpdater
         rru = rrus.Find(
             Function(upd)

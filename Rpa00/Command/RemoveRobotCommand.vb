@@ -17,7 +17,7 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
             Return False
         End If
 
-        If dat.Transaction.Parameters.Count = 0 Then
+        If dat.System.CommandData.Parameters.Count = 0 Then
             Dim err3 As String = $"プロジェクトにロボットが存在しません"
             If dat.Project.RobotAliasDictionary.Count = 0 Then
                 Console.WriteLine(err3)
@@ -26,8 +26,8 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
             End If
         End If
 
-        If dat.Transaction.Parameters.Count > 0 Then
-            Dim robo As String = dat.Transaction.Parameters(0)
+        If dat.System.CommandData.Parameters.Count > 0 Then
+            Dim robo As String = dat.System.CommandData.Parameters(0)
             Dim err4 As String = $"プロジェクトに指定したロボット '{robo}' が存在しません"
             If Not dat.Project.RobotAliasDictionary.ContainsKey(robo) Then
                 Console.WriteLine(err4)
@@ -43,8 +43,8 @@ Public Class RemoveRobotCommand : Inherits RpaCommandBase
         Dim roboname As String = vbNullString
 
         ' Parameters(0) = アタッチするロボットの指定の有無
-        If dat.Transaction.Parameters.Count > 0 Then
-            roboname = dat.Transaction.Parameters(0)
+        If dat.System.CommandData.Parameters.Count > 0 Then
+            roboname = dat.System.CommandData.Parameters(0)
         Else
             Dim idx As Integer = -1
             Dim lastidx As Integer = -1

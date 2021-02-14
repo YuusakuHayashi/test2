@@ -2,7 +2,7 @@
 
 Public Class ChangeProjectPropertyCommand : Inherits RpaCommandBase
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
-        Dim pname As String = dat.Transaction.Parameters(0)
+        Dim pname As String = dat.System.CommandData.Parameters(0)
         Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
         If pi Is Nothing Then
             Console.WriteLine($"プロパティ '{pname}' は存在しません")
@@ -20,8 +20,8 @@ Public Class ChangeProjectPropertyCommand : Inherits RpaCommandBase
     End Function
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim pname As String = dat.Transaction.Parameters(0)
-        Dim ptext As String = dat.Transaction.Parameters(1)
+        Dim pname As String = dat.System.CommandData.Parameters(0)
+        Dim ptext As String = dat.System.CommandData.Parameters(1)
         Dim pi As PropertyInfo = dat.Project.GetType().GetProperty(pname)
 
         Dim pvalue As Object

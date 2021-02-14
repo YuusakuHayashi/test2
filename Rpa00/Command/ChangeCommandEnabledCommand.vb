@@ -2,8 +2,8 @@
 Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
         ' 論理和
-        If Not (Boolean.TryParse(dat.Transaction.Parameters(1), True) Or Boolean.TryParse(dat.Transaction.Parameters(1), False)) Then
-            Console.WriteLine($"パラメタ '{dat.Transaction.Parameters(1)}' の論理値への変換に失敗しました")
+        If Not (Boolean.TryParse(dat.System.CommandData.Parameters(1), True) Or Boolean.TryParse(dat.System.CommandData.Parameters(1), False)) Then
+            Console.WriteLine($"パラメタ '{dat.System.CommandData.Parameters(1)}' の論理値への変換に失敗しました")
             Console.WriteLine()
             Return False
         End If
@@ -11,8 +11,8 @@ Public Class ChangeCommandEnabledCommand : Inherits RpaCommandBase
     End Function
 
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim val As String = dat.Transaction.Parameters(0)
-        Dim torf As Boolean = Boolean.Parse(dat.Transaction.Parameters(1))
+        Dim val As String = dat.System.CommandData.Parameters(0)
+        Dim torf As Boolean = Boolean.Parse(dat.System.CommandData.Parameters(1))
         Dim hit As Boolean = False
 
         For Each cmd In dat.Initializer.MyCommandDictionary.Values

@@ -73,12 +73,13 @@ Public Module RpaModule
         Return [new]
     End Function
 
-    Public Sub Save(ByVal savefile As String, ByRef obj As Object, ByVal chgfile As String)
-        obj.Save(savefile, obj)
-        File.Delete(chgfile)
-        Console.WriteLine($"ファイル '{savefile} をセーブしました")
-        Console.WriteLine()
-    End Sub
+    ' 廃止(RpaSystemへ移行)
+    'Public Sub Save(ByVal savefile As String, ByRef obj As Object, ByVal chgfile As String)
+    '    obj.Save(savefile, obj)
+    '    File.Delete(chgfile)
+    '    Call RpaWriteLine($"ファイル '{savefile} をセーブしました")
+    '    Call RpaWriteLine()
+    'End Sub
 
     Public Sub CreateChangedFile(ByVal f As String)
         Dim sw As System.IO.StreamWriter

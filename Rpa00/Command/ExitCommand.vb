@@ -57,7 +57,7 @@ Public Class ExitCommand : Inherits RpaCommandBase
         End If
         ''-----------------------------------------------------------------------------------------'
 
-        dat.Transaction.ExitFlag = True
+        dat.System.ExitFlag = True
         Return 0
     End Function
 

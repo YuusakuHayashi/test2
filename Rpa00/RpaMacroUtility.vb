@@ -269,7 +269,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Function Main(ByRef dat As RpaDataWrapper) As Integer
             Dim i As Integer = -1
-            If dat.Transaction.Parameters.Count = 0 Then
+            If dat.System.CommandData.Parameters.Count = 0 Then
                 i = AllUpdate(dat)
             Else
                 i = SelectedUpdate(dat)
@@ -278,16 +278,16 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Private Function AllUpdate(ByRef dat As RpaDataWrapper) As Integer
-            Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
+            Dim utilpfx As String = $"{dat.System.CommandData.UtilityCommand}"
             dat.System.LateBindingCommands.Add($"{utilpfx} download")
             dat.System.LateBindingCommands.Add($"{utilpfx} install")
             Return 0
         End Function
 
         Private Function SelectedUpdate(ByRef dat As RpaDataWrapper) As Integer
-            Dim utilpfx As String = $"{dat.Transaction.UtilityCommand}"
-            dat.System.LateBindingCommands.Add($"{utilpfx} download {dat.Transaction.ParametersText}")
-            dat.System.LateBindingCommands.Add($"{utilpfx} install {dat.Transaction.ParametersText}")
+            Dim utilpfx As String = $"{dat.System.CommandData.UtilityCommand}"
+            dat.System.LateBindingCommands.Add($"{utilpfx} download {dat.System.CommandData.ParametersText}")
+            dat.System.LateBindingCommands.Add($"{utilpfx} install {dat.System.CommandData.ParametersText}")
             Return 0
         End Function
 
@@ -317,7 +317,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Function Main(ByRef dat As RpaDataWrapper) As Integer
             Dim i As Integer = -1
-            If dat.Transaction.Parameters.Count = 0 Then
+            If dat.System.CommandData.Parameters.Count = 0 Then
                 i = AllInstall(dat)
             Else
                 i = SelectedInstall(dat)
@@ -351,7 +351,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         End Function
 
         Public Function SelectedInstall(ByRef dat As RpaDataWrapper) As Integer
-            For Each para In dat.Transaction.Parameters
+            For Each para In dat.System.CommandData.Parameters
                 Dim bas As String = $"{Parent.MacroUtilityDirectory}\{para}"
                 Dim ext As String = Path.GetExtension(bas)
                 If File.Exists(bas) And (ext = ".bas" Or ext = ".cls") Then
@@ -421,7 +421,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
 
         Private Function Main(ByRef dat As RpaDataWrapper) As Integer
             Dim i As Integer = -1
-            If dat.Transaction.Parameters.Count = 0 Then
+            If dat.System.CommandData.Parameters.Count = 0 Then
                 i = AllDownload(dat)
             Else
                 i = SelectedDownload(dat)
@@ -456,7 +456,7 @@ Public Class RpaMacroUtility : Inherits RpaUtilityBase
         Private Function SelectedDownload(ByRef dat As RpaDataWrapper) As Integer
             Dim srcdir As String = Parent.RootBasDirectory(dat)
             Dim dstdir As String = Parent.MacroUtilityDirectory
-            For Each para In dat.Transaction.Parameters
+            For Each para In dat.System.CommandData.Parameters
                 Dim src As String = $"{srcdir}\{para}"
                 Dim ext As String = Path.GetExtension(src)
                 Dim dst As String = $"{dstdir}\{para}"

@@ -11,7 +11,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         If rpa Is Nothing Then
             Console.WriteLine($"プロジェクトの新規作成を中止しました")
             Console.WriteLine()
-            dat.Transaction.ExitFlag = True
+            dat.System.ExitFlag = True
             Return 1000
         End If
 
@@ -20,7 +20,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         If rpa Is Nothing Then
             Console.WriteLine($"プロジェクトの新規作成を中止しました")
             Console.WriteLine()
-            dat.Transaction.ExitFlag = True
+            dat.System.ExitFlag = True
             Return 1000
         End If
 
@@ -31,7 +31,7 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
         If ini Is Nothing Then
             Console.WriteLine($"プロジェクトの新規作成を中止しました")
             Console.WriteLine()
-            dat.Transaction.ExitFlag = True
+            dat.System.ExitFlag = True
             Return 1000
         End If
 
@@ -52,8 +52,8 @@ Public Class NewProjectCommand : Inherits RpaCommandBase
 
         Directory.CreateDirectory(rpa.SystemProjectDirectory)
         Console.WriteLine($"ディレクトリ '{rpa.SystemProjectDirectory}' を新規作成しました")
-        Call RpaModule.Save(rpa.SystemJsonFileName, rpa, rpa.SystemJsonChangedFileName)
-        Call RpaModule.Save(RpaCui.SystemIniFileName, ini, RpaInitializer.SystemIniChangedFileName)
+        Call dat.System.Save(rpa.SystemJsonFileName, rpa, rpa.SystemJsonChangedFileName)
+        Call dat.System.Save(RpaCui.SystemIniFileName, ini, RpaInitializer.SystemIniChangedFileName)
         Return 0
     End Function
 

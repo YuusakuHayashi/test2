@@ -2,7 +2,7 @@
 
 Public Class AddUtilityCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim util As String = dat.Transaction.Parameters(0)
+        Dim util As String = dat.System.CommandData.Parameters(0)
         Dim uobj As Object = RpaCodes.RpaUtilityObject(util)
 
         If uobj Is Nothing Then

@@ -2,7 +2,7 @@
 
 Public Class RemoveMyCommandCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        'For Each [key] In dat.Transaction.Parameters
+        'For Each [key] In dat.System.CommandData.Parameters
         '    If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
         '        dat.Initializer.MyCommandDictionary([key]).IsEnabled = False
         '    Else
@@ -15,7 +15,7 @@ Public Class RemoveMyCommandCommand : Inherits RpaCommandBase
         '    End If
         'Next
         For Each cmd In dat.Initializer.MyCommandDictionary.Values
-            If dat.Transaction.Parameters.Contains(cmd.TrueCommand) Then
+            If dat.System.CommandData.Parameters.Contains(cmd.TrueCommand) Then
                 cmd.IsEnabled = False
                 Console.WriteLine($"'{cmd.TrueCommand}' コマンドを無効にしました")
             End If

@@ -3,7 +3,7 @@
 Public Class ActivateMyCommandCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         For Each cmd In dat.Initializer.MyCommandDictionary.Values
-            If dat.Transaction.Parameters.Contains(cmd.TrueCommand) Then
+            If dat.System.CommandData.Parameters.Contains(cmd.TrueCommand) Then
                 cmd.IsEnabled = True
                 Console.WriteLine($"'{cmd.TrueCommand}' コマンドを有効にしました")
             End If

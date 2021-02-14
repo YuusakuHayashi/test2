@@ -1,7 +1,7 @@
 ﻿Public Class AddCommandAliasCommand : Inherits RpaCommandBase
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
-        Dim [key] As String = dat.Transaction.Parameters(1)
-        Dim truecmd As String = dat.Transaction.Parameters(0)
+        Dim [key] As String = dat.System.CommandData.Parameters(1)
+        Dim truecmd As String = dat.System.CommandData.Parameters(0)
 
         If dat.Initializer.MyCommandDictionary.ContainsKey([key]) Then
             dat.Initializer.MyCommandDictionary([key]).TrueCommand = truecmd

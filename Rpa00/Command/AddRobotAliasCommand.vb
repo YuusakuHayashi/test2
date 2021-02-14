@@ -2,8 +2,8 @@
 
 Public Class AddRobotAliasCommand : Inherits RpaCommandBase
     Private Function Check(ByRef dat As RpaDataWrapper) As Boolean
-        Dim [key] As String = dat.Transaction.Parameters(0)
-        Dim [alias] As String = dat.Transaction.Parameters(1)
+        Dim [key] As String = dat.System.CommandData.Parameters(0)
+        Dim [alias] As String = dat.System.CommandData.Parameters(1)
         If Not dat.Project.RobotAliasDictionary.ContainsKey([key]) Then
             Console.WriteLine($"ロボット '{[key]}' は登録簿にありません")
             Console.WriteLine()
@@ -17,8 +17,8 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
         Dim oldrobo As String = dat.Project.RobotAlias
         Dim olddir As String = dat.Project.MyRobotDirectory
 
-        Dim [key] As String = dat.Transaction.Parameters(0)
-        Dim [alias] As String = dat.Transaction.Parameters(1)
+        Dim [key] As String = dat.System.CommandData.Parameters(0)
+        Dim [alias] As String = dat.System.CommandData.Parameters(1)
         dat.Project.RobotAliasDictionary([key]) = [alias]
         Console.WriteLine($"ロボット '{[key]}' に '{[alias]}' を登録しました")
 
@@ -39,7 +39,7 @@ Public Class AddRobotAliasCommand : Inherits RpaCommandBase
             End If
         End If
 
-        RpaModule.Save(dat.Project.SystemJsonFileName, dat.Project, dat.Project.SystemJsonChangedFileName)
+        dat.System.Save(dat.Project.SystemJsonFileName, dat.Project, dat.Project.SystemJsonChangedFileName)
 
         Console.WriteLine()
 

@@ -41,6 +41,12 @@
                 </DockPanel>
             </DataTemplate>
             
+            <DataTemplate DataType="{x:Type local:CommandLogsOutputViewModel}">
+                <DockPanel LastChildFill="True">
+                    <DataGrid ItemsSource="{Binding Logs}" />
+                </DockPanel>
+            </DataTemplate>
+
             <!-- 増やす時はこの下に追加 -->
             <!-- 起動＆チェック -->
             <DataTemplate DataType="{x:Type local:NoContentViewModel}">
@@ -69,7 +75,7 @@
         </Grid.ColumnDefinitions>
         <Menu Margin="0,0,0,5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
             <MenuItem Header="ファイル">
-                <MenuItem Header="終了" Command="{Binding}"/>
+                <MenuItem Header="終了" Command="{Binding ExitCommand}"/>
             </MenuItem>
         </Menu>
         <DockPanel Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" LastChildFill="True">

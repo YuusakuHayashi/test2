@@ -20,7 +20,7 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
             Return False
         End If
 
-        If dat.Transaction.Parameters.Count = 0 Then
+        If dat.System.CommandData.Parameters.Count = 0 Then
             Dim err3 As String = $"プロジェクトにロボットが存在しません"
             If dat.Project.RobotAliasDictionary.Count = 0 Then
                 Console.WriteLine(err3)
@@ -29,8 +29,8 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
             End If
         End If
 
-        If dat.Transaction.Parameters.Count > 0 Then
-            rpa.RobotName = dat.Transaction.Parameters(0)
+        If dat.System.CommandData.Parameters.Count > 0 Then
+            rpa.RobotName = dat.System.CommandData.Parameters(0)
 
             Dim err4 As String = $"'RootRobotDirectory'が設定されていません"
             If String.IsNullOrEmpty(rpa.RootRobotDirectory) Then
@@ -61,8 +61,8 @@ Public Class AttachRobotCommand : Inherits RpaCommandBase
         Dim roboname As String = vbNullString
 
         ' Parameters(0) = アタッチするロボットの指定の有無
-        If dat.Transaction.Parameters.Count > 0 Then
-            roboname = dat.Transaction.Parameters(0)
+        If dat.System.CommandData.Parameters.Count > 0 Then
+            roboname = dat.System.CommandData.Parameters(0)
         Else
             Dim idx As Integer = -1
             Dim lastidx As Integer = -1

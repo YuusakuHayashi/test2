@@ -32,6 +32,62 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         End Get
     End Property
 
+    Private ReadOnly Property RunnerRunRobotIconFileName As String
+        Get
+            Return $"{Controller.SystemDllDirectory}\runnerrunrobot.png"
+        End Get
+    End Property
+    Private _RunnerRunRobotIcon As BitmapImage
+    Public ReadOnly Property RunnerRunRobotIcon As BitmapImage
+        Get
+            If Me._RunnerRunRobotIcon Is Nothing Then
+                Me._RunnerRunRobotIcon = RpaGuiModule.CreateIcon(Me.RunnerRunRobotIconFileName)
+            End If
+            Return Me._RunnerRunRobotIcon
+        End Get
+    End Property
+    Private _RunRobotCommandToolTip As String
+    Public Property RunRobotCommandToolTip As String
+        Get
+            If String.IsNullOrEmpty(Me._RunRobotCommandToolTip) Then
+                Me._RunRobotCommandToolTip = Me.RunRobotCommandDatas(0).CommandText
+            End If
+            Return Me._RunRobotCommandToolTip
+        End Get
+        Set(value As String)
+            Me._RunRobotCommandToolTip = value
+            RaisePropertyChanged("RunRobotCommandToolTip")
+        End Set
+    End Property
+
+    Private ReadOnly Property RunnerCheckRobotIconFileName As String
+        Get
+            Return $"{Controller.SystemDllDirectory}\runnercheckrobot.png"
+        End Get
+    End Property
+    Private _RunnerCheckRobotIcon As BitmapImage
+    Public ReadOnly Property RunnerCheckRobotIcon As BitmapImage
+        Get
+            If Me._RunnerCheckRobotIcon Is Nothing Then
+                Me._RunnerCheckRobotIcon = RpaGuiModule.CreateIcon(Me.RunnerCheckRobotIconFileName)
+            End If
+            Return Me._RunnerCheckRobotIcon
+        End Get
+    End Property
+    Private _CheckRobotCommandToolTip As String
+    Public Property CheckRobotCommandToolTip As String
+        Get
+            If String.IsNullOrEmpty(Me._CheckRobotCommandToolTip) Then
+                Me._CheckRobotCommandToolTip = Me.CheckRobotCommandDatas(0).CommandText
+            End If
+            Return Me._CheckRobotCommandToolTip
+        End Get
+        Set(value As String)
+            Me._CheckRobotCommandToolTip = value
+            RaisePropertyChanged("CheckRobotCommandToolTip")
+        End Set
+    End Property
+
     Private ReadOnly Property ReloadMyRobotReadMeIconFileName As String
         Get
             Return $"{Controller.SystemDllDirectory}\reloadmyrobotreadme.png"
@@ -70,6 +126,21 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         Set(value As String)
             Me._GuiCommand = value
             RaisePropertyChanged("GuiCommand")
+        End Set
+    End Property
+
+    Private _MyRobotReadMeContentVisibility As Visibility
+    <JsonIgnore>
+    Public Property MyRobotReadMeContentVisibility As Visibility
+        Get
+            If Me._MyRobotReadMeContentVisibility = Nothing Then
+                Me._MyRobotReadMeContentVisibility = Visibility.Visible
+            End If
+            Return Me._MyRobotReadMeContentVisibility
+        End Get
+        Set(value As Visibility)
+            Me._MyRobotReadMeContentVisibility = value
+            RaisePropertyChanged("MyRobotReadMeContentVisibility")
         End Set
     End Property
 
@@ -270,6 +341,82 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     End Property
 
     '---------------------------------------------------------------------------------------------'
+    Private _RunRobotCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property RunRobotCommand As ICommand
+        Get
+            If Me._RunRobotCommand Is Nothing Then
+                Me._RunRobotCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf RunRobotCommandExecute,
+                    .CanExecuteHandler = AddressOf RunRobotCommandCanExecute
+                }
+            End If
+            Return Me._RunRobotCommand
+        End Get
+    End Property
+
+    Private _IsRunRobotCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsRunRobotCommandEnabled As Boolean
+        Get
+            Return Me._IsRunRobotCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsRunRobotCommandEnabled = value
+            RaisePropertyChanged("IsRunRobotCommandEnabled")
+            CType(RunRobotCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub RunRobotCommandExecute(ByVal parameter As Object)
+        Call SetConsoleCommand(Me.RunRobotCommandDatas(0))
+        ViewController.ExecuteGuiCommandPath = True
+    End Sub
+
+    Private Function RunRobotCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsRunRobotCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
+    Private _CheckRobotCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property CheckRobotCommand As ICommand
+        Get
+            If Me._CheckRobotCommand Is Nothing Then
+                Me._CheckRobotCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf CheckRobotCommandExecute,
+                    .CanExecuteHandler = AddressOf CheckRobotCommandCanExecute
+                }
+            End If
+            Return Me._CheckRobotCommand
+        End Get
+    End Property
+
+    Private _IsCheckRobotCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsCheckRobotCommandEnabled As Boolean
+        Get
+            Return Me._IsCheckRobotCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsCheckRobotCommandEnabled = value
+            RaisePropertyChanged("IsCheckRobotCommandEnabled")
+            CType(CheckRobotCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub CheckRobotCommandExecute(ByVal parameter As Object)
+        Call SetConsoleCommand(Me.CheckRobotCommandDatas(0))
+        ViewController.ExecuteGuiCommandPath = True
+    End Sub
+
+    Private Function CheckRobotCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsCheckRobotCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
     Private _SaveRunnerCommand As ICommand
     <JsonIgnore>
     Public ReadOnly Property SaveRunnerCommand As ICommand
@@ -390,18 +537,57 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     End Function
     '---------------------------------------------------------------------------------------------'
 
+    '---------------------------------------------------------------------------------------------'
+    Private _CollapseMyRobotReadMeCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property CollapseMyRobotReadMeCommand As ICommand
+        Get
+            If Me._CollapseMyRobotReadMeCommand Is Nothing Then
+                Me._CollapseMyRobotReadMeCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf CollapseMyRobotReadMeCommandExecute,
+                    .CanExecuteHandler = AddressOf CollapseMyRobotReadMeCommandCanExecute
+                }
+            End If
+            Return Me._CollapseMyRobotReadMeCommand
+        End Get
+    End Property
+
+    Private _IsCollapseMyRobotReadMeCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsCollapseMyRobotReadMeCommandEnabled As Boolean
+        Get
+            Return Me._IsCollapseMyRobotReadMeCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsCollapseMyRobotReadMeCommandEnabled = value
+            RaisePropertyChanged("IsCollapseMyRobotReadMeCommandEnabled")
+            CType(CollapseMyRobotReadMeCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub CollapseMyRobotReadMeCommandExecute(ByVal parameter As Object)
+        Me.MyRobotReadMeContentVisibility = Visibility.Collapsed
+    End Sub
+
+    Private Function CollapseMyRobotReadMeCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsCollapseMyRobotReadMeCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
     Private Sub CheckPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If e.PropertyName = "RunRobotCommandIndex" Then
             If sender.RunRobotCommandIndex >= 0 Then
                 Call SetConsoleCommand(sender.RunRobotCommandDatas(sender.RunRobotCommandIndex))
                 Me.CheckRobotCommandIndex = -1
             End If
+            Me.RunRobotCommandToolTip = vbNullString
         End If
         If e.PropertyName = "CheckRobotCommandIndex" Then
             If sender.CheckRobotCommandIndex >= 0 Then
                 Call SetConsoleCommand(sender.CheckRobotCommandDatas(sender.CheckRobotCommandIndex))
                 Me.RunRobotCommandIndex = -1
             End If
+            Me.CheckRobotCommandToolTip = vbNullString
         End If
     End Sub
 
@@ -487,11 +673,10 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     Private Sub UpdateRunRobotCommandDatas(ByVal cmdstr As String)
         For Each cmddata In Me.RunRobotCommandDatas
             If cmddata.CommandText = cmdstr Then
-                cmddata.ExecuteDate = DateTime.Now
-                Exit Sub
+                Me.RunRobotCommandDatas.Remove(cmddata)
+                Exit For
             End If
         Next
-        ' 新しいコマンドの場合
         Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now}
         Me.RunRobotCommandDatas = Rpa00.RpaModule.Push(Of CommandData, ObservableCollection(Of CommandData))(newcmd, Me.RunRobotCommandDatas)
     End Sub
@@ -499,11 +684,10 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     Private Sub UpdateCheckRobotCommandDatas(ByVal cmdstr As String)
         For Each cmddata In Me.CheckRobotCommandDatas
             If cmddata.CommandText = cmdstr Then
-                cmddata.ExecuteDate = DateTime.Now
-                Exit Sub
+                Me.CheckRobotCommandDatas.Remove(cmddata)
+                Exit For
             End If
         Next
-        ' 新しいコマンドの場合
         Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now}
         Me.CheckRobotCommandDatas = Rpa00.RpaModule.Push(Of CommandData, ObservableCollection(Of CommandData))(newcmd, Me.CheckRobotCommandDatas)
     End Sub
@@ -565,6 +749,9 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
             End If
         End If
         Me.IsSaveMyRobotReadMeCommandEnabled = CheckSaveMyRobotReadMeCommandEnabled()
+        Me.IsCollapseMyRobotReadMeCommandEnabled = True
+        Me.IsRunRobotCommandEnabled = True
+        Me.IsCheckRobotCommandEnabled = True
     End Sub
 
     Sub New()

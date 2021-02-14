@@ -19,7 +19,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <IncrementalBuild>true</IncrementalBuild>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\RpaCui\debugrobot\</OutputPath>
     <DocumentationFile>RpaGui00.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
   </PropertyGroup>
@@ -67,6 +67,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandLogsOutputViewModel.vb" />
     <Compile Include="ConsoleOutputViewModel.vb" />
     <Compile Include="Controller.xaml.vb">
       <DependentUpon>Controller.xaml</DependentUpon>

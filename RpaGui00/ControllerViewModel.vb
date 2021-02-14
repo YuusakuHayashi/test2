@@ -4,16 +4,13 @@ Imports System.Collections.Specialized
 Imports Newtonsoft.Json
 
 Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel)
-    ' !!! RpaDataWrapper型のdllオブジェクトがキャストされる
-    ' 別プロジェクトのせいか、RpaDataWrapper型としては定義できなかった
-    ' (するとキャスト時エラーになる)
-    Private _Data As Object
+    Private _Data As Rpa00.RpaDataWrapper
     <JsonIgnore>
-    Public Property Data As Object
+    Public Property Data As Rpa00.RpaDataWrapper
         Get
             Return Me._Data
         End Get
-        Set(value As Object)
+        Set(value As Rpa00.RpaDataWrapper)
             Me._Data = value
             Call RaisePropertyChanged("Data")
         End Set
@@ -41,8 +38,6 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
                 [obj].Initialize()
                 [tab] = New TabItemViewModel With {.Header = "メニュー", .Content = obj}
                 Me._ExplorerTabs.Add([tab])
-
-                'Me._ExplorerTabs.Add(New TabItemViewModel With {.Header = "メニュー", .Content = New MenuExplorerViewModel With {.ViewController = Me}})
             End If
             Return Me._ExplorerTabs
         End Get
@@ -71,7 +66,10 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
                 [tab] = New TabItemViewModel With {.Header = "コンソール", .Content = obj}
                 Me._OutputTabs.Add([tab])
 
-                'Me._OutputTabs.Add(New TabViewModel With {.Header = "コンソール", .Content = New ConsoleOutputViewModel With {.ViewController = Me}})
+                [obj] = New CommandLogsOutputViewModel With {.ViewController = Me}
+                [obj].Initialize()
+                [tab] = New TabItemViewModel With {.Header = "コマンドログ", .Content = obj}
+                Me._OutputTabs.Add([tab])
             End If
             Return Me._OutputTabs
         End Get
@@ -167,6 +165,76 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
         End Set
     End Property
 
+    'Private _CommandLogsPath As Object
+    'Public Property CommandLogsPath As Object
+    '    Get
+    '        Return Me._CommandLogsPath
+    '    End Get
+    '    Set(value As Object)
+    '        Me._CommandLogsPath = value
+    '        RaisePropertyChanged("CommandLogsPath")
+    '    End Set
+    'End Property
+
+    ' ConsoleOutputクラスがExecuteGuiCommand起動要求を監視するためのパス
+    Private _ExecuteGuiCommandPath As Boolean
+    Public Property ExecuteGuiCommandPath As Boolean
+        Get
+            Return Me._ExecuteGuiCommandPath
+        End Get
+        Set(value As Boolean)
+            Me._ExecuteGuiCommandPath = value
+            RaisePropertyChanged("ExecuteGuiCommandPath")
+        End Set
+    End Property
+    '---------------------------------------------------------------------------------------------'
+
+    Private _ExitCommand As ICommand
+    Public ReadOnly Property ExitCommand As ICommand
+        Get
+            If Me._ExitCommand Is Nothing Then
+                Me._ExitCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf ExitCommandExecute,
+                    .CanExecuteHandler = AddressOf ExitCommandCanExecute
+                }
+            End If
+            Return Me._ExitCommand
+        End Get
+    End Property
+
+    Private _IsExitCommandEnabled As Boolean
+    Public Property IsExitCommandEnabled As Boolean
+        Get
+            Return Me._IsExitCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsExitCommandEnabled = value
+            RaisePropertyChanged("IsExitCommandEnabled")
+            CType(ExitCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Async Sub ExitCommandExecute(ByVal parameter As Object)
+        Dim t As Task = Task.Run(
+            Sub()
+                Call _ExitCommandExecute(parameter)
+            End Sub
+        )
+        Await Task.WhenAll(t)
+        Application.Current.Shutdown()
+    End Sub
+
+    Private Sub _ExitCommandExecute(ByVal parameter As Object)
+        Data.System.ExecuteMode = Rpa00.RpaSystem.ExecuteModeNumber.RpaGui
+        Data.System.GuiCommandText = $"exit"
+        Call Data.System.Main(Data)
+    End Sub
+
+    Private Function ExitCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsExitCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
     'Private Sub CheckPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
     '    If e.PropertyName = "ExplorerTabIndex" Then
     '        Me.ExplorerTabs(Me.OutputTabIndex).Content.ViewController = Me
@@ -183,6 +251,7 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
     End Sub
 
     Sub New()
+        Me.IsExitCommandEnabled = True
         Me.ExplorerTabIndex = 0
         Me.OutputTabIndex = 0
         'AddHandler Me.PropertyChanged, AddressOf CheckPropertyChanged

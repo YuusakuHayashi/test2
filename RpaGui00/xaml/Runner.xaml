@@ -23,10 +23,34 @@
         <DockPanel Grid.Row="0" Grid.Column="0" LastChildFill="True">
             <StackPanel DockPanel.Dock="Top">
                 <Menu>
-                    <MenuItem Command="{Binding SaveRunnerCommand}">
-                        <MenuItem.Icon>
-                            <Image Source="{Binding RunnerSaveIcon, Mode=OneTime}" />
-                        </MenuItem.Icon>
+                    <Menu.Resources>
+                    </Menu.Resources>
+                    <MenuItem Height="50" Width="50" Command="{Binding SaveRunnerCommand}">
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <Image Height="20" Width="20" Source="{Binding RunnerSaveIcon}" HorizontalAlignment="Center" />
+                                <TextBlock Text="保存" FontSize="8" Margin="0,3,0,0" HorizontalAlignment="Center" />
+                                <Button Content="" FontSize="5" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Height="50" Width="50" Command="{Binding RunRobotCommand}" ToolTip="{Binding RunRobotCommandToolTip}" >
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <Image Height="20" Width="20" Source="{Binding RunnerRunRobotIcon}" />
+                                <TextBlock Text="開始" FontSize="8" Margin="0,3,0,0" HorizontalAlignment="Center" />
+                                <Button Content="▼" FontSize="5" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem Height="50" Width="50" Command="{Binding CheckRobotCommand}" ToolTip="{Binding CheckRobotCommandToolTip}">
+                        <MenuItem.Header>
+                            <StackPanel>
+                                <Image Height="20" Width="20" Source="{Binding RunnerCheckRobotIcon}" />
+                                <TextBlock Text="チェック" FontSize="8" Margin="0,3,0,0" HorizontalAlignment="Center" />
+                                <Button Content="▼" FontSize="5" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Center" />
+                            </StackPanel>
+                        </MenuItem.Header>
                     </MenuItem>
                 </Menu>
             </StackPanel>
@@ -89,8 +113,16 @@
             Grid.Row="0" Grid.Column="1"
             HorizontalAlignment="Stretch"
             ResizeDirection="Columns" ResizeBehavior="PreviousAndCurrent" />
-        <DockPanel Grid.Row="0" Grid.Column="2" LastChildFill="True">
-            <TextBlock Background="WhiteSmoke" DockPanel.Dock="Top" Text="ReadMeファイル内容" />
+        <DockPanel Grid.Row="0" Grid.Column="2" LastChildFill="True" Visibility="{Binding MyRobotReadMeContentVisibility}">
+            <Grid Height="20" Background="WhiteSmoke" DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="15" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="ReadMeファイル内容"  />
+                <Button Grid.Column="2" Content="×" Background="Transparent" BorderThickness="0" Command="{Binding CollapseMyRobotReadMeCommand}" />
+            </Grid>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Command="{Binding ReloadMyRobotReadMeCommand}">
                     <MenuItem.Icon>

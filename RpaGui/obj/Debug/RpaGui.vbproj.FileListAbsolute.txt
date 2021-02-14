@@ -55,3 +55,7 @@ C:\Users\yuusa\project\test2\RpaGui\bin\Debug\RpaCui.exe.config
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.g.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.vbproj.GenerateResource.Cache
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.exe.config
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.exe
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.pdb
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.xml
