@@ -72,8 +72,8 @@
                 i = dlg(dat)
             End If
         Catch ex As Exception
-            Console.WriteLine($"({Me.GetType.Name}.CanExecuteHandler) {ex.Message}")
-            Console.WriteLine()
+            dat.System.RpaWriteLine($"({Me.GetType.Name}.CanExecuteHandler) {ex.Message}")
+            dat.System.RpaWriteLine()
             i = False
         End Try
         Return i
@@ -106,8 +106,8 @@
                 i = dlg(dat)
             End If
         Catch ex As Exception
-            Console.WriteLine($"({Me.GetType.Name}.ExecuteHandler) {ex.Message}")
-            Console.WriteLine()
+            dat.System.RpaWriteLine($"({Me.GetType.Name}.ExecuteHandler) {ex.Message}")
+            dat.System.RpaWriteLine()
             i = -1
         End Try
         Return i
@@ -134,8 +134,8 @@
     '            i = t.Result
     '        End If
     '    Catch ex As Exception
-    '        Console.WriteLine($"({Me.GetType.Name}.ExecuteHandler) {ex.Message}")
-    '        Console.WriteLine()
+    '        dat.System.RpaWriteLine($"({Me.GetType.Name}.ExecuteHandler) {ex.Message}")
+    '        dat.System.RpaWriteLine()
     '        i = -1
     '    End Try
     '    Return i

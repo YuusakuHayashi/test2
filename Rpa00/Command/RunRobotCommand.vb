@@ -2,7 +2,7 @@
     Private Function Main(ByRef dat As RpaDataWrapper) As Integer
         Dim i = 0
         'MyRobotObjectのリロード用
-        Dim j As Integer = dat.Project.SwitchRobot(dat.Project.RobotName)
+        Dim j As Integer = dat.Project.ImplicitSwitchRobot(dat.Project.RobotName)
         dat.Project.MyRobotObject.Data = dat
         Call dat.System.RpaWriteLine()
         Call dat.System.RpaWriteLine($"プロジェクトの起動条件を確認しています・・・")

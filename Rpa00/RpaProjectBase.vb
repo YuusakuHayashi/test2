@@ -105,6 +105,15 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         End Set
     End Property
 
+    Private _IsImplicitRobotNameChanged As Boolean
+    Private Property IsImplicitRobotNameChanged As Boolean
+        Get
+            Return Me._IsImplicitRobotNameChanged
+        End Get
+        Set(value As Boolean)
+            Me._IsImplicitRobotNameChanged = value
+        End Set
+    End Property
     Private _RobotName As String
     Public Property RobotName As String
         Get
@@ -113,7 +122,9 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
         Set(value As String)
             'Me._RobotAlias = vbNullString
             Me._RobotName = value
-            RaisePropertyChanged("RobotName")
+            If Not Me.IsImplicitRobotNameChanged Then
+                RaisePropertyChanged("RobotName")
+            End If
         End Set
     End Property
 
@@ -239,6 +250,17 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Public Overridable Function SwitchRobot(ByVal [name] As String) As Integer
         Me.RobotName = [name]
         Me.MyRobotObject = Nothing
+
+        Return 0
+    End Function
+
+    ' RobotNameアクセサ
+    ' このアクセサを使用すると、変更通知を出さない(.chg)
+    Public Overridable Function ImplicitSwitchRobot(ByVal [name] As String) As Integer
+        Me.IsImplicitRobotNameChanged = True
+        Me.RobotName = [name]
+        Me.MyRobotObject = Nothing
+        Me.IsImplicitRobotNameChanged = False
 
         Return 0
     End Function

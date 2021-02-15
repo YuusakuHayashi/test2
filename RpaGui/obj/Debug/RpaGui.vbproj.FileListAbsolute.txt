@@ -29,9 +29,6 @@ C:\Users\yuusa\project\test2\RpaGui\bin\Debug\RpaCui.pdb
 C:\Users\yuusa\project\test2\RpaGui\bin\Debug\RpaCui.xml
 C:\Users\yuusa\project\test2\RpaGui\bin\Debug\RpaCui.exe.config
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\bin\Debug\RpaGui.exe.config
-\\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.exe
-\\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.xml
-\\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\bin\Debug\RpaGui.exe
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\bin\Debug\RpaGui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\bin\Debug\RpaGui.xml
@@ -46,6 +43,14 @@ C:\Users\yuusa\project\test2\RpaGui\bin\Debug\RpaCui.exe.config
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\bin\Debug\Newtonsoft.Json.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\bin\Debug\RpaCui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\bin\Debug\RpaCui.xml
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.exe.config
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.exe
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.pdb
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaGui.exe.config
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaGui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaGui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaGui.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.vbprojResolveAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\MainWindow.g.vb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\Application.g.vb
@@ -55,7 +60,6 @@ C:\Users\yuusa\project\test2\RpaGui\bin\Debug\RpaCui.exe.config
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.g.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.vbproj.GenerateResource.Cache
-C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.exe.config
-C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.exe
-C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.pdb
-C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.xml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Debug\RpaGui.pdb

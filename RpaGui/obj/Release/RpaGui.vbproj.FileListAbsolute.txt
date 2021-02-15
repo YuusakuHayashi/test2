@@ -55,3 +55,7 @@ C:\Users\yuusa\project\test2\RpaGui\obj\Release\RpaGui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Release\RpaGui.g.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Release\RpaGui.Resources.resources
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui\obj\Release\RpaGui.vbproj.GenerateResource.Cache
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaGui.exe.config
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaGui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaGui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaGui.xml

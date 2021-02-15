@@ -9,8 +9,71 @@
     <Grid>
         <Grid.Resources>
             <local:ReturnCodeToMessageConverter x:Key="ReturnCodeToMessageConverter" />
-            <local:ReturnCodeToForegroundConverter x:Key="ReturnCodeToForeGroundConverter" />
-            <!--<SolidColorBrush x:Key="ReturnCodeColor" Color="{Binding ViewController.Data.System.ReturnCode, Converter={StaticResource ReturnCodeToForegroundConverter}}" />-->
+            <ContentControl x:Key="LargeMenuBar">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Menu Grid.Row="0">
+                        <Menu.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <DockPanel Margin="5,5,5,0" LastChildFill="False" />
+                            </ItemsPanelTemplate>
+                        </Menu.ItemsPanel>
+                        <MenuItem Command="{Binding SaveRunnerCommand}" HorizontalContentAlignment="Center">
+                            <MenuItem.Header>
+                                <StackPanel Width="30">
+                                    <Image Height="20" Width="20" Source="{Binding RunnerSaveIcon}" />
+                                    <TextBlock Text="保存" FontSize="8" Margin="0,3,0,0" TextAlignment="Center" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem Command="{Binding RunRobotCommand}" ToolTip="{Binding RunRobotCommandToolTip}" HorizontalContentAlignment="Center">
+                            <MenuItem.Header>
+                                <StackPanel Width="30">
+                                    <Image Height="20" Width="20" Source="{Binding RunnerRunRobotIcon}" />
+                                    <TextBlock Text="開始" FontSize="8" Margin="0,3,0,0" TextAlignment="Center" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem Command="{Binding CheckRobotCommand}" ToolTip="{Binding CheckRobotCommandToolTip}" HorizontalContentAlignment="Center">
+                            <MenuItem.Header>
+                                <StackPanel Width="30">
+                                    <Image Height="20" Width="20" Source="{Binding RunnerCheckRobotIcon}" />
+                                    <TextBlock Text="チェック" FontSize="8" Margin="0,3,0,0" TextAlignment="Center" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                    <Menu Grid.Row="1">
+                        <Menu.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <DockPanel Margin="5,0,5,5" LastChildFill="False" />
+                            </ItemsPanelTemplate>
+                        </Menu.ItemsPanel>
+                        <MenuItem HorizontalContentAlignment="Center">
+                            <MenuItem.Header>
+                                <StackPanel Width="30" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem HorizontalContentAlignment="Center">
+                            <MenuItem.Header>
+                                <StackPanel Width="30">
+                                    <TextBlock Text="▼" FontSize="5" TextAlignment="Center" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem HorizontalContentAlignment="Center">
+                            <MenuItem.Header>
+                                <StackPanel Width="30">
+                                    <TextBlock Text="▼" FontSize="5" TextAlignment="Center" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                </Grid>
+            </ContentControl>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -21,39 +84,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <DockPanel Grid.Row="0" Grid.Column="0" LastChildFill="True">
-            <StackPanel DockPanel.Dock="Top">
-                <Menu>
-                    <Menu.Resources>
-                    </Menu.Resources>
-                    <MenuItem Height="50" Width="50" Command="{Binding SaveRunnerCommand}">
-                        <MenuItem.Header>
-                            <StackPanel>
-                                <Image Height="20" Width="20" Source="{Binding RunnerSaveIcon}" HorizontalAlignment="Center" />
-                                <TextBlock Text="保存" FontSize="8" Margin="0,3,0,0" HorizontalAlignment="Center" />
-                                <Button Content="" FontSize="5" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Center" />
-                            </StackPanel>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem Height="50" Width="50" Command="{Binding RunRobotCommand}" ToolTip="{Binding RunRobotCommandToolTip}" >
-                        <MenuItem.Header>
-                            <StackPanel>
-                                <Image Height="20" Width="20" Source="{Binding RunnerRunRobotIcon}" />
-                                <TextBlock Text="開始" FontSize="8" Margin="0,3,0,0" HorizontalAlignment="Center" />
-                                <Button Content="▼" FontSize="5" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Center" />
-                            </StackPanel>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem Height="50" Width="50" Command="{Binding CheckRobotCommand}" ToolTip="{Binding CheckRobotCommandToolTip}">
-                        <MenuItem.Header>
-                            <StackPanel>
-                                <Image Height="20" Width="20" Source="{Binding RunnerCheckRobotIcon}" />
-                                <TextBlock Text="チェック" FontSize="8" Margin="0,3,0,0" HorizontalAlignment="Center" />
-                                <Button Content="▼" FontSize="5" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Center" />
-                            </StackPanel>
-                        </MenuItem.Header>
-                    </MenuItem>
-                </Menu>
-            </StackPanel>
+            <ContentControl DockPanel.Dock="Top" Content="{StaticResource LargeMenuBar}" />
             <ScrollViewer DockPanel.Dock="Top">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top">

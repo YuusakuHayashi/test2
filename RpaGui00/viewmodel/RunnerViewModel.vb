@@ -580,14 +580,12 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                 Call SetConsoleCommand(sender.RunRobotCommandDatas(sender.RunRobotCommandIndex))
                 Me.CheckRobotCommandIndex = -1
             End If
-            Me.RunRobotCommandToolTip = vbNullString
         End If
         If e.PropertyName = "CheckRobotCommandIndex" Then
             If sender.CheckRobotCommandIndex >= 0 Then
                 Call SetConsoleCommand(sender.CheckRobotCommandDatas(sender.CheckRobotCommandIndex))
                 Me.RunRobotCommandIndex = -1
             End If
-            Me.CheckRobotCommandToolTip = vbNullString
         End If
     End Sub
 
@@ -679,6 +677,7 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         Next
         Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now}
         Me.RunRobotCommandDatas = Rpa00.RpaModule.Push(Of CommandData, ObservableCollection(Of CommandData))(newcmd, Me.RunRobotCommandDatas)
+        Me.RunRobotCommandToolTip = vbNullString
     End Sub
 
     Private Sub UpdateCheckRobotCommandDatas(ByVal cmdstr As String)
@@ -690,8 +689,11 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         Next
         Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now}
         Me.CheckRobotCommandDatas = Rpa00.RpaModule.Push(Of CommandData, ObservableCollection(Of CommandData))(newcmd, Me.CheckRobotCommandDatas)
+        Me.CheckRobotCommandToolTip = vbNullString
     End Sub
 
+    ' ConsoleOutputViewModel.GuiCommandTextsPathにアイテムが追加された時、こちらの履歴にも追加する
+    ' ConsoleOutputViewModel.GuiCommandTextsPathにアイテムが追加されるのは、実行時となる
     Private Sub CheckCollectionChanged(ByVal sender As Object, ByVal e As NotifyCollectionChangedEventArgs)
         If e.Action = NotifyCollectionChangedAction.Add Then
             'Dim cmdstr As String = e.NewItems(e.NewStartingIndex)

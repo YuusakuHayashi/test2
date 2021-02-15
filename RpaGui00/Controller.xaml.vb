@@ -14,13 +14,30 @@ Public Class Controller
     End Property
 
     ' !!! RpaCuiと同じプロパティ。同期して変更する必要あり
+    'Private Shared _SystemDllDirectory As String
+    'Public Shared Property SystemDllDirectory As String
+    '    Get
+    '        If String.IsNullOrEmpty(Controller._SystemDllDirectory) Then
+    '            'Controller._SystemDllDirectory = $"{Controller.SystemDirectory}\dll"
+    '            Controller._SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
+    '            'Controller._SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
+    '            If Not Directory.Exists(Controller._SystemDllDirectory) Then
+    '                Directory.CreateDirectory(Controller._SystemDllDirectory)
+    '            End If
+    '        End If
+    '        Return Controller._SystemDllDirectory
+    '    End Get
+    '    Set(value As String)
+    '        Controller._SystemDllDirectory = value
+    '    End Set
+    'End Property
+
+    ' !!! RpaCuiと同じプロパティ。同期して変更する必要あり
     Private Shared _SystemDllDirectory As String
     Public Shared Property SystemDllDirectory As String
         Get
             If String.IsNullOrEmpty(Controller._SystemDllDirectory) Then
-                'Controller._SystemDllDirectory = $"{Controller.SystemDirectory}\dll"
-                'Controller._SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
-                Controller._SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
+                Controller._SystemDllDirectory = $"{Controller.SystemDirectory}\dll"
                 If Not Directory.Exists(Controller._SystemDllDirectory) Then
                     Directory.CreateDirectory(Controller._SystemDllDirectory)
                 End If
@@ -44,6 +61,8 @@ Public Class Controller
         InitializeComponent()
 
         ' InitializeComponent() 呼び出しの後で初期化を追加します。        
+        'Controller.SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
+        'Controller.SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
 
         '-----------------------------------------------------------------------------------------'
         ' !!! RpaCuiと同じロジック。同期して変更する必要あり？

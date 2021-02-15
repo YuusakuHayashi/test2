@@ -162,7 +162,7 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
     Private Function Main(ByRef dat As Object) As Integer
         Dim mutil As New RpaMacroUtility
 
-        Dim months As List(Of String) = dat.Transaction.Parameters
+        Dim months As List(Of String) = dat.System.CommandData.Parameters
 
         ' シートの対応関係表
         'Dim siosc As Dictionary(Of String, String) = Data.Project.RootRobotObject.SingleMonthBookDatas.InputOutputSheetCorrespondence
@@ -305,8 +305,8 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
             [k] = mutil.InvokeMacro("Rpa02.WriteOutputData", {mdstbook, indatas})
         End If
 
-        Console.WriteLine($"処理完了！")
-        Console.WriteLine()
+        dat.System.RpaWriteLine($"処理完了！")
+        dat.System.RpaWriteLine()
 
         Return 0
     End Function
@@ -335,41 +335,41 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
         Dim outil As New RpaOutlookUtility
 
         Dim [new] As List(Of String)
-        If dat.Transaction.Parameters.Contains("nocheck") Then
-            'dat.Transaction.Parameters = Rpa00.RpaModule.Pop(Of List(Of String))(dat.Transaction.Parameters)
-            [new] = dat.Transaction.Parameters
+        If dat.System.CommandData.Parameters.Contains("nocheck") Then
+            'dat.System.CommandData.Parameters = Rpa00.RpaModule.Pop(Of List(Of String))(dat.System.CommandData.Parameters)
+            [new] = dat.System.CommandData.Parameters
             [new].Remove("nocheck")
-            dat.Transaction.Parameters = [new]
+            dat.System.CommandData.Parameters = [new]
             Return True
         End If
 
         If String.IsNullOrEmpty(Me.DOBookDatas.BookName) Then
-            Console.WriteLine($" 'DOBookDatas.BookName' が設定されていません")
+            dat.System.RpaWriteLine($" 'DOBookDatas.BookName' が設定されていません")
             Return False
         End If
         If Not File.Exists(Me.DOBookDatas.BookName) Then
-            Console.WriteLine($"ファイル '{Me.DOBookDatas.BookName}' が存在しません")
+            dat.System.RpaWriteLine($"ファイル '{Me.DOBookDatas.BookName}' が存在しません")
             Return False
         End If
         If String.IsNullOrEmpty(Me.SingleMonthBookDatas.BookName) Then
-            Console.WriteLine($"'SingleMonthBookDatas.BookName' が設定されていません")
+            dat.System.RpaWriteLine($"'SingleMonthBookDatas.BookName' が設定されていません")
             Return False
         End If
         If Not File.Exists(Me.SingleMonthBookDatas.BookName) Then
-            Console.WriteLine($"ファイル '{Me.SingleMonthBookDatas.BookName}' が存在しません")
+            dat.System.RpaWriteLine($"ファイル '{Me.SingleMonthBookDatas.BookName}' が存在しません")
             Return False
         End If
         If String.IsNullOrEmpty(Me.MultiMonthBookDatas.BookName) Then
-            Console.WriteLine($"'MultiMonthBookDatas.BookName' が設定されていません")
+            dat.System.RpaWriteLine($"'MultiMonthBookDatas.BookName' が設定されていません")
             Return False
         End If
         If Not File.Exists(Me.MultiMonthBookDatas.BookName) Then
-            Console.WriteLine($"ファイル '{Me.MultiMonthBookDatas.BookName}' が存在しません")
+            dat.System.RpaWriteLine($"ファイル '{Me.MultiMonthBookDatas.BookName}' が存在しません")
             Return False
         End If
 
         If Not File.Exists(mutil.MacroFileName) Then
-            Console.WriteLine($"マクロファイル '{mutil.MacroFileName}' が存在しません")
+            dat.System.RpaWriteLine($"マクロファイル '{mutil.MacroFileName}' が存在しません")
             Return False
         End If
 
@@ -380,11 +380,11 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
             If obj IsNot Nothing Then
                 Dim ck2 = CType(obj, Boolean)
                 If Not ck2 Then
-                    Console.WriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
+                    dat.System.RpaWriteLine($"ファイル '{mutil.MacroFileName}' 内にモジュール '{[mod]}' が存在しません")
                     ck = False
                 End If
             Else
-                Console.WriteLine($"モジュールのチェックに失敗しました")
+                dat.System.RpaWriteLine($"モジュールのチェックに失敗しました")
                 ck = False
                 Exit For
             End If
@@ -400,12 +400,12 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
             If obj IsNot Nothing Then
                 Dim ck2 = CType(obj, Boolean)
                 If Not ck2 Then
-                    Console.WriteLine($"'SingleMonthBookDatas.InputOutputSheetCorrespondence' の")
-                    Console.WriteLine($"シート名 '{ws}' は、 '{Me.DOBookDatas.BookName}' 内に存在しません")
+                    dat.System.RpaWriteLine($"'SingleMonthBookDatas.InputOutputSheetCorrespondence' の")
+                    dat.System.RpaWriteLine($"シート名 '{ws}' は、 '{Me.DOBookDatas.BookName}' 内に存在しません")
                     ck = False
                 End If
             Else
-                Console.WriteLine($"シートのチェックに失敗しました")
+                dat.System.RpaWriteLine($"シートのチェックに失敗しました")
                 ck = False
                 Exit For
             End If
@@ -421,12 +421,12 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
             If obj IsNot Nothing Then
                 Dim ck2 = CType(obj, Boolean)
                 If Not ck2 Then
-                    Console.WriteLine($"'SingleMonthBookDatas.InputOutputSheetCorrespondence' の")
-                    Console.WriteLine($"シート名 '{ws}' は、 '{Me.SingleMonthBookDatas.BookName}' 内に存在しません")
+                    dat.System.RpaWriteLine($"'SingleMonthBookDatas.InputOutputSheetCorrespondence' の")
+                    dat.System.RpaWriteLine($"シート名 '{ws}' は、 '{Me.SingleMonthBookDatas.BookName}' 内に存在しません")
                     ck = False
                 End If
             Else
-                Console.WriteLine($"シートのチェックに失敗しました")
+                dat.System.RpaWriteLine($"シートのチェックに失敗しました")
                 ck = False
                 Exit For
             End If
@@ -442,12 +442,12 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
             If obj IsNot Nothing Then
                 Dim ck2 = CType(obj, Boolean)
                 If Not ck2 Then
-                    Console.WriteLine($"'MultiMonthBookDatas.InputOutputSheetCorrespondence' の")
-                    Console.WriteLine($"シート名 '{ws}' は、 '{Me.DOBookDatas.BookName}' 内に存在しません")
+                    dat.System.RpaWriteLine($"'MultiMonthBookDatas.InputOutputSheetCorrespondence' の")
+                    dat.System.RpaWriteLine($"シート名 '{ws}' は、 '{Me.DOBookDatas.BookName}' 内に存在しません")
                     ck = False
                 End If
             Else
-                Console.WriteLine($"シートのチェックに失敗しました")
+                dat.System.RpaWriteLine($"シートのチェックに失敗しました")
                 ck = False
                 Exit For
             End If
@@ -463,12 +463,12 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
             If obj IsNot Nothing Then
                 Dim ck2 = CType(obj, Boolean)
                 If Not ck2 Then
-                    Console.WriteLine($"'MultiMonthBookDatas.InputOutputSheetCorrespondence' の")
-                    Console.WriteLine($"シート名 '{ws}' は、 '{Me.MultiMonthBookDatas.BookName}' 内に存在しません")
+                    dat.System.RpaWriteLine($"'MultiMonthBookDatas.InputOutputSheetCorrespondence' の")
+                    dat.System.RpaWriteLine($"シート名 '{ws}' は、 '{Me.MultiMonthBookDatas.BookName}' 内に存在しません")
                     ck = False
                 End If
             Else
-                Console.WriteLine($"シートのチェックに失敗しました")
+                dat.System.RpaWriteLine($"シートのチェックに失敗しました")
                 ck = False
                 Exit For
             End If
@@ -477,15 +477,15 @@ Public Class Rpa02 : Inherits RpaBase(Of Rpa02)
             Return False
         End If
 
-        If dat.Transaction.Parameters.Count = 0 Or dat.Transaction.Parameters.Count > 5 Then
-            Console.WriteLine($"パラメータ数が不正です")
+        If dat.System.CommandData.Parameters.Count = 0 Or dat.System.CommandData.Parameters.Count > 5 Then
+            dat.System.RpaWriteLine($"パラメータ数が不正です")
             Return False
         End If
 
         ck = True
-        For Each para In dat.Transaction.Parameters
+        For Each para In dat.System.CommandData.Parameters
             If Not (para = "1" Or para = "2" Or para = "3" Or para = "4" Or para = "5" Or para = "6" Or para = "7" Or para = "8" Or para = "9" Or para = "10" Or para = "11" Or para = "12") Then
-                Console.WriteLine($"パラメータ '{para}' は不正です")
+                dat.System.RpaWriteLine($"パラメータ '{para}' は不正です")
                 ck = False
             End If
         Next

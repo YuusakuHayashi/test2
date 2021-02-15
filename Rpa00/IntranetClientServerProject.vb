@@ -323,7 +323,12 @@ Public Class IntranetClientServerProject
     Public Overrides Function SwitchRobot(name As String) As Integer
         Dim i As Integer = MyBase.SwitchRobot(name)
         Me.RootRobotObject = Nothing
+        Return 0
+    End Function
 
+    Public Overrides Function ImplicitSwitchRobot(ByVal [name] As String) As Integer
+        Dim i As Integer = MyBase.ImplicitSwitchRobot([name])
+        Me.RootRobotObject = Nothing
         Return 0
     End Function
 
@@ -491,6 +496,7 @@ Public Class IntranetClientServerProject
 
     Protected Overrides Sub Finalize()
         RemoveHandler Me.PropertyChanged, AddressOf CreateChangedFile
+        RemoveHandler Me.PropertyChanged, AddressOf CheckUpdateAvailable
         MyBase.Finalize()
     End Sub
 End Class
