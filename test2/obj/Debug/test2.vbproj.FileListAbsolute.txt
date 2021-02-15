@@ -97,7 +97,6 @@ C:\Users\yuusa\project\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.pdb
 C:\Users\yuusa\project\test2\test2\bin\Debug\Microsoft.Xaml.Behaviors.xml
 C:\Users\yuusa\project\test2\test2\obj\Debug\Window.g.vb
 C:\Users\yuusa\project\test2\test2\obj\Debug\Window.baml
-C:\Users\yuusa\project\test2\test2\obj\Debug\test2.vbprojAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\test2\bin\Debug\test2.exe.config
 \\Coral\個人情報-林祐\project\wpf\test2\test2\bin\Debug\test2.exe
 \\Coral\個人情報-林祐\project\wpf\test2\test2\bin\Debug\test2.pdb
@@ -141,3 +140,4 @@ C:\Users\yuusa\project\test2\test2\obj\Debug\test2.vbprojAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.exe
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.xml
 \\Coral\個人情報-林祐\project\wpf\test2\test2\obj\Debug\test2.pdb
+C:\Users\yuusa\project\test2\test2\obj\Debug\test2.vbprojAssemblyReference.cache

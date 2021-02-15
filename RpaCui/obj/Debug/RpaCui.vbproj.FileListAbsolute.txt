@@ -23,7 +23,6 @@ C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbproj.CopyComplete
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.exe
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.xml
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.pdb
-C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbprojAssemblyReference.cache
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.exe.config
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Newtonsoft.Json.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\obj\Debug\RpaCui.Resources.resources
@@ -34,3 +33,4 @@ C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbprojAssemblyReference.cac
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\obj\Debug\RpaCui.vbprojResolveAssemblyReference.cache
+C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbprojAssemblyReference.cache

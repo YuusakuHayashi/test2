@@ -129,6 +129,32 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         End Set
     End Property
 
+    ' メニューの引数ありで起動の際に指定するコマンドテキスト
+    Private _RunRobotCommandText As String
+    <JsonIgnore>
+    Public Property RunRobotCommandText As String
+        Get
+            Return Me._RunRobotCommandText
+        End Get
+        Set(value As String)
+            Me._RunRobotCommandText = value
+            RaisePropertyChanged("RunRobotCommandText")
+        End Set
+    End Property
+
+    ' メニューの引数ありで起動の際に指定するコマンドテキスト
+    Private _CheckRobotCommandText As String
+    <JsonIgnore>
+    Public Property CheckRobotCommandText As String
+        Get
+            Return Me._CheckRobotCommandText
+        End Get
+        Set(value As String)
+            Me._CheckRobotCommandText = value
+            RaisePropertyChanged("CheckRobotCommandText")
+        End Set
+    End Property
+
     Private _MyRobotReadMeContentVisibility As Visibility
     <JsonIgnore>
     Public Property MyRobotReadMeContentVisibility As Visibility
@@ -369,12 +395,50 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     End Property
 
     Private Sub RunRobotCommandExecute(ByVal parameter As Object)
-        Call SetConsoleCommand(Me.RunRobotCommandDatas(0))
+        Call SetConsoleCommand(Me.RunRobotCommandDatas(0).CommandText)
         ViewController.ExecuteGuiCommandPath = True
     End Sub
 
     Private Function RunRobotCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me.IsRunRobotCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
+    Private _RunRobotWithParametersCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property RunRobotWithParametersCommand As ICommand
+        Get
+            If Me._RunRobotWithParametersCommand Is Nothing Then
+                Me._RunRobotWithParametersCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf RunRobotWithParametersCommandExecute,
+                    .CanExecuteHandler = AddressOf RunRobotWithParametersCommandCanExecute
+                }
+            End If
+            Return Me._RunRobotWithParametersCommand
+        End Get
+    End Property
+
+    Private _IsRunRobotWithParametersCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsRunRobotWithParametersCommandEnabled As Boolean
+        Get
+            Return Me._IsRunRobotWithParametersCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsRunRobotWithParametersCommandEnabled = value
+            RaisePropertyChanged("IsRunRobotWithParametersCommandEnabled")
+            CType(RunRobotWithParametersCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub RunRobotWithParametersCommandExecute(ByVal parameter As Object)
+        Call SetConsoleCommand(Me.RunRobotCommandText)
+        ViewController.ExecuteGuiCommandPath = True
+    End Sub
+
+    Private Function RunRobotWithParametersCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsRunRobotWithParametersCommandEnabled
     End Function
     '---------------------------------------------------------------------------------------------'
 
@@ -407,12 +471,50 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     End Property
 
     Private Sub CheckRobotCommandExecute(ByVal parameter As Object)
-        Call SetConsoleCommand(Me.CheckRobotCommandDatas(0))
+        Call SetConsoleCommand(Me.CheckRobotCommandDatas(0).CommandText)
         ViewController.ExecuteGuiCommandPath = True
     End Sub
 
     Private Function CheckRobotCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me.IsCheckRobotCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
+    Private _CheckRobotWithParametersCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property CheckRobotWithParametersCommand As ICommand
+        Get
+            If Me._CheckRobotWithParametersCommand Is Nothing Then
+                Me._CheckRobotWithParametersCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf CheckRobotWithParametersCommandExecute,
+                    .CanExecuteHandler = AddressOf CheckRobotWithParametersCommandCanExecute
+                }
+            End If
+            Return Me._CheckRobotWithParametersCommand
+        End Get
+    End Property
+
+    Private _IsCheckRobotWithParametersCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsCheckRobotWithParametersCommandEnabled As Boolean
+        Get
+            Return Me._IsCheckRobotWithParametersCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsCheckRobotWithParametersCommandEnabled = value
+            RaisePropertyChanged("IsCheckRobotWithParametersCommandEnabled")
+            CType(CheckRobotWithParametersCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub CheckRobotWithParametersCommandExecute(ByVal parameter As Object)
+        Call SetConsoleCommand(Me.CheckRobotCommandText)
+        ViewController.ExecuteGuiCommandPath = True
+    End Sub
+
+    Private Function CheckRobotWithParametersCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsCheckRobotWithParametersCommandEnabled
     End Function
     '---------------------------------------------------------------------------------------------'
 
@@ -577,20 +679,27 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     Private Sub CheckPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If e.PropertyName = "RunRobotCommandIndex" Then
             If sender.RunRobotCommandIndex >= 0 Then
-                Call SetConsoleCommand(sender.RunRobotCommandDatas(sender.RunRobotCommandIndex))
+                Call SetConsoleCommand(sender.RunRobotCommandDatas(sender.RunRobotCommandIndex).CommandText)
+                Me.RunRobotCommandText = Me.RunRobotCommandDatas(sender.RunRobotCommandIndex).CommandText
                 Me.CheckRobotCommandIndex = -1
             End If
         End If
         If e.PropertyName = "CheckRobotCommandIndex" Then
             If sender.CheckRobotCommandIndex >= 0 Then
-                Call SetConsoleCommand(sender.CheckRobotCommandDatas(sender.CheckRobotCommandIndex))
+                Call SetConsoleCommand(sender.CheckRobotCommandDatas(sender.CheckRobotCommandIndex).CommandText)
+                Me.CheckRobotCommandText = Me.CheckRobotCommandDatas(sender.CheckRobotCommandIndex).CommandText
                 Me.RunRobotCommandIndex = -1
             End If
         End If
     End Sub
 
-    Private Sub SetConsoleCommand(ByRef cmd As CommandData)
-        ViewController.GuiCommandTextPath = cmd.CommandText
+    ' 廃止
+    'Private Overloads Sub SetConsoleCommand(ByRef cmd As CommandData)
+    '    ViewController.GuiCommandTextPath = cmd.CommandText
+    'End Sub
+
+    Private Overloads Sub SetConsoleCommand(ByVal cmdtxt As String)
+        ViewController.GuiCommandTextPath = cmdtxt
     End Sub
 
     ' 検討中
@@ -744,6 +853,8 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                     Me.IsSaveRunnerCommandEnabled = True
                     Me.CheckRobotCommandIndex = -1
                     Me.RunRobotCommandIndex = -1
+                    Me.RunRobotCommandText = Me.RunRobotCommandDatas(0).CommandText
+                    Me.CheckRobotCommandText = Me.CheckRobotCommandDatas(0).CommandText
                     AddHandler Me.PropertyChanged, AddressOf CheckPropertyChanged
                     AddHandler ViewController.PropertyChanged, AddressOf CheckControllerPropertyChanged
                     AddHandler ViewController.GuiCommandTextsPath.CollectionChanged, AddressOf CheckCollectionChanged
@@ -754,6 +865,8 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         Me.IsCollapseMyRobotReadMeCommandEnabled = True
         Me.IsRunRobotCommandEnabled = True
         Me.IsCheckRobotCommandEnabled = True
+        Me.IsRunRobotWithParametersCommandEnabled = True
+        Me.IsCheckRobotWithParametersCommandEnabled = True
     End Sub
 
     Sub New()

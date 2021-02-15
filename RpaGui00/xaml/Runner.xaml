@@ -63,6 +63,14 @@
                                     <TextBlock Text="▼" FontSize="5" TextAlignment="Center" />
                                 </StackPanel>
                             </MenuItem.Header>
+                            <MenuItem VerticalContentAlignment="Center" Command="{Binding RunRobotWithParametersCommand}">
+                                <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="パラメタを指定して開始" />
+                                        <TextBox Margin="10,0,0,0" Width="200" Text="{Binding RunRobotCommandText}" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
                         </MenuItem>
                         <MenuItem HorizontalContentAlignment="Center">
                             <MenuItem.Header>
@@ -70,6 +78,14 @@
                                     <TextBlock Text="▼" FontSize="5" TextAlignment="Center" />
                                 </StackPanel>
                             </MenuItem.Header>
+                            <MenuItem VerticalContentAlignment="Center" Command="{Binding CheckRobotWithParametersCommand}">
+                                <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="パラメタを指定してチェック" />
+                                        <TextBox Margin="10,0,0,0" Width="200" Text="{Binding CheckRobotCommandText}" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
                         </MenuItem>
                     </Menu>
                 </Grid>
