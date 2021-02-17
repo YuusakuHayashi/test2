@@ -5,6 +5,9 @@ Imports System.Collections.Specialized
 Imports Newtonsoft.Json
 
 Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewModel)
+    Private Const RUNCOMMAND = "runrobot"
+    Private Const CHKCOMMAND = "checkrobot"
+
     Private ReadOnly Property RunnerJsonFileName As String
         Get
             Dim fil As String = vbNullString
@@ -260,6 +263,16 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                 Me._ExecuteDate = value
             End Set
         End Property
+
+        Private _ExecuteTimes As Integer
+        Public Property ExecuteTimes As Integer
+            Get
+                Return Me._ExecuteTimes
+            End Get
+            Set(value As Integer)
+                Me._ExecuteTimes = value
+            End Set
+        End Property
     End Class
 
     Private _ProcessTime As Integer
@@ -344,6 +357,17 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         End Get
         Set(value As Boolean)
             Me._IsProcessEnded = value
+        End Set
+    End Property
+
+    Private _OverTimeFlag As Boolean
+    Public Property OverTimeFlag As Boolean
+        Get
+            Return Me._OverTimeFlag
+        End Get
+        Set(value As Boolean)
+            Me._OverTimeFlag = value
+            RaisePropertyChanged("RunRobotCommandToolTip")
         End Set
     End Property
 
@@ -443,6 +467,44 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     '---------------------------------------------------------------------------------------------'
 
     '---------------------------------------------------------------------------------------------'
+    Private _RunRobotWithNoParameterCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property RunRobotWithNoParameterCommand As ICommand
+        Get
+            If Me._RunRobotWithNoParameterCommand Is Nothing Then
+                Me._RunRobotWithNoParameterCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf RunRobotWithNoParameterCommandExecute,
+                    .CanExecuteHandler = AddressOf RunRobotWithNoParameterCommandCanExecute
+                }
+            End If
+            Return Me._RunRobotWithNoParameterCommand
+        End Get
+    End Property
+
+    Private _IsRunRobotWithNoParameterCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsRunRobotWithNoParameterCommandEnabled As Boolean
+        Get
+            Return Me._IsRunRobotWithNoParameterCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsRunRobotWithNoParameterCommandEnabled = value
+            RaisePropertyChanged("IsRunRobotWithNoParameterCommandEnabled")
+            CType(RunRobotWithNoParameterCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub RunRobotWithNoParameterCommandExecute(ByVal parameter As Object)
+        Call SetConsoleCommand(RunnerViewModel.RUNCOMMAND)
+        ViewController.ExecuteGuiCommandPath = True
+    End Sub
+
+    Private Function RunRobotWithNoParameterCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsRunRobotWithNoParameterCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
     Private _CheckRobotCommand As ICommand
     <JsonIgnore>
     Public ReadOnly Property CheckRobotCommand As ICommand
@@ -477,6 +539,44 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
 
     Private Function CheckRobotCommandCanExecute(ByVal parameter As Object) As Boolean
         Return Me.IsCheckRobotCommandEnabled
+    End Function
+    '---------------------------------------------------------------------------------------------'
+
+    '---------------------------------------------------------------------------------------------'
+    Private _CheckRobotWithNoParameterCommand As ICommand
+    <JsonIgnore>
+    Public ReadOnly Property CheckRobotWithNoParameterCommand As ICommand
+        Get
+            If Me._CheckRobotWithNoParameterCommand Is Nothing Then
+                Me._CheckRobotWithNoParameterCommand = New DelegateCommand With {
+                    .ExecuteHandler = AddressOf CheckRobotWithNoParameterCommandExecute,
+                    .CanExecuteHandler = AddressOf CheckRobotWithNoParameterCommandCanExecute
+                }
+            End If
+            Return Me._CheckRobotWithNoParameterCommand
+        End Get
+    End Property
+
+    Private _IsCheckRobotWithNoParameterCommandEnabled As Boolean
+    <JsonIgnore>
+    Public Property IsCheckRobotWithNoParameterCommandEnabled As Boolean
+        Get
+            Return Me._IsCheckRobotWithNoParameterCommandEnabled
+        End Get
+        Set(value As Boolean)
+            Me._IsCheckRobotWithNoParameterCommandEnabled = value
+            RaisePropertyChanged("IsCheckRobotWithNoParameterCommandEnabled")
+            CType(CheckRobotWithNoParameterCommand, DelegateCommand).RaiseCanExecuteChanged()
+        End Set
+    End Property
+
+    Private Sub CheckRobotWithNoParameterCommandExecute(ByVal parameter As Object)
+        Call SetConsoleCommand(RunnerViewModel.CHKCOMMAND)
+        ViewController.ExecuteGuiCommandPath = True
+    End Sub
+
+    Private Function CheckRobotWithNoParameterCommandCanExecute(ByVal parameter As Object) As Boolean
+        Return Me.IsCheckRobotWithNoParameterCommandEnabled
     End Function
     '---------------------------------------------------------------------------------------------'
 
@@ -744,13 +844,13 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     Private Sub ProcessEnd()
         Dim cmds As String() = Me.GuiCommand.Split(" "c)
         If Me.ProcessTime > 0 Then
-            If cmds(0) = "runrobot" Then
+            If cmds(0) = RunnerViewModel.RUNCOMMAND Then
                 If ViewController.Data.System.ReturnCode = 0 Then
                     Me.RunProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.RunProcessTimeLogs)
                     Call CalculateRunAverageTime()
                 End If
             End If
-            If cmds(0) = "checkrobot" Then
+            If cmds(0) = RunnerViewModel.CHKCOMMAND Then
                 If ViewController.Data.System.ReturnCode = 0 Then
                     Me.CheckProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.CheckProcessTimeLogs)
                     Call CalculateCheckAverageTime()
@@ -761,42 +861,62 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     End Sub
 
     Private Sub ProcessStart()
+        Me.OverTimeFlag = False
         Dim cmds As String() = Me.GuiCommand.Split(" "c)
-        If cmds(0) = "runrobot" Then
+        If cmds(0) = RunnerViewModel.RUNCOMMAND Then
             Me.AverageTime = Me.RunAverageTime
         End If
-        If cmds(0) = "checkrobot" Then
+        If cmds(0) = RunnerViewModel.CHKCOMMAND Then
             Me.AverageTime = Me.CheckAverageTime
         End If
 
         Do
             Threading.Thread.Sleep(1000)
             Me.ProcessTime += 1
-        Loop Until Me.IsProcessEnded
+            If Me.ProcessTime > Me.AverageTime Then
+                Me.OverTimeFlag = True
+                Exit Do
+            End If
+            If Me.IsProcessEnded Then
+                Exit Do
+            End If
+        Loop Until False
+
+        Do
+            If Me.IsProcessEnded Then
+                Exit Do
+            End If
+            Threading.Thread.Sleep(1000)
+            Me.ProcessTime += 1
+        Loop Until False
 
         Call ProcessEnd()
     End Sub
 
     Private Sub UpdateRunRobotCommandDatas(ByVal cmdstr As String)
+        Dim times As Integer = 0
         For Each cmddata In Me.RunRobotCommandDatas
             If cmddata.CommandText = cmdstr Then
+                times = cmddata.ExecuteTimes
                 Me.RunRobotCommandDatas.Remove(cmddata)
                 Exit For
             End If
         Next
-        Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now}
+        Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now, .ExecuteTimes = (times + 1)}
         Me.RunRobotCommandDatas = Rpa00.RpaModule.Push(Of CommandData, ObservableCollection(Of CommandData))(newcmd, Me.RunRobotCommandDatas)
         Me.RunRobotCommandToolTip = vbNullString
     End Sub
 
     Private Sub UpdateCheckRobotCommandDatas(ByVal cmdstr As String)
+        Dim times As Integer = 0
         For Each cmddata In Me.CheckRobotCommandDatas
             If cmddata.CommandText = cmdstr Then
+                times = cmddata.ExecuteTimes
                 Me.CheckRobotCommandDatas.Remove(cmddata)
                 Exit For
             End If
         Next
-        Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now}
+        Dim newcmd As CommandData = New CommandData With {.CommandText = cmdstr, .ExecuteDate = DateTime.Now, .ExecuteTimes = (times + 1)}
         Me.CheckRobotCommandDatas = Rpa00.RpaModule.Push(Of CommandData, ObservableCollection(Of CommandData))(newcmd, Me.CheckRobotCommandDatas)
         Me.CheckRobotCommandToolTip = vbNullString
     End Sub
@@ -808,11 +928,11 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
             'Dim cmdstr As String = e.NewItems(e.NewStartingIndex)
             Dim cmdstr As String = ViewController.GuiCommandTextsPath(e.NewStartingIndex)
             Dim cmds As String() = cmdstr.Split(" "c)
-            If cmds(0) = "runrobot" Then
+            If cmds(0) = RunnerViewModel.RUNCOMMAND Then
                 UpdateRunRobotCommandDatas(cmdstr)
                 Exit Sub
             End If
-            If cmds(0) = "checkrobot" Then
+            If cmds(0) = RunnerViewModel.CHKCOMMAND Then
                 UpdateCheckRobotCommandDatas(cmdstr)
                 Exit Sub
             End If
@@ -821,16 +941,16 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
 
     Public Overrides Sub Initialize()
         If ViewController IsNot Nothing Then
-            ViewController.ExecutableGuiCommands = New List(Of String)(New String() {"runrobot", "checkrobot"})
+            ViewController.ExecutableGuiCommands = New List(Of String)(New String() {RunnerViewModel.RUNCOMMAND, RunnerViewModel.CHKCOMMAND})
             If ViewController.Data IsNot Nothing Then
                 If ViewController.Data.Project IsNot Nothing Then
                     Me.IsProjectExist = True
                     Dim vm As RunnerViewModel = Me.Load(Me.RunnerJsonFileName)
                     If vm Is Nothing Then
                         Me.RunRobotCommandDatas = New ObservableCollection(Of CommandData)
-                        Me.RunRobotCommandDatas.Add(New CommandData With {.CommandText = "runrobot", .ExecuteDate = DateTime.Now})
+                        Me.RunRobotCommandDatas.Add(New CommandData With {.CommandText = RunnerViewModel.RUNCOMMAND, .ExecuteDate = DateTime.Now})
                         Me.CheckRobotCommandDatas = New ObservableCollection(Of CommandData)
-                        Me.CheckRobotCommandDatas.Add(New CommandData With {.CommandText = "checkrobot", .ExecuteDate = DateTime.Now})
+                        Me.CheckRobotCommandDatas.Add(New CommandData With {.CommandText = RunnerViewModel.CHKCOMMAND, .ExecuteDate = DateTime.Now})
 
                         Me.RunProcessTimeLogs = New List(Of Integer)
                         Me.CheckProcessTimeLogs = New List(Of Integer)
@@ -867,6 +987,8 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         Me.IsCheckRobotCommandEnabled = True
         Me.IsRunRobotWithParametersCommandEnabled = True
         Me.IsCheckRobotWithParametersCommandEnabled = True
+        Me.IsRunRobotWithNoParameterCommandEnabled = True
+        Me.IsCheckRobotWithNoParameterCommandEnabled = True
     End Sub
 
     Sub New()

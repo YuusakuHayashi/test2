@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:RpaGui00"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid Margin="5">
         <Grid.Resources>
             <local:ReturnCodeToMessageConverter x:Key="ReturnCodeToMessageConverter" />
             <ContentControl x:Key="LargeMenuBar">
@@ -23,25 +23,25 @@
                         </Menu.ItemsPanel>
                         <MenuItem Command="{Binding SaveRunnerCommand}" HorizontalContentAlignment="Center">
                             <MenuItem.Header>
-                                <StackPanel Width="30">
-                                    <Image Height="20" Width="20" Source="{Binding RunnerSaveIcon}" />
-                                    <TextBlock Text="保存" FontSize="8" Margin="0,3,0,0" TextAlignment="Center" />
+                                <StackPanel Width="50">
+                                    <Image Height="30" Width="30" Source="{Binding RunnerSaveIcon}" />
+                                    <TextBlock Text="保存" FontSize="10" Margin="0,3,0,0" TextAlignment="Center" />
                                 </StackPanel>
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem Command="{Binding RunRobotCommand}" ToolTip="{Binding RunRobotCommandToolTip}" HorizontalContentAlignment="Center">
                             <MenuItem.Header>
-                                <StackPanel Width="30">
-                                    <Image Height="20" Width="20" Source="{Binding RunnerRunRobotIcon}" />
-                                    <TextBlock Text="開始" FontSize="8" Margin="0,3,0,0" TextAlignment="Center" />
+                                <StackPanel Width="50">
+                                    <Image Height="30" Width="20" Source="{Binding RunnerRunRobotIcon}" />
+                                    <TextBlock Text="開始" FontSize="10" Margin="0,3,0,0" TextAlignment="Center" />
                                 </StackPanel>
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem Command="{Binding CheckRobotCommand}" ToolTip="{Binding CheckRobotCommandToolTip}" HorizontalContentAlignment="Center">
                             <MenuItem.Header>
-                                <StackPanel Width="30">
-                                    <Image Height="20" Width="20" Source="{Binding RunnerCheckRobotIcon}" />
-                                    <TextBlock Text="チェック" FontSize="8" Margin="0,3,0,0" TextAlignment="Center" />
+                                <StackPanel Width="50">
+                                    <Image Height="30" Width="30" Source="{Binding RunnerCheckRobotIcon}" />
+                                    <TextBlock Text="チェック" FontSize="10" Margin="0,3,0,0" TextAlignment="Center" />
                                 </StackPanel>
                             </MenuItem.Header>
                         </MenuItem>
@@ -52,37 +52,53 @@
                                 <DockPanel Margin="5,0,5,5" LastChildFill="False" />
                             </ItemsPanelTemplate>
                         </Menu.ItemsPanel>
-                        <MenuItem HorizontalContentAlignment="Center">
+                        <MenuItem HorizontalContentAlignment="Center" IsEnabled="False">
                             <MenuItem.Header>
-                                <StackPanel Width="30" />
+                                <StackPanel Width="50" />
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem HorizontalContentAlignment="Center">
                             <MenuItem.Header>
-                                <StackPanel Width="30">
-                                    <TextBlock Text="▼" FontSize="5" TextAlignment="Center" />
+                                <StackPanel Width="50">
+                                    <TextBlock Text="▼" FontSize="8" TextAlignment="Center" />
                                 </StackPanel>
                             </MenuItem.Header>
                             <MenuItem VerticalContentAlignment="Center" Command="{Binding RunRobotWithParametersCommand}">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="パラメタを指定して開始" />
+                                        <TextBlock Width="120" Text="パラメタを指定して開始" />
                                         <TextBox Margin="10,0,0,0" Width="200" Text="{Binding RunRobotCommandText}" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem VerticalContentAlignment="Center" Command="{Binding RunRobotWithNoParameterCommand}">
+                                <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Width="120" Text="パラメタなしで開始" />
+                                        <TextBlock Margin="10,0,0,0" Text="runrobot" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
                         </MenuItem>
                         <MenuItem HorizontalContentAlignment="Center">
                             <MenuItem.Header>
-                                <StackPanel Width="30">
-                                    <TextBlock Text="▼" FontSize="5" TextAlignment="Center" />
+                                <StackPanel Width="50">
+                                    <TextBlock Text="▼" FontSize="8" TextAlignment="Center" />
                                 </StackPanel>
                             </MenuItem.Header>
                             <MenuItem VerticalContentAlignment="Center" Command="{Binding CheckRobotWithParametersCommand}">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="パラメタを指定してチェック" />
+                                        <TextBlock Width="120" Text="パラメタを指定してチェック" />
                                         <TextBox Margin="10,0,0,0" Width="200" Text="{Binding CheckRobotCommandText}" VerticalContentAlignment="Center" />
+                                    </StackPanel>
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem VerticalContentAlignment="Center" Command="{Binding CheckRobotWithNoParameterCommand}">
+                                <MenuItem.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Width="120" Text="パラメタなしでチェック" />
+                                        <TextBlock Margin="10,0,0,0" Text="checkrobot" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
@@ -104,53 +120,40 @@
             <ScrollViewer DockPanel.Dock="Top">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top">
-                        <TextBlock Background="WhiteSmoke"  Text="チェックコマンド履歴" />
-                        <ScrollViewer>
-                            <ListBox Height="100" ItemsSource="{Binding CheckRobotCommandDatas}" SelectedIndex="{Binding CheckRobotCommandIndex}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Top" Text="{Binding CommandText}" FontWeight="ExtraBold" />
-                                            <TextBlock VerticalAlignment="Bottom"  Foreground="Gray" Text="{Binding ExecuteDate}" FontSize="8" Margin="10,0,0,0"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </ScrollViewer>
+                        <Expander Header="チェックコマンド履歴" IsExpanded="True">
+                            <ScrollViewer>
+                                <DataGrid Height="100" ItemsSource="{Binding CheckRobotCommandDatas}" SelectedIndex="{Binding CheckRobotCommandIndex}" CanUserAddRows="False" />
+                            </ScrollViewer>
+                        </Expander>
                     </StackPanel>
                     <StackPanel Margin="0,5,0,0" DockPanel.Dock="Top">
-                        <TextBlock Background="WhiteSmoke" Text="起動コマンド履歴" />
-                        <ScrollViewer>
-                            <ListBox Height="100" ItemsSource="{Binding RunRobotCommandDatas}" SelectedIndex="{Binding RunRobotCommandIndex}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Top" Text="{Binding CommandText}" FontWeight="ExtraBold" />
-                                            <TextBlock VerticalAlignment="Bottom"  Foreground="Gray" Text="{Binding ExecuteDate}" FontSize="8" Margin="10,0,0,0"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </ScrollViewer>
+                        <Expander Header="起動コマンド履歴" IsExpanded="True">
+                            <ScrollViewer>
+                                <DataGrid Height="100" ItemsSource="{Binding RunRobotCommandDatas}" SelectedIndex="{Binding RunRobotCommandIndex}" CanUserAddRows="False" />
+                            </ScrollViewer>
+                        </Expander>
                     </StackPanel>
                     <StackPanel Margin="0,5,0,0" DockPanel.Dock="Top">
-                        <TextBlock Background="WhiteSmoke" Text="処理状況" />
-                        <TextBlock Margin="0,3,0,0" Text="{Binding ViewController.Data.System.ReturnCode, Converter={StaticResource ReturnCodeToMessageConverter}}" />
-                        <ProgressBar Margin="0,3,0,0" Value="{Binding ProcessTime}" Maximum="{Binding AverageTime}" />
-                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock Text="(経過時間 / 平均(予測)時間)" />
-                            <TextBlock Text="{Binding ProcessTime}" Margin="5,0,0,0" />
-                            <TextBlock Text="/" Margin="1,0,0,0" />
-                            <TextBlock Text="{Binding AverageTime}" Margin="1,0,0,0" />
-                        </StackPanel>
-                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock Text="(起動平均(予測)時間)" />
-                            <TextBlock Text="{Binding RunAverageTime}" Margin="5,0,0,0" />
-                        </StackPanel>
-                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                            <TextBlock Text="(チェック平均(予測)時間)" />
-                            <TextBlock Text="{Binding CheckAverageTime}" Margin="5,0,0,0" />
-                        </StackPanel>
+                        <Expander Header="処理状況">
+                            <StackPanel>
+                                <TextBlock Text="{Binding ViewController.Data.System.ReturnCode, Converter={StaticResource ReturnCodeToMessageConverter}}" />
+                                <ProgressBar Margin="0,3,0,0" Value="{Binding ProcessTime}" Maximum="{Binding AverageTime}" />
+                                <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                                    <TextBlock Text="(経過時間 / 平均(予測)時間)" />
+                                    <TextBlock Text="{Binding ProcessTime}" Margin="5,0,0,0" />
+                                    <TextBlock Text="/" Margin="1,0,0,0" />
+                                    <TextBlock Text="{Binding AverageTime}" Margin="1,0,0,0" />
+                                </StackPanel>
+                                <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                                    <TextBlock Text="(起動平均(予測)時間)" />
+                                    <TextBlock Text="{Binding RunAverageTime}" Margin="5,0,0,0" />
+                                </StackPanel>
+                                <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                                    <TextBlock Text="(チェック平均(予測)時間)" />
+                                    <TextBlock Text="{Binding CheckAverageTime}" Margin="5,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
                 </DockPanel>
             </ScrollViewer>

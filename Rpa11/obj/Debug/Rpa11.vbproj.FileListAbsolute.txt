@@ -1,0 +1,9 @@
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.vbprojResolveAssemblyReference.cache
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.Resources.resources
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.vbproj.GenerateResource.Cache
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa11.dll
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa11.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\Rpa11.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.dll
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.xml
+\\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.pdb

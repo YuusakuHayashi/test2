@@ -32,5 +32,4 @@ C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\obj\Debug\RpaCui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot\RpaCui.xml
-\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\obj\Debug\RpaCui.vbprojResolveAssemblyReference.cache
 C:\Users\yuusa\project\test2\RpaCui\obj\Debug\RpaCui.vbprojAssemblyReference.cache

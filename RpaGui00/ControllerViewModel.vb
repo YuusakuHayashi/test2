@@ -4,6 +4,21 @@ Imports System.Collections.Specialized
 Imports Newtonsoft.Json
 
 Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel)
+    Private ReadOnly Property ContentErrorImageFileName As String
+        Get
+            Return $"{Controller.SystemDllDirectory}\contenterror.png"
+        End Get
+    End Property
+    Private _ContentErrorImage As BitmapImage
+    Public ReadOnly Property ContentErrorImage As BitmapImage
+        Get
+            If Me._ContentErrorImage Is Nothing Then
+                Me._ContentErrorImage = RpaGuiModule.CreateIcon(Me.ContentErrorImageFileName)
+            End If
+            Return Me._ContentErrorImage
+        End Get
+    End Property
+
     Private _Data As Rpa00.RpaDataWrapper
     <JsonIgnore>
     Public Property Data As Rpa00.RpaDataWrapper
@@ -13,6 +28,17 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
         Set(value As Rpa00.RpaDataWrapper)
             Me._Data = value
             Call RaisePropertyChanged("Data")
+        End Set
+    End Property
+
+    Private _StatusCode As Integer
+    Public Property StatusCode As Integer
+        Get
+            Return Me._StatusCode
+        End Get
+        Set(value As Integer)
+            Me._StatusCode = value
+            Call RaisePropertyChanged("StatusCode")
         End Set
     End Property
 

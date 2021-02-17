@@ -61,29 +61,34 @@ Public Class Controller
         InitializeComponent()
 
         ' InitializeComponent() 呼び出しの後で初期化を追加します。        
-        'Controller.SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
-        Controller.SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
+        Dim vm As ControllerViewModel
+        Try
+            Controller.SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
+            'Controller.SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
 
-        '-----------------------------------------------------------------------------------------'
-        ' !!! RpaCuiと同じロジック。同期して変更する必要あり？
-        ' DLLロード
-        ' アップデート・デバッグパスには現状対応してない
-        Dim rpa00dll As String = $"{Controller.SystemDllDirectory}\Rpa00.dll"
-        Dim asm As Assembly = Assembly.LoadFrom(rpa00dll)
-        Dim [mod] As [Module] = asm.GetModule("Rpa00.dll")
-        Dim dat_type = [mod].GetType("Rpa00.RpaDataWrapper")
-        Dim dat = Activator.CreateInstance(dat_type)
-        ' セーブ情報読み込み
-        If Not File.Exists(Controller.SystemIniFileName) Then
-            dat.Initializer.Save(Controller.SystemIniFileName, dat.Initializer)
-        End If
-        dat.Initializer = dat.Initializer.Load(Controller.SystemIniFileName)
-        dat.Project = dat.System.LoadCurrentRpa(dat)
-        '-----------------------------------------------------------------------------------------'        
-        Dim vm As New ControllerViewModel
-        vm.Data = dat
-        vm.Initialize()
+            '-----------------------------------------------------------------------------------------'
+            ' !!! RpaCuiと同じロジック。同期して変更する必要あり？
+            ' DLLロード
+            ' アップデート・デバッグパスには現状対応してない
+            Dim rpa00dll As String = $"{Controller.SystemDllDirectory}\Rpa00.dll"
+            Dim asm As Assembly = Assembly.LoadFrom(rpa00dll)
+            Dim [mod] As [Module] = asm.GetModule("Rpa00.dll")
+            Dim dat_type = [mod].GetType("Rpa00.RpaDataWrapper")
+            Dim dat = Activator.CreateInstance(dat_type)
+            ' セーブ情報読み込み
+            If Not File.Exists(Controller.SystemIniFileName) Then
+                dat.Initializer.Save(Controller.SystemIniFileName, dat.Initializer)
+            End If
+            dat.Initializer = dat.Initializer.Load(Controller.SystemIniFileName)
+            dat.Project = dat.System.LoadCurrentRpa(dat)
+            '-----------------------------------------------------------------------------------------'        
+            vm = New ControllerViewModel
+            vm.Data = dat
+            vm.Initialize()
 
-        Me.DataContext = vm
+            Me.DataContext = vm
+        Catch ex As Exception
+            vm.MainContent = New ContentErrorViewModel
+        End Try
     End Sub
 End Class

@@ -120,6 +120,13 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
         End If
     End Sub
 
+    Private Sub SystemPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
+        If e.PropertyName = "StatusCode" Then
+            ViewController.StatusCode = ViewController.Data.System.StatusCode
+            Exit Sub
+        End If
+    End Sub
+
     Private Sub CheckViewControllerPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
         If e.PropertyName = "GuiCommandTextPath" Then
             Me.GuiCommandText = ViewController.GuiCommandTextPath
@@ -136,6 +143,7 @@ Public Class ConsoleOutputViewModel : Inherits ControllerViewModelBase(Of Consol
 
     Public Overrides Sub Initialize()
         AddHandler ViewController.PropertyChanged, AddressOf CheckViewControllerPropertyChanged
+        AddHandler ViewController.Data.System.PropertyChanged, AddressOf SystemPropertyChanged
     End Sub
 
     Sub New()

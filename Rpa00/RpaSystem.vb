@@ -94,6 +94,20 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
         End Set
     End Property
 
+    ' 現状、コマンド実行状態しかない
+    ' 0 ... 通常
+    ' 1 ... コマンド実行中
+    Private _StatusCode As Integer
+    Public Property StatusCode As Integer
+        Get
+            Return Me._StatusCode
+        End Get
+        Set(value As Integer)
+            Me._StatusCode = value
+            RaisePropertyChanged("StatusCode")
+        End Set
+    End Property
+
     ' 2021/02/08 : Gui化のため追加
     Private _OutputText As String
     Public Property OutputText As String
@@ -748,6 +762,7 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
                     Me.CommandData.CommandText = Me.GuiCommandText
                 End If
 
+                Me.StatusCode = 1
 
                 ' コマンド生成
                 '---------------------------------------------------------------------------------'
@@ -793,6 +808,7 @@ Public Class RpaSystem : Implements INotifyPropertyChanged
                 ' ExitFlag が立った場合でも、LateBindingCommandを処理する必要がある
                 'Call CheckExitFlag(dat)
 
+                Me.StatusCode = 0
                 Me.IsRunTime = False
             End Try
 

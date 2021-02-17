@@ -42,6 +42,9 @@ Public Class RpaInitializer
     Private _UserName As String
     Public Property UserName As String
         Get
+            If String.IsNullOrEmpty(Me._UserName) Then
+                Me._UserName = System.Environment.GetEnvironmentVariable("USERNAME")
+            End If
             Return Me._UserName
         End Get
         Set(value As String)

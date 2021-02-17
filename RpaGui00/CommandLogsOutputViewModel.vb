@@ -19,7 +19,7 @@ Public Class CommandLogsOutputViewModel : Inherits ControllerViewModelBase(Of Co
 
     Private Sub CommandLogsChanged(ByVal sender As ObservableCollection(Of Rpa00.RpaCommand), ByVal e As NotifyCollectionChangedEventArgs)
         If e.Action = NotifyCollectionChangedAction.Add Then
-            Me.Logs.Add(e.NewItems(e.NewStartingIndex))
+            Me.Logs.Add(e.NewItems.SyncRoot(e.NewStartingIndex))
         End If
     End Sub
 

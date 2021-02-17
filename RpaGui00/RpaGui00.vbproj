@@ -73,9 +73,11 @@
       <DependentUpon>Controller.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControllerViewModelBase.vb" />
+    <Compile Include="converter\OverTimeToColorConverter.vb" />
     <Compile Include="converter\ReturnCodeToForegroundConverter.vb" />
     <Compile Include="converter\ReturnCodeToMessageConverter.vb" />
     <Compile Include="converter\RunnerStatusConverter.vb" />
+    <Compile Include="converter\StatusCodeToColorConverter.vb" />
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="ExecutableMenuBase.vb" />
     <Compile Include="ExecuteMenu.vb" />
@@ -87,6 +89,7 @@
     <Compile Include="RpaGuiModule.vb" />
     <Compile Include="TabItemViewModel.vb" />
     <Compile Include="ViewModelBase.vb" />
+    <Compile Include="viewmodel\ContentErrorViewModel.vb" />
     <Compile Include="viewmodel\NoContentViewModel.vb" />
     <Compile Include="viewmodel\RunnerViewModel.vb" />
     <Page Include="Controller.xaml">
