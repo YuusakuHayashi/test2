@@ -8,7 +8,6 @@ Public Class RpaInitializer
     Implements INotifyPropertyChanged
 
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
-
     Protected Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
         RaiseEvent PropertyChanged(
             Me, New PropertyChangedEventArgs(PropertyName)

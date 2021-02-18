@@ -73,6 +73,7 @@
       <DependentUpon>Controller.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControllerViewModelBase.vb" />
+    <Compile Include="converter\ExecuteCountToGreenConverter.vb" />
     <Compile Include="converter\OverTimeToColorConverter.vb" />
     <Compile Include="converter\ReturnCodeToForegroundConverter.vb" />
     <Compile Include="converter\ReturnCodeToMessageConverter.vb" />

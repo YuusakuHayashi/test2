@@ -9,6 +9,16 @@
         End Set
     End Property
 
+    Private _ICSProject As Object
+    Public Property ICSProject As Object
+        Get
+            Return Me._ICSProject
+        End Get
+        Set(value As Object)
+            Me._ICSProject = value
+        End Set
+    End Property
+
     Private _Transaction As RpaTransaction
     Public Property Transaction As RpaTransaction
         Get

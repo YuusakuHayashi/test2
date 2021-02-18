@@ -8,7 +8,19 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     Private Const RUNCOMMAND = "runrobot"
     Private Const CHKCOMMAND = "checkrobot"
 
-    Private ReadOnly Property RunnerJsonFileName As String
+    Private ReadOnly Property ProjectRunnerJsonFileName As String
+        Get
+            Dim fil As String = vbNullString
+            If ViewController.Data IsNot Nothing Then
+                If ViewController.Data.Project IsNot Nothing Then
+                    fil = $"{ViewController.Data.Project.MyDirectory}\runner.json"
+                End If
+            End If
+            Return fil
+        End Get
+    End Property
+
+    Private ReadOnly Property RobotRunnerJsonFileName As String
         Get
             Dim fil As String = vbNullString
             If ViewController.Data IsNot Nothing Then
@@ -390,6 +402,20 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
         End Set
     End Property
 
+    Private _ProjectRunner As ProjectRunnerModel
+    Public Property ProjectRunner As ProjectRunnerModel
+        Get
+            If Me._ProjectRunner Is Nothing Then
+                Me._ProjectRunner = New ProjectRunnerModel
+            End If
+            Return Me._ProjectRunner
+        End Get
+        Set(value As ProjectRunnerModel)
+            Me._ProjectRunner = value
+            RaisePropertyChanged("ProjectRunner")
+        End Set
+    End Property
+
     '---------------------------------------------------------------------------------------------'
     Private _RunRobotCommand As ICommand
     <JsonIgnore>
@@ -647,7 +673,8 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     End Property
 
     Private Sub SaveRunnerCommandExecute(ByVal parameter As Object)
-        Call Me.Save(Me.RunnerJsonFileName, Me)
+        Call Me.Save(Me.RobotRunnerJsonFileName, Me)
+        Call Me.ProjectRunner.Save(Me.ProjectRunnerJsonFileName, Me.ProjectRunner)
     End Sub
 
     Private Function SaveRunnerCommandCanExecute(ByVal parameter As Object) As Boolean
@@ -849,12 +876,14 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                     Me.RunProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.RunProcessTimeLogs)
                     Call CalculateRunAverageTime()
                 End If
+                Me.ProjectRunner.ExecutionsOfYear.Last.Count += 1
             End If
             If cmds(0) = RunnerViewModel.CHKCOMMAND Then
                 If ViewController.Data.System.ReturnCode = 0 Then
                     Me.CheckProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.CheckProcessTimeLogs)
                     Call CalculateCheckAverageTime()
                 End If
+                Me.ProjectRunner.ExecutionsOfYear.Last.Count += 1
             End If
             Me.ProcessTime = 0
         End If
@@ -945,7 +974,7 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
             If ViewController.Data IsNot Nothing Then
                 If ViewController.Data.Project IsNot Nothing Then
                     Me.IsProjectExist = True
-                    Dim vm As RunnerViewModel = Me.Load(Me.RunnerJsonFileName)
+                    Dim vm As RunnerViewModel = Me.Load(Me.RobotRunnerJsonFileName)
                     If vm Is Nothing Then
                         Me.RunRobotCommandDatas = New ObservableCollection(Of CommandData)
                         Me.RunRobotCommandDatas.Add(New CommandData With {.CommandText = RunnerViewModel.RUNCOMMAND, .ExecuteDate = DateTime.Now})
@@ -969,6 +998,10 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                         Me.RunAverageTime = vm.RunAverageTime
                         Me.CheckAverageTime = vm.CheckAverageTime
                     End If
+
+                    Me.ProjectRunner = Me.ProjectRunner.Load(Me.ProjectRunnerJsonFileName)
+                    Call Me.ProjectRunner.GoExecutionsOfYearFoward()
+
                     Me.IsReloadMyRobotReadMeCommandEnabled = True
                     Me.IsSaveRunnerCommandEnabled = True
                     Me.CheckRobotCommandIndex = -1
@@ -992,5 +1025,83 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
     End Sub
 
     Sub New()
+    End Sub
+End Class
+
+Public Class ProjectRunnerModel : Inherits ViewModelBase(Of ProjectRunnerModel)
+    Public Class ExecutionOfDay : Implements INotifyPropertyChanged
+
+        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+        Protected Sub RaisePropertyChanged(ByVal PropertyName As String)
+            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(PropertyName))
+        End Sub
+
+        Private _ExecuteDate As Date
+        Public Property ExecuteDate As Date
+            Get
+                Return Me._ExecuteDate
+            End Get
+            Set(value As Date)
+                Me._ExecuteDate = value
+                RaisePropertyChanged("ExecuteDate")
+            End Set
+        End Property
+
+        Private _Count As Integer
+        Public Property Count As Integer
+            Get
+                Return Me._Count
+            End Get
+            Set(value As Integer)
+                Me._Count = value
+                RaisePropertyChanged("Count")
+            End Set
+        End Property
+    End Class
+
+    Private _ExecutionsOfYear As ObservableCollection(Of ExecutionOfDay)
+    Public Property ExecutionsOfYear As ObservableCollection(Of ExecutionOfDay)
+        Get
+            If Me._ExecutionsOfYear Is Nothing Then
+                Me._ExecutionsOfYear = New ObservableCollection(Of ExecutionOfDay)
+            End If
+            Return Me._ExecutionsOfYear
+        End Get
+        Set(value As ObservableCollection(Of ExecutionOfDay))
+            Me._ExecutionsOfYear = value
+            RaisePropertyChanged("ExecutionsOfYear")
+        End Set
+    End Property
+
+    Public Sub GoExecutionsOfYearFoward()
+        If Me.ExecutionsOfYear.Count = 0 Then
+            Call InitializeExecutionsOfYear()
+        End If
+
+        Dim latest As Date = Me.ExecutionsOfYear.Last.ExecuteDate
+        Dim term As Integer = (DateTime.Today - latest).TotalDays
+
+        If term >= 366 Then
+            Call InitializeExecutionsOfYear()
+            term = 0
+        End If
+
+        Dim i As Integer = term
+        Do
+            If i <= 0 Then
+                Exit Do
+            End If
+            Me.ExecutionsOfYear.RemoveAt(0)
+            Me.ExecutionsOfYear.Add(New ExecutionOfDay With {.ExecuteDate = DateTime.Today.AddDays(-i)})
+            i -= 1
+        Loop Until False
+    End Sub
+
+    Private Sub InitializeExecutionsOfYear()
+        Me.ExecutionsOfYear = New ObservableCollection(Of ExecutionOfDay)
+        Dim today As Date = DateTime.Today
+        For i As Integer = 366 To 0 Step -1
+            Me.ExecutionsOfYear.Add(New ExecutionOfDay With {.ExecuteDate = today.AddDays(-i)})
+        Next
     End Sub
 End Class

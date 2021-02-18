@@ -7,3 +7,13 @@
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.dll
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.xml
 \\Coral\個人情報-林祐\project\wpf\test2\Rpa11\obj\Debug\Rpa11.pdb
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Rpa11.dll
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Rpa11.pdb
+C:\Users\yuusa\project\test2\RpaCui\debugrobot\Rpa11.xml
+C:\Users\yuusa\project\test2\Rpa11\obj\Debug\Rpa11.Resources.resources
+C:\Users\yuusa\project\test2\Rpa11\obj\Debug\Rpa11.vbproj.GenerateResource.cache
+C:\Users\yuusa\project\test2\Rpa11\obj\Debug\Rpa11.vbproj.CoreCompileInputs.cache
+C:\Users\yuusa\project\test2\Rpa11\obj\Debug\Rpa11.vbproj.CopyComplete
+C:\Users\yuusa\project\test2\Rpa11\obj\Debug\Rpa11.dll
+C:\Users\yuusa\project\test2\Rpa11\obj\Debug\Rpa11.xml
+C:\Users\yuusa\project\test2\Rpa11\obj\Debug\Rpa11.pdb

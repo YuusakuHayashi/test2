@@ -117,7 +117,9 @@
                     <MenuItem Header="終了" Command="{Binding ExitCommand}"/>
                 </MenuItem>
             </Menu>
-            <StackPanel Grid.Column="2" Background="{StaticResource SystemDefaultBackgroundColor}">
+            <StackPanel Grid.Column="2" Background="{StaticResource SystemDefaultBackgroundColor}" Orientation="Horizontal">
+                <TextBlock Foreground="{StaticResource SystemDefaultForegroundColor}" Margin="0,0,10,0" Text="{Binding CurrentRobotName}" />
+                <TextBlock Foreground="{StaticResource SystemDefaultForegroundColor}" Margin="0,0,10,0" Text="{Binding CurrentProjectName}" />
                 <TextBlock Foreground="{StaticResource SystemDefaultForegroundColor}" Margin="0,0,10,0" Text="{Binding Data.Initializer.UserName}" />
             </StackPanel>
         </Grid>

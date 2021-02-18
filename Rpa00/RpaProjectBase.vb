@@ -9,8 +9,9 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
     Inherits Rpa00.JsonHandler(Of T)
     Implements INotifyPropertyChanged
 
+    ' 継承先でプロパティ変更を監視している・・・
+    ' 見直した方がいいかも・・・
     Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
-
     Protected Overridable Sub RaisePropertyChanged(ByVal PropertyName As String)
         RaiseEvent PropertyChanged(
             Me, New PropertyChangedEventArgs(PropertyName)
@@ -124,6 +125,7 @@ Public MustInherit Class RpaProjectBase(Of T As {New})
             Me._RobotName = value
             If Not Me.IsImplicitRobotNameChanged Then
                 RaisePropertyChanged("RobotName")
+                RpaEvent.Instance.RaiseProjectChanged("RobotName")
             End If
         End Set
     End Property

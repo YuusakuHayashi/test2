@@ -19,6 +19,28 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
         End Get
     End Property
 
+    Private _CurrentProjectName As String
+    Public Property CurrentProjectName As String
+        Get
+            Return Me._CurrentProjectName
+        End Get
+        Set(value As String)
+            Me._CurrentProjectName = value
+            Call RaisePropertyChanged("CurrentProjectName")
+        End Set
+    End Property
+
+    Private _CurrentRobotName As String
+    Public Property CurrentRobotName As String
+        Get
+            Return Me._CurrentRobotName
+        End Get
+        Set(value As String)
+            Me._CurrentRobotName = value
+            Call RaisePropertyChanged("CurrentRobotName")
+        End Set
+    End Property
+
     Private _Data As Rpa00.RpaDataWrapper
     <JsonIgnore>
     Public Property Data As Rpa00.RpaDataWrapper
@@ -261,25 +283,48 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
     End Function
     '---------------------------------------------------------------------------------------------'
 
-    'Private Sub CheckPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
-    '    If e.PropertyName = "ExplorerTabIndex" Then
-    '        Me.ExplorerTabs(Me.OutputTabIndex).Content.ViewController = Me
-    '        Me.ExplorerTabs(Me.OutputTabIndex).Content.Initialize()
-    '    End If
-    '    If e.PropertyName = "OutputTabIndex" Then
-    '        Me.OutputTabs(Me.OutputTabIndex).Content.ViewController = Me
-    '        Me.OutputTabs(Me.OutputTabIndex).Content.Initialize()
-    '    End If
-    'End Sub
+    Private Sub CheckDataChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
+        If e.PropertyName = "CurrentProject" Then
+            Call SetCurrentProjectName()
+        End If
+    End Sub
+
+    Private Sub SetCurrentProjectName()
+        If Data.Initializer.CurrentProject Is Nothing Then
+            Me.CurrentProjectName = "No Project"
+        End If
+        If String.IsNullOrEmpty(Data.Initializer.CurrentProject.Name) Then
+            Me.CurrentProjectName = "No Project"
+        Else
+            Me.CurrentProjectName = Data.Initializer.CurrentProject.Name
+        End If
+    End Sub
+
+    Private Sub CheckProjectChanged(ByVal sender As Object, ByVal e As Rpa00.RpaEvent.ProjectChangedEventArgs)
+        If e.PropertyName = "RobotName" Then
+            Call SetCurrentRobotName()
+        End If
+    End Sub
+
+    Private Sub SetCurrentRobotName()
+        If String.IsNullOrEmpty(Data.Project.RobotAlias) Then
+            Me.CurrentProjectName = "No Robot"
+        Else
+            Me.CurrentRobotName = Data.Project.RobotAlias
+        End If
+    End Sub
 
     Public Overrides Sub Initialize()
         Data.System.ReturnCode = -1
+        Call SetCurrentProjectName()
+        Call SetCurrentRobotName()
+        AddHandler Data.Initializer.PropertyChanged, AddressOf CheckDataChanged
+        AddHandler Rpa00.RpaEvent.Instance.ProjectChanged, AddressOf CheckProjectChanged
     End Sub
 
     Sub New()
         Me.IsExitCommandEnabled = True
         Me.ExplorerTabIndex = 0
         Me.OutputTabIndex = 0
-        'AddHandler Me.PropertyChanged, AddressOf CheckPropertyChanged
     End Sub
 End Class

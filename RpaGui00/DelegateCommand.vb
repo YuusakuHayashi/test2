@@ -1,5 +1,4 @@
 ﻿Public Class DelegateCommand : Implements ICommand
-
     Public Property CanExecuteHandler As Func(Of Object, Boolean)
     Public Property ExecuteHandler As Action(Of String)
 
