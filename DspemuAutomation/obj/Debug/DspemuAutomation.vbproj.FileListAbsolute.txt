@@ -1,0 +1,17 @@
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\DspemuAutomation.exe.config
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\DspemuAutomation.exe
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\DspemuAutomation.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Rpa11.dll
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Rpa00.dll
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Newtonsoft.Json.dll
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\RpaCui.exe
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Rpa11.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Rpa11.xml
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Rpa00.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Rpa00.xml
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\Newtonsoft.Json.xml
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\RpaCui.pdb
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\bin\Debug\RpaCui.xml
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\obj\Debug\DspemuAutomation.vbprojResolveAssemblyReference.cache
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\obj\Debug\DspemuAutomation.exe
+\\Coral\個人情報-林祐\project\wpf\test2\DspemuAutomation\obj\Debug\DspemuAutomation.pdb
