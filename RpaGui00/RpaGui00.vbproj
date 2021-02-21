@@ -73,7 +73,8 @@
       <DependentUpon>Controller.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControllerViewModelBase.vb" />
-    <Compile Include="converter\ExecuteCountToGreenConverter.vb" />
+    <Compile Include="converter\DensityToGreenConverter.vb" />
+    <Compile Include="converter\DoubleToMonthStringsConverter.vb" />
     <Compile Include="converter\OverTimeToColorConverter.vb" />
     <Compile Include="converter\ReturnCodeToForegroundConverter.vb" />
     <Compile Include="converter\ReturnCodeToMessageConverter.vb" />
@@ -82,6 +83,10 @@
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="ExecutableMenuBase.vb" />
     <Compile Include="ExecuteMenu.vb" />
+    <Compile Include="GreenCalender.xaml.vb">
+      <DependentUpon>GreenCalender.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GreenCalenderViewModel.vb" />
     <Compile Include="MainContentViewModelBase.vb" />
     <Compile Include="MenuController.xaml.vb">
       <DependentUpon>MenuController.xaml</DependentUpon>
@@ -94,6 +99,10 @@
     <Compile Include="viewmodel\NoContentViewModel.vb" />
     <Compile Include="viewmodel\RunnerViewModel.vb" />
     <Page Include="Controller.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GreenCalender.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

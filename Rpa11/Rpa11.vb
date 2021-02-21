@@ -155,16 +155,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private _CheckFileName As String
-    Public Property CheckFileName As String
-        Get
-            Return Me._CheckFileName
-        End Get
-        Set(value As String)
-            Me._CheckFileName = value
-        End Set
-    End Property
-
     Private _OutputFileName As String
     Public Property OutputFileName As String
         Get
@@ -197,19 +187,41 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
     Private Delegate Sub DspemuAutomationDelegater(ByRef dspemu As Object)
 
-    Private _MainToDoList As List(Of DspemuAutomationDelegater)
-    Private ReadOnly Property MainToDoList As List(Of DspemuAutomationDelegater)
+    ' Open
+    '---------------------------------------------------------------------------------------------'
+    Private _OpenHandler As List(Of DspemuAutomationDelegater)
+    Private Property OpenHandler As List(Of DspemuAutomationDelegater)
         Get
-            If Me._MainToDoList Is Nothing Then
-                Me._MainToDoList = New List(Of DspemuAutomationDelegater)
-                Me._MainToDoList.Add(AddressOf SetConfiguration)
-                Me._MainToDoList.Add(AddressOf Logon)
-                Me._MainToDoList.Add(AddressOf GoExecutingJobMenu)
-                Me._MainToDoList.Add(AddressOf GetScreen)
-                Me._MainToDoList.Add(AddressOf Complete)
+            If Me._OpenHandler Is Nothing Then
+                Me._OpenHandler = New List(Of DspemuAutomationDelegater)
             End If
-            Return Me._MainToDoList
+            Return Me._OpenHandler
         End Get
+        Set(value As List(Of DspemuAutomationDelegater))
+            Me._OpenHandler = value
+        End Set
+    End Property
+
+    Private Sub ConnectionEstablish(ByRef dspemu As Object)
+        dspemu = GetObject(Me.EMDFileName)
+        Me.DspemuReturnCode = dspemu.Open
+    End Sub
+    '---------------------------------------------------------------------------------------------'
+
+
+    ' Main
+    '---------------------------------------------------------------------------------------------'
+    Private _MainHandler As List(Of DspemuAutomationDelegater)
+    Private Property MainHandler As List(Of DspemuAutomationDelegater)
+        Get
+            If Me._MainHandler Is Nothing Then
+                Me._MainHandler = New List(Of DspemuAutomationDelegater)
+            End If
+            Return Me._MainHandler
+        End Get
+        Set(value As List(Of DspemuAutomationDelegater))
+            Me._MainHandler = value
+        End Set
     End Property
 
     Private Sub SetConfiguration(ByRef dspemu As Object)
@@ -291,16 +303,22 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private Sub Complete(ByRef dspemu As Object)
         Me.TransactionLogs.Add("DSPEMU操作は正常終了しました")
     End Sub
+    '---------------------------------------------------------------------------------------------'
 
-    Private _CloserToDoList As List(Of DspemuAutomationDelegater)
-    Private ReadOnly Property CloserToDoList As List(Of DspemuAutomationDelegater)
+
+    ' Close
+    '---------------------------------------------------------------------------------------------'
+    Private _CloseHandler As List(Of DspemuAutomationDelegater)
+    Private Property CloseHandler As List(Of DspemuAutomationDelegater)
         Get
-            If Me._CloserToDoList Is Nothing Then
-                Me._CloserToDoList = New List(Of DspemuAutomationDelegater)
-                Me._CloserToDoList.Add(AddressOf Close)
+            If Me._CloseHandler Is Nothing Then
+                Me._CloseHandler = New List(Of DspemuAutomationDelegater)
             End If
-            Return Me._CloserToDoList
+            Return Me._CloseHandler
         End Get
+        Set(value As List(Of DspemuAutomationDelegater))
+            Me._CloseHandler = value
+        End Set
     End Property
 
     Private Sub Close(ByRef dspemu As Object)
@@ -313,6 +331,23 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             dspemu.Quit
         End If
     End Sub
+    '---------------------------------------------------------------------------------------------'
+
+
+    ' Output
+    '---------------------------------------------------------------------------------------------'
+    Private _OutputHandler As List(Of Action)
+    Private Property OutputHandler As List(Of Action)
+        Get
+            If Me._OutputHandler Is Nothing Then
+                Me._OutputHandler = New List(Of Action)
+            End If
+            Return Me._OutputHandler
+        End Get
+        Set(value As List(Of Action))
+            Me._OutputHandler = value
+        End Set
+    End Property
 
     Private Sub PrintScreen()
         Dim sw As StreamWriter
@@ -343,20 +378,42 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             End If
         End Try
     End Sub
+    '---------------------------------------------------------------------------------------------'
 
     ' DspemuAutomation プロジェクトから実行
-    Public Function Run() As Integer
+    Public Function PrintExecutingJob() As Integer
+        Me.OpenHandler = Nothing
+        Me.OpenHandler.Add(AddressOf ConnectionEstablish)
+
+        Me.MainHandler = Nothing
+        Me.MainHandler.Add(AddressOf SetConfiguration)
+        Me.MainHandler.Add(AddressOf Logon)
+        Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
+        Me.MainHandler.Add(AddressOf GetScreen)
+        Me.MainHandler.Add(AddressOf Complete)
+
+        Me.CloseHandler = Nothing
+        Me.CloseHandler.Add(AddressOf Close)
+
+        Me.OutputHandler = Nothing
+        Me.OutputHandler.Add(AddressOf PrintScreen)
         Return Main()
     End Function
 
     Private Overloads Function Main() As Integer
         Dim dspemu As Object
         Try
-            dspemu = GetObject(Me.EMDFileName)
-            Me.DspemuReturnCode = dspemu.Open
+            For Each todo In Me.OpenHandler
+                Call todo(dspemu)
+                If Me.DspemuReturnCode > 0 Then
+                    Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
+                    Me.TransactionLogs.Add($"接続時のエラー ................... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
+                    Exit For
+                End If
+            Next
             Try
                 If Me.DspemuReturnCode = 0 Then
-                    For Each todo In Me.MainToDoList
+                    For Each todo In Me.MainHandler
                         Call todo(dspemu)
                         If Me.DspemuReturnCode > 0 Then
                             Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
@@ -364,9 +421,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                             Exit For
                         End If
                     Next
-                Else
-                    Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
-                    Me.TransactionLogs.Add($"接続時のエラー ................... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
                 End If
             Catch ex2 As Exception
                 Me.TransactionLogs.Add($"主処理中の例外 ................... {ex2.HResult} {ex2.Message}")
@@ -374,7 +428,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                 Me.ExceptionCode = ex2.HResult
             Finally
                 Try
-                    For Each todo In Me.CloserToDoList
+                    For Each todo In Me.CloseHandler
                         Call todo(dspemu)
                         If Me.DspemuReturnCode > 0 Then
                             Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
@@ -387,18 +441,36 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                 End Try
             End Try
         Catch ex As Exception
-            Me.TransactionLogs.Add($"オブジェクト取得・接続時の例外 ... {ex.HResult} {ex.Message}")
+            Me.TransactionLogs.Add($"接続時の例外 ..................... {ex.HResult} {ex.Message}")
             Me.ExceptionMessage = ex.Message
             Me.ExceptionCode = ex.HResult
         Finally
             dspemu = Nothing
-            Call PrintScreen()
+            For Each todo In Me.OutputHandler
+                Call todo()
+            Next
         End Try
         Return 0
     End Function
 
     ' RpaProject から実行
     Private Overloads Function Main(ByRef dat As Object) As Integer
+        Me.OpenHandler = Nothing
+        Me.OpenHandler.Add(AddressOf ConnectionEstablish)
+
+        Me.MainHandler = Nothing
+        Me.MainHandler.Add(AddressOf SetConfiguration)
+        Me.MainHandler.Add(AddressOf Logon)
+        Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
+        Me.MainHandler.Add(AddressOf GetScreen)
+        Me.MainHandler.Add(AddressOf Complete)
+
+        Me.CloseHandler = Nothing
+        Me.CloseHandler.Add(AddressOf Close)
+
+        Me.OutputHandler = Nothing
+        Me.OutputHandler.Add(AddressOf PrintScreen)
+
         Return Main()
     End Function
 

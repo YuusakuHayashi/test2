@@ -61,3 +61,5 @@ C:\Users\yuusa\project\test2\RpaCui\debugrobot\RpaGui00.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Debug\RpaGui00.dll
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Debug\RpaGui00.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Debug\RpaGui00.pdb
+C:\Users\yuusa\project\test2\RpaGui00\obj\Debug\GreenCalender.g.vb
+C:\Users\yuusa\project\test2\RpaGui00\obj\Debug\GreenCalender.baml

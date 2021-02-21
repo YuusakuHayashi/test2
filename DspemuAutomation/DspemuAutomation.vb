@@ -18,7 +18,7 @@ Module DspemuAutomation
 
         If rpa IsNot Nothing Then
             If rpa.CheckRun() Then
-                rpa.Run()
+                rpa.PrintExecutingJob()
             Else
                 File.Create(chkf)
             End If
