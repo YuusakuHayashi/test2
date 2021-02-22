@@ -39,6 +39,47 @@ Public Class GreenCalenderViewModel : Inherits ViewModelBase(Of GreenCalenderVie
         End Property
     End Class
 
+    Public Class ColumnHeaderData : Implements INotifyPropertyChanged
+        Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+        Protected Sub RaisePropertyChanged(ByVal PropertyName As String)
+            RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(PropertyName))
+        End Sub
+
+        Private _Name As String
+        Public Property Name As String
+            Get
+                Return Me._Name
+            End Get
+            Set(value As String)
+                Me._Name = value
+                RaisePropertyChanged("Name")
+            End Set
+        End Property
+
+        Private _Row As Integer
+        Public Property Row As Integer
+            Get
+                Return Me._Row
+            End Get
+            Set(value As Integer)
+                Me._Row = value
+                RaisePropertyChanged("Row")
+            End Set
+        End Property
+    End Class
+
+    Private _YearString As String
+    <JsonIgnore>
+    Public Property YearString As String
+        Get
+            Return Me._YearString
+        End Get
+        Set(value As String)
+            Me._YearString = value
+            RaisePropertyChanged("YearString")
+        End Set
+    End Property
+
     Private _GreenYear As ObservableCollection(Of GreenDay)
     Public Property GreenYear As ObservableCollection(Of GreenDay)
         Get
@@ -71,21 +112,18 @@ Public Class GreenCalenderViewModel : Inherits ViewModelBase(Of GreenCalenderVie
         End Set
     End Property
 
-    Private _Weeks As ObservableCollection(Of String)
+    Private _ColumnHeaders As ObservableCollection(Of ColumnHeaderData)
     <JsonIgnore>
-    Public Property Weeks As ObservableCollection(Of String)
+    Public Property ColumnHeaders As ObservableCollection(Of ColumnHeaderData)
         Get
-            If Me._Weeks Is Nothing Then
-                Me._Weeks = New ObservableCollection(Of String)
-                For i As Integer = 0 To 6
-                    Me._Weeks.Add(vbNullString)
-                Next
+            If Me._ColumnHeaders Is Nothing Then
+                Me._ColumnHeaders = New ObservableCollection(Of ColumnHeaderData)
             End If
-            Return Me._Weeks
+            Return Me._ColumnHeaders
         End Get
-        Set(value As ObservableCollection(Of String))
-            Me._Weeks = value
-            RaisePropertyChanged("Weeks")
+        Set(value As ObservableCollection(Of ColumnHeaderData))
+            Me._ColumnHeaders = value
+            RaisePropertyChanged("ColumnHeaders")
         End Set
     End Property
 
@@ -94,8 +132,41 @@ Public Class GreenCalenderViewModel : Inherits ViewModelBase(Of GreenCalenderVie
         Dim act2 As Action = AddressOf GoCalenderFoward
         Dim act3 As Action = AddressOf SetMonthRow
         Dim act4 As Action = AddressOf SetWeekColumn
-        Dim all As Action = [Delegate].Combine(act1, act2, act3, act4)
+        Dim act5 As Action = AddressOf SetYear
+        Dim all As Action = [Delegate].Combine(act1, act2, act3, act4, act5)
         Call all()
+    End Sub
+
+    Private Sub InitializeCalender()
+        If Me.GreenYear.Count > 0 Then
+            Dim latest As Date = Me.GreenYear.Last.Day
+            Dim term As Integer = (DateTime.Today - latest).TotalDays
+
+            If term < 366 Then
+                Exit Sub
+            End If
+        End If
+
+        Me.GreenYear = New ObservableCollection(Of GreenDay)
+        Dim today As Date = DateTime.Today
+        For i As Integer = 366 To 0 Step -1
+            Me.GreenYear.Add(New GreenDay With {.Day = today.AddDays(-i)})
+        Next
+    End Sub
+
+    Private Sub GoCalenderFoward()
+        Dim latest As Date = Me.GreenYear.Last.Day
+        Dim term As Integer = (DateTime.Today - latest).TotalDays
+
+        Dim i As Integer = term
+        Do
+            If i <= 0 Then
+                Exit Do
+            End If
+            Me.GreenYear.RemoveAt(0)
+            Me.GreenYear.Add(New GreenDay With {.Day = DateTime.Today.AddDays(-i + 1)})
+            i -= 1
+        Loop Until False
     End Sub
 
     Private Sub SetMonthRow()
@@ -136,40 +207,23 @@ Public Class GreenCalenderViewModel : Inherits ViewModelBase(Of GreenCalenderVie
     End Sub
 
     Private Sub SetWeekColumn()
-        Me.Weeks(0) = Strings.Left(Me.GreenYear(0).Day.DayOfWeek.ToString, 3)
-        Me.Weeks(3) = Strings.Left(Me.GreenYear(3).Day.DayOfWeek.ToString, 3)
-        Me.Weeks(6) = Strings.Left(Me.GreenYear(6).Day.DayOfWeek.ToString, 3)
+        Me.ColumnHeaders.Add(New ColumnHeaderData With {
+            .Row = 1,
+            .Name = Strings.Left(Me.GreenYear(0).Day.DayOfWeek.ToString, 3)
+        })
+        Me.ColumnHeaders.Add(New ColumnHeaderData With {
+            .Row = 4,
+            .Name = Strings.Left(Me.GreenYear(3).Day.DayOfWeek.ToString, 3)
+        })
+        Me.ColumnHeaders.Add(New ColumnHeaderData With {
+            .Row = 7,
+            .Name = Strings.Left(Me.GreenYear(6).Day.DayOfWeek.ToString, 3)
+        })
     End Sub
 
-    Private Sub InitializeCalender()
-        If Me.GreenYear.Count > 0 Then
-            Dim latest As Date = Me.GreenYear.Last.Day
-            Dim term As Integer = (DateTime.Today - latest).TotalDays
-
-            If term < 366 Then
-                Exit Sub
-            End If
-        End If
-
-        Me.GreenYear = New ObservableCollection(Of GreenDay)
-        Dim today As Date = DateTime.Today
-        For i As Integer = 366 To 0 Step -1
-            Me.GreenYear.Add(New GreenDay With {.Day = today.AddDays(-i)})
-        Next
-    End Sub
-
-    Private Sub GoCalenderFoward()
-        Dim latest As Date = Me.GreenYear.Last.Day
-        Dim term As Integer = (DateTime.Today - latest).TotalDays
-
-        Dim i As Integer = term
-        Do
-            If i <= 0 Then
-                Exit Do
-            End If
-            Me.GreenYear.RemoveAt(0)
-            Me.GreenYear.Add(New GreenDay With {.Day = DateTime.Today.AddDays(-i + 1)})
-            i -= 1
-        Loop Until False
+    Private Sub SetYear()
+        Dim tyear As Integer = Me.GreenYear.First.Day.Year.ToString
+        Dim nyear As Integer = Me.GreenYear.Last.Day.Year.ToString
+        Me.YearString = $"({tyear} ~ {nyear})"
     End Sub
 End Class

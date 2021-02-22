@@ -139,22 +139,25 @@
                                 <TextBlock Text="{Binding ViewController.Data.System.ReturnCode, Converter={StaticResource ReturnCodeToMessageConverter}}" />
                                 <ProgressBar Margin="0,3,0,0" Value="{Binding ProcessTime}" Maximum="{Binding AverageTime}" />
                                 <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                                    <TextBlock Text="(経過時間 / 平均(予測)時間)" />
+                                    <TextBlock Text="(経過時間 / 平均(予測)時間)" Width="200" FontWeight="ExtraBold" />
                                     <TextBlock Text="{Binding ProcessTime}" Margin="5,0,0,0" />
                                     <TextBlock Text="/" Margin="1,0,0,0" />
                                     <TextBlock Text="{Binding AverageTime}" Margin="1,0,0,0" />
                                 </StackPanel>
                                 <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                                    <TextBlock Text="(起動平均(予測)時間)" />
+                                    <TextBlock Text="(起動平均(予測)時間)" Width="200" FontWeight="ExtraBold" />
                                     <TextBlock Text="{Binding RunAverageTime}" Margin="5,0,0,0" />
                                 </StackPanel>
                                 <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
-                                    <TextBlock Text="(チェック平均(予測)時間)" />
+                                    <TextBlock Text="(チェック平均(予測)時間)" Width="200" FontWeight="ExtraBold" />
                                     <TextBlock Text="{Binding CheckAverageTime}" Margin="5,0,0,0" />
                                 </StackPanel>
-                                <ScrollViewer HorizontalScrollBarVisibility="Visible">
-                                    <local:GreenCalender DataContext="{Binding GreenCalender}" Width="500" />
-                                </ScrollViewer>
+                                <StackPanel Margin="0,3,0,0">
+                                    <TextBlock Text="緑のカレンダー" FontWeight="ExtraBold" />
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                        <local:GreenCalender DataContext="{Binding GreenCalender}" />
+                                    </ScrollViewer>
+                                </StackPanel>
                             </StackPanel>
                         </Expander>
                     </StackPanel>

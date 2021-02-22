@@ -5,25 +5,14 @@ Module DspemuAutomation
     Sub Main()
         Dim exef As String = Application.ExecutablePath
         Dim rpaf As String = $"{Path.GetDirectoryName(exef)}\dspemuautomation.json"
-        Dim errf As String = $"{Path.GetDirectoryName(exef)}\error"
-        Dim chkf As String = $"{Path.GetDirectoryName(exef)}\check"
-        Dim rpa As Rpa11.Rpa11 = Rpa11.Rpa11.LoadFromFile(rpaf)
-
-        If File.Exists(errf) Then
-            File.Delete(errf)
-        End If
-        If File.Exists(chkf) Then
-            File.Delete(chkf)
-        End If
-
-        If rpa IsNot Nothing Then
-            If rpa.CheckRun() Then
-                rpa.PrintExecutingJob()
-            Else
-                File.Create(chkf)
+        Try
+            Dim rpa As Rpa11.Rpa11 = Rpa11.Rpa11.LoadFromFile(rpaf)
+            If rpa IsNot Nothing Then
+                If rpa.CheckRun() Then
+                    rpa.PrintExecutingJob()
+                End If
             End If
-        Else
-            File.Create(errf)
-        End If
+        Catch ex As Exception
+        End Try
     End Sub
 End Module

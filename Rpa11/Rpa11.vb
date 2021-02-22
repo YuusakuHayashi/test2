@@ -93,26 +93,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private _ExceptionMessage As String
-    Private Property ExceptionMessage As String
-        Get
-            Return Me._ExceptionMessage
-        End Get
-        Set(value As String)
-            Me._ExceptionMessage = value
-        End Set
-    End Property
-
-    Private _ExceptionCode As Int32
-    Private Property ExceptionCode As Int32
-        Get
-            Return Me._ExceptionCode
-        End Get
-        Set(value As Int32)
-            Me._ExceptionCode = value
-        End Set
-    End Property
-
     Private _ScreenDatas As List(Of String)
     Private ReadOnly Property ScreenDatas As List(Of String)
         Get
@@ -382,20 +362,16 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
     ' DspemuAutomation プロジェクトから実行
     Public Function PrintExecutingJob() As Integer
-        Me.OpenHandler = Nothing
         Me.OpenHandler.Add(AddressOf ConnectionEstablish)
 
-        Me.MainHandler = Nothing
         Me.MainHandler.Add(AddressOf SetConfiguration)
         Me.MainHandler.Add(AddressOf Logon)
         Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
         Me.MainHandler.Add(AddressOf GetScreen)
         Me.MainHandler.Add(AddressOf Complete)
 
-        Me.CloseHandler = Nothing
         Me.CloseHandler.Add(AddressOf Close)
 
-        Me.OutputHandler = Nothing
         Me.OutputHandler.Add(AddressOf PrintScreen)
         Return Main()
     End Function
@@ -424,8 +400,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                 End If
             Catch ex2 As Exception
                 Me.TransactionLogs.Add($"主処理中の例外 ................... {ex2.HResult} {ex2.Message}")
-                Me.ExceptionMessage = ex2.Message
-                Me.ExceptionCode = ex2.HResult
             Finally
                 Try
                     For Each todo In Me.CloseHandler
@@ -442,33 +416,32 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             End Try
         Catch ex As Exception
             Me.TransactionLogs.Add($"接続時の例外 ..................... {ex.HResult} {ex.Message}")
-            Me.ExceptionMessage = ex.Message
-            Me.ExceptionCode = ex.HResult
         Finally
             dspemu = Nothing
             For Each todo In Me.OutputHandler
                 Call todo()
             Next
+
+            Me.OpenHandler = Nothing
+            Me.MainHandler = Nothing
+            Me.CloseHandler = Nothing
+            Me.OutputHandler = Nothing
         End Try
         Return 0
     End Function
 
     ' RpaProject から実行
     Private Overloads Function Main(ByRef dat As Object) As Integer
-        Me.OpenHandler = Nothing
         Me.OpenHandler.Add(AddressOf ConnectionEstablish)
 
-        Me.MainHandler = Nothing
         Me.MainHandler.Add(AddressOf SetConfiguration)
         Me.MainHandler.Add(AddressOf Logon)
         Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
         Me.MainHandler.Add(AddressOf GetScreen)
         Me.MainHandler.Add(AddressOf Complete)
 
-        Me.CloseHandler = Nothing
         Me.CloseHandler.Add(AddressOf Close)
 
-        Me.OutputHandler = Nothing
         Me.OutputHandler.Add(AddressOf PrintScreen)
 
         Return Main()
@@ -499,6 +472,11 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Return Check()
     End Function
 
+    ' RpaProject プロジェクトから実行
+    Private Overloads Function Check(ByRef dat As Object) As Boolean
+        Return Check()
+    End Function
+
     Private Overloads Function Check() As Boolean
         Dim b1 As Boolean = True
         If String.IsNullOrEmpty(Me.UserName) Then
@@ -522,10 +500,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             b1 = False
         End If
         Return b1
-    End Function
-
-    Private Overloads Function Check(ByRef dat As Object) As Boolean
-        Return Check()
     End Function
 
     Sub New()
