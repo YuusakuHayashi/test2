@@ -83,6 +83,10 @@
     <Compile Include="DelegateCommand.vb" />
     <Compile Include="ExecutableMenuBase.vb" />
     <Compile Include="ExecuteMenu.vb" />
+    <Compile Include="ExplorerTabs\ExplorerTabs.xaml.vb">
+      <DependentUpon>ExplorerTabs.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExplorerTabs\ProjectExplorerViewModel.vb" />
     <Compile Include="GreenCalender.xaml.vb">
       <DependentUpon>GreenCalender.xaml</DependentUpon>
     </Compile>
@@ -94,6 +98,7 @@
     <Compile Include="MenuExplorerViewModel.vb" />
     <Compile Include="RpaGuiModule.vb" />
     <Compile Include="TabItemViewModel.vb" />
+    <Compile Include="RpaViewModelBase.vb" />
     <Compile Include="ViewModelBase.vb" />
     <Compile Include="viewmodel\ContentErrorViewModel.vb" />
     <Compile Include="viewmodel\NoContentViewModel.vb" />
@@ -102,11 +107,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ExplorerTabs\ExplorerTabs.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GreenCalender.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MenuController.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="resources\RpaSystem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

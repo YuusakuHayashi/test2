@@ -876,14 +876,14 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                     Me.RunProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.RunProcessTimeLogs)
                     Call CalculateRunAverageTime()
                 End If
-                Me.GreenCalender.GreenYear.Last.Density += 1
+                Me.GreenCalender.Range.Last.Density += 1
             End If
             If cmds(0) = RunnerViewModel.CHKCOMMAND Then
                 If ViewController.Data.System.ReturnCode = 0 Then
                     Me.CheckProcessTimeLogs = Rpa00.RpaModule.Push(Of Integer, List(Of Integer))(Me.ProcessTime, Me.CheckProcessTimeLogs)
                     Call CalculateCheckAverageTime()
                 End If
-                Me.GreenCalender.GreenYear.Last.Density += 1
+                Me.GreenCalender.Range.Last.Density += 1
             End If
             Me.ProcessTime = 0
         End If

@@ -1,5 +1,5 @@
 ﻿Imports Newtonsoft.Json
-Public Class ControllerViewModelBase(Of T As {New}) : Inherits ViewModelBase(Of T)
+Public Class ControllerViewModelBase(Of T As {New}) : Inherits RpaViewModelBase(Of T)
     Private _ViewController As ControllerViewModel
     <JsonIgnore>
     Public Property ViewController As ControllerViewModel

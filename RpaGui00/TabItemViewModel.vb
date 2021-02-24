@@ -1,4 +1,4 @@
-﻿Public Class TabItemViewModel : Inherits ViewModelBase(Of TabItemViewModel)
+﻿Public Class TabItemViewModel : Inherits RpaViewModelBase(Of TabItemViewModel)
     Private _Content As Object
     Public Property Content As Object
         Get

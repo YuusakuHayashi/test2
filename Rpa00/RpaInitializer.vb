@@ -81,7 +81,6 @@ Public Class RpaInitializer
         End Get
     End Property
 
-
     Private _CurrentProject As RpaProject
     Public Property CurrentProject As RpaProject
         Get

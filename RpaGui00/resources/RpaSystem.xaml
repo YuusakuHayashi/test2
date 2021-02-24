@@ -1,0 +1,23 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:RpaGui00">
+    <!-- すきまの色 -->
+    <SolidColorBrush x:Key="SystemBaseColor">
+        <SolidColorBrush.Color>
+            <Color A="255" R="73" G="52" B="39" />
+        </SolidColorBrush.Color>
+    </SolidColorBrush>
+
+    <!-- システム基本色 -->
+    <SolidColorBrush x:Key="SystemThemeColor">
+        <SolidColorBrush.Color>
+            <Color A="255" R="33" B="16" G="22" />
+        </SolidColorBrush.Color>
+    </SolidColorBrush>
+
+    <!-- システム基本文字色 -->
+    <SolidColorBrush x:Key="SystemFontColor" Color="White" />
+
+    <!-- パネル基本色 -->
+    <SolidColorBrush x:Key="SystemPanelColor" Color="WhiteSmoke" />
+</ResourceDictionary>

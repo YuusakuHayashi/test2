@@ -21,6 +21,12 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private Const GO_EXIT_SCREEN_TEXT = "--- *** END DISPLAY *** ---"
     Private Const GO_NEXT_SCREEN_TEXT = "--- *** CONTINUE *** ---"
 
+    Private Enum OutputModeNumber
+        BOTH = 0
+        CONSOLE = 1
+        FILE = 2
+    End Enum
+
     Private Enum SystemConnection
         CX_SYS_NOTREADY = 0
         CX_SYS_READY = 1
@@ -135,6 +141,16 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
+    Private _OutputMode As Integer
+    Public Property OutputMode As Integer
+        Get
+            Return Me._OutputMode
+        End Get
+        Set(value As Integer)
+            Me._OutputMode = value
+        End Set
+    End Property
+
     Private _OutputFileName As String
     Public Property OutputFileName As String
         Get
@@ -143,6 +159,33 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Set(value As String)
             Me._OutputFileName = value
         End Set
+    End Property
+
+    Private _SaveableLogsCount As Integer
+    Public Property SaveableLogsCount As Integer
+        Get
+            Return Me._SaveableLogsCount
+        End Get
+        Set(value As Integer)
+            Me._SaveableLogsCount = value
+        End Set
+    End Property
+
+    Private _OutputLogDirectoryName As String
+    Public Property OutputLogDirectoryName As String
+        Get
+            Return Me._OutputLogDirectoryName
+        End Get
+        Set(value As String)
+            Me._OutputLogDirectoryName = value
+        End Set
+    End Property
+
+    Private ReadOnly Property OutputLogFileName As String
+        Get
+            Dim yyyymmddhhmmss As String = Date.Now.ToString("yyyyMMddhhmmss")
+            Return $"{Me._OutputLogDirectoryName}\log_{yyyymmddhhmmss}.txt"
+        End Get
     End Property
 
     Private _DspemuWaitTime As Int32
@@ -205,7 +248,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Property
 
     Private Sub SetConfiguration(ByRef dspemu As Object)
-        dspemu.WaitTime = Me.DspemuWaitTime
+        dspemu.WaitTime = IIf(Me.DspemuWaitTime > 0, Me.dspemu.WaitTime, dspemu.WaitTime)
         dspemu.RectFlag = True
         dspemu.OpenMode = Me.DspemuOpenMode
         dspemu.SessionTo = Me.EMDFileName
@@ -330,33 +373,73 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Property
 
     Private Sub PrintScreen()
-        Dim sw As StreamWriter
+        Dim sw1 As StreamWriter
+        Dim sw2 As StreamWriter
         Try
-            sw = New StreamWriter(Me.OutputFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
+            sw1 = New StreamWriter(Me.OutputFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
+            sw2 = New StreamWriter(Me.OutputLogFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
             For Each Data In Me.ScreenDatas
-                sw.WriteLine(Data)
-                sw.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
-                sw.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
+                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                    sw1.WriteLine(Data)
+                    sw1.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
+                    sw1.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
 
-                Console.WriteLine(Data)
-                Console.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
-                Console.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
+                    sw2.WriteLine(Data)
+                    sw2.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
+                    sw2.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
+                End If
+
+                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                    Console.WriteLine(Data)
+                    Console.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
+                    Console.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
+                End If
             Next
 
-            sw.WriteLine(Me.LogSeparater)
-            Console.WriteLine(Me.LogSeparater)
+            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                sw1.WriteLine(Me.LogSeparater)
+                sw2.WriteLine(Me.LogSeparater)
+            End If
+            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                Console.WriteLine(Me.LogSeparater)
+            End If
 
             For Each log In Me.TransactionLogs
-                sw.WriteLine(log)
-                Console.WriteLine(log)
+                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                    sw1.WriteLine(log)
+                    sw2.WriteLine(log)
+                End If
+                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                    Console.WriteLine(log)
+                End If
             Next
         Catch ex As Exception
         Finally
-            If sw IsNot Nothing Then
-                sw.Close()
-                sw.Dispose()
+            If sw1 IsNot Nothing Then
+                sw1.Close()
+                sw1.Dispose()
+            End If
+            If sw2 IsNot Nothing Then
+                sw2.Close()
+                sw2.Dispose()
             End If
         End Try
+    End Sub
+
+    Private Sub DisposeLogs()
+        Dim logs As List(Of String) = Directory.GetFiles(Me.OutputLogDirectoryName).ToList
+        logs.Sort(
+            Function(before, after)
+                Return (before < after)
+            End Function
+        )
+        Do
+            If logs.Count <= Me.SaveableLogsCount Then
+                Exit Do
+            End If
+            File.Delete(logs(0))
+            logs.RemoveAt(0)
+        Loop Until False
     End Sub
     '---------------------------------------------------------------------------------------------'
 
@@ -373,6 +456,8 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Me.CloseHandler.Add(AddressOf Close)
 
         Me.OutputHandler.Add(AddressOf PrintScreen)
+        Me.OutputHandler.Add(AddressOf DisposeLogs)
+
         Return Main()
     End Function
 
@@ -443,6 +528,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Me.CloseHandler.Add(AddressOf Close)
 
         Me.OutputHandler.Add(AddressOf PrintScreen)
+        Me.OutputHandler.Add(AddressOf DisposeLogs)
 
         Return Main()
     End Function
@@ -479,11 +565,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
     Private Overloads Function Check() As Boolean
         Dim b1 As Boolean = True
-        If String.IsNullOrEmpty(Me.UserName) Then
-            Dim err As String = $"UserName '{Me.UserName}' が指定されていません"
-            Console.WriteLine(err)
-            b1 = False
-        End If
         If String.IsNullOrEmpty(Me.EMDFileName) Then
             Dim err As String = $"EMDFileName '{Me.EMDFileName}' が指定されていません"
             Console.WriteLine(err)
@@ -496,6 +577,16 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End If
         If String.IsNullOrEmpty(Me.OutputFileName) Then
             Dim err As String = $"OutputFileName '{Me.OutputFileName}' が指定されていません"
+            Console.WriteLine(err)
+            b1 = False
+        End If
+        If String.IsNullOrEmpty(Me.OutputLogDirectoryName) Then
+            Dim err As String = $"OutputLogDirectoryName '{Me.OutputLogDirectoryName}' が指定されていません"
+            Console.WriteLine(err)
+            b1 = False
+        End If
+        If Not Directory.Exists(Me.OutputLogDirectoryName) Then
+            Dim err As String = $"OutputLogDirectoryName '{Me.OutputLogDirectoryName}' は存在しません"
             Console.WriteLine(err)
             b1 = False
         End If

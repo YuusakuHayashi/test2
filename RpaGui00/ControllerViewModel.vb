@@ -3,7 +3,7 @@ Imports System.Collections.ObjectModel
 Imports System.Collections.Specialized
 Imports Newtonsoft.Json
 
-Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel)
+Public Class ControllerViewModel : Inherits RpaViewModelBase(Of ControllerViewModel)
     Private ReadOnly Property ContentErrorImageFileName As String
         Get
             Return $"{Controller.SystemDllDirectory}\contenterror.png"
@@ -81,6 +81,11 @@ Public Class ControllerViewModel : Inherits ViewModelBase(Of ControllerViewModel
                 Dim [obj] As Object
                 Dim [tab] As TabItemViewModel
                 Me._ExplorerTabs = New ObservableCollection(Of TabItemViewModel)
+
+                [obj] = New ProjectExplorerViewModel With {.ViewController = Me}
+                [obj].Initialize()
+                [tab] = New TabItemViewModel With {.Header = "プロジェクト", .Content = obj}
+                Me._ExplorerTabs.Add([tab])
 
                 [obj] = New MenuExplorerViewModel With {.ViewController = Me}
                 [obj].Initialize()

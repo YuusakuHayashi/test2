@@ -1,5 +1,5 @@
 ﻿Imports Newtonsoft.Json
-Public MustInherit Class ExecutableMenuBase(Of T As {New}) : Inherits ViewModelBase(Of T)
+Public MustInherit Class ExecutableMenuBase(Of T As {New}) : Inherits RpaViewModelBase(Of T)
 
     ' !!! RpaDataWrapper型のdllオブジェクトがキャストされる
     ' 別プロジェクトのせいか、RpaDataWrapper型としては定義できなかった
