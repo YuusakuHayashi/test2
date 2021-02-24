@@ -111,7 +111,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
     Private ReadOnly Property PageSeparater(ByVal page As Integer) As String
         Get
-            Return $"                                                                   PAGE. {page}"
+            Return $"                                                                        PAGE. {page}"
         End Get
     End Property
 
@@ -248,7 +248,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Property
 
     Private Sub SetConfiguration(ByRef dspemu As Object)
-        dspemu.WaitTime = IIf(Me.DspemuWaitTime > 0, Me.dspemu.WaitTime, dspemu.WaitTime)
+        dspemu.WaitTime = IIf(Me.DspemuWaitTime > 0, Me.DspemuWaitTime, dspemu.WaitTime)
         dspemu.RectFlag = True
         dspemu.OpenMode = Me.DspemuOpenMode
         dspemu.SessionTo = Me.EMDFileName
@@ -376,8 +376,10 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Dim sw1 As StreamWriter
         Dim sw2 As StreamWriter
         Try
-            sw1 = New StreamWriter(Me.OutputFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
-            sw2 = New StreamWriter(Me.OutputLogFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
+            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                sw1 = New StreamWriter(Me.OutputFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
+                sw2 = New StreamWriter(Me.OutputLogFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
+            End If
             For Each Data In Me.ScreenDatas
                 If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
                     sw1.WriteLine(Data)
@@ -389,7 +391,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                     sw2.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
                 End If
 
-                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.CONSOLE Then
                     Console.WriteLine(Data)
                     Console.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
                     Console.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
@@ -400,7 +402,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                 sw1.WriteLine(Me.LogSeparater)
                 sw2.WriteLine(Me.LogSeparater)
             End If
-            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.CONSOLE Then
                 Console.WriteLine(Me.LogSeparater)
             End If
 
@@ -409,7 +411,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                     sw1.WriteLine(log)
                     sw2.WriteLine(log)
                 End If
-                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
+                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.CONSOLE Then
                     Console.WriteLine(log)
                 End If
             Next
