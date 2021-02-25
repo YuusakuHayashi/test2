@@ -1000,7 +1000,6 @@ Public Class RunnerViewModel : Inherits ControllerViewModelBase(Of RunnerViewMod
                     End If
 
                     Me.GreenCalender = Me.GreenCalender.Load(Me.RunnerGreenCalenderJsonFileName)
-                    Call Me.GreenCalender.SetupGreenCalender()
 
                     Me.IsReloadMyRobotReadMeCommandEnabled = True
                     Me.IsSaveRunnerCommandEnabled = True

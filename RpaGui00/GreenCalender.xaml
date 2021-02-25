@@ -12,13 +12,6 @@
                 <TextBlock Text="GreenCalender" FontWeight="ExtraBold" />
                 <TextBlock Text="{Binding YearString}" FontWeight="ExtraBold" />
             </StackPanel>
-            <!--<TextBlock Grid.Row="{Binding ColumnHeaders[0].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[0].Name}" FontSize="9" TextAlignment="Right" />
-                <TextBlock Grid.Row="{Binding ColumnHeaders[1].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[1].Name}" FontSize="9" TextAlignment="Right" />
-                <TextBlock Grid.Row="{Binding ColumnHeaders[2].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[2].Name}" FontSize="9" TextAlignment="Right" />
-                <TextBlock Grid.Row="{Binding ColumnHeaders[3].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[3].Name}" FontSize="9" TextAlignment="Right" />
-                <TextBlock Grid.Row="{Binding ColumnHeaders[4].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[4].Name}" FontSize="9" TextAlignment="Right" />
-                <TextBlock Grid.Row="{Binding ColumnHeaders[5].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[5].Name}" FontSize="9" TextAlignment="Right" />
-                <TextBlock Grid.Row="{Binding ColumnHeaders[6].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[6].Name}" FontSize="9" TextAlignment="Right" />-->
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -91,6 +84,7 @@
                                     <ColumnDefinition Width="18" />
                                     <ColumnDefinition Width="18" />
                                     <ColumnDefinition Width="18" />
+                                    <ColumnDefinition Width="18" />
                                 </Grid.ColumnDefinitions>
                             </Grid>
                         </ItemsPanelTemplate>
@@ -99,7 +93,7 @@
                         <Style>
                             <Setter Property="Grid.Row" Value="0" />
                             <Setter Property="Grid.Column" Value="{Binding Column}" />
-                            <Setter Property="Grid.ColumnSpan" Value="2" />
+                            <Setter Property="Grid.ColumnSpan" Value="{Binding ColumnSpan}" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
@@ -107,7 +101,7 @@
                             <DataTemplate.Resources>
                                 <local:DoubleToMonthStringsConverter x:Key="DoubleToMonthStringsConverter" />
                             </DataTemplate.Resources>
-                            <TextBlock Margin="3" FontSize="8" Text="{Binding Month, Converter={StaticResource DoubleToMonthStringsConverter}}" />
+                            <TextBlock Margin="3" FontSize="8" Text="{Binding Header}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -125,6 +119,7 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="30" />
@@ -135,12 +130,13 @@
                     <ItemsControl.ItemContainerStyle>
                         <Style>
                             <Setter Property="Grid.Row" Value="{Binding Row}" />
+                            <Setter Property="Grid.RowSpan" Value="1" />
                             <Setter Property="Grid.Column" Value="0" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Week}" FontSize="8" TextAlignment="Center" />
+                            <TextBlock Text="{Binding Header}" FontSize="8" TextAlignment="Center" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -158,8 +154,10 @@
                                     <RowDefinition Height="18" />
                                     <RowDefinition Height="18" />
                                     <RowDefinition Height="18" />
+                                    <RowDefinition Height="18" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="18" />
                                     <ColumnDefinition Width="18" />
                                     <ColumnDefinition Width="18" />
                                     <ColumnDefinition Width="18" />
@@ -220,7 +218,9 @@
                     <ItemsControl.ItemContainerStyle>
                         <Style>
                             <Setter Property="Grid.Row" Value="{Binding Row}" />
+                            <Setter Property="Grid.RowSpan" Value="{Binding RowSpan}" />
                             <Setter Property="Grid.Column" Value="{Binding Column}" />
+                            <Setter Property="Grid.ColumnSpan" Value="{Binding ColumnSpan}" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
@@ -245,8 +245,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-
-                <ComboBox Grid.Row="1" Grid.Column="2" Margin="10" Width="50" Height="25" VerticalAlignment="Top" ItemsSource="{Binding Term}" />
+                <ComboBox Grid.Row="1" Grid.Column="2" Margin="10" Width="50" Height="25" VerticalAlignment="Top" ItemsSource="{Binding TermTypes}" SelectedIndex="{Binding TermIndex}" />
             </Grid>
         </StackPanel>
     </Grid>
