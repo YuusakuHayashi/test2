@@ -323,9 +323,9 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End If
     End Sub
 
-    Private Sub Complete(ByRef dspemu As Object)
-        Me.TransactionLogs.Add("DSPEMU操作は正常終了しました")
-    End Sub
+    'Private Sub Complete(ByRef dspemu As Object)
+    '    Me.TransactionLogs.Add("DSPEMU操作は正常終了しました")
+    'End Sub
     '---------------------------------------------------------------------------------------------'
 
 
@@ -453,7 +453,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Me.MainHandler.Add(AddressOf Logon)
         Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
         Me.MainHandler.Add(AddressOf GetScreen)
-        Me.MainHandler.Add(AddressOf Complete)
+        'Me.MainHandler.Add(AddressOf Complete)
 
         Me.CloseHandler.Add(AddressOf Close)
 
@@ -473,6 +473,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                     Me.TransactionLogs.Add($"接続時のエラー ................... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
                     Exit For
                 End If
+                Me.TransactionLogs.Add($"接続が完了しました")
             Next
             Try
                 If Me.DspemuReturnCode = 0 Then
@@ -483,19 +484,25 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                             Me.TransactionLogs.Add($"主処理中のエラー ................. {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
                             Exit For
                         End If
+                        Me.TransactionLogs.Add($"主処理が完了しました")
                     Next
                 End If
             Catch ex2 As Exception
                 Me.TransactionLogs.Add($"主処理中の例外 ................... {ex2.HResult} {ex2.Message}")
             Finally
                 Try
+                    Dim err As Integer = 0
                     For Each todo In Me.CloseHandler
                         Call todo(dspemu)
                         If Me.DspemuReturnCode > 0 Then
                             Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
                             Me.TransactionLogs.Add($"終了処理中のエラー ............... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
+                            err += 1
                         End If
                     Next
+                    If err = 0 Then
+                        Me.TransactionLogs.Add($"終了処理が完了しました")
+                    End If
                 Catch ex3 As Exception
                     Me.TransactionLogs.Add($"終了処理中の例外 ................. {ex3.HResult} {ex3.Message}")
                 Finally
@@ -525,7 +532,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Me.MainHandler.Add(AddressOf Logon)
         Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
         Me.MainHandler.Add(AddressOf GetScreen)
-        Me.MainHandler.Add(AddressOf Complete)
+        'Me.MainHandler.Add(AddressOf Complete)
 
         Me.CloseHandler.Add(AddressOf Close)
 

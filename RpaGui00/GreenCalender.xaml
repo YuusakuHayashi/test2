@@ -21,12 +21,13 @@
                 <TextBlock Grid.Row="{Binding ColumnHeaders[6].Row}" Grid.Column="0" Text="{Binding ColumnHeaders[6].Name}" FontSize="9" TextAlignment="Right" />-->
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <!-- RowHeader -->
                 <ItemsControl Grid.Row="0" Grid.Column="1" ItemsSource="{Binding RowHeaders}" HorizontalAlignment="Left">
@@ -139,11 +140,11 @@
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Week}" FontSize="8"/>
+                            <TextBlock Text="{Binding Week}" FontSize="8" TextAlignment="Center" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-
                 </ItemsControl>
+                
                 <!-- Contents -->
                 <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Range}" HorizontalAlignment="Left">
                     <ItemsControl.ItemsPanel>
@@ -227,10 +228,25 @@
                             <DataTemplate.Resources>
                                 <local:DensityToGreenConverter x:Key="DensityToGreenConverter" />
                             </DataTemplate.Resources>
-                            <Border Margin="3" Background="{Binding Density, Converter={StaticResource DensityToGreenConverter}}" CornerRadius="2" ToolTip="{Binding Day}" />
+                            <Border Margin="3" Background="{Binding Density, Converter={StaticResource DensityToGreenConverter}}" CornerRadius="2">
+                                <Border.ToolTip>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Day" />
+                                            <TextBlock Margin="3,0,0,0" Text="{Binding Day}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Density" />
+                                            <TextBlock Margin="3,0,0,0" Text="{Binding Density}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border.ToolTip>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+
+                <ComboBox Grid.Row="1" Grid.Column="2" Margin="10" Width="50" Height="25" VerticalAlignment="Top" ItemsSource="{Binding Term}" />
             </Grid>
         </StackPanel>
     </Grid>
