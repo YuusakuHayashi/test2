@@ -477,49 +477,79 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Next
             Try
                 If Me.DspemuReturnCode = 0 Then
+                    Dim err As Boolean = False
                     For Each todo In Me.MainHandler
                         Call todo(dspemu)
                         If Me.DspemuReturnCode > 0 Then
                             Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
                             Me.TransactionLogs.Add($"主処理中のエラー ................. {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
+                            err = True
                             Exit For
                         End If
-                        Me.TransactionLogs.Add($"主処理が完了しました")
                     Next
+                    If Not err Then
+                        Me.TransactionLogs.Add($"主処理が完了しました")
+                    End If
                 End If
             Catch ex2 As Exception
                 Me.TransactionLogs.Add($"主処理中の例外 ................... {ex2.HResult} {ex2.Message}")
             Finally
-                Try
-                    Dim err As Integer = 0
-                    For Each todo In Me.CloseHandler
-                        Call todo(dspemu)
-                        If Me.DspemuReturnCode > 0 Then
-                            Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
-                            Me.TransactionLogs.Add($"終了処理中のエラー ............... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
-                            err += 1
-                        End If
-                    Next
-                    If err = 0 Then
-                        Me.TransactionLogs.Add($"終了処理が完了しました")
-                    End If
-                Catch ex3 As Exception
-                    Me.TransactionLogs.Add($"終了処理中の例外 ................. {ex3.HResult} {ex3.Message}")
-                Finally
-                End Try
+                'Try
+                '    Dim err As Boolean = False
+                '    For Each todo In Me.CloseHandler
+                '        Call todo(dspemu)
+                '        If Me.DspemuReturnCode > 0 Then
+                '            Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
+                '            Me.TransactionLogs.Add($"終了処理中のエラー ............... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
+                '            err = True
+                '        End If
+                '    Next
+                '    If Not err Then
+                '        Me.TransactionLogs.Add($"終了処理が完了しました")
+                '    End If
+                'Catch ex3 As Exception
+                '    Me.TransactionLogs.Add($"終了処理中の例外 ................. {ex3.HResult} {ex3.Message}")
+                'Finally
+                'End Try
             End Try
         Catch ex As Exception
             Me.TransactionLogs.Add($"接続時の例外 ..................... {ex.HResult} {ex.Message}")
         Finally
-            dspemu = Nothing
-            For Each todo In Me.OutputHandler
-                Call todo()
-            Next
+            Try
+                Dim err As Boolean = False
+                For Each todo In Me.CloseHandler
+                    Call todo(dspemu)
+                    If Me.DspemuReturnCode > 0 Then
+                        Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
+                        Me.TransactionLogs.Add($"終了処理中のエラー ............... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
+                        err = True
+                    End If
+                Next
+                If Not err Then
+                    Me.TransactionLogs.Add($"終了処理が完了しました")
+                End If
+            Catch ex3 As Exception
+                Me.TransactionLogs.Add($"終了処理中の例外 ................. {ex3.HResult} {ex3.Message}")
+            Finally
+                dspemu = Nothing
+                For Each todo In Me.OutputHandler
+                    Call todo()
+                Next
 
-            Me.OpenHandler = Nothing
-            Me.MainHandler = Nothing
-            Me.CloseHandler = Nothing
-            Me.OutputHandler = Nothing
+                Me.OpenHandler = Nothing
+                Me.MainHandler = Nothing
+                Me.CloseHandler = Nothing
+                Me.OutputHandler = Nothing
+            End Try
+            'dspemu = Nothing
+            'For Each todo In Me.OutputHandler
+            '    Call todo()
+            'Next
+
+            'Me.OpenHandler = Nothing
+            'Me.MainHandler = Nothing
+            'Me.CloseHandler = Nothing
+            'Me.OutputHandler = Nothing
         End Try
         Return 0
     End Function
