@@ -151,7 +151,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private ReadOnly Property LogFileName As String
         Get
             Dim yyyymmddhhmmss As String = Date.Now.ToString("yyyyMMddhhmmss")
-            Return $"{Me._OutputLogDirectoryName}\log_{yyyymmddhhmmss}.txt"
+            Return $"{Me._LogDirectoryName}\log_{yyyymmddhhmmss}.txt"
         End Get
     End Property
 
@@ -214,7 +214,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Class
 
     Private _DspemuPages As List(Of List(Of DspemuLine))
-    Public Property DspemuPages As List(Of List(Of DspemuLine))
+    Private Property DspemuPages As List(Of List(Of DspemuLine))
         Get
             If Me._DspemuPages Is Nothing Then
                 Me._DspemuPages = New List(Of List(Of DspemuLine))
@@ -277,13 +277,13 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private _OutputLogDirectoryName As String
-    Public Property OutputLogDirectoryName As String
+    Private _LogDirectoryName As String
+    Public Property LogDirectoryName As String
         Get
-            Return Me._OutputLogDirectoryName
+            Return Me._LogDirectoryName
         End Get
         Set(value As String)
-            Me._OutputLogDirectoryName = value
+            Me._LogDirectoryName = value
         End Set
     End Property
 
@@ -444,7 +444,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             dline.ColorStatus = DspemuLineColorStatus.RED
             Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** JOB <EXECUTING> [0-9][0-9]\.[0-9][0-9] *** -^") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ \*\*\* JOB <EXECUTING> [0-9][0-9]\.[0-9][0-9] \*\*\* -+") Then
             dline.LineType = DspemuLineType.EJ_TITLE
             dline.ColorStatus = DspemuLineColorStatus.NORMAL
             Exit Sub
@@ -454,7 +454,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             dline.ColorStatus = DspemuLineColorStatus.RED
             Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ [EHORD]\*[0-9]{3} [0-9]{2}*") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ [EHORD]\*[0-9]{3} [0-9]{2}") Then
             dline.LineType = DspemuLineType.EJ_JOB_HEADER
             dline.ColorStatus = DspemuLineColorStatus.NORMAL
             dline.JobStatus = Strings.Mid(dline.Text, 2, 1)
@@ -473,12 +473,12 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             dline.JobStatus = pline.JobStatus
             Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** CONTINUE *** -+") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ \*\*\* CONTINUE \*\*\* -+") Then
             dline.LineType = DspemuLineType.EJ_CONTINUE
             dline.ColorStatus = DspemuLineColorStatus.RED
             Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** END DISPLAY *** -+") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ \*\*\* END DISPLAY \*\*\* -+") Then
             dline.LineType = DspemuLineType.EJ_END_DISPLAY
             dline.ColorStatus = DspemuLineColorStatus.NORMAL
             Exit Sub
@@ -582,11 +582,13 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Me.OutputFileWriter.Dispose()
             Me.LogFileWriter.Close()
             Me.LogFileWriter.Dispose()
+            Me.OutputFileWriter = Nothing
+            Me.LogFileWriter = Nothing
         End Try
     End Sub
 
     Private Sub DisposeLogs()
-        Dim logs As List(Of String) = Directory.GetFiles(Me.OutputLogDirectoryName).ToList
+        Dim logs As List(Of String) = Directory.GetFiles(Me.LogDirectoryName).ToList
         logs.Sort(
             Function(before, after)
                 Return (before < after)
@@ -748,13 +750,13 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Console.WriteLine(err)
             b1 = False
         End If
-        If String.IsNullOrEmpty(Me.OutputLogDirectoryName) Then
-            Dim err As String = $"OutputLogDirectoryName '{Me.OutputLogDirectoryName}' が指定されていません"
+        If String.IsNullOrEmpty(Me.LogDirectoryName) Then
+            Dim err As String = $"LogDirectoryName '{Me.LogDirectoryName}' が指定されていません"
             Console.WriteLine(err)
             b1 = False
         End If
-        If Not Directory.Exists(Me.OutputLogDirectoryName) Then
-            Dim err As String = $"OutputLogDirectoryName '{Me.OutputLogDirectoryName}' は存在しません"
+        If Not Directory.Exists(Me.LogDirectoryName) Then
+            Dim err As String = $"LogDirectoryName '{Me.LogDirectoryName}' は存在しません"
             Console.WriteLine(err)
             b1 = False
         End If
