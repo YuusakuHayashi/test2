@@ -21,7 +21,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private Const GO_EXIT_SCREEN_TEXT = "--- *** END DISPLAY *** ---"
     Private Const GO_NEXT_SCREEN_TEXT = "--- *** CONTINUE *** ---"
 
-    Private Enum OutputModeNumber
+    Private Enum OutputType
         BOTH = 0
         CONSOLE = 1
         FILE = 2
@@ -86,6 +86,32 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
+    Private _OutputFileWriter As StreamWriter
+    Private Property OutputFileWriter As StreamWriter
+        Get
+            If Me._OutputFileWriter Is Nothing Then
+                Me._OutputFileWriter = New StreamWriter(Me.OutputFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
+            End If
+            Return Me._OutputFileWriter
+        End Get
+        Set(value As StreamWriter)
+            Me._OutputFileWriter = value
+        End Set
+    End Property
+
+    Private _LogFileWriter As StreamWriter
+    Private Property LogFileWriter As StreamWriter
+        Get
+            If Me._OutputFileWriter Is Nothing Then
+                Me._LogFileWriter = New StreamWriter(Me.LogFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
+            End If
+            Return Me._LogFileWriter
+        End Get
+        Set(value As StreamWriter)
+            Me._LogFileWriter = value
+        End Set
+    End Property
+
     Private _TransactionLogs As List(Of String)
     Private Property TransactionLogs As List(Of String)
         Get
@@ -122,7 +148,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Property
 
     ' ログファイル名
-    Private ReadOnly Property OutputLogFileName As String
+    Private ReadOnly Property LogFileName As String
         Get
             Dim yyyymmddhhmmss As String = Date.Now.ToString("yyyyMMddhhmmss")
             Return $"{Me._OutputLogDirectoryName}\log_{yyyymmddhhmmss}.txt"
@@ -283,19 +309,19 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
     '---------------------------------------------------------------------------------------------'
 
-    Private Delegate Sub DspemuLineCheckDelegater(ByRef dline As DspemuLine)
-    Private _DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
-    Private Property DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
-        Get
-            If Me._DspemuLineCheckHandler Is Nothing Then
-                Me._DspemuLineCheckHandler = New List(Of DspemuLineCheckDelegater)
-            End If
-            Return Me._DspemuLineCheckHandler
-        End Get
-        Set(value As List(Of DspemuLineCheckDelegater))
-            Me._DspemuLineCheckHandler = value
-        End Set
-    End Property
+    'Private Delegate Sub DspemuLineCheckDelegater(ByRef dline As DspemuLine)
+    'Private _DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
+    'Private Property DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
+    '    Get
+    '        If Me._DspemuLineCheckHandler Is Nothing Then
+    '            Me._DspemuLineCheckHandler = New List(Of DspemuLineCheckDelegater)
+    '        End If
+    '        Return Me._DspemuLineCheckHandler
+    '    End Get
+    '    Set(value As List(Of DspemuLineCheckDelegater))
+    '        Me._DspemuLineCheckHandler = value
+    '    End Set
+    'End Property
 
     Private Delegate Sub DspemuAutomationDelegater(ByRef dspemu As Object)
 
@@ -387,9 +413,9 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
                 If dline.LineType = DspemuLineType.EJ_END_DISPLAY Then
                     repage = False
-                End If
-                If dline.LineType = DspemuLineType.EJ_CONTINUE Then
+                ElseIf dline.LineType = DspemuLineType.EJ_CONTINUE Then
                     repage = True
+                Else
                 End If
 
                 row += 1
@@ -527,59 +553,35 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
+    Private Sub WriteDspemuLine(ByVal txt As String)
+        If Me.OutputMode = OutputType.BOTH Or Me.OutputMode = OutputType.FILE Then
+            Me.OutputFileWriter.WriteLine(txt)
+            Me.LogFileWriter.WriteLine(txt)
+        ElseIf Me.OutputMode = OutputType.CONSOLE Then
+            Console.WriteLine(txt)
+        End If
+    End Sub
+
     Private Sub PrintScreen()
-        Dim sw1 As StreamWriter
-        Dim sw2 As StreamWriter
         Try
-            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
-                sw1 = New StreamWriter(Me.OutputFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
-                sw2 = New StreamWriter(Me.OutputLogFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
-            End If
-            For Each Data In Me.ScreenDatas
-                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
-                    sw1.WriteLine(Data)
-                    sw1.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
-                    sw1.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
-
-                    sw2.WriteLine(Data)
-                    sw2.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
-                    sw2.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
-                End If
-
-                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.CONSOLE Then
-                    Console.WriteLine(Data)
-                    Console.WriteLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
-                    Console.WriteLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
-                End If
+            For Each page In Me.DspemuPages
+                For Each line In page
+                    Call WriteDspemuLine(line.Text)
+                Next
+                Call WriteDspemuLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
+                Call WriteDspemuLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
             Next
 
-            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
-                sw1.WriteLine(Me.LogSeparater)
-                sw2.WriteLine(Me.LogSeparater)
-            End If
-            If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.CONSOLE Then
-                Console.WriteLine(Me.LogSeparater)
-            End If
-
+            Call WriteDspemuLine(Me.LogSeparater)
             For Each log In Me.TransactionLogs
-                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.FILE Then
-                    sw1.WriteLine(log)
-                    sw2.WriteLine(log)
-                End If
-                If Me.OutputMode = OutputModeNumber.BOTH Or Me.OutputMode = OutputModeNumber.CONSOLE Then
-                    Console.WriteLine(log)
-                End If
+                Call WriteDspemuLine(log)
             Next
         Catch ex As Exception
         Finally
-            If sw1 IsNot Nothing Then
-                sw1.Close()
-                sw1.Dispose()
-            End If
-            If sw2 IsNot Nothing Then
-                sw2.Close()
-                sw2.Dispose()
-            End If
+            Me.OutputFileWriter.Close()
+            Me.OutputFileWriter.Dispose()
+            Me.LogFileWriter.Close()
+            Me.LogFileWriter.Dispose()
         End Try
     End Sub
 
@@ -608,7 +610,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Me.MainHandler.Add(AddressOf Logon)
         Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
         Me.MainHandler.Add(AddressOf GetScreen)
-        'Me.MainHandler.Add(AddressOf Complete)
 
         Me.CloseHandler.Add(AddressOf Close)
 
@@ -649,23 +650,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Catch ex2 As Exception
                 Me.TransactionLogs.Add($"主処理中の例外 ................... {ex2.HResult} {ex2.Message}")
             Finally
-                'Try
-                '    Dim err As Boolean = False
-                '    For Each todo In Me.CloseHandler
-                '        Call todo(dspemu)
-                '        If Me.DspemuReturnCode > 0 Then
-                '            Dim i As Integer = dspemu.ErrorToMsg(Me.DspemuReturnCode)
-                '            Me.TransactionLogs.Add($"終了処理中のエラー ............... {Me.DspemuReturnCode} {dspemu.ErrorMsg}")
-                '            err = True
-                '        End If
-                '    Next
-                '    If Not err Then
-                '        Me.TransactionLogs.Add($"終了処理が完了しました")
-                '    End If
-                'Catch ex3 As Exception
-                '    Me.TransactionLogs.Add($"終了処理中の例外 ................. {ex3.HResult} {ex3.Message}")
-                'Finally
-                'End Try
             End Try
         Catch ex As Exception
             Me.TransactionLogs.Add($"接続時の例外 ..................... {ex.HResult} {ex.Message}")
@@ -696,15 +680,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
                 Me.CloseHandler = Nothing
                 Me.OutputHandler = Nothing
             End Try
-            'dspemu = Nothing
-            'For Each todo In Me.OutputHandler
-            '    Call todo()
-            'Next
-
-            'Me.OpenHandler = Nothing
-            'Me.MainHandler = Nothing
-            'Me.CloseHandler = Nothing
-            'Me.OutputHandler = Nothing
         End Try
         Return 0
     End Function
@@ -717,7 +692,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Me.MainHandler.Add(AddressOf Logon)
         Me.MainHandler.Add(AddressOf GoExecutingJobMenu)
         Me.MainHandler.Add(AddressOf GetScreen)
-        'Me.MainHandler.Add(AddressOf Complete)
 
         Me.CloseHandler.Add(AddressOf Close)
 
