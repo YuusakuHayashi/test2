@@ -68,3 +68,6 @@ C:\Users\yuusa\project\test2\RpaGui00\obj\Debug\GreenCalender.baml
 C:\Users\yuusa\project\test2\RpaGui00\obj\Debug\resources\RpaSystem.baml
 C:\Users\yuusa\project\test2\RpaGui00\obj\Debug\ExplorerTabs\ExplorerTabs.g.vb
 C:\Users\yuusa\project\test2\RpaGui00\obj\Debug\ExplorerTabs\ExplorerTabs.baml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Debug\ExplorerTabs\ExplorerTabs.g.vb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Debug\ExplorerTabs\ExplorerTabs.baml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Debug\resources\RpaSystem.baml

@@ -121,6 +121,86 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Get
     End Property
 
+    ' ログファイル名
+    Private ReadOnly Property OutputLogFileName As String
+        Get
+            Dim yyyymmddhhmmss As String = Date.Now.ToString("yyyyMMddhhmmss")
+            Return $"{Me._OutputLogDirectoryName}\log_{yyyymmddhhmmss}.txt"
+        End Get
+    End Property
+
+    Private Enum DspemuLineType
+        EJ_TITLE = 1
+        EJ_WAITING_OUTPUT = 2
+        EJ_JOB_HEADER = 3
+        EJ_JOB_ROW2 = 4
+        EJ_RTOW = 5
+        EJ_END_DISPLAY = 10
+        EJ_CONTINUE = 11
+        EJ_OPERATOR_CALL = 99
+    End Enum
+
+    Private Enum DspemuLineColorStatus
+        NORMAL = 0
+        RED = 1
+    End Enum
+
+    Public Class DspemuLine
+        Private _LineType As Integer
+        Public Property LineType As Integer
+            Get
+                Return Me._LineType
+            End Get
+            Set(value As Integer)
+                Me._LineType = value
+            End Set
+        End Property
+
+        Private _Text As String
+        Public Property Text As String
+            Get
+                Return Me._Text
+            End Get
+            Set(value As String)
+                Me._Text = value
+            End Set
+        End Property
+
+        Private _ColorStatus As Integer
+        Public Property ColorStatus As Integer
+            Get
+                Return Me._ColorStatus
+            End Get
+            Set(value As Integer)
+                Me._ColorStatus = value
+            End Set
+        End Property
+
+        Private _JobStatus As String
+        Public Property JobStatus As String
+            Get
+                Return Me._JobStatus
+            End Get
+            Set(value As String)
+                Me._JobStatus = value
+            End Set
+        End Property
+    End Class
+
+    Private _DspemuPages As List(Of List(Of DspemuLine))
+    Public Property DspemuPages As List(Of List(Of DspemuLine))
+        Get
+            If Me._DspemuPages Is Nothing Then
+                Me._DspemuPages = New List(Of List(Of DspemuLine))
+            End If
+            Return Me._DspemuPages
+        End Get
+        Set(value As List(Of List(Of DspemuLine)))
+            Me._DspemuPages = value
+        End Set
+    End Property
+
+    ' Public 設定 --------------------------------------------------------------------------------'
     Private _UserName As String
     Public Property UserName As String
         Get
@@ -181,13 +261,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private ReadOnly Property OutputLogFileName As String
-        Get
-            Dim yyyymmddhhmmss As String = Date.Now.ToString("yyyyMMddhhmmss")
-            Return $"{Me._OutputLogDirectoryName}\log_{yyyymmddhhmmss}.txt"
-        End Get
-    End Property
-
     Private _DspemuWaitTime As Int32
     Public Property DspemuWaitTime As Int32
         Get
@@ -205,6 +278,22 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Get
         Set(value As Int32)
             Me._DspemuOpenMode = value
+        End Set
+    End Property
+
+    '---------------------------------------------------------------------------------------------'
+
+    Private Delegate Sub DspemuLineCheckDelegater(ByRef dline As DspemuLine)
+    Private _DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
+    Private Property DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
+        Get
+            If Me._DspemuLineCheckHandler Is Nothing Then
+                Me._DspemuLineCheckHandler = New List(Of DspemuLineCheckDelegater)
+            End If
+            Return Me._DspemuLineCheckHandler
+        End Get
+        Set(value As List(Of DspemuLineCheckDelegater))
+            Me._DspemuLineCheckHandler = value
         End Set
     End Property
 
@@ -278,21 +367,40 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Sub
 
     Private Sub GetScreen(ByRef dspemu As Object)
+        Dim maxrow As Int32 = dspemu.DspemuRow
+        Dim maxcol As Int32 = dspemu.DspemuColumn
         Do
             dspemu.WaitStatus(CX_STAT_INPERR, InpStatus.CX_INPCOM_UNLOCK, 1)
             dspemu.CopyMode = 0
-            Me.DspemuReturnCode = dspemu.GetScreen()
-            If Me.DspemuReturnCode > 0 Then
-                Exit Sub
-            End If
+            Dim row As Integer = 1
+            Dim page As New List(Of DspemuLine)
+            Dim repage As Boolean = False
+            Do
+                Me.DspemuReturnCode = dspemu.GetScreen(row, 1, row, maxcol)
+                If Me.DspemuReturnCode > 0 Then
+                    Exit Sub
+                End If
 
-            Dim txt As String = dspemu.ScreenData
-            Me.ScreenDatas.Add(txt)
+                Dim dline As New DspemuLine With {.Text = dspemu.ScreenData}
+                Call CheckDspemuLine(dline)
+                page.Add(dline)
 
-            If txt.Contains(GO_EXIT_SCREEN_TEXT) Then
-                Exit Do
-            End If
-            If txt.Contains(GO_NEXT_SCREEN_TEXT) Then
+                If dline.LineType = DspemuLineType.EJ_END_DISPLAY Then
+                    repage = False
+                End If
+                If dline.LineType = DspemuLineType.EJ_CONTINUE Then
+                    repage = True
+                End If
+
+                row += 1
+                If row > maxrow Then
+                    Exit Do
+                End If
+            Loop Until False
+
+            Me.DspemuPages.Add(page)
+
+            If repage Then
                 Me.DspemuReturnCode = dspemu.SendKeys(PF12_KEY)
                 If Me.DspemuReturnCode > 0 Then
                     Exit Sub
@@ -302,6 +410,53 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             End If
             Exit Do
         Loop Until False
+    End Sub
+
+    Private Sub CheckDspemuLine(ByRef dline As DspemuLine)
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "OPERATOR CALL $") Then
+            dline.LineType = DspemuLineType.EJ_OPERATOR_CALL
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            Exit Sub
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** JOB <EXECUTING> [0-9][0-9]\.[0-9][0-9] *** -^") Then
+            dline.LineType = DspemuLineType.EJ_TITLE
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            Exit Sub
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ CLASS     ([A-Z],)*([A-Z])* WAITING OUTPUT") Then
+            dline.LineType = DspemuLineType.EJ_WAITING_OUTPUT
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            Exit Sub
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ [EHORD]\*[0-9]{3} [0-9]{2}*") Then
+            dline.LineType = DspemuLineType.EJ_JOB_HEADER
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            dline.JobStatus = Strings.Mid(dline.Text, 2, 1)
+            Exit Sub
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^            T=[0-9][0-9]\.[0-9][0-9],RSIZE=\(") Then
+            dline.LineType = DspemuLineType.EJ_JOB_ROW2
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            dline.JobStatus = Me.DspemuPages.Last.Last.JobStatus
+            Exit Sub
+        End If
+        Dim pline As DspemuLine = Me.DspemuPages.Last.Last
+        If pline.LineType = DspemuLineType.EJ_JOB_ROW2 And pline.JobStatus = "O" Then
+            dline.LineType = DspemuLineType.EJ_RTOW
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            dline.JobStatus = pline.JobStatus
+            Exit Sub
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** CONTINUE *** -+") Then
+            dline.LineType = DspemuLineType.EJ_CONTINUE
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            Exit Sub
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** END DISPLAY *** -+") Then
+            dline.LineType = DspemuLineType.EJ_END_DISPLAY
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            Exit Sub
+        End If
     End Sub
 
     Private Sub LogOff(ByRef dspemu As Object)
