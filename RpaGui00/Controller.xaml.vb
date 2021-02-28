@@ -44,8 +44,8 @@ Public Class Controller
         ' InitializeComponent() 呼び出しの後で初期化を追加します。        
         Dim vm As ControllerViewModel
         ' デバッグする場合
-        Controller.SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
-        'Controller.SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
+        'Controller.SystemDllDirectory = $"\\Coral\個人情報-林祐\project\wpf\test2\RpaCui\debugrobot"
+        Controller.SystemDllDirectory = $"C:\Users\yuusa\project\test2\RpaCui\debugrobot"
 
         '-----------------------------------------------------------------------------------------'
         ' !!! RpaCuiと同じロジック。同期して変更する必要あり？

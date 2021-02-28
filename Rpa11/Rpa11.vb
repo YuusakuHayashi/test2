@@ -135,6 +135,16 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Get
     End Property
 
+    Private _PageDatas As List(Of String)
+    Private ReadOnly Property PageDatas As List(Of String)
+        Get
+            If Me._PageDatas Is Nothing Then
+                Me._PageDatas = New List(Of String)
+            End If
+            Return Me._PageDatas
+        End Get
+    End Property
+
     Private ReadOnly Property PageSeparater(ByVal page As Integer) As String
         Get
             Return $"                                                                        PAGE. {page}"
@@ -213,16 +223,16 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Property
     End Class
 
-    Private _DspemuPages As List(Of List(Of DspemuLine))
-    Public Property DspemuPages As List(Of List(Of DspemuLine))
+    Private _DspemuPage As List(Of DspemuLine)
+    Public Property DspemuPage As List(Of DspemuLine)
         Get
-            If Me._DspemuPages Is Nothing Then
-                Me._DspemuPages = New List(Of List(Of DspemuLine))
+            If Me._DspemuPage Is Nothing Then
+                Me._DspemuPage = New List(Of DspemuLine)
             End If
-            Return Me._DspemuPages
+            Return Me._DspemuPage
         End Get
-        Set(value As List(Of List(Of DspemuLine)))
-            Me._DspemuPages = value
+        Set(value As List(Of DspemuLine))
+            Me._DspemuPage = value
         End Set
     End Property
 
@@ -393,96 +403,24 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Sub
 
     Private Sub GetScreen(ByRef dspemu As Object)
-        Dim maxrow As Int32 = dspemu.DspemuRow
-        Dim maxcol As Int32 = dspemu.DspemuColumn
         Do
             dspemu.WaitStatus(CX_STAT_INPERR, InpStatus.CX_INPCOM_UNLOCK, 1)
             dspemu.CopyMode = 0
-            Dim row As Integer = 1
-            Dim page As New List(Of DspemuLine)
-            Dim repage As Boolean = False
-            Do
-                Me.DspemuReturnCode = dspemu.GetScreen(row, 1, row, maxcol)
-                If Me.DspemuReturnCode > 0 Then
-                    Exit Sub
-                End If
-
-                Dim dline As New DspemuLine With {.Text = dspemu.ScreenData}
-                Call CheckDspemuLine(dline)
-                page.Add(dline)
-
-                If dline.LineType = DspemuLineType.EJ_END_DISPLAY Then
-                    repage = False
-                ElseIf dline.LineType = DspemuLineType.EJ_CONTINUE Then
-                    repage = True
-                Else
-                End If
-
-                row += 1
-                If row > maxrow Then
-                    Exit Do
-                End If
-            Loop Until False
-
-            Me.DspemuPages.Add(page)
-
-            If repage Then
+            Me.DspemuReturnCode = dspemu.GetScreen()
+            If Me.DspemuReturnCode > 0 Then
+                Exit Sub
+            End If
+            Dim txt As String = dspemu.ScreenData
+            Me.ScreenDatas.Add(txt)
+            If txt.Contains(GO_EXIT_SCREEN_TEXT) Or txt.Contains(GO_NEXT_SCREEN_TEXT) Then
                 Me.DspemuReturnCode = dspemu.SendKeys(PF12_KEY)
-                If Me.DspemuReturnCode > 0 Then
-                    Exit Sub
+                If Me.DspemuReturnCode = 0 Then
+                    dspemu.Wait(1)
+                    Continue Do
                 End If
-                dspemu.Wait(1)
-                Continue Do
             End If
             Exit Do
         Loop Until False
-    End Sub
-
-    Private Sub CheckDspemuLine(ByRef dline As DspemuLine)
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "OPERATOR CALL $") Then
-            dline.LineType = DspemuLineType.EJ_OPERATOR_CALL
-            dline.ColorStatus = DspemuLineColorStatus.RED
-            Exit Sub
-        End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** JOB <EXECUTING> [0-9][0-9]\.[0-9][0-9] *** -^") Then
-            dline.LineType = DspemuLineType.EJ_TITLE
-            dline.ColorStatus = DspemuLineColorStatus.NORMAL
-            Exit Sub
-        End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ CLASS     ([A-Z],)*([A-Z])* WAITING OUTPUT") Then
-            dline.LineType = DspemuLineType.EJ_WAITING_OUTPUT
-            dline.ColorStatus = DspemuLineColorStatus.RED
-            Exit Sub
-        End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ [EHORD]\*[0-9]{3} [0-9]{2}*") Then
-            dline.LineType = DspemuLineType.EJ_JOB_HEADER
-            dline.ColorStatus = DspemuLineColorStatus.NORMAL
-            dline.JobStatus = Strings.Mid(dline.Text, 2, 1)
-            Exit Sub
-        End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^            T=[0-9][0-9]\.[0-9][0-9],RSIZE=\(") Then
-            dline.LineType = DspemuLineType.EJ_JOB_ROW2
-            dline.ColorStatus = DspemuLineColorStatus.NORMAL
-            dline.JobStatus = Me.DspemuPages.Last.Last.JobStatus
-            Exit Sub
-        End If
-        Dim pline As DspemuLine = Me.DspemuPages.Last.Last
-        If pline.LineType = DspemuLineType.EJ_JOB_ROW2 And pline.JobStatus = "O" Then
-            dline.LineType = DspemuLineType.EJ_RTOW
-            dline.ColorStatus = DspemuLineColorStatus.RED
-            dline.JobStatus = pline.JobStatus
-            Exit Sub
-        End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** CONTINUE *** -+") Then
-            dline.LineType = DspemuLineType.EJ_CONTINUE
-            dline.ColorStatus = DspemuLineColorStatus.RED
-            Exit Sub
-        End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** END DISPLAY *** -+") Then
-            dline.LineType = DspemuLineType.EJ_END_DISPLAY
-            dline.ColorStatus = DspemuLineColorStatus.NORMAL
-            Exit Sub
-        End If
     End Sub
 
     Private Sub LogOff(ByRef dspemu As Object)
@@ -562,15 +500,84 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End If
     End Sub
 
+    Private Sub ConvertScreenDatasToPageDatas()
+        For Each screen In Me.ScreenDatas
+            Dim page As String = vbNullString
+            Dim lines As String() = screen.Split(vbCrLf)
+            For Each line In lines
+                Dim dline As DspemuLine = CreateDspemuLine(line)
+                Dim pline As String = CreatePageLine(dline)
+                page &= $"{pline}{vbCrLf}"
+                Me.DspemuPage.Add(dline)
+            Next
+            Me.PageDatas.Add(page)
+            Me.DspemuPage = Nothing
+        Next
+    End Sub
+
+    Private Function CreateDspemuLine(ByVal line As String) As DspemuLine
+        Dim dline As New DspemuLine With {.Text = line}
+
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "OPERATOR CALL $") Then
+            dline.LineType = DspemuLineType.EJ_OPERATOR_CALL
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            Return dline
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** JOB <EXECUTING> [0-9][0-9]\.[0-9][0-9] *** -^") Then
+            dline.LineType = DspemuLineType.EJ_TITLE
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            Return dline
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ CLASS     ([A-Z],)*([A-Z])* WAITING OUTPUT") Then
+            dline.LineType = DspemuLineType.EJ_WAITING_OUTPUT
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            Return dline
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ [EHORD]\*[0-9]{3} [0-9]{2}*") Then
+            dline.LineType = DspemuLineType.EJ_JOB_HEADER
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            dline.JobStatus = Strings.Mid(dline.Text, 2, 1)
+            Return dline
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^            T=[0-9][0-9]\.[0-9][0-9],RSIZE=\(") Then
+            dline.LineType = DspemuLineType.EJ_JOB_ROW2
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            dline.JobStatus = Me.DspemuPage.Last.JobStatus
+            Return dline
+        End If
+        Dim pline As DspemuLine = Me.DspemuPage.Last
+        If pline.LineType = DspemuLineType.EJ_JOB_ROW2 And pline.JobStatus = "O" Then
+            dline.LineType = DspemuLineType.EJ_RTOW
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            dline.JobStatus = pline.JobStatus
+            Return dline
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** CONTINUE *** -+") Then
+            dline.LineType = DspemuLineType.EJ_CONTINUE
+            dline.ColorStatus = DspemuLineColorStatus.RED
+            Return dline
+        End If
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** END DISPLAY *** -+") Then
+            dline.LineType = DspemuLineType.EJ_END_DISPLAY
+            dline.ColorStatus = DspemuLineColorStatus.NORMAL
+            Return dline
+        End If
+
+        Return dline
+    End Function
+
+    Private Function CreatePageLine(ByVal dline As DspemuLine) As String
+    End Function
+
     Private Sub PrintScreen()
         Try
-            For Each page In Me.DspemuPages
-                For Each line In page
-                    Call WriteDspemuLine(line.Text)
-                Next
-                Call WriteDspemuLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
-                Call WriteDspemuLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
-            Next
+            'For Each page In Me.DspemuPage
+            '    For Each line In page
+            '        Call WriteDspemuLine(line.Text)
+            '    Next
+            '    Call WriteDspemuLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
+            '    Call WriteDspemuLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
+            'Next
 
             Call WriteDspemuLine(Me.LogSeparater)
             For Each log In Me.TransactionLogs
@@ -580,8 +587,10 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Finally
             Me.OutputFileWriter.Close()
             Me.OutputFileWriter.Dispose()
+            Me.OutputFileWriter = Nothing
             Me.LogFileWriter.Close()
             Me.LogFileWriter.Dispose()
+            Me.LogFileWriter = Nothing
         End Try
     End Sub
 

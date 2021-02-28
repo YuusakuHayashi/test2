@@ -365,8 +365,10 @@ Public Class GreenCalenderViewModel : Inherits RpaViewModelBase(Of GreenCalender
     Private Sub SetupGreenCalender()
         Dim all As Action
         If Me.IsInitialized Then
-            Dim act1 As Action = AddressOf SwitchTerm
-            all = [Delegate].Combine(act1)
+            Dim act1 As Action = AddressOf SynchronizeYearRange
+            Dim act2 As Action = AddressOf SynchronizeOtherRanges
+            Dim act3 As Action = AddressOf SwitchTerm
+            all = [Delegate].Combine(act1, act2, act3)
         Else
             Dim act1 As Action = AddressOf InitializeYearRange
             Dim act2 As Action = AddressOf GoYearRangeFoward
@@ -387,6 +389,7 @@ Public Class GreenCalenderViewModel : Inherits RpaViewModelBase(Of GreenCalender
         Call all()
     End Sub
 
+    ' 初回のみ実行
     Private Sub InitializeYearRange()
         If Me.YearRange.Count > 0 Then
             Dim latest As Date = Me.YearRange.Last.Day
@@ -404,6 +407,7 @@ Public Class GreenCalenderViewModel : Inherits RpaViewModelBase(Of GreenCalender
         Next
     End Sub
 
+    ' 初回のみ実行
     Private Sub GoYearRangeFoward()
         Dim latest As Date = Me.YearRange.Last.Day
         Dim term As Integer = (DateTime.Today - latest).TotalDays
@@ -476,6 +480,8 @@ Public Class GreenCalenderViewModel : Inherits RpaViewModelBase(Of GreenCalender
     End Sub
 
     Private Sub SetYearRowHeader()
+        Me.YearRowHeaders = Nothing
+
         Dim term As Integer = -1
         Dim premon As Integer = 0
         Dim col As Integer = 0
@@ -606,10 +612,54 @@ Public Class GreenCalenderViewModel : Inherits RpaViewModelBase(Of GreenCalender
         })
     End Sub
 
+
     Private Sub SetQuaterColumnHeader()
     End Sub
 
-    Public Sub SwitchTerm()
+    Private Sub SynchronizeYearRange()
+        Dim yidx As Integer = -1 : Dim ymax As Integer = Me.YearRange.Count - 1
+        For Each cell In Me.Range
+            Do
+                yidx += 1
+                If yidx <= ymax Then
+                    If Me.YearRange(yidx).Day = cell.Day Then
+                        Me.YearRange(yidx).Density = cell.Density
+                        Exit Do
+                    End If
+                Else
+                    Exit Do
+                End If
+            Loop Until False
+        Next
+    End Sub
+
+    Private Sub SynchronizeOtherRanges()
+        Dim qidx As Integer = 0 : Dim qmax As Integer = Me.QuaterRange.Count - 1
+        Dim midx As Integer = 0 : Dim mmax As Integer = Me.MonthRange.Count - 1
+        Dim widx As Integer = 0 : Dim wmax As Integer = Me.WeekRange.Count - 1
+        For Each cell In Me.YearRange
+            If qidx <= qmax Then
+                If cell.Day = Me.QuaterRange(qidx).Day Then
+                    Me.QuaterRange(qidx).Density = cell.Density
+                End If
+                qidx += 1
+            End If
+            If midx <= mmax Then
+                If cell.Day = Me.QuaterRange(midx).Day Then
+                    Me.QuaterRange(midx).Density = cell.Density
+                End If
+                midx += 1
+            End If
+            If widx <= wmax Then
+                If cell.Day = Me.QuaterRange(widx).Day Then
+                    Me.QuaterRange(widx).Density = cell.Density
+                End If
+                widx += 1
+            End If
+        Next
+    End Sub
+
+    Private Sub SwitchTerm()
         Dim rowhead As ObservableCollection(Of RowHeaderData)
         Dim colhead As ObservableCollection(Of ColumnHeaderData)
         Dim cellrange As ObservableCollection(Of CellData)
