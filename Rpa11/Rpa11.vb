@@ -161,7 +161,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private ReadOnly Property LogFileName As String
         Get
             Dim yyyymmddhhmmss As String = Date.Now.ToString("yyyyMMddhhmmss")
-            Return $"{Me._OutputLogDirectoryName}\log_{yyyymmddhhmmss}.txt"
+            Return $"{Me._LogDirectoryName}\log_{yyyymmddhhmmss}.txt"
         End Get
     End Property
 
@@ -287,13 +287,13 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private _OutputLogDirectoryName As String
-    Public Property OutputLogDirectoryName As String
+    Private _LogDirectoryName As String
+    Public Property LogDirectoryName As String
         Get
-            Return Me._OutputLogDirectoryName
+            Return Me._LogDirectoryName
         End Get
         Set(value As String)
-            Me._OutputLogDirectoryName = value
+            Me._LogDirectoryName = value
         End Set
     End Property
 
@@ -595,7 +595,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Sub
 
     Private Sub DisposeLogs()
-        Dim logs As List(Of String) = Directory.GetFiles(Me.OutputLogDirectoryName).ToList
+        Dim logs As List(Of String) = Directory.GetFiles(Me.LogDirectoryName).ToList
         logs.Sort(
             Function(before, after)
                 Return (before < after)
@@ -757,13 +757,13 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Console.WriteLine(err)
             b1 = False
         End If
-        If String.IsNullOrEmpty(Me.OutputLogDirectoryName) Then
-            Dim err As String = $"OutputLogDirectoryName '{Me.OutputLogDirectoryName}' が指定されていません"
+        If String.IsNullOrEmpty(Me.LogDirectoryName) Then
+            Dim err As String = $"LogDirectoryName '{Me.LogDirectoryName}' が指定されていません"
             Console.WriteLine(err)
             b1 = False
         End If
-        If Not Directory.Exists(Me.OutputLogDirectoryName) Then
-            Dim err As String = $"OutputLogDirectoryName '{Me.OutputLogDirectoryName}' は存在しません"
+        If Not Directory.Exists(Me.LogDirectoryName) Then
+            Dim err As String = $"LogDirectoryName '{Me.LogDirectoryName}' は存在しません"
             Console.WriteLine(err)
             b1 = False
         End If
