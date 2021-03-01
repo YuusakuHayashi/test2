@@ -27,6 +27,11 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         FILE = 2
     End Enum
 
+    Private Enum Layout
+        TEXT = 0
+        HTML = 1
+    End Enum
+
     Private Enum SystemConnection
         CX_SYS_NOTREADY = 0
         CX_SYS_READY = 1
@@ -102,7 +107,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private _LogFileWriter As StreamWriter
     Private Property LogFileWriter As StreamWriter
         Get
-            If Me._OutputFileWriter Is Nothing Then
+            If Me._LogFileWriter Is Nothing Then
                 Me._LogFileWriter = New StreamWriter(Me.LogFileName, False, Text.Encoding.GetEncoding("Shift-JIS"))
             End If
             Return Me._LogFileWriter
@@ -161,7 +166,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private ReadOnly Property LogFileName As String
         Get
             Dim yyyymmddhhmmss As String = Date.Now.ToString("yyyyMMddhhmmss")
-            Return $"{Me._LogDirectoryName}\log_{yyyymmddhhmmss}.txt"
+            Return $"{Me.LogDirectoryName}\log_{yyyymmddhhmmss}.txt"
         End Get
     End Property
 
@@ -179,6 +184,17 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     Private Enum DspemuLineColorStatus
         NORMAL = 0
         RED = 1
+    End Enum
+
+    Private Enum DspemuColor
+        CX_COLOR_OMIT = 0
+        CX_COLOR_BLUE = 1
+        CX_COLOR_RED = 2
+        CX_COLOR_PINK = 3
+        CX_COLOR_GREEN = 4
+        CX_COLOR_SBLUE = 5
+        CX_COLOR_YELLOW = 6
+        CX_COLOR_WHITE = 7
     End Enum
 
     Public Class DspemuLine
@@ -224,7 +240,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Class
 
     Private _DspemuPage As List(Of DspemuLine)
-    Public Property DspemuPage As List(Of DspemuLine)
+    Private Property DspemuPage As List(Of DspemuLine)
         Get
             If Me._DspemuPage Is Nothing Then
                 Me._DspemuPage = New List(Of DspemuLine)
@@ -233,6 +249,26 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Get
         Set(value As List(Of DspemuLine))
             Me._DspemuPage = value
+        End Set
+    End Property
+
+    Private _CurrentHtmlColor As Int32
+    Private Property CurrentHtmlColor As Int32
+        Get
+            Return Me._CurrentHtmlColor
+        End Get
+        Set(value As Int32)
+            Me._CurrentHtmlColor = value
+        End Set
+    End Property
+
+    Private _CurrentHtmlBackground As Int32
+    Private Property CurrentHtmlBackground As Int32
+        Get
+            Return Me._CurrentHtmlBackground
+        End Get
+        Set(value As Int32)
+            Me._CurrentHtmlBackground = value
         End Set
     End Property
 
@@ -317,6 +353,48 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
+    Private _MaxPage As Int32
+    Public Property MaxPage As Int32
+        Get
+            If Me._MaxPage = 0 Then
+                Me._MaxPage = 10
+            End If
+            Return Me._MaxPage
+        End Get
+        Set(value As Int32)
+            Me._MaxPage = value
+        End Set
+    End Property
+
+    Private _OutputLayout As Int32
+    Public Property OutputLayout As Int32
+        Get
+            Return Me._OutputLayout
+        End Get
+        Set(value As Int32)
+            Me._OutputLayout = value
+        End Set
+    End Property
+
+    Private _HtmlColor As Int32
+    Public Property HtmlColor As Int32
+        Get
+            Return Me._HtmlColor
+        End Get
+        Set(value As Int32)
+            Me._HtmlColor = value
+        End Set
+    End Property
+
+    Private _HtmlBackground As Int32
+    Public Property HtmlBackground As Int32
+        Get
+            Return Me._HtmlBackground
+        End Get
+        Set(value As Int32)
+            Me._HtmlBackground = value
+        End Set
+    End Property
     '---------------------------------------------------------------------------------------------'
 
     'Private Delegate Sub DspemuLineCheckDelegater(ByRef dline As DspemuLine)
@@ -403,6 +481,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     End Sub
 
     Private Sub GetScreen(ByRef dspemu As Object)
+        Dim max As Integer = 1
         Do
             dspemu.WaitStatus(CX_STAT_INPERR, InpStatus.CX_INPCOM_UNLOCK, 1)
             dspemu.CopyMode = 0
@@ -412,11 +491,14 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             End If
             Dim txt As String = dspemu.ScreenData
             Me.ScreenDatas.Add(txt)
-            If txt.Contains(GO_EXIT_SCREEN_TEXT) Or txt.Contains(GO_NEXT_SCREEN_TEXT) Then
-                Me.DspemuReturnCode = dspemu.SendKeys(PF12_KEY)
-                If Me.DspemuReturnCode = 0 Then
-                    dspemu.Wait(1)
-                    Continue Do
+            If Me.MaxPage >= max Then
+                If txt.Contains(GO_NEXT_SCREEN_TEXT) Then
+                    Me.DspemuReturnCode = dspemu.SendKeys(PF12_KEY)
+                    If Me.DspemuReturnCode = 0 Then
+                        dspemu.Wait(1)
+                        max += 1
+                        Continue Do
+                    End If
                 End If
             End If
             Exit Do
@@ -491,97 +573,205 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private Sub WriteDspemuLine(ByVal txt As String)
-        If Me.OutputMode = OutputType.BOTH Or Me.OutputMode = OutputType.FILE Then
-            Me.OutputFileWriter.WriteLine(txt)
-            Me.LogFileWriter.WriteLine(txt)
-        ElseIf Me.OutputMode = OutputType.CONSOLE Then
-            Console.WriteLine(txt)
-        End If
-    End Sub
-
+    '---------------------------------------------------------------------------------------------'
     Private Sub ConvertScreenDatasToPageDatas()
+        Me.HtmlBodyHandler = Nothing
+        Me.HtmlBodyHandler.Add(AddressOf WrapPre)
+        Me.HtmlBodyHandler.Add(AddressOf AddPageP)
+        Me.HtmlBodyHandler.Add(AddressOf WrapDiv)
+        Me.HtmlBodyHandler.Add(AddressOf AddHr)
+
+        Me.HtmlLineHandler = Nothing
+        Me.HtmlLineHandler.Add(AddressOf CreateDspemuLine)
+        Me.HtmlLineHandler.Add(AddressOf WrapSpan)
+
         For Each screen In Me.ScreenDatas
             Dim page As String = vbNullString
             Dim lines As String() = screen.Split(vbCrLf)
             For Each line In lines
-                Dim dline As DspemuLine = CreateDspemuLine(line)
-                Dim pline As String = CreatePageLine(dline)
+                Dim pline As String = vbNullString
+                If Me.OutputLayout = Layout.HTML Then
+                    Dim dline As DspemuLine = New DspemuLine With {.Text = line.Trim(vbLf)}
+                    For Each todo In Me.HtmlLineHandler
+                        Call todo(dline)
+                    Next
+                    pline = dline.Text
+                    Me.DspemuPage.Add(dline)
+                ElseIf Me.OutputLayout = Layout.TEXT Then
+                    pline = line.Trim(vbLf)
+                Else
+                End If
                 page &= $"{pline}{vbCrLf}"
-                Me.DspemuPage.Add(dline)
             Next
+            If Me.OutputLayout = Layout.HTML Then
+                For Each todo In Me.HtmlBodyHandler
+                    page = todo(page)
+                Next
+            Else
+                page &= $"{Me.PageSeparater(Me.PageDatas.Count + 1)}"
+            End If
             Me.PageDatas.Add(page)
             Me.DspemuPage = Nothing
         Next
     End Sub
 
-    Private Function CreateDspemuLine(ByVal line As String) As DspemuLine
-        Dim dline As New DspemuLine With {.Text = line}
+    Private Sub ConvertLogDatasToPageDatas()
+        Me.HtmlBodyHandler = Nothing
 
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "OPERATOR CALL $") Then
+        Me.HtmlLineHandler = Nothing
+        Me.HtmlLineHandler.Add(AddressOf WrapP)
+
+        Dim page As String = vbNullString
+        Dim pline As String = vbNullString
+        If Me.OutputLayout = Layout.HTML Then
+            Dim dline As DspemuLine = New DspemuLine With {.Text = Me.LogSeparater}
+            For Each todo In Me.HtmlLineHandler
+                Call todo(dline)
+            Next
+            pline = dline.Text
+        Else
+            pline = Me.LogSeparater
+        End If
+        page &= $"{pline}{vbCrLf}"
+
+        For Each log In Me.TransactionLogs
+            Dim pline2 As String = vbNullString
+            If Me.OutputLayout = Layout.HTML Then
+                Dim dline As DspemuLine = New DspemuLine With {.Text = log}
+                For Each todo In Me.HtmlLineHandler
+                    Call todo(dline)
+                Next
+                pline2 = dline.Text
+            Else
+                pline2 = log
+            End If
+            page &= $"{pline2}{vbCrLf}"
+        Next
+        Me.PageDatas.Add(page)
+    End Sub
+
+    Private _HtmlBodyHandler As List(Of Func(Of String, String))
+    Private Property HtmlBodyHandler As List(Of Func(Of String, String))
+        Get
+            If Me._HtmlBodyHandler Is Nothing Then
+                Me._HtmlBodyHandler = New List(Of Func(Of String, String))
+            End If
+            Return Me._HtmlBodyHandler
+        End Get
+        Set(value As List(Of Func(Of String, String)))
+            Me._HtmlBodyHandler = value
+        End Set
+    End Property
+
+    Private Function WrapPre(ByVal page As String) As String
+        Return $"<pre style='width:600; background:{ConvertStyleStr(Me.HtmlBackground)};'>{page}</pre>"
+    End Function
+    Private Function AddPageP(ByVal page As String) As String
+        Return $"{page}<p style='text-align:right;'>{Me.PageSeparater(Me.PageDatas.Count + 1)}</p>"
+    End Function
+    Private Function WrapDiv(ByVal page As String) As String
+        Return $"<div style='width:fit-content;'>{page}</div>"
+    End Function
+    Private Function AddHr(ByVal page As String) As String
+        Return $"{page}<hr />"
+    End Function
+
+    Private _HtmlLineHandler As List(Of Action(Of DspemuLine))
+    Private Property HtmlLineHandler As List(Of Action(Of DspemuLine))
+        Get
+            If Me._HtmlLineHandler Is Nothing Then
+                Me._HtmlLineHandler = New List(Of Action(Of DspemuLine))
+            End If
+            Return Me._HtmlLineHandler
+        End Get
+        Set(value As List(Of Action(Of DspemuLine)))
+            Me._HtmlLineHandler = value
+        End Set
+    End Property
+
+    Private Sub CreateDspemuLine(ByVal dline As DspemuLine)
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "\* OPERATOR CALL \* $") Then
             dline.LineType = DspemuLineType.EJ_OPERATOR_CALL
             dline.ColorStatus = DspemuLineColorStatus.RED
-            Return dline
+            Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** JOB <EXECUTING> [0-9][0-9]\.[0-9][0-9] *** -^") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^-+ \*\*\* JOB <EXECUTING> [0-9][0-9]\.[0-9][0-9] \*\*\* -+") Then
             dline.LineType = DspemuLineType.EJ_TITLE
             dline.ColorStatus = DspemuLineColorStatus.NORMAL
-            Return dline
+            Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ CLASS     ([A-Z],)*([A-Z])* WAITING OUTPUT") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^CLASS     ([A-Z]\,)*([A-Z])* WAITING OUTPUT") Then
             dline.LineType = DspemuLineType.EJ_WAITING_OUTPUT
             dline.ColorStatus = DspemuLineColorStatus.RED
-            Return dline
+            Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ [EHORD]\*[0-9]{3} [0-9]{2}*") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^[EHORD]\*[0-9]{3} [0-9]{2}  ") Then
             dline.LineType = DspemuLineType.EJ_JOB_HEADER
             dline.ColorStatus = DspemuLineColorStatus.NORMAL
-            dline.JobStatus = Strings.Mid(dline.Text, 2, 1)
-            Return dline
+            dline.JobStatus = Strings.Mid(dline.Text, 1, 1)
+            Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^            T=[0-9][0-9]\.[0-9][0-9],RSIZE=\(") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^          T=[0-9][0-9]\.[0-9][0-9]\,RSIZE=\(") Then
             dline.LineType = DspemuLineType.EJ_JOB_ROW2
             dline.ColorStatus = DspemuLineColorStatus.NORMAL
             dline.JobStatus = Me.DspemuPage.Last.JobStatus
-            Return dline
+            Exit Sub
         End If
         Dim pline As DspemuLine = Me.DspemuPage.Last
         If pline.LineType = DspemuLineType.EJ_JOB_ROW2 And pline.JobStatus = "O" Then
             dline.LineType = DspemuLineType.EJ_RTOW
             dline.ColorStatus = DspemuLineColorStatus.RED
             dline.JobStatus = pline.JobStatus
-            Return dline
+            Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** CONTINUE *** -+") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^-+ \*\*\* CONTINUE \*\*\* -+$") Then
             dline.LineType = DspemuLineType.EJ_CONTINUE
             dline.ColorStatus = DspemuLineColorStatus.RED
-            Return dline
+            Exit Sub
         End If
-        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^ -+ *** END DISPLAY *** -+") Then
+        If Text.RegularExpressions.Regex.IsMatch(dline.Text, "^-+ \*\*\* END DISPLAY \*\*\* -+$") Then
             dline.LineType = DspemuLineType.EJ_END_DISPLAY
             dline.ColorStatus = DspemuLineColorStatus.NORMAL
-            Return dline
+            Exit Sub
         End If
+    End Sub
 
-        Return dline
+    Private Sub WrapSpan(ByVal dline As DspemuLine)
+        Dim hc As String = vbNullString
+        Select Case dline.ColorStatus
+            Case DspemuLineColorStatus.NORMAL
+                hc = ConvertStyleStr(Me.HtmlColor)
+            Case DspemuLineColorStatus.RED
+                hc = ConvertStyleStr(DspemuColor.CX_COLOR_RED)
+            Case Else
+                hc = ConvertStyleStr(Me.HtmlColor)
+        End Select
+        dline.Text = $"<span style='color:{hc};'>{dline.Text}</span>"
+    End Sub
+
+    Private Function ConvertStyleStr(ByVal color As Int32) As String
+        Select Case color
+            Case DspemuColor.CX_COLOR_OMIT : Return "black"
+            Case DspemuColor.CX_COLOR_BLUE : Return "blue"
+            Case DspemuColor.CX_COLOR_RED : Return "red"
+            Case DspemuColor.CX_COLOR_PINK : Return "pink"
+            Case DspemuColor.CX_COLOR_GREEN : Return "green"
+            Case DspemuColor.CX_COLOR_SBLUE : Return "skyblue"
+            Case DspemuColor.CX_COLOR_YELLOW : Return "yellow"
+            Case DspemuColor.CX_COLOR_WHITE : Return "white"
+            Case Else : Return "black"
+        End Select
     End Function
 
-    Private Function CreatePageLine(ByVal dline As DspemuLine) As String
-    End Function
+    Private Sub WrapP(ByVal dline As DspemuLine)
+        dline.Text = $"<p>{dline.Text}</p>"
+    End Sub
+    '---------------------------------------------------------------------------------------------'
 
     Private Sub PrintScreen()
         Try
-            'For Each page In Me.DspemuPage
-            '    For Each line In page
-            '        Call WriteDspemuLine(line.Text)
-            '    Next
-            '    Call WriteDspemuLine(Me.PageSeparater(Me.ScreenDatas.IndexOf(Data) + 1))
-            '    Call WriteDspemuLine($"{vbCrLf}{vbCrLf}{vbCrLf}{vbCrLf}")
-            'Next
-
-            Call WriteDspemuLine(Me.LogSeparater)
-            For Each log In Me.TransactionLogs
-                Call WriteDspemuLine(log)
+            For Each page In Me.PageDatas
+                Call WriteDspemuLine(page)
             Next
         Catch ex As Exception
         Finally
@@ -592,6 +782,16 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Me.LogFileWriter.Dispose()
             Me.LogFileWriter = Nothing
         End Try
+    End Sub
+
+    Private Sub WriteDspemuLine(ByVal txt As String)
+        If Me.OutputMode = OutputType.BOTH Or Me.OutputMode = OutputType.FILE Then
+            Me.OutputFileWriter.WriteLine(txt)
+            Me.LogFileWriter.WriteLine(txt)
+        End If
+        If Me.OutputMode = OutputType.CONSOLE Or Me.OutputMode = OutputType.BOTH Then
+            Console.WriteLine(txt)
+        End If
     End Sub
 
     Private Sub DisposeLogs()
@@ -622,6 +822,8 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
         Me.CloseHandler.Add(AddressOf Close)
 
+        Me.OutputHandler.Add(AddressOf ConvertScreenDatasToPageDatas)
+        Me.OutputHandler.Add(AddressOf ConvertLogDatasToPageDatas)
         Me.OutputHandler.Add(AddressOf PrintScreen)
         Me.OutputHandler.Add(AddressOf DisposeLogs)
 
@@ -704,6 +906,8 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
         Me.CloseHandler.Add(AddressOf Close)
 
+        Me.OutputHandler.Add(AddressOf ConvertScreenDatasToPageDatas)
+        Me.OutputHandler.Add(AddressOf ConvertLogDatasToPageDatas)
         Me.OutputHandler.Add(AddressOf PrintScreen)
         Me.OutputHandler.Add(AddressOf DisposeLogs)
 
@@ -767,6 +971,10 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Console.WriteLine(err)
             b1 = False
         End If
+
+        Me.CurrentHtmlColor = Me.HtmlColor
+        Me.CurrentHtmlBackground = Me.HtmlBackground
+
         Return b1
     End Function
 
