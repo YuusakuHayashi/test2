@@ -252,27 +252,8 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private _CurrentHtmlColor As Int32
-    Private Property CurrentHtmlColor As Int32
-        Get
-            Return Me._CurrentHtmlColor
-        End Get
-        Set(value As Int32)
-            Me._CurrentHtmlColor = value
-        End Set
-    End Property
-
-    Private _CurrentHtmlBackground As Int32
-    Private Property CurrentHtmlBackground As Int32
-        Get
-            Return Me._CurrentHtmlBackground
-        End Get
-        Set(value As Int32)
-            Me._CurrentHtmlBackground = value
-        End Set
-    End Property
-
-    ' Public 設定 --------------------------------------------------------------------------------'
+    ' Public 設定
+    ' --------------------------------------------------------------------------------------------'
     Private _UserName As String
     Public Property UserName As String
         Get
@@ -376,40 +357,47 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private _HtmlColor As Int32
-    Public Property HtmlColor As Int32
+    Private _PageColor As Int32
+    Public Property PageColor As Int32
         Get
-            Return Me._HtmlColor
+            Return Me._PageColor
         End Get
         Set(value As Int32)
-            Me._HtmlColor = value
+            Me._PageColor = value
         End Set
     End Property
 
-    Private _HtmlBackground As Int32
-    Public Property HtmlBackground As Int32
+    Private _PageBackground As Int32
+    Public Property PageBackground As Int32
         Get
-            Return Me._HtmlBackground
+            Return Me._PageBackground
         End Get
         Set(value As Int32)
-            Me._HtmlBackground = value
+            Me._PageBackground = value
+        End Set
+    End Property
+
+    Private _LogColor As Int32
+    Public Property LogColor As Int32
+        Get
+            Return Me._LogColor
+        End Get
+        Set(value As Int32)
+            Me._LogColor = value
+        End Set
+    End Property
+
+    Private _LogBackground As Int32
+    Public Property LogBackground As Int32
+        Get
+            Return Me._LogBackground
+        End Get
+        Set(value As Int32)
+            Me._LogBackground = value
         End Set
     End Property
     '---------------------------------------------------------------------------------------------'
 
-    'Private Delegate Sub DspemuLineCheckDelegater(ByRef dline As DspemuLine)
-    'Private _DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
-    'Private Property DspemuLineCheckHandler As List(Of DspemuLineCheckDelegater)
-    '    Get
-    '        If Me._DspemuLineCheckHandler Is Nothing Then
-    '            Me._DspemuLineCheckHandler = New List(Of DspemuLineCheckDelegater)
-    '        End If
-    '        Return Me._DspemuLineCheckHandler
-    '    End Get
-    '    Set(value As List(Of DspemuLineCheckDelegater))
-    '        Me._DspemuLineCheckHandler = value
-    '    End Set
-    'End Property
 
     Private Delegate Sub DspemuAutomationDelegater(ByRef dspemu As Object)
 
@@ -523,10 +511,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Exit Sub
         End If
     End Sub
-
-    'Private Sub Complete(ByRef dspemu As Object)
-    '    Me.TransactionLogs.Add("DSPEMU操作は正常終了しました")
-    'End Sub
     '---------------------------------------------------------------------------------------------'
 
 
@@ -576,14 +560,14 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
     '---------------------------------------------------------------------------------------------'
     Private Sub ConvertScreenDatasToPageDatas()
         Me.HtmlBodyHandler = Nothing
-        Me.HtmlBodyHandler.Add(AddressOf WrapPre)
+        Me.HtmlBodyHandler.Add(AddressOf WrapPageInPre)
         Me.HtmlBodyHandler.Add(AddressOf AddPageP)
         Me.HtmlBodyHandler.Add(AddressOf WrapDiv)
         Me.HtmlBodyHandler.Add(AddressOf AddHr)
 
         Me.HtmlLineHandler = Nothing
         Me.HtmlLineHandler.Add(AddressOf CreateDspemuLine)
-        Me.HtmlLineHandler.Add(AddressOf WrapSpan)
+        Me.HtmlLineHandler.Add(AddressOf WrapLineInSpan)
 
         For Each screen In Me.ScreenDatas
             Dim page As String = vbNullString
@@ -617,9 +601,11 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
     Private Sub ConvertLogDatasToPageDatas()
         Me.HtmlBodyHandler = Nothing
+        Me.HtmlBodyHandler.Add(AddressOf WrapLogsInPre)
+        Me.HtmlBodyHandler.Add(AddressOf WrapDiv)
 
         Me.HtmlLineHandler = Nothing
-        Me.HtmlLineHandler.Add(AddressOf WrapP)
+        Me.HtmlLineHandler.Add(AddressOf WrapLogInSpan)
 
         Dim page As String = vbNullString
         Dim pline As String = vbNullString
@@ -647,6 +633,11 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             End If
             page &= $"{pline2}{vbCrLf}"
         Next
+        If Me.OutputLayout = Layout.HTML Then
+            For Each todo In Me.HtmlBodyHandler
+                page = todo(page)
+            Next
+        End If
         Me.PageDatas.Add(page)
     End Sub
 
@@ -663,8 +654,11 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private Function WrapPre(ByVal page As String) As String
-        Return $"<pre style='width:600; background:{ConvertStyleStr(Me.HtmlBackground)};'>{page}</pre>"
+    Private Function WrapLogsInPre(ByVal page As String) As String
+        Return $"<pre style='width:600; background:{ConvertStyleStr(Me.LogBackground)};'>{page}</pre>"
+    End Function
+    Private Function WrapPageInPre(ByVal page As String) As String
+        Return $"<pre style='width:600; background:{ConvertStyleStr(Me.PageBackground)};'>{page}</pre>"
     End Function
     Private Function AddPageP(ByVal page As String) As String
         Return $"{page}<p style='text-align:right;'>{Me.PageSeparater(Me.PageDatas.Count + 1)}</p>"
@@ -736,15 +730,27 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End If
     End Sub
 
-    Private Sub WrapSpan(ByVal dline As DspemuLine)
+    Private Sub WrapLineInSpan(ByVal dline As DspemuLine)
         Dim hc As String = vbNullString
         Select Case dline.ColorStatus
             Case DspemuLineColorStatus.NORMAL
-                hc = ConvertStyleStr(Me.HtmlColor)
+                hc = ConvertStyleStr(Me.PageColor)
             Case DspemuLineColorStatus.RED
                 hc = ConvertStyleStr(DspemuColor.CX_COLOR_RED)
             Case Else
-                hc = ConvertStyleStr(Me.HtmlColor)
+                hc = ConvertStyleStr(Me.PageColor)
+        End Select
+        dline.Text = $"<span style='color:{hc};'>{dline.Text}</span>"
+    End Sub
+    Private Sub WrapLogInSpan(ByVal dline As DspemuLine)
+        Dim hc As String = vbNullString
+        Select Case dline.ColorStatus
+            Case DspemuLineColorStatus.NORMAL
+                hc = ConvertStyleStr(Me.LogColor)
+            Case DspemuLineColorStatus.RED
+                hc = ConvertStyleStr(DspemuColor.CX_COLOR_RED)
+            Case Else
+                hc = ConvertStyleStr(Me.LogColor)
         End Select
         dline.Text = $"<span style='color:{hc};'>{dline.Text}</span>"
     End Sub
@@ -762,10 +768,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Case Else : Return "black"
         End Select
     End Function
-
-    Private Sub WrapP(ByVal dline As DspemuLine)
-        dline.Text = $"<p>{dline.Text}</p>"
-    End Sub
     '---------------------------------------------------------------------------------------------'
 
     Private Sub PrintScreen()
@@ -971,9 +973,6 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Console.WriteLine(err)
             b1 = False
         End If
-
-        Me.CurrentHtmlColor = Me.HtmlColor
-        Me.CurrentHtmlBackground = Me.HtmlBackground
 
         Return b1
     End Function
