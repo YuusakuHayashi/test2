@@ -562,7 +562,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         Me.HtmlBodyHandler = Nothing
         Me.HtmlBodyHandler.Add(AddressOf WrapPageInPre)
         Me.HtmlBodyHandler.Add(AddressOf AddPageP)
-        Me.HtmlBodyHandler.Add(AddressOf WrapDiv)
+        Me.HtmlBodyHandler.Add(AddressOf WrapPageInDiv)
         Me.HtmlBodyHandler.Add(AddressOf AddHr)
 
         Me.HtmlLineHandler = Nothing
@@ -601,11 +601,11 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
 
     Private Sub ConvertLogDatasToPageDatas()
         Me.HtmlBodyHandler = Nothing
-        Me.HtmlBodyHandler.Add(AddressOf WrapLogsInPre)
-        Me.HtmlBodyHandler.Add(AddressOf WrapDiv)
+        'Me.HtmlBodyHandler.Add(AddressOf WrapLogsInP)
+        Me.HtmlBodyHandler.Add(AddressOf WrapLogsInDiv)
 
         Me.HtmlLineHandler = Nothing
-        Me.HtmlLineHandler.Add(AddressOf WrapLogInSpan)
+        Me.HtmlLineHandler.Add(AddressOf WrapLogInP)
 
         Dim page As String = vbNullString
         Dim pline As String = vbNullString
@@ -654,17 +654,22 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Set
     End Property
 
-    Private Function WrapLogsInPre(ByVal page As String) As String
-        Return $"<pre style='width:600; background:{ConvertStyleStr(Me.LogBackground)};'>{page}</pre>"
-    End Function
+    'Private Function WrapLogsInP(ByVal page As String) As String
+    '    'Return $"<pre style='width:600; background:{ConvertStyleStr(Me.LogBackground)};'>{page}</pre>"
+    '    Return $"<p style='background:{ConvertStyleStr(Me.LogBackground)};'>{page}</pre>"
+    'End Function
     Private Function WrapPageInPre(ByVal page As String) As String
-        Return $"<pre style='width:600; background:{ConvertStyleStr(Me.PageBackground)};'>{page}</pre>"
+        'Return $"<pre style='width:600; background:{ConvertStyleStr(Me.PageBackground)};'>{page}</pre>"
+        Return $"<pre style='background:{ConvertStyleStr(Me.PageBackground)};'>{page}</pre>"
     End Function
     Private Function AddPageP(ByVal page As String) As String
         Return $"{page}<p style='text-align:right;'>{Me.PageSeparater(Me.PageDatas.Count + 1)}</p>"
     End Function
-    Private Function WrapDiv(ByVal page As String) As String
+    Private Function WrapPageInDiv(ByVal page As String) As String
         Return $"<div style='width:fit-content;'>{page}</div>"
+    End Function
+    Private Function WrapLogsInDiv(ByVal page As String) As String
+        Return $"<div style='background:{ConvertStyleStr(Me.LogBackground)};'>{page}</div>"
     End Function
     Private Function AddHr(ByVal page As String) As String
         Return $"{page}<hr />"
@@ -742,7 +747,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
         End Select
         dline.Text = $"<span style='color:{hc};'>{dline.Text}</span>"
     End Sub
-    Private Sub WrapLogInSpan(ByVal dline As DspemuLine)
+    Private Sub WrapLogInP(ByVal dline As DspemuLine)
         Dim hc As String = vbNullString
         Select Case dline.ColorStatus
             Case DspemuLineColorStatus.NORMAL
@@ -752,7 +757,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Case Else
                 hc = ConvertStyleStr(Me.LogColor)
         End Select
-        dline.Text = $"<span style='color:{hc};'>{dline.Text}</span>"
+        dline.Text = $"<p style='color:{hc};'>{dline.Text}</span>"
     End Sub
 
     Private Function ConvertStyleStr(ByVal color As Int32) As String
@@ -765,6 +770,7 @@ Public Class Rpa11 : Inherits Rpa00.RpaBase(Of Rpa11)
             Case DspemuColor.CX_COLOR_SBLUE : Return "skyblue"
             Case DspemuColor.CX_COLOR_YELLOW : Return "yellow"
             Case DspemuColor.CX_COLOR_WHITE : Return "white"
+            Case 100 : Return "lightgray"
             Case Else : Return "black"
         End Select
     End Function

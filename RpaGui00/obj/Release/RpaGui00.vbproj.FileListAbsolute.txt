@@ -60,3 +60,6 @@ C:\Users\yuusa\project\test2\RpaGui00\obj\Release\RpaGui00.pdb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaCui\releaserobot\RpaGui00.xml
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Release\GreenCalender.g.vb
 \\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Release\GreenCalender.baml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Release\ExplorerTabs\ExplorerTabs.g.vb
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Release\ExplorerTabs\ExplorerTabs.baml
+\\Coral\個人情報-林祐\project\wpf\test2\RpaGui00\obj\Release\resources\RpaSystem.baml

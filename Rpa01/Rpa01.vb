@@ -625,7 +625,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' バックアップへコピー
         Dim creonly = Me.PrintCreatedOnly
-        If Data.Transaction.Parameters.Contains("createdonly") Then
+        If Data.System.CommandData.Parameters.Contains("createdonly") Then
             creonly = True
         Else
             creonly = False
@@ -647,7 +647,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         End If
 
         bookname_1 = vbNullString
-        If Not Data.Transaction.Parameters.Contains("noprint") Then
+        If Not Data.System.CommandData.Parameters.Contains("noprint") Then
             For Each imd In Me.IraishoMeisaiDatas
                 If bookname_1 <> imd.BookName Then
                     [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, imd.BookName, imd.DistinationSheetName})
@@ -705,7 +705,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         sheetname_2 = $"停止{Me.RestartCount.ToString}回目"
         [x] = mutil.InvokeMacro("Rpa01.CreateSofuMeisai", {Me.Tmp2CsvFileName, Me.OutputSMXlsxFileName, sheetname_2, SHIFT_JIS, setting_v1})
 
-        'If Not Data.Transaction.Parameters.Contains("noprint") Then
+        'If Not Data.System.CommandData.Parameters.Contains("noprint") Then
         '    [x] = mutil.InvokeMacro("RpaSystem.PrintOutSheet", {prn, Me.OutputSMXlsxFileName, sheetname_2})
         'End If
         ' Test
@@ -719,7 +719,7 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
         '-----------------------------------------------------------------------------------------'
         Call dat.System.RpaWriteLine("件数集計ファイルを作成中・・・")
         Call CreateSummaryFile(dat)
-        If Not Data.Transaction.Parameters.Contains("noprint") Then
+        If Not Data.System.CommandData.Parameters.Contains("noprint") Then
             Call putil.TextPrintRequest((New FileInfo(Me.OutputKensuuTxtFileName)), SHIFT_JIS)
         End If
         Call dat.System.RpaWriteLine("件数集計ファイル作成完了！")
@@ -728,14 +728,14 @@ Public Class Rpa01 : Inherits Rpa00.RpaBase(Of Rpa01)
 
         ' 終了処理
         '-----------------------------------------------------------------------------------------'
-        If (Data.Transaction.Parameters.Count > 0) And (Data.Transaction.Parameters.Contains("end")) Then
+        If (Data.System.CommandData.Parameters.Count > 0) And (Data.System.CommandData.Parameters.Contains("end")) Then
             Me.RestartCode = vbNullString
             Me.RestartCount = 1
         End If
-        If (Data.Transaction.Parameters.Count > 0) And (Not Data.Transaction.Parameters.Contains("end")) Then
+        If (Data.System.CommandData.Parameters.Count > 0) And (Not Data.System.CommandData.Parameters.Contains("end")) Then
             Me.RestartCount += 1
         End If
-        If (Data.Transaction.Parameters.Count = 0) Then
+        If (Data.System.CommandData.Parameters.Count = 0) Then
             Me.RestartCount += 1
         End If
 
